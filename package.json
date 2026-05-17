@@ -11,7 +11,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:migrate": "mkdir -p data && drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
