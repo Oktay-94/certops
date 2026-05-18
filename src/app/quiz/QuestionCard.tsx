@@ -1,13 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { Question } from "@/db/schema";
 
 type Props = {
   question: Question;
+  nextHref: string;
+  isLast: boolean;
 };
 
-export function QuestionCard({ question }: Props) {
+export function QuestionCard({ question, nextHref, isLast }: Props) {
   const [selected, setSelected] = useState<string[]>([]);
   const [checked, setChecked] = useState(false);
 
@@ -101,18 +104,27 @@ export function QuestionCard({ question }: Props) {
       )}
 
       {checked && (
-        <section className="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 p-6">
-          <header
-            className={`text-sm font-semibold uppercase tracking-wide ${
-              isCorrect ? "text-emerald-700" : "text-rose-700"
-            }`}
+        <>
+          <section className="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 p-6">
+            <header
+              className={`text-sm font-semibold uppercase tracking-wide ${
+                isCorrect ? "text-emerald-700" : "text-rose-700"
+              }`}
+            >
+              {isCorrect ? "Richtig" : "Falsch"}
+            </header>
+            <p className="mt-3 leading-relaxed text-zinc-800">
+              {question.explanation}
+            </p>
+          </section>
+
+          <Link
+            href={nextHref}
+            className="mt-6 inline-block rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800"
           >
-            {isCorrect ? "Richtig" : "Falsch"}
-          </header>
-          <p className="mt-3 leading-relaxed text-zinc-800">
-            {question.explanation}
-          </p>
-        </section>
+            {isLast ? "Quiz beenden" : "Nächste Frage"}
+          </Link>
+        </>
       )}
     </article>
   );
