@@ -1,6 +1,13 @@
 import { and, asc, eq } from "drizzle-orm";
 import type { DB } from "./index";
-import { questions, type NewQuestion, type Question } from "./schema";
+import {
+  questionAttempts,
+  questions,
+  type NewQuestion,
+  type NewQuestionAttempt,
+  type Question,
+  type QuestionAttempt,
+} from "./schema";
 
 export function getQuestionsByCert(
   db: DB,
@@ -17,4 +24,24 @@ export function getQuestionsByCert(
 export function insertQuestion(db: DB, q: NewQuestion): Question {
   const [row] = db.insert(questions).values(q).returning().all();
   return row;
+}
+
+export function insertAttempt(
+  db: DB,
+  attempt: NewQuestionAttempt,
+): QuestionAttempt {
+  const [row] = db.insert(questionAttempts).values(attempt).returning().all();
+  return row;
+}
+
+export function getAttemptsBySession(
+  db: DB,
+  sessionId: string,
+): QuestionAttempt[] {
+  return db
+    .select()
+    .from(questionAttempts)
+    .where(eq(questionAttempts.sessionId, sessionId))
+    .orderBy(asc(questionAttempts.answeredAt))
+    .all();
 }

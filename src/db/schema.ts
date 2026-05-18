@@ -35,3 +35,31 @@ export const questions = sqliteTable(
 
 export type Question = typeof questions.$inferSelect;
 export type NewQuestion = typeof questions.$inferInsert;
+
+export const questionAttempts = sqliteTable(
+  "question_attempts",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "restrict" }),
+
+    selected: text("selected", { mode: "json" }).$type<string[]>().notNull(),
+    correct: integer("correct", { mode: "boolean" }).notNull(),
+
+    sessionId: text("session_id").notNull(),
+    timeTakenMs: integer("time_taken_ms"),
+
+    answeredAt: integer("answered_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (t) => [
+    index("idx_question_attempts_session").on(t.sessionId),
+    index("idx_question_attempts_question").on(t.questionId),
+  ],
+);
+
+export type QuestionAttempt = typeof questionAttempts.$inferSelect;
+export type NewQuestionAttempt = typeof questionAttempts.$inferInsert;

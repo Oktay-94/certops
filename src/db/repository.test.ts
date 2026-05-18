@@ -5,7 +5,12 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import type { DB } from "./index";
 import * as schema from "./schema";
-import { getQuestionsByCert, insertQuestion } from "./repository";
+import {
+  getAttemptsBySession,
+  getQuestionsByCert,
+  insertAttempt,
+  insertQuestion,
+} from "./repository";
 
 function createTestDb(): DB {
   const sqlite = new Database(":memory:");
@@ -79,5 +84,90 @@ describe("repository", () => {
 
   it("returns an empty array when no questions match", () => {
     expect(getQuestionsByCert(db, "CLF-C02")).toEqual([]);
+  });
+});
+
+describe("question_attempts", () => {
+  let db: DB;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("inserts an attempt and returns the persisted row", () => {
+    const q = insertQuestion(db, sampleClf);
+
+    const row = insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "session-1",
+    });
+
+    expect(row.id).toBeGreaterThan(0);
+    expect(row.questionId).toBe(q.id);
+    expect(row.selected).toEqual(["A"]);
+    expect(row.correct).toBe(true);
+    expect(row.sessionId).toBe("session-1");
+    expect(row.timeTakenMs).toBeNull();
+    expect(row.answeredAt).toBeInstanceOf(Date);
+  });
+
+  it("throws on FK violation when question_id does not exist", () => {
+    expect(() =>
+      insertAttempt(db, {
+        questionId: 9999,
+        selected: ["A"],
+        correct: false,
+        sessionId: "session-x",
+      }),
+    ).toThrow();
+  });
+
+  it("getAttemptsBySession returns only attempts for the requested session", () => {
+    const q = insertQuestion(db, sampleClf);
+
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "session-a",
+    });
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["B"],
+      correct: false,
+      sessionId: "session-a",
+    });
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "session-b",
+    });
+
+    const a = getAttemptsBySession(db, "session-a");
+    expect(a).toHaveLength(2);
+    expect(a.every((r) => r.sessionId === "session-a")).toBe(true);
+
+    expect(getAttemptsBySession(db, "session-unknown")).toEqual([]);
+  });
+
+  it("roundtrips multi-select selected JSON array", () => {
+    const q = insertQuestion(db, sampleClf);
+
+    const row = insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A", "C"],
+      correct: false,
+      sessionId: "session-multi",
+      timeTakenMs: 4200,
+    });
+
+    expect(row.selected).toEqual(["A", "C"]);
+    expect(row.timeTakenMs).toBe(4200);
+
+    const [reloaded] = getAttemptsBySession(db, "session-multi");
+    expect(reloaded.selected).toEqual(["A", "C"]);
   });
 });
