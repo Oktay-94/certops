@@ -1,8 +1,13 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { db } from "@/db";
 import { getQuestionsByCert } from "@/db/repository";
+import { seedFromString, shuffle } from "@/lib/shuffle";
 
-export default function QuizPage() {
+const SESSION_COOKIE = "certops_session_id";
+const ROUND_COOKIE = "certops_round_id";
+
+export default async function QuizPage() {
   const questions = getQuestionsByCert(db, "CLF-C02");
 
   if (questions.length === 0) {
@@ -22,5 +27,11 @@ export default function QuizPage() {
     );
   }
 
-  redirect(`/quiz/${questions[0].id}`);
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? "";
+  const roundId = cookieStore.get(ROUND_COOKIE)?.value ?? "";
+  const seed = seedFromString(`${sessionId}:${roundId}`);
+  const ordered = shuffle(questions, seed);
+
+  redirect(`/quiz/${ordered[0].id}`);
 }

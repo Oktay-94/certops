@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import type { QuestionDisplay } from "@/db/schema";
 import { submitAnswer } from "./[id]/actions";
 
@@ -18,6 +19,7 @@ type Verdict = {
 };
 
 export function QuestionCard({ question, nextHref, isLast }: Props) {
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -25,21 +27,25 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
 
   const checked = verdict !== null;
   const selectedSet = new Set(selected);
+  const lastChoiceId = question.choices[question.choices.length - 1]?.id ?? "";
 
-  function toggle(choiceId: string) {
-    if (checked || isPending) return;
-    if (question.type === "single") {
-      setSelected([choiceId]);
-      return;
-    }
-    setSelected((prev) =>
-      prev.includes(choiceId)
-        ? prev.filter((id) => id !== choiceId)
-        : [...prev, choiceId],
-    );
-  }
+  const toggle = useCallback(
+    (choiceId: string) => {
+      if (checked || isPending) return;
+      if (question.type === "single") {
+        setSelected([choiceId]);
+        return;
+      }
+      setSelected((prev) =>
+        prev.includes(choiceId)
+          ? prev.filter((id) => id !== choiceId)
+          : [...prev, choiceId],
+      );
+    },
+    [checked, isPending, question.type],
+  );
 
-  function onSubmit() {
+  const onSubmit = useCallback(() => {
     setError(null);
     startTransition(async () => {
       try {
@@ -56,7 +62,60 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
         setError(err instanceof Error ? err.message : "Unbekannter Fehler");
       }
     });
-  }
+  }, [question.id, selected]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        target?.isContentEditable
+      ) {
+        return;
+      }
+
+      const key = e.key;
+
+      if (!checked) {
+        // Choice-Buchstaben: case-insensitiv gegen choice.id matchen.
+        const match = question.choices.find(
+          (c) => c.id.toLowerCase() === key.toLowerCase(),
+        );
+        if (match) {
+          e.preventDefault();
+          toggle(match.id);
+          return;
+        }
+        if (key === "Enter" && selected.length > 0 && !isPending) {
+          e.preventDefault();
+          onSubmit();
+        }
+        return;
+      }
+
+      // verdict gesetzt → Weiter-Navigation
+      if (key === "Enter" || key === "ArrowRight" || key.toLowerCase() === "n") {
+        e.preventDefault();
+        router.push(nextHref);
+      }
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    question.choices,
+    selected,
+    checked,
+    isPending,
+    nextHref,
+    router,
+    toggle,
+    onSubmit,
+  ]);
 
   function choiceClass(choiceId: string): string {
     const base =
@@ -154,6 +213,12 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
           </Link>
         </>
       )}
+
+      <p className="mt-6 text-xs text-zinc-500">
+        {checked
+          ? "Tasten: Enter · N · → für nächste Frage"
+          : `Tasten: A–${lastChoiceId} wählen · Enter prüfen`}
+      </p>
     </article>
   );
 }
