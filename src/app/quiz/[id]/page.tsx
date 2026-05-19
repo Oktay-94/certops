@@ -42,8 +42,27 @@ export default async function QuizQuestionPage({ params }: Props) {
   const isLast = idx + 1 >= ordered.length;
   const nextHref = isLast ? "/quiz/done" : `/quiz/${ordered[idx + 1].id}`;
 
+  const position = idx + 1;
+  const total = ordered.length;
+  const percent = Math.round((position / total) * 100);
+
   return (
     <main className="max-w-2xl mx-auto px-6 py-12 sm:py-16">
+      <div className="mb-6">
+        <div className="flex items-center justify-between text-xs text-zinc-500">
+          <span>
+            Frage {position} von {total}
+          </span>
+          <span className="tabular-nums">{percent}%</span>
+        </div>
+        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-zinc-100">
+          <div
+            className="h-full bg-zinc-400 transition-all"
+            style={{ width: `${percent}%` }}
+            aria-hidden
+          />
+        </div>
+      </div>
       <QuestionCard question={question} nextHref={nextHref} isLast={isLast} />
     </main>
   );
