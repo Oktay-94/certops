@@ -36,6 +36,11 @@ export const questions = sqliteTable(
 export type Question = typeof questions.$inferSelect;
 export type NewQuestion = typeof questions.$inferInsert;
 
+export type QuestionDisplay = Pick<
+  Question,
+  "id" | "cert" | "domain" | "type" | "prompt" | "choices"
+>;
+
 export const questionAttempts = sqliteTable(
   "question_attempts",
   {

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { db } from "@/db";
 import { getQuestionsByCert } from "@/db/repository";
+import type { QuestionDisplay } from "@/db/schema";
 import { QuestionCard } from "../QuestionCard";
 
 type Props = {
@@ -12,16 +13,20 @@ export default async function QuizQuestionPage({ params }: Props) {
   const id = Number.parseInt(idParam, 10);
   if (!Number.isInteger(id) || id <= 0) notFound();
 
-  // HACK / Phase-1 trade-off:
-  // The full question record — including `correct` and `explanation` —
-  // is handed to the client component. See note in src/app/quiz/page.tsx
-  // (now this page's redirect target). Same trade-off applies here.
-  // Must move grading server-side before multi-user or scored attempts.
   const all = getQuestionsByCert(db, "CLF-C02");
   const idx = all.findIndex((q) => q.id === id);
   if (idx === -1) notFound();
 
-  const question = all[idx];
+  const q = all[idx];
+  const question: QuestionDisplay = {
+    id: q.id,
+    cert: q.cert,
+    domain: q.domain,
+    type: q.type,
+    prompt: q.prompt,
+    choices: q.choices,
+  };
+
   const isLast = idx + 1 >= all.length;
   const nextHref = isLast ? "/quiz/done" : `/quiz/${all[idx + 1].id}`;
 

@@ -1,28 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import type { Question } from "@/db/schema";
+import { useState, useTransition } from "react";
+import type { QuestionDisplay } from "@/db/schema";
+import { submitAnswer } from "./[id]/actions";
 
 type Props = {
-  question: Question;
+  question: QuestionDisplay;
   nextHref: string;
   isLast: boolean;
 };
 
+type Verdict = {
+  correct: boolean;
+  explanation: string;
+  correctIds: Set<string>;
+};
+
 export function QuestionCard({ question, nextHref, isLast }: Props) {
   const [selected, setSelected] = useState<string[]>([]);
-  const [checked, setChecked] = useState(false);
+  const [verdict, setVerdict] = useState<Verdict | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
-  const correctSet = new Set(question.correct);
+  const checked = verdict !== null;
   const selectedSet = new Set(selected);
-  const isCorrect =
-    checked &&
-    selectedSet.size === correctSet.size &&
-    [...selectedSet].every((id) => correctSet.has(id));
 
   function toggle(choiceId: string) {
-    if (checked) return;
+    if (checked || isPending) return;
     if (question.type === "single") {
       setSelected([choiceId]);
       return;
@@ -34,13 +39,31 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
     );
   }
 
+  function onSubmit() {
+    setError(null);
+    startTransition(async () => {
+      try {
+        const res = await submitAnswer({
+          questionId: question.id,
+          selected,
+        });
+        setVerdict({
+          correct: res.correct,
+          explanation: res.explanation,
+          correctIds: new Set(res.correctIds),
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unbekannter Fehler");
+      }
+    });
+  }
+
   function choiceClass(choiceId: string): string {
     const base =
       "w-full text-left border rounded-xl px-5 py-4 transition flex items-start gap-3";
     const isSelected = selectedSet.has(choiceId);
-    const isAnswer = correctSet.has(choiceId);
 
-    if (!checked) {
+    if (!verdict) {
       return `${base} ${
         isSelected
           ? "border-zinc-900 bg-zinc-50"
@@ -48,6 +71,7 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
       }`;
     }
 
+    const isAnswer = verdict.correctIds.has(choiceId);
     if (isAnswer && isSelected) {
       return `${base} border-emerald-600 bg-emerald-50`;
     }
@@ -82,7 +106,7 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
             key={choice.id}
             type="button"
             onClick={() => toggle(choice.id)}
-            disabled={checked}
+            disabled={checked || isPending}
             aria-pressed={selectedSet.has(choice.id)}
             className={choiceClass(choice.id)}
           >
@@ -95,26 +119,30 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
       {!checked && (
         <button
           type="button"
-          onClick={() => setChecked(true)}
-          disabled={selected.length === 0}
+          onClick={onSubmit}
+          disabled={selected.length === 0 || isPending}
           className="mt-8 rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
         >
-          Antwort prüfen
+          {isPending ? "Prüfe …" : "Antwort prüfen"}
         </button>
       )}
 
-      {checked && (
+      {error && (
+        <p className="mt-4 text-sm text-rose-700">Fehler: {error}</p>
+      )}
+
+      {verdict && (
         <>
           <section className="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 p-6">
             <header
               className={`text-sm font-semibold uppercase tracking-wide ${
-                isCorrect ? "text-emerald-700" : "text-rose-700"
+                verdict.correct ? "text-emerald-700" : "text-rose-700"
               }`}
             >
-              {isCorrect ? "Richtig" : "Falsch"}
+              {verdict.correct ? "Richtig" : "Falsch"}
             </header>
             <p className="mt-3 leading-relaxed text-zinc-800">
-              {question.explanation}
+              {verdict.explanation}
             </p>
           </section>
 
