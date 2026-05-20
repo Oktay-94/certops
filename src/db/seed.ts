@@ -28,24 +28,6 @@ const clfC02Questions: NewQuestion[] = [
   {
     cert: "CLF-C02",
     domain: "Security and Compliance",
-    type: "single",
-    prompt:
-      "Im AWS Shared Responsibility Model — für welche der folgenden Aufgaben ist AUSSCHLIESSLICH AWS verantwortlich?",
-    choices: [
-      { id: "A", text: "Patchen des Gast-Betriebssystems auf einer EC2-Instanz" },
-      { id: "B", text: "Konfiguration der Security Groups einer EC2-Instanz" },
-      { id: "C", text: "Physische Sicherheit der AWS-Rechenzentren" },
-      { id: "D", text: "Verschlüsselung von Daten in einem S3-Bucket" },
-    ],
-    correct: ["C"],
-    explanation:
-      "AWS ist für 'Security OF the Cloud' verantwortlich — dazu gehört die physische Sicherheit der Rechenzentren, Hardware und das Host-OS des Hypervisors. Gast-OS-Patches, Security Groups und Datenverschlüsselung sind Kundenaufgaben ('Security IN the Cloud').",
-    difficulty: 2,
-    sourceRef: "AWS Exam Guide CLF-C02, Domain 2.1",
-  },
-  {
-    cert: "CLF-C02",
-    domain: "Security and Compliance",
     type: "multiple",
     prompt:
       "Welche zwei Maßnahmen entsprechen den AWS-IAM-Best-Practices für den Root-User eines AWS-Accounts? (Wähle ZWEI.)",
@@ -54,10 +36,11 @@ const clfC02Questions: NewQuestion[] = [
       { id: "B", text: "Access Keys für den Root-User erstellen und in der CI-Pipeline verwenden" },
       { id: "C", text: "Den Root-User für tägliche Verwaltungsaufgaben nutzen" },
       { id: "D", text: "Den Root-User nur für Aufgaben verwenden, die ihn zwingend erfordern" },
+      { id: "E", text: "Den Root-User per IP-Whitelist absichern und ohne MFA arbeiten" },
     ],
     correct: ["A", "D"],
     explanation:
-      "Best Practice: MFA aktivieren (A) und den Root-User nur für die wenigen Aufgaben nutzen, die ihn explizit verlangen (D), z. B. Account-Schließung oder Support-Plan-Wechsel. Access Keys für Root sollen NICHT existieren, und tägliche Arbeit erfolgt über IAM-User/Roles.",
+      "Best Practice: MFA aktivieren (A) und den Root-User nur für die wenigen Aufgaben nutzen, die ihn explizit verlangen (D), z. B. Account-Schließung oder Support-Plan-Wechsel. Access Keys für Root sollen NICHT existieren, und tägliche Arbeit erfolgt über IAM-User/Roles. E ist falsch: eine IP-Whitelist ersetzt MFA nicht — AWS empfiehlt explizit MFA für den Root-User, da eine Netzwerk-Einschränkung allein keinen Schutz gegen kompromittierte Credentials (Phishing, Leak) bietet.",
     difficulty: 2,
     sourceRef: "AWS Exam Guide CLF-C02, Domain 2.2",
   },
@@ -437,7 +420,7 @@ const clfC02Questions: NewQuestion[] = [
   // ── Cloud Technology and Services (+10) ──
   {
     cert: "CLF-C02",
-    domain: "Cloud Technology and Services",
+    domain: "Billing, Pricing, and Support",
     type: "single",
     prompt:
       "Ein Unternehmen betreibt eine Batch-Verarbeitungs-Workload, die fehlertolerant ist und jederzeit unterbrochen werden kann. Die Workload muss möglichst kostengünstig auf EC2 laufen. Welche Kauf-Option (Purchasing Option) ist am besten geeignet?",
@@ -626,7 +609,7 @@ const clfC02Questions: NewQuestion[] = [
   },
   {
     cert: "CLF-C02",
-    domain: "Cloud Technology and Services",
+    domain: "Cloud Concepts",
     type: "single",
     prompt:
       "Ein Unternehmen muss 100 TB Daten aus einem On-Premises-Rechenzentrum in AWS migrieren. Die verfügbare Internet-Bandbreite ist begrenzt (ca. 100 Mbps), und der Transfer über das Internet würde Wochen dauern. Welche AWS-Lösung ist am besten geeignet?",
