@@ -746,6 +746,616 @@ const clfC02Questions: NewQuestion[] = [
     difficulty: 2,
     sourceRef: "AWS Pricing Calculator",
   },
+
+  // ╔════════════════════════════════════════════╗
+  // ║ K2 — +30 questions (35 → 64)                ║
+  // ╚════════════════════════════════════════════╝
+
+  // ── K2 — Cloud Concepts (+11) ──
+
+  // 1.1 Benefits — HA vs Elasticity
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Eine E-Commerce-Anwendung muss bei Black-Friday-Lastspitzen automatisch mehr EC2-Instanzen starten und nach den Spitzen wieder abbauen. Welcher Cloud-Vorteil beschreibt diese Fähigkeit am besten?",
+    choices: [
+      { id: "A", text: "High Availability" },
+      { id: "B", text: "Elasticity" },
+      { id: "C", text: "Durability" },
+      { id: "D", text: "Fault Tolerance" },
+    ],
+    correct: ["B"],
+    explanation:
+      "Elasticity beschreibt das dynamische Hoch- und Herunterskalieren von Ressourcen nach Bedarf — exakt das Black-Friday-Szenario. High Availability zielt auf Uptime/Verfügbarkeit (mehrere AZs), nicht auf Skalierung. Durability bezieht sich auf Datenerhalt (z. B. S3 mit 11 Neunen). Fault Tolerance ist die Fähigkeit, trotz Komponentenausfall weiterzuarbeiten — auch nicht das Kernthema beim Skalieren.",
+    difficulty: 1,
+    sourceRef: "AWS Whitepaper 'Overview of Amazon Web Services' — Six Advantages of Cloud Computing",
+  },
+
+  // 1.2 Well-Architected — Operational Excellence
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Eine Säule des AWS Well-Architected Framework konzentriert sich darauf, Workloads effizient zu betreiben, Operations als Code zu behandeln und Anpassungen häufig und in kleinen, reversiblen Schritten vorzunehmen. Um welche Säule handelt es sich?",
+    choices: [
+      { id: "A", text: "Reliability" },
+      { id: "B", text: "Performance Efficiency" },
+      { id: "C", text: "Operational Excellence" },
+      { id: "D", text: "Cost Optimization" },
+    ],
+    correct: ["C"],
+    explanation:
+      "Operational Excellence umfasst Design-Prinzipien wie 'Perform operations as code' (Infrastructure as Code), 'Make frequent, small, reversible changes', 'Refine operations procedures frequently', 'Anticipate failure' und 'Learn from operational events'. Reliability fokussiert auf Wiederherstellung nach Ausfällen, Performance Efficiency auf optimale Ressourcennutzung, Cost Optimization auf Kostenvermeidung — alle wichtig, aber das Operations-as-Code-Prinzip ist Operational Excellence.",
+    difficulty: 2,
+    sourceRef: "AWS Well-Architected Framework — Operational Excellence Pillar",
+  },
+
+  // 1.2 Well-Architected — Sustainability
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Welche Säule des AWS Well-Architected Framework wurde 2021 als sechste Säule hinzugefügt und behandelt die Minimierung der Umweltauswirkungen beim Betrieb von Cloud-Workloads?",
+    choices: [
+      { id: "A", text: "Performance Efficiency" },
+      { id: "B", text: "Sustainability" },
+      { id: "C", text: "Cost Optimization" },
+      { id: "D", text: "Reliability" },
+    ],
+    correct: ["B"],
+    explanation:
+      "Sustainability ist die jüngste Säule (re:Invent 2021). Sie zielt auf die Reduktion der Umweltauswirkungen — durch Auswahl effizienter Regionen (Carbon-Footprint pro Region), Rightsizing, Nutzung serverless/managed Services (höhere Auslastung der AWS-Hardware), Reduktion ungenutzter Ressourcen. Die anderen fünf Säulen: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization — alle älter.",
+    difficulty: 1,
+    sourceRef: "AWS Well-Architected Framework — Sustainability Pillar (added 2021)",
+  },
+
+  // 1.2 Well-Architected — Multi: 2 Säulen für Szenario
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "multiple",
+    prompt:
+      "Ein Unternehmen plant eine Workload, die durch Auto-Scaling über mehrere Availability Zones läuft, mit täglichen Backups und automatisierter Wiederherstellung nach Ausfällen. Welche zwei Säulen des Well-Architected Framework adressieren diese Anforderungen am DIREKTESTEN? (Wähle 2 Antworten)",
+    choices: [
+      { id: "A", text: "Reliability" },
+      { id: "B", text: "Cost Optimization" },
+      { id: "C", text: "Performance Efficiency" },
+      { id: "D", text: "Sustainability" },
+      { id: "E", text: "Operational Excellence" },
+    ],
+    correct: ["A", "E"],
+    explanation:
+      "Reliability adressiert Wiederherstellbarkeit nach Ausfällen, Multi-AZ-Verteilung, Backup/Restore, automatisches Recovery. Operational Excellence deckt die Automatisierung von Backups und Recovery-Prozessen als Code ab. Cost Optimization, Performance Efficiency und Sustainability sind nicht die Hauptthemen dieses Szenarios. Hinweis: jede Architektur berührt mehrere Säulen — hier sind Reliability und Operational Excellence die DIREKTESTEN.",
+    difficulty: 2,
+    sourceRef: "AWS Well-Architected Framework — Reliability and Operational Excellence Pillars",
+  },
+
+  // 1.3 Migration — AWS CAF Perspectives
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Das AWS Cloud Adoption Framework (AWS CAF) gruppiert seine Fähigkeiten in mehrere 'Perspectives', die jeweils unterschiedliche Stakeholder-Gruppen ansprechen. Welche der folgenden Listen entspricht den OFFIZIELLEN sechs CAF-Perspectives?",
+    choices: [
+      { id: "A", text: "Strategy, Innovation, Operations, Security, Compliance, Finance" },
+      { id: "B", text: "Business, People, Governance, Platform, Security, Operations" },
+      { id: "C", text: "Plan, Build, Run, Secure, Optimize, Migrate" },
+      { id: "D", text: "Compute, Storage, Network, Database, Security, Analytics" },
+    ],
+    correct: ["B"],
+    explanation:
+      "Die sechs CAF-Perspectives sind: Business (Strategie/Outcomes), People (Kultur/Skills), Governance (Risiko/Compliance), Platform (Architektur/Engineering), Security (Sicherheits-Capabilities) und Operations (Service Delivery). CAF läuft in vier Phasen (Envision, Align, Launch, Scale) und deckt 47 Capabilities über die 6 Perspectives ab. Die anderen Optionen sind erfunden oder mischen Konzepte mit anderen Frameworks.",
+    difficulty: 2,
+    sourceRef: "AWS Cloud Adoption Framework Documentation",
+  },
+
+  // 1.3 Migration — Refactor vs Replatform
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Ein Unternehmen möchte eine bestehende, monolithische On-Premises-Anwendung in eine cloud-native Microservices-Architektur umbauen, die serverless auf AWS Lambda und Amazon DynamoDB läuft. Welche der 7-Rs-Migrations-Strategien beschreibt diesen Ansatz am besten?",
+    choices: [
+      { id: "A", text: "Rehost (Lift-and-Shift)" },
+      { id: "B", text: "Replatform (Lift-and-Reshape)" },
+      { id: "C", text: "Refactor (Re-Architect)" },
+      { id: "D", text: "Repurchase" },
+    ],
+    correct: ["C"],
+    explanation:
+      "Refactor (auch 'Re-Architect') bedeutet, eine Anwendung grundlegend cloud-native umzubauen — z. B. Monolith → Microservices, EC2 → Lambda, SQL → DynamoDB. Höchster Aufwand, höchster langfristiger Nutzen. Rehost = ohne Code-Änderungen verschieben (EC2). Replatform = kleinere Optimierungen (z. B. MySQL → RDS), aber kein Architektur-Umbau. Repurchase = Wechsel zu SaaS (z. B. Salesforce statt eigenem CRM).",
+    difficulty: 2,
+    sourceRef: "AWS Migration Strategies — 7 Rs Framework",
+  },
+
+  // 1.4 Economics — Fixed vs Variable Cost
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Welche Aussage beschreibt am besten, warum AWS Cloud-Nutzung typischerweise als 'Variable Expense' (variable Kosten) und nicht als 'Capital Expense' (Investitionsausgabe) eingeordnet wird?",
+    choices: [
+      { id: "A", text: "Weil AWS-Rechnungen jeden Monat denselben Festbetrag aufweisen." },
+      { id: "B", text: "Weil Kunden für die tatsächliche Nutzung zahlen und keine Hardware vorab kaufen müssen." },
+      { id: "C", text: "Weil AWS-Services nur dann verfügbar sind, wenn der Kunde monatlich einen Pauschalbetrag zahlt." },
+      { id: "D", text: "Weil Kunden physische Hardware in einem AWS-Rechenzentrum besitzen, aber gemeinsam nutzen." },
+    ],
+    correct: ["B"],
+    explanation:
+      "Cloud-Nutzung ist Variable Expense (OpEx), weil Kunden nur für tatsächlich verbrauchte Ressourcen zahlen — keine Vorab-Investition in Server, Rechenzentren, Klimatisierung. Variable Kosten skalieren mit der Nutzung. CapEx bedeutet großen Vorab-Kauf physischer Assets, die über mehrere Jahre abgeschrieben werden — das klassische Modell von On-Premises. AWS dreht das um: kein Vorab-Kauf, granulare Abrechnung, sofortige Anpassung an Bedarf.",
+    difficulty: 1,
+    sourceRef: "AWS Whitepaper 'Overview of Amazon Web Services' — Six Advantages of Cloud Computing",
+  },
+
+  // 1.4 Economics — BYOL
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Ein Unternehmen besitzt bereits gültige Windows-Server-Lizenzen mit Software Assurance und möchte diese auf EC2-Dedicated-Hosts weiterverwenden, anstatt erneut für die Lizenzierung über AWS zu zahlen. Welches Lizenzmodell ermöglicht das?",
+    choices: [
+      { id: "A", text: "License Included" },
+      { id: "B", text: "Bring Your Own License (BYOL)" },
+      { id: "C", text: "AWS License Manager Free Tier" },
+      { id: "D", text: "Reserved Instance Discount" },
+    ],
+    correct: ["B"],
+    explanation:
+      "BYOL erlaubt es, vorhandene Lizenzen (z. B. Windows Server, SQL Server, Oracle) auf AWS weiterzuverwenden — typisch auf Dedicated Hosts wegen Hardware-Affinität. 'License Included' = AWS legt die Lizenzkosten auf den Stundenpreis um (kein vorhandener Vertrag nötig, aber teurer). AWS License Manager hilft beim Tracken, ist aber kein Lizenzmodell selbst. Reserved Instance Discount betrifft Compute-Kapazität, nicht Software-Lizenzen.",
+    difficulty: 2,
+    sourceRef: "AWS License Manager / BYOL Documentation",
+  },
+
+  // 1.4 Economics — Rightsizing
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Was bedeutet der Begriff 'Rightsizing' im Kontext von AWS Cloud-Ökonomie?",
+    choices: [
+      { id: "A", text: "Den höchsten verfügbaren EC2-Instanz-Typ wählen, um maximale Performance sicherzustellen." },
+      { id: "B", text: "EC2-Instanzen automatisch nach Last hoch- und herunterskalieren." },
+      { id: "C", text: "Den am besten passenden Instanz-Typ und die optimale Größe für eine Workload auswählen, basierend auf tatsächlicher CPU-, RAM- und Netzwerk-Nutzung." },
+      { id: "D", text: "Alle EC2-Instanzen in derselben Region zentralisieren, um Kosten zu sparen." },
+    ],
+    correct: ["C"],
+    explanation:
+      "Rightsizing bedeutet, jede Workload mit dem am besten passenden Instance-Typ (compute-/memory-/storage-optimiert) und der minimal nötigen Größe zu betreiben — basierend auf gemessener Auslastung. Über-provisionierte Instanzen sind die häufigste Quelle vermeidbarer Cloud-Kosten. AWS Compute Optimizer und Cost Explorer geben Rightsizing-Empfehlungen. Größtmöglich wählen (A) verschwendet Geld. Auto-Skalieren (B) ist Elasticity. Zentralisieren in einer Region (D) ist keine etablierte Rightsizing-Strategie.",
+    difficulty: 2,
+    sourceRef: "AWS Cost Optimization Pillar / AWS Compute Optimizer",
+  },
+
+  // 1.4 Economics — CloudFormation Automation Benefit
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Welcher Vorteil von AWS CloudFormation trägt direkt zur Kostenkontrolle und Wirtschaftlichkeit von Cloud-Workloads bei?",
+    choices: [
+      { id: "A", text: "CloudFormation gibt automatisch Volumenrabatte auf alle erstellten Ressourcen." },
+      { id: "B", text: "CloudFormation ermöglicht reproduzierbares, automatisiertes Provisioning, wodurch manuelle Fehler und 'vergessene' (weiterlaufende, ungenutzte) Ressourcen reduziert werden." },
+      { id: "C", text: "CloudFormation ist günstiger als die AWS Management Console und reduziert dadurch die Service-Kosten." },
+      { id: "D", text: "CloudFormation ersetzt EC2 durch Lambda-Funktionen, was immer kostengünstiger ist." },
+    ],
+    correct: ["B"],
+    explanation:
+      "CloudFormation (Infrastructure as Code) macht Provisioning reproduzierbar, versionierbar und automatisierbar. Vorteile für die Wirtschaftlichkeit: weniger manuelle Fehler, einheitliche Umgebungen (Dev/Stage/Prod), einfaches Aufräumen ungenutzter Ressourcen via 'delete-stack', kein 'Cost-Drift' durch handgeklickte Test-Ressourcen. CloudFormation selbst ist kostenlos — Kosten entstehen nur durch die provisionierten Ressourcen. Volumenrabatte (A) sind kein CloudFormation-Feature. Console vs IaC (C) hat keinen Preisunterschied. EC2 → Lambda (D) ist eine Architektur-Entscheidung, kein CloudFormation-Feature.",
+    difficulty: 2,
+    sourceRef: "AWS CloudFormation Documentation",
+  },
+
+  // 3.2 Global Infra — Multi-Region DR (DB-getaggt als Cloud Concepts, konsistent mit Whizlabs-Konvention)
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Concepts",
+    type: "single",
+    prompt:
+      "Ein Unternehmen möchte sicherstellen, dass eine kritische Webanwendung auch dann erreichbar bleibt, wenn eine GANZE AWS-Region (z. B. eu-central-1) komplett ausfällt. Welche Architektur erfüllt diese Anforderung?",
+    choices: [
+      { id: "A", text: "Deployment in mehreren Availability Zones derselben Region" },
+      { id: "B", text: "Deployment in mehreren AWS-Regionen mit Route 53 Failover-Routing" },
+      { id: "C", text: "Mehrere EC2-Instanzen in derselben Availability Zone" },
+      { id: "D", text: "Tägliche Snapshots der EBS-Volumes" },
+    ],
+    correct: ["B"],
+    explanation:
+      "Multi-Region-Deployments schützen gegen vollständige Region-Outages — z. B. Stack in eu-central-1 + Standby in eu-west-1, Route 53 Failover-Routing wechselt automatisch. Multi-AZ (A) schützt gegen AZ-Ausfälle innerhalb einer Region, aber NICHT gegen Region-weite Ausfälle. Mehrere Instanzen in einer AZ (C) ist die schwächste Variante — Single Point of Failure. Snapshots (D) ermöglichen Recovery, aber nicht laufende HA über Region-Grenzen. Hinweis: Multi-Region ist teurer und komplexer (Datenreplikation, Cross-Region-Traffic-Kosten) — wird nur für sehr kritische Workloads gemacht.",
+    difficulty: 2,
+    sourceRef: "AWS Disaster Recovery Documentation / Amazon Route 53",
+  },
+
+  // ── K2 — Security and Compliance (+9) ──
+
+  // 2.1 Shared Responsibility — RDS Customer Side
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "single",
+    prompt:
+      "Ein Unternehmen betreibt eine Anwendung mit Amazon RDS (Managed Database Service). Welche der folgenden Aufgaben fällt unter die Verantwortung des KUNDEN im Shared Responsibility Model?",
+    choices: [
+      { id: "A", text: "Patches des Betriebssystems der zugrunde liegenden Datenbank-Host-Server installieren" },
+      { id: "B", text: "Hardware-Wartung der physischen Server, auf denen RDS läuft" },
+      { id: "C", text: "Konfiguration von Datenbank-Benutzern, Tabellen-Berechtigungen und IAM-Zugriffsrichtlinien" },
+      { id: "D", text: "Patchen der RDS-Datenbank-Engine (z. B. PostgreSQL-Minor-Version-Updates)" },
+    ],
+    correct: ["C"],
+    explanation:
+      "Bei Managed Services wie RDS verschiebt sich die Verantwortungsgrenze: AWS übernimmt OS, Hardware, Hypervisor, Patches der DB-Engine, automatische Backups und Multi-AZ-Failover. Der Kunde verantwortet das, was 'in' der Datenbank passiert: DB-Schema, User/Rollen innerhalb der DB, Tabellen-Berechtigungen, IAM-Policies für RDS-API-Zugriff, Wahl der Verschlüsselungsoptionen, Backup-Aufbewahrungsdauer. Merksatz: AWS = Engine läuft, Kunde = Daten + Zugriff.",
+    difficulty: 2,
+    sourceRef: "AWS Shared Responsibility Model — Managed Services",
+  },
+
+  // 2.1 Shared Responsibility — Lambda Customer Side
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "single",
+    prompt:
+      "Für welche Aufgabe ist der KUNDE verantwortlich, wenn er eine Anwendung auf AWS Lambda betreibt?",
+    choices: [
+      { id: "A", text: "Patchen des Linux-Kernels der Server, auf denen die Lambda-Runtime läuft" },
+      { id: "B", text: "Skalieren der Lambda-Infrastruktur auf tausende parallele Ausführungen" },
+      { id: "C", text: "Sicherheit des eigenen Function-Codes und Konfiguration der IAM-Execution-Role" },
+      { id: "D", text: "Wartung und Update der zugrunde liegenden Hypervisor-Software" },
+    ],
+    correct: ["C"],
+    explanation:
+      "Lambda ist Serverless: AWS übernimmt Server, OS, Runtime-Patches, Hypervisor, automatisches Skalieren, HA. Der Kunde verantwortet ausschließlich den Function-Code (inkl. Logik-Sicherheit, Dependency-Updates der eigenen Libraries) und die IAM-Execution-Role (welche AWS-Ressourcen die Funktion zugreifen darf). Lambda hat die schmalste Kunden-Verantwortung aller Compute-Services — deshalb auch der schnellste Sicherheits-Gewinn bei Migration von EC2 zu Lambda.",
+    difficulty: 2,
+    sourceRef: "AWS Lambda Security / Shared Responsibility Model",
+  },
+
+  // 2.1 Shared Responsibility — S3 Bucket Misconfiguration
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "single",
+    prompt:
+      "Ein Entwickler lädt Kundendaten in einen Amazon-S3-Bucket. Wer ist im Shared Responsibility Model dafür verantwortlich, dass dieser Bucket nicht versehentlich öffentlich zugänglich wird?",
+    choices: [
+      { id: "A", text: "AWS — durch automatische Schutzmechanismen auf allen Buckets" },
+      { id: "B", text: "AWS und Kunde gemeinsam — beide müssen explizit zustimmen, einen Bucket öffentlich zu machen" },
+      { id: "C", text: "Der Kunde — durch korrekte Bucket-Policies, IAM, ACLs und 'Block Public Access'-Einstellungen" },
+      { id: "D", text: "AWS Support — der nach jeder Bucket-Erstellung eine manuelle Sicherheits-Prüfung durchführt" },
+    ],
+    correct: ["C"],
+    explanation:
+      "S3-Buckets sind seit 2023 standardmäßig nicht-öffentlich (Block Public Access on by default), aber der Kunde bleibt verantwortlich für die korrekte Konfiguration: Bucket-Policies, IAM-Policies, Verschlüsselung, Replikation. AWS sichert die Infrastruktur ('Security OF the Cloud') und stellt Sicherheitsfunktionen bereit — aber der Kunde muss sie aktivieren und korrekt konfigurieren ('Security IN the Cloud'). Öffentliche S3-Buckets bleiben eine der häufigsten Ursachen für Daten-Leaks.",
+    difficulty: 2,
+    sourceRef: "Amazon S3 Security Best Practices / AWS Shared Responsibility Model",
+  },
+
+  // 2.1 Shared Responsibility — Multi: 2 AWS-Verantwortungen bei RDS
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "multiple",
+    prompt:
+      "Welche ZWEI der folgenden Aufgaben gehören bei der Verwendung von Amazon RDS in die Verantwortung von AWS? (Wähle 2 Antworten)",
+    choices: [
+      { id: "A", text: "Patches der zugrunde liegenden Datenbank-Engine bereitstellen" },
+      { id: "B", text: "Verschlüsselung der gespeicherten Daten aktivieren" },
+      { id: "C", text: "IAM-Berechtigungen für die RDS-API steuern" },
+      { id: "D", text: "Physische Sicherheit der Rechenzentren gewährleisten" },
+      { id: "E", text: "Schema-Design der Tabellen festlegen" },
+    ],
+    correct: ["A", "D"],
+    explanation:
+      "AWS verantwortet bei RDS: physische Sicherheit der DCs (D), OS- und Hypervisor-Patches, DB-Engine-Patches und Minor-Version-Upgrades (A), Hardware-Wartung, Netzwerk-Infrastruktur. Der Kunde verantwortet: Verschlüsselungs-Konfiguration aktivieren (B — AWS stellt die Funktion bereit, Kunde muss sie einschalten), IAM-Policies und DB-Zugriffskontrolle (C), Schema-Design und Daten-Modell (E), Wahl der Engine und Instance-Größe, Backup-Strategie. AWS macht die Engine sicher; was IN der DB passiert, ist Kundensache.",
+    difficulty: 2,
+    sourceRef: "AWS Shared Responsibility Model — Amazon RDS",
+  },
+
+  // 2.2 Security/Governance — CloudTrail vs Config
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "single",
+    prompt:
+      "Ein Compliance-Auditor benötigt ein lückenloses Audit-Log darüber, WER WANN WELCHE API-Aktion in einem AWS-Konto durchgeführt hat (z. B. 'User Alice hat um 14:32 Uhr den S3-Bucket xyz gelöscht'). Welcher AWS-Service ist dafür die richtige Wahl?",
+    choices: [
+      { id: "A", text: "Amazon CloudWatch" },
+      { id: "B", text: "AWS CloudTrail" },
+      { id: "C", text: "AWS Config" },
+      { id: "D", text: "AWS Trusted Advisor" },
+    ],
+    correct: ["B"],
+    explanation:
+      "AWS CloudTrail loggt API-Aktivität: Wer (Identity), Wann (Timestamp), Was (API Action), Wovon (Source IP), Worauf (Resource). Standardmäßig 90 Tage Event History; für längere Aufbewahrung Trail in S3 anlegen. CloudWatch = Metriken, Logs, Alarms (Performance/Operations, nicht Audit-Aktivität pro User). AWS Config = Tracking von Konfigurationsänderungen an Ressourcen (z. B. 'wurde Security Group X jemals modifiziert?'), nicht primär API-Aktor. Trusted Advisor = Best-Practice-Empfehlungen. Merksatz: CloudTrail = WHO did WHAT, Config = WHAT changed HOW.",
+    difficulty: 2,
+    sourceRef: "AWS CloudTrail Documentation",
+  },
+
+  // 2.4 Security Components — WAF Use Case
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "single",
+    prompt:
+      "Eine Webanwendung läuft hinter einem Application Load Balancer und soll vor häufigen Web-Angriffen wie SQL Injection, Cross-Site Scripting (XSS) und bekannten Bot-Mustern geschützt werden. Welcher AWS-Service erfüllt diese Aufgabe?",
+    choices: [
+      { id: "A", text: "AWS Shield Standard" },
+      { id: "B", text: "AWS Web Application Firewall (WAF)" },
+      { id: "C", text: "Amazon GuardDuty" },
+      { id: "D", text: "Amazon Inspector" },
+    ],
+    correct: ["B"],
+    explanation:
+      "AWS WAF ist die Web Application Firewall für Layer-7-Schutz: SQL Injection, XSS, Bad Bots, Rate Limiting, Geo-Blocking. Wird vor CloudFront, ALB, API Gateway oder AppSync geschaltet. Verwendet AWS Managed Rules (z. B. OWASP Top 10) oder eigene Rules. Shield Standard = automatisch aktiv, DDoS-Schutz auf Layer 3/4 (Netzwerk), nicht Layer 7. GuardDuty = Threat Detection via Logs (CloudTrail/VPC Flow/DNS), nicht inline Web-Filtering. Inspector = Vulnerability Scanner für EC2/ECR/Lambda, kein Traffic-Filter.",
+    difficulty: 2,
+    sourceRef: "AWS WAF Documentation",
+  },
+
+  // 2.4 Security Components — Shield Standard vs Advanced
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "single",
+    prompt: "Welche Aussage über AWS Shield ist KORREKT?",
+    choices: [
+      { id: "A", text: "Shield Standard ist kostenpflichtig, Shield Advanced ist kostenlos für alle AWS-Kunden." },
+      { id: "B", text: "Shield Standard ist automatisch und kostenlos für alle AWS-Kunden aktiv; Shield Advanced ist eine kostenpflichtige Erweiterung mit Zugang zum AWS DDoS Response Team." },
+      { id: "C", text: "AWS Shield ist ein Schwachstellen-Scanner für EC2-Instanzen." },
+      { id: "D", text: "AWS Shield ersetzt vollständig die Notwendigkeit für AWS WAF." },
+    ],
+    correct: ["B"],
+    explanation:
+      "Shield Standard ist immer aktiv und kostenlos — schützt gegen häufige Netzwerk- und Transport-Layer-DDoS-Angriffe (Layer 3/4). Shield Advanced kostet ~3.000 USD/Monat pro Organisation und bietet zusätzlich: erweiterten Schutz auch auf Layer 7, 24/7-Zugang zum AWS DDoS Response Team (DRT), Cost Protection (Abrechnung skalierter Ressourcen während Angriff), Echtzeit-Metriken. Shield schützt vor DDoS; WAF filtert Web-Angriffe wie SQL Injection — die beiden ergänzen sich, ersetzen sich nicht.",
+    difficulty: 2,
+    sourceRef: "AWS Shield Documentation",
+  },
+
+  // 2.4 Security Components — Macie
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "single",
+    prompt:
+      "Ein Unternehmen möchte automatisch erkennen, ob in Amazon-S3-Buckets versehentlich personenbezogene Daten (PII) wie Sozialversicherungsnummern, Kreditkartennummern oder Geburtsdaten gespeichert sind. Welcher AWS-Service ist speziell darauf ausgelegt?",
+    choices: [
+      { id: "A", text: "Amazon GuardDuty" },
+      { id: "B", text: "AWS CloudTrail" },
+      { id: "C", text: "Amazon Macie" },
+      { id: "D", text: "AWS Config" },
+    ],
+    correct: ["C"],
+    explanation:
+      "Amazon Macie nutzt Machine Learning und Pattern Matching, um sensible Daten (PII, PHI, Finanzdaten, Credentials, AWS-Access-Keys) in S3-Buckets automatisch zu klassifizieren und zu kennzeichnen. Standard Managed Identifiers für gängige Typen + Custom Identifiers via Regex. Erzeugt Findings in Security Hub. GuardDuty = Threat Detection (verdächtige API-Calls, Crypto-Mining), nicht Daten-Klassifizierung. CloudTrail = API-Audit-Logs. Config = Konfigurations-Tracking. Macie ist auf S3 spezialisiert.",
+    difficulty: 2,
+    sourceRef: "Amazon Macie Documentation",
+  },
+
+  // 2.4 Security Components — Multi: Inspector + GuardDuty Differenzierung
+  {
+    cert: "CLF-C02",
+    domain: "Security and Compliance",
+    type: "multiple",
+    prompt:
+      "Welche ZWEI AWS-Services führen kontinuierliche, automatisierte Sicherheits-Scans durch — der eine auf Schwachstellen in EC2/ECR/Lambda, der andere auf bösartige Verhaltensmuster im AWS-Konto? (Wähle 2 Antworten)",
+    choices: [
+      { id: "A", text: "Amazon Inspector" },
+      { id: "B", text: "AWS Trusted Advisor" },
+      { id: "C", text: "Amazon GuardDuty" },
+      { id: "D", text: "AWS Artifact" },
+      { id: "E", text: "AWS Config" },
+    ],
+    correct: ["A", "C"],
+    explanation:
+      "Amazon Inspector (A) scannt automatisch und kontinuierlich EC2-Instanzen, Container-Images in ECR und Lambda-Funktionen auf Software-Schwachstellen (CVEs) und ungewollte Netzwerk-Exposure. Amazon GuardDuty (C) analysiert CloudTrail-, VPC-Flow- und DNS-Logs auf bösartige Verhaltensmuster (kompromittierte Credentials, Crypto-Mining, ungewöhnliche API-Calls). Trusted Advisor (B) = Best-Practice-Empfehlungen, kein Schwachstellen-Scanner. Artifact (D) = Self-Service-Portal für Compliance-Berichte (SOC, ISO). Config (E) = Konfigurations-Tracking, kein aktiver Scan auf Bedrohungen.",
+    difficulty: 2,
+    sourceRef: "Amazon Inspector / Amazon GuardDuty Documentation",
+  },
+
+  // ── K2 — Cloud Technology and Services (+10) ──
+
+  // 3.1 Deploying — CloudFormation als IaC-Service
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt:
+      "Welcher AWS-Service ermöglicht es, AWS-Infrastruktur als Code (Infrastructure as Code, IaC) in JSON- oder YAML-Vorlagen zu definieren und automatisiert, reproduzierbar und versioniert auszurollen?",
+    choices: [
+      { id: "A", text: "AWS CloudFormation" },
+      { id: "B", text: "AWS Systems Manager" },
+      { id: "C", text: "AWS Cloud9" },
+      { id: "D", text: "AWS Elastic Beanstalk" },
+    ],
+    correct: ["A"],
+    explanation:
+      "AWS CloudFormation ist der native IaC-Service: Templates in JSON/YAML, Stacks für gebündelte Ressourcen, Drift-Detection, StackSets für Multi-Account-Multi-Region-Deployments, Rollback bei Fehlern. CloudFormation selbst ist kostenlos — Kosten entstehen nur durch die provisionierten Ressourcen. Systems Manager = Operations und Konfigurations-Management bestehender Ressourcen. Cloud9 = browser-basierte IDE. Elastic Beanstalk = PaaS, deployed Anwendungen, nutzt CloudFormation intern, ist aber nicht selbst der IaC-Service.",
+    difficulty: 1,
+    sourceRef: "AWS CloudFormation Documentation",
+  },
+
+  // 3.1 Deploying — CLI für Automation
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt:
+      "Ein DevOps-Engineer möchte AWS-Ressourcen aus einem Bash-Skript heraus erstellen und verwalten, das nachts automatisch auf einem EC2-Build-Server läuft. Welche Zugriffsmethode auf AWS ist dafür am geeignetsten?",
+    choices: [
+      { id: "A", text: "AWS Management Console" },
+      { id: "B", text: "AWS Command Line Interface (AWS CLI)" },
+      { id: "C", text: "AWS-Konto-Login per Browser durch einen Mitarbeiter" },
+      { id: "D", text: "Postal Mail an den AWS Support" },
+    ],
+    correct: ["B"],
+    explanation:
+      "Die AWS CLI ist das richtige Werkzeug für skriptbare, automatisierte AWS-Operationen aus Shell-Skripten heraus. Authentifizierung idealerweise über IAM Role am EC2-Instance-Profile (keine Access Keys im Skript!). Alternativen: AWS SDK (programmatisch in Python/Java/JS/Go/etc. — wenn Code direkt mit AWS reden soll), CloudFormation/Terraform (wenn IaC gewünscht). Die Management Console (A) ist interaktiv, nicht skriptbar. Browser-Login (C) ist manuell. Briefpost (D) ist Quatsch.",
+    difficulty: 1,
+    sourceRef: "AWS CLI Documentation",
+  },
+
+  // 3.1 Deploying — Direct Connect vs VPN
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt:
+      "Ein Finanzunternehmen benötigt eine permanente Netzwerk-Verbindung zwischen seinem On-Premises-Rechenzentrum und AWS mit konsistent niedriger Latenz, hoher Bandbreite (10 Gbps) und der Garantie, dass der Traffic NICHT über das öffentliche Internet läuft. Welche Lösung erfüllt diese Anforderungen am besten?",
+    choices: [
+      { id: "A", text: "AWS Site-to-Site VPN über das öffentliche Internet" },
+      { id: "B", text: "AWS Direct Connect" },
+      { id: "C", text: "AWS Client VPN für jeden Mitarbeiter" },
+      { id: "D", text: "Mehrere parallele NAT Gateways" },
+    ],
+    correct: ["B"],
+    explanation:
+      "AWS Direct Connect stellt eine dedizierte Glasfaser-Verbindung von einer AWS-Direct-Connect-Location zum Kunden bereit — 1/10/100 Gbps, konsistente Latenz, Traffic NICHT über öffentliches Internet. Aufbau dauert Wochen, dafür stabile Performance + reduzierte Data-Transfer-Kosten. Site-to-Site VPN (A) läuft über das öffentliche Internet (verschlüsselt via IPsec) — schnell aufgesetzt, aber Latenz/Bandbreite hängen vom Internet ab. Client VPN (C) = einzelne Nutzer-Geräte. NAT Gateways (D) = ausgehender Internet-Traffic aus privaten Subnetzen, keine Hybrid-Verbindung.",
+    difficulty: 2,
+    sourceRef: "AWS Direct Connect Documentation",
+  },
+
+  // 3.4 Database — DynamoDB Use Case
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt:
+      "Eine mobile Gaming-Anwendung benötigt eine Datenbank, die einstellige Millisekunden-Latenz garantiert, automatisch auf Millionen von Requests pro Sekunde skaliert und für ein Key-Value-Datenmodell (Spieler-ID → Profil-Daten) optimiert ist. Welcher AWS-Service ist am besten geeignet?",
+    choices: [
+      { id: "A", text: "Amazon RDS for PostgreSQL" },
+      { id: "B", text: "Amazon Aurora" },
+      { id: "C", text: "Amazon DynamoDB" },
+      { id: "D", text: "Amazon Redshift" },
+    ],
+    correct: ["C"],
+    explanation:
+      "Amazon DynamoDB ist eine vollständig verwaltete, serverless NoSQL-Datenbank: einstellige Millisekunden-Latenz im Standard-Modus, sub-Millisekunden mit DAX-Cache, automatische Skalierung (On-Demand) auf Millionen Requests/Sek., Multi-Region (Global Tables) optional. Ideal für Key-Value- und Document-Workloads, Gaming, IoT, Session-Stores, Shopping Carts. RDS PostgreSQL/Aurora = relational mit SQL-Joins und ACID — andere Stärken, höhere Latenz. Redshift = Data Warehouse für Analytics über große Datenmengen, nicht für Low-Latency-Transaktional.",
+    difficulty: 2,
+    sourceRef: "Amazon DynamoDB Documentation",
+  },
+
+  // 3.4 Database — ElastiCache vs MemoryDB
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt: "Was ist der wesentliche Unterschied zwischen Amazon ElastiCache und Amazon MemoryDB?",
+    choices: [
+      { id: "A", text: "Beide sind identisch — nur die Preise unterscheiden sich." },
+      { id: "B", text: "ElastiCache ist ein In-Memory-Cache (vor anderer Datenbank, nicht-durable); MemoryDB ist eine durable In-Memory-Primär-Datenbank mit Multi-AZ-Persistenz." },
+      { id: "C", text: "ElastiCache ist NoSQL, MemoryDB ist relational." },
+      { id: "D", text: "ElastiCache läuft nur auf EC2, MemoryDB ist serverless." },
+    ],
+    correct: ["B"],
+    explanation:
+      "ElastiCache (für Valkey, Redis OSS oder Memcached) ist ein klassischer Cache vor einer Primär-Datenbank (z. B. RDS) — Daten sind transient, bei Knoten-Ausfall können Schreibvorgänge verloren gehen. MemoryDB nutzt dieselbe Redis/Valkey-API, persistiert aber jeden Schreibvorgang in einem Multi-AZ Transaction Log — durable, geeignet als Primär-Datenbank für Workloads, die Mikrosekunden-Lese-Latenz UND Persistenz brauchen. Faustregel: brauchst du nur Caching → ElastiCache; brauchst du Cache-Geschwindigkeit als Primary Store → MemoryDB.",
+    difficulty: 2,
+    sourceRef: "Amazon ElastiCache and MemoryDB Documentation",
+  },
+
+  // 3.5 Network — CloudFront Use Case
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt: "Welcher der folgenden Anwendungsfälle ist der typischste für Amazon CloudFront?",
+    choices: [
+      { id: "A", text: "Speichern von Datenbank-Backups in mehreren Regionen für Disaster Recovery" },
+      { id: "B", text: "Globale Auslieferung von Webinhalten (HTML, Bilder, Videos, APIs) mit niedriger Latenz durch Caching an Edge Locations weltweit" },
+      { id: "C", text: "Ausführen von Schwachstellen-Scans auf EC2-Instanzen" },
+      { id: "D", text: "Verschlüsselung von Daten in transit zwischen EC2-Instanzen" },
+    ],
+    correct: ["B"],
+    explanation:
+      "Amazon CloudFront ist das AWS Content Delivery Network (CDN): über 600 Edge Locations weltweit cachen Inhalte aus dem Origin (z. B. S3-Bucket, ALB, EC2 oder externer Server) und liefern sie mit niedriger Latenz an Endnutzer aus. Reduziert Origin-Last und Data-Transfer-Kosten. Integriert mit Shield (DDoS) und WAF. Datenbank-Backups (A) = Aurora Cross-Region, RDS Snapshots. Vulnerability Scans (C) = Inspector. Encryption in Transit (D) = TLS, ACM — keine CDN-Funktion.",
+    difficulty: 1,
+    sourceRef: "Amazon CloudFront Documentation",
+  },
+
+  // 3.6 Storage — EBS vs EFS vs FSx
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt: "Welche Aussage über die AWS-Storage-Services ist KORREKT?",
+    choices: [
+      { id: "A", text: "Amazon EBS = shared file storage für mehrere EC2-Instanzen; Amazon EFS = block storage für eine einzelne EC2-Instanz." },
+      { id: "B", text: "Amazon EBS = block storage typischerweise an eine EC2-Instanz in einer AZ angeschlossen; Amazon EFS = NFS-basiertes shared file storage über mehrere EC2-Instanzen und AZs; Amazon FSx = managed file systems für spezifische Protokolle (Windows / Lustre / NetApp ONTAP / OpenZFS)." },
+      { id: "C", text: "EBS, EFS und FSx sind funktional identisch — nur die Preise unterscheiden sich." },
+      { id: "D", text: "Alle drei Services sind Object Storage und konkurrieren mit Amazon S3." },
+    ],
+    correct: ["B"],
+    explanation:
+      "EBS = Block Storage, einer AZ zugeordnet, an eine EC2-Instanz attached (Multi-Attach für io1/io2 ausnahmsweise möglich). Wie eine virtuelle Festplatte. EFS = NFS-basiertes File System, gleichzeitig von tausenden EC2-Instanzen, Lambda-Funktionen oder On-Premises über mehrere AZs nutzbar. Linux-Workloads. FSx = managed file systems für spezielle Protokolle: FSx for Windows (SMB), FSx for Lustre (HPC), FSx for NetApp ONTAP (Enterprise-NAS), FSx for OpenZFS. Keiner davon ist Object Storage (das ist S3).",
+    difficulty: 2,
+    sourceRef: "AWS Storage Services Documentation",
+  },
+
+  // 3.6 Storage — Multi: S3 Lifecycle Actions
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "multiple",
+    prompt:
+      "Welche ZWEI Aktionen können mit Amazon S3 Lifecycle Policies automatisiert werden? (Wähle 2 Antworten)",
+    choices: [
+      { id: "A", text: "Objekte nach einer definierten Zeitspanne automatisch in eine günstigere Storage-Klasse verschieben (z. B. Standard → Glacier Deep Archive)" },
+      { id: "B", text: "Den Bucket automatisch öffentlich zugänglich machen" },
+      { id: "C", text: "Objekte nach einer definierten Aufbewahrungsfrist automatisch löschen (Expiration)" },
+      { id: "D", text: "Alle Objekte automatisch in einen anderen AWS-Account migrieren" },
+      { id: "E", text: "Bucket-Namen automatisch ändern" },
+    ],
+    correct: ["A", "C"],
+    explanation:
+      "S3 Lifecycle Policies automatisieren zwei Kategorien: Transition Actions (A) verschieben Objekte zwischen Storage-Klassen (Standard → IA → Glacier Instant/Flexible Retrieval → Deep Archive) basierend auf Alter; Expiration Actions (C) löschen Objekte nach einer Frist (oft Compliance-getrieben, z. B. Logs nach 7 Jahren). Public-Schalten (B) wird über Bucket-Policy gesteuert, nicht Lifecycle. Cross-Account-Migration (D) = S3 Replication, nicht Lifecycle. Bucket-Namen (E) sind unveränderlich nach Erstellung.",
+    difficulty: 2,
+    sourceRef: "Amazon S3 Lifecycle Configuration Documentation",
+  },
+
+  // 3.7 AI/ML + Analytics — Athena vs Redshift
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt:
+      "Ein Analyst möchte einmalig ad-hoc SQL-Queries direkt auf eine Sammlung von CSV- und JSON-Dateien in einem Amazon-S3-Bucket ausführen, ohne vorher die Daten in ein Data Warehouse zu laden oder einen Cluster zu provisionieren. Welcher Service eignet sich am besten?",
+    choices: [
+      { id: "A", text: "Amazon Redshift" },
+      { id: "B", text: "Amazon Athena" },
+      { id: "C", text: "Amazon RDS" },
+      { id: "D", text: "Amazon DynamoDB" },
+    ],
+    correct: ["B"],
+    explanation:
+      "Amazon Athena ist serverless Interactive Query Service: SQL direkt auf Daten in S3 (CSV, JSON, Parquet, ORC, Avro), keine Cluster-Verwaltung, Pay-per-Query (etwa 5 USD pro TB gescannter Daten). Ideal für ad-hoc-Analysen, Log-Auswertung, einmalige Berichte. Redshift = managed Data Warehouse, erfordert Cluster (provisioned oder Serverless), günstiger für regelmäßige komplexe Analysen über große Datenmengen, aber Daten müssen erst geladen werden. RDS = transaktionale DB. DynamoDB = NoSQL Key-Value, nicht für SQL-Analytics.",
+    difficulty: 2,
+    sourceRef: "Amazon Athena Documentation",
+  },
+
+  // 3.8 Other Services — SQS vs SNS vs EventBridge
+  {
+    cert: "CLF-C02",
+    domain: "Cloud Technology and Services",
+    type: "single",
+    prompt:
+      "Eine Anwendung muss Bestellungen entgegennehmen und in eine Warteschlange legen, sodass mehrere Worker-Prozesse die Bestellungen UNABHÄNGIG voneinander und im EIGENEN Tempo abarbeiten können — auch wenn die Worker zwischenzeitlich offline sind. Welcher AWS-Service erfüllt dieses Pull-basierte Queue-Pattern am besten?",
+    choices: [
+      { id: "A", text: "Amazon Simple Notification Service (SNS)" },
+      { id: "B", text: "Amazon Simple Queue Service (SQS)" },
+      { id: "C", text: "Amazon EventBridge" },
+      { id: "D", text: "Amazon Kinesis Data Streams" },
+    ],
+    correct: ["B"],
+    explanation:
+      "Amazon SQS ist eine vollständig verwaltete Message-Queue (Pull-Modell): Producer legen Messages in die Queue, Consumer pollen und arbeiten sie eigenständig ab. Decoupling von Producer/Consumer, Retries, Visibility Timeouts, Dead-Letter-Queues. Genau das beschriebene Bestellungs-Worker-Pattern. SNS (A) = Pub/Sub Fan-Out (Push), eine Message an viele Subscriber gleichzeitig. EventBridge (C) = Event-Bus mit Content-Based Routing, ideal für Multi-Source-Event-Verteilung mit Regeln. Kinesis Data Streams (D) = High-Throughput-Streaming mit Replay-Fähigkeit, andere Anwendungsfälle (z. B. Real-Time-Analytics).",
+    difficulty: 2,
+    sourceRef: "Amazon SQS Documentation",
+  },
 ];
 
 async function seed() {
