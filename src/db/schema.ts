@@ -68,3 +68,34 @@ export const questionAttempts = sqliteTable(
 
 export type QuestionAttempt = typeof questionAttempts.$inferSelect;
 export type NewQuestionAttempt = typeof questionAttempts.$inferInsert;
+
+export const flashcards = sqliteTable(
+  "flashcards",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    cert: text("cert", { enum: ["CLF-C02", "SAA-C03"] }).notNull(),
+    domain: text("domain").notNull(),
+
+    front: text("front").notNull(),
+    back: text("back").notNull(),
+
+    difficulty: integer("difficulty"),
+    sourceRef: text("source_ref"),
+
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date())
+      .$onUpdateFn(() => new Date()),
+  },
+  (t) => [
+    index("idx_flashcards_cert").on(t.cert),
+    index("idx_flashcards_cert_domain").on(t.cert, t.domain),
+  ],
+);
+
+export type Flashcard = typeof flashcards.$inferSelect;
+export type NewFlashcard = typeof flashcards.$inferInsert;
