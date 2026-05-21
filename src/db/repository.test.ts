@@ -8,11 +8,16 @@ import * as schema from "./schema";
 import {
   getAttemptStats,
   getAttemptsBySession,
+  getDomainStats,
   getLastNAttempts,
+  getNeverSeenQuestions,
+  getQuestionStats,
   getQuestionsByCert,
   insertAttempt,
   insertQuestion,
 } from "./repository";
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function createTestDb(): DB {
   const sqlite = new Database(":memory:");
@@ -308,5 +313,211 @@ describe("getAttemptStats", () => {
     const stats = getAttemptStats(db, "s1");
     expect(stats.total).toBe(1);
     expect(stats.correct).toBe(1);
+  });
+});
+
+describe("getQuestionStats", () => {
+  let db: DB;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("omits questions with no attempts", async () => {
+    insertQuestion(db, sampleClf);
+    expect(getQuestionStats(db, "s1")).toEqual([]);
+  });
+
+  it("returns avgCorrectLast3 = 1 and totalAttempts = 1 for a single correct attempt", () => {
+    const q = insertQuestion(db, sampleClf);
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+    });
+
+    const [stat] = getQuestionStats(db, "s1");
+    expect(stat.id).toBe(q.id);
+    expect(stat.avgCorrectLast3).toBe(1);
+    expect(stat.totalAttempts).toBe(1);
+  });
+
+  it("averages exactly 3 attempts (2 right, 1 wrong → ≈0.6667)", async () => {
+    const q = insertQuestion(db, sampleClf);
+    for (const correct of [true, false, true]) {
+      insertAttempt(db, {
+        questionId: q.id,
+        selected: ["A"],
+        correct,
+        sessionId: "s1",
+      });
+      await sleep(5);
+    }
+
+    const [stat] = getQuestionStats(db, "s1");
+    expect(stat.avgCorrectLast3).toBeCloseTo(2 / 3, 4);
+    expect(stat.totalAttempts).toBe(3);
+  });
+
+  it("considers only the most recent 3 attempts but counts all in totalAttempts", () => {
+    const q = insertQuestion(db, sampleClf);
+    // 5 attempts in chronological order: F, F, T, T, T
+    // → last 3 are all true → avg = 1.0, totalAttempts = 5
+    // Explicit timestamps because the schema stores seconds-precision and
+    // multiple inserts in the same second would have undefined ordering.
+    const base = Math.floor(Date.now() / 1000);
+    const sequence = [false, false, true, true, true];
+    sequence.forEach((correct, i) => {
+      insertAttempt(db, {
+        questionId: q.id,
+        selected: ["A"],
+        correct,
+        sessionId: "s1",
+        answeredAt: new Date((base + i) * 1000),
+      });
+    });
+
+    const [stat] = getQuestionStats(db, "s1");
+    expect(stat.avgCorrectLast3).toBe(1);
+    expect(stat.totalAttempts).toBe(5);
+  });
+
+  it("isolates by session", () => {
+    const q = insertQuestion(db, sampleClf);
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "sA",
+    });
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["B"],
+      correct: false,
+      sessionId: "sB",
+    });
+
+    expect(getQuestionStats(db, "sA")).toHaveLength(1);
+    expect(getQuestionStats(db, "sA")[0].avgCorrectLast3).toBe(1);
+    expect(getQuestionStats(db, "sB")[0].avgCorrectLast3).toBe(0);
+  });
+});
+
+describe("getDomainStats", () => {
+  let db: DB;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("aggregates avgCorrectRate over questions with ≥2 attempts, separates unseen counts", async () => {
+    const cloud = insertQuestion(db, sampleClf);
+    const cloud2 = insertQuestion(db, {
+      ...sampleClf,
+      prompt: "Other cloud question",
+    });
+    const security = insertQuestion(db, {
+      ...sampleClf,
+      domain: "Security and Compliance",
+      prompt: "Sec q",
+    });
+
+    // cloud: 2 attempts, both correct → avg 1.0
+    insertAttempt(db, {
+      questionId: cloud.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+    });
+    await sleep(5);
+    insertAttempt(db, {
+      questionId: cloud.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+    });
+    // cloud2: only 1 attempt → excluded from avgCorrectRate
+    insertAttempt(db, {
+      questionId: cloud2.id,
+      selected: ["B"],
+      correct: false,
+      sessionId: "s1",
+    });
+    // security: 0 attempts → unseen
+
+    void security;
+
+    const stats = getDomainStats(db, "s1", "CLF-C02");
+    const cc = stats.find((d) => d.domain === "Cloud Concepts")!;
+    const sec = stats.find((d) => d.domain === "Security and Compliance")!;
+
+    // Cloud Concepts: only cloud (≥2 attempts) counts toward avg; cloud2 (1 attempt) excluded.
+    expect(cc.avgCorrectRate).toBe(1);
+    expect(cc.questionsPracticed).toBe(2);
+    expect(cc.questionsUnseen).toBe(0);
+
+    expect(sec.avgCorrectRate).toBeNull();
+    expect(sec.questionsPracticed).toBe(0);
+    expect(sec.questionsUnseen).toBe(1);
+  });
+
+  it("respects the cert filter", () => {
+    insertQuestion(db, sampleClf);
+    insertQuestion(db, sampleSaa);
+    const stats = getDomainStats(db, "s1", "CLF-C02");
+    expect(stats.some((d) => d.domain === "Cloud Concepts")).toBe(true);
+    expect(stats.some((d) => d.domain === "Design Secure Architectures")).toBe(
+      false,
+    );
+  });
+});
+
+describe("getNeverSeenQuestions", () => {
+  let db: DB;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("returns questions without any attempt for the given session", () => {
+    const q1 = insertQuestion(db, sampleClf);
+    const q2 = insertQuestion(db, { ...sampleClf, prompt: "Q2" });
+    insertQuestion(db, { ...sampleClf, prompt: "Q3" });
+
+    insertAttempt(db, {
+      questionId: q1.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "sA",
+    });
+
+    const unseen = getNeverSeenQuestions(db, "sA", "CLF-C02");
+    expect(unseen.map((q) => q.id).sort()).toEqual(
+      [q2.id, q2.id + 1].sort(),
+    );
+  });
+
+  it("treats a question as unseen for session-a even if session-b answered it", () => {
+    const q = insertQuestion(db, sampleClf);
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "sB",
+    });
+
+    const unseen = getNeverSeenQuestions(db, "sA", "CLF-C02");
+    expect(unseen).toHaveLength(1);
+    expect(unseen[0].id).toBe(q.id);
+  });
+
+  it("respects the cert filter", () => {
+    insertQuestion(db, sampleClf);
+    insertQuestion(db, sampleSaa);
+
+    const clf = getNeverSeenQuestions(db, "sA", "CLF-C02");
+    expect(clf).toHaveLength(1);
+    expect(clf[0].cert).toBe("CLF-C02");
   });
 });

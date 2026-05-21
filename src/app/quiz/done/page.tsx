@@ -6,6 +6,7 @@ import {
   getLastNAttempts,
   getQuestionsByCert,
 } from "@/db/repository";
+import { scoreColorClass } from "@/lib/scoreColor";
 
 const SESSION_COOKIE = "certops_session_id";
 
@@ -14,13 +15,9 @@ function pct(correct: number, total: number): number {
   return Math.round((correct / total) * 100);
 }
 
-// CLF-C02 Pass-Threshold = 70%. Drei Zonen für Pro-Domain-Hervorhebung.
 function domainToneClass(correct: number, total: number): string {
   if (total === 0) return "text-zinc-500";
-  const p = correct / total;
-  if (p >= 0.7) return "text-emerald-700";
-  if (p >= 0.6) return "text-amber-700";
-  return "text-rose-700";
+  return scoreColorClass(correct / total);
 }
 
 export default async function QuizDonePage() {

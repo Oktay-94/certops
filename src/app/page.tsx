@@ -19,10 +19,15 @@ export default function Home() {
           </p>
         </Link>
 
-        <ComingSoonCard
-          title="Statistik"
-          description="Trefferquoten und Schwachstellen"
-        />
+        <Link
+          href="/stats"
+          className="rounded-xl border border-zinc-200 bg-white p-6 transition hover:border-zinc-300 hover:bg-zinc-50"
+        >
+          <h2 className="text-lg font-semibold text-zinc-900">Statistik</h2>
+          <p className="mt-2 text-sm text-zinc-600">
+            Trefferquoten und Schwachstellen
+          </p>
+        </Link>
 
         <ComingSoonCard
           title="Karteikarten"
