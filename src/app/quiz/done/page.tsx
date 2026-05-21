@@ -92,12 +92,20 @@ export default async function QuizDonePage() {
         </section>
       )}
 
-      <Link
-        href="/quiz"
-        className="mt-10 inline-block rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800"
-      >
-        Übungsrunde neu starten
-      </Link>
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+        <Link
+          href="/quiz"
+          className="inline-block rounded-xl bg-zinc-900 px-6 py-3 text-center text-white transition hover:bg-zinc-800"
+        >
+          Übungsrunde neu starten
+        </Link>
+        <Link
+          href="/"
+          className="inline-block rounded-xl border border-zinc-300 px-6 py-3 text-center text-zinc-900 transition hover:bg-zinc-100"
+        >
+          Zurück zum Dashboard
+        </Link>
+      </div>
     </main>
   );
 }
