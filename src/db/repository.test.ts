@@ -9,6 +9,7 @@ import {
   getAttemptStats,
   getAttemptsBySession,
   getDomainStats,
+  getFlashcards,
   getLastNAttempts,
   getNeverSeenQuestions,
   getQuestionStats,
@@ -16,6 +17,7 @@ import {
   insertAttempt,
   insertQuestion,
 } from "./repository";
+import { flashcards } from "./schema";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -519,5 +521,52 @@ describe("getNeverSeenQuestions", () => {
     const clf = getNeverSeenQuestions(db, "sA", "CLF-C02");
     expect(clf).toHaveLength(1);
     expect(clf[0].cert).toBe("CLF-C02");
+  });
+});
+
+describe("getFlashcards", () => {
+  let db: DB;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("returns flashcards for the requested cert, ordered by id", () => {
+    db.insert(flashcards)
+      .values([
+        {
+          cert: "CLF-C02",
+          domain: "Cloud Technology and Services",
+          front: "F1",
+          back: "B1",
+        },
+        {
+          cert: "CLF-C02",
+          domain: "Cloud Technology and Services",
+          front: "F2",
+          back: "B2",
+        },
+        {
+          cert: "SAA-C03",
+          domain: "Design Secure Architectures",
+          front: "F3",
+          back: "B3",
+        },
+      ])
+      .run();
+
+    const clf = getFlashcards(db, "CLF-C02");
+    expect(clf).toHaveLength(2);
+    expect(clf[0].front).toBe("F1");
+    expect(clf[1].front).toBe("F2");
+    expect(clf[0].id).toBeLessThan(clf[1].id);
+
+    const saa = getFlashcards(db, "SAA-C03");
+    expect(saa).toHaveLength(1);
+    expect(saa[0].front).toBe("F3");
+  });
+
+  it("returns an empty array when no cards match", () => {
+    expect(getFlashcards(db, "CLF-C02")).toEqual([]);
   });
 });

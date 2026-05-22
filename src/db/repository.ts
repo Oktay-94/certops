@@ -1,8 +1,10 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import type { DB } from "./index";
 import {
+  flashcards,
   questionAttempts,
   questions,
+  type Flashcard,
   type NewQuestion,
   type NewQuestionAttempt,
   type Question,
@@ -213,6 +215,18 @@ export function getDomainStats(
     questionsPracticed: Number(r.questions_practiced),
     questionsUnseen: Number(r.questions_unseen),
   }));
+}
+
+export function getFlashcards(
+  db: DB,
+  cert: Flashcard["cert"],
+): Flashcard[] {
+  return db
+    .select()
+    .from(flashcards)
+    .where(eq(flashcards.cert, cert))
+    .orderBy(asc(flashcards.id))
+    .all();
 }
 
 export function getNeverSeenQuestions(
