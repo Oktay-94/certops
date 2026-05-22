@@ -1,6 +1,7 @@
 import { db } from "./index";
-import { questionAttempts, questions } from "./schema";
+import { flashcards, questionAttempts, questions } from "./schema";
 import { clfC02Questions } from "./seed/index";
+import { clfC02Flashcards } from "./seed/cards/index";
 
 // CLF-C02 domains (AWS Exam Guide):
 //   1. Cloud Concepts
@@ -23,8 +24,12 @@ async function seed() {
   // forces us to clear attempts before reseeding questions.
   db.delete(questionAttempts).run();
   db.delete(questions).run();
+  db.delete(flashcards).run();
   db.insert(questions).values(all).run();
-  console.log(`Seeded ${all.length} question(s).`);
+  db.insert(flashcards).values(clfC02Flashcards).run();
+  console.log(
+    `Seeded ${all.length} question(s), ${clfC02Flashcards.length} flashcard(s).`,
+  );
 }
 
 seed().catch((err) => {
