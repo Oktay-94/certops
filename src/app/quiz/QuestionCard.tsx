@@ -176,14 +176,22 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
       </div>
 
       {!checked && (
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={selected.length === 0 || isPending}
-          className="mt-8 rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
-        >
-          {isPending ? "Prüfe …" : "Antwort prüfen"}
-        </button>
+        <div className="mt-8 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={onSubmit}
+            disabled={selected.length === 0 || isPending}
+            className="rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+          >
+            {isPending ? "Prüfe …" : "Antwort prüfen"}
+          </button>
+          <Link
+            href="/"
+            className="inline-block rounded-xl border border-zinc-300 px-4 py-2 text-sm text-zinc-900 transition hover:bg-zinc-100"
+          >
+            Quiz beenden
+          </Link>
+        </div>
       )}
 
       {error && (
@@ -205,12 +213,22 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
             </p>
           </section>
 
-          <Link
-            href={nextHref}
-            className="mt-6 inline-block rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800"
-          >
-            {isLast ? "Quiz beenden" : "Nächste Frage"}
-          </Link>
+          <div className="mt-6 flex items-center justify-between gap-3">
+            <Link
+              href={nextHref}
+              className="inline-block rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800"
+            >
+              {isLast ? "Quiz beenden" : "Nächste Frage"}
+            </Link>
+            {!isLast && (
+              <Link
+                href="/"
+                className="inline-block rounded-xl border border-zinc-300 px-4 py-2 text-sm text-zinc-900 transition hover:bg-zinc-100"
+              >
+                Quiz beenden
+              </Link>
+            )}
+          </div>
         </>
       )}
 
