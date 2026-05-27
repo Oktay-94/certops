@@ -1,0 +1,1 @@
+ALTER TABLE `flashcards` ADD `icon_slugs` text;

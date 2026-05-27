@@ -83,6 +83,8 @@ export const flashcards = sqliteTable(
     difficulty: integer("difficulty"),
     sourceRef: text("source_ref"),
 
+    iconSlugs: text("icon_slugs", { mode: "json" }).$type<string[]>(),
+
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),

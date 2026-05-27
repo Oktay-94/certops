@@ -713,4 +713,30 @@ describe("getFlashcards", () => {
   it("returns an empty array when no cards match", () => {
     expect(getFlashcards(db, "CLF-C02")).toEqual([]);
   });
+
+  it("roundtrips iconSlugs as a JSON array (null + populated)", () => {
+    db.insert(flashcards)
+      .values([
+        {
+          cert: "CLF-C02",
+          domain: "Cloud Technology and Services",
+          front: "no icons",
+          back: "B",
+        },
+        {
+          cert: "CLF-C02",
+          domain: "Cloud Technology and Services",
+          front: "with icons",
+          back: "B",
+          iconSlugs: ["ec2", "s3"],
+        },
+      ])
+      .run();
+
+    const rows = getFlashcards(db, "CLF-C02");
+    const noIcons = rows.find((r) => r.front === "no icons")!;
+    const withIcons = rows.find((r) => r.front === "with icons")!;
+    expect(noIcons.iconSlugs).toBeNull();
+    expect(withIcons.iconSlugs).toEqual(["ec2", "s3"]);
+  });
 });
