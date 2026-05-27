@@ -1,22 +1,25 @@
 import Link from "next/link";
 import { db } from "@/db";
 import { getFlashcards } from "@/db/repository";
-import { FlashcardDeck } from "./FlashcardDeck";
+import { FlashcardGrid } from "./FlashcardGrid";
 
 export default function CardsPage() {
   const cards = getFlashcards(db, "CLF-C02");
 
   if (cards.length === 0) return <EmptyState />;
 
+  const domains = Array.from(new Set(cards.map((c) => c.domain))).sort();
+
   return (
-    <main className="max-w-2xl mx-auto px-6 py-12 sm:py-16">
+    <main className="max-w-7xl mx-auto px-6 py-10 sm:py-12">
       <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
-        Karteikarten
+        AWS Karteikarten
       </h1>
       <p className="mt-3 text-zinc-600">
-        CLF-C02 · {cards.length} Karten
+        Vorderseite = Frage · Rückseite = Antwort · Klick zum Umdrehen
       </p>
-      <FlashcardDeck
+
+      <FlashcardGrid
         cards={cards.map((c) => ({
           id: c.id,
           cert: c.cert,
@@ -24,6 +27,7 @@ export default function CardsPage() {
           front: c.front,
           back: c.back,
         }))}
+        domains={domains}
       />
     </main>
   );

@@ -39,7 +39,7 @@ export default function Home() {
         >
           <h2 className="text-lg font-semibold text-zinc-900">Karteikarten</h2>
           <p className="mt-2 text-sm text-zinc-600">
-            {cardCount} Karten — Compute &amp; Storage
+            {cardCount} Karten — Begriffe trainieren
           </p>
         </Link>
       </div>
