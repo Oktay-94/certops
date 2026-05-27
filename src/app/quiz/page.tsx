@@ -1,18 +1,19 @@
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import Link from "next/link";
 import { db } from "@/db";
 import { getQuestionsByCert } from "@/db/repository";
-import { seedFromString, shuffle } from "@/lib/shuffle";
+import { QuizConfigForm } from "./QuizConfigForm";
 
-const SESSION_COOKIE = "certops_session_id";
-const ROUND_COOKIE = "certops_round_id";
+type Props = {
+  searchParams: Promise<{ error?: string }>;
+};
 
-export default async function QuizPage() {
+export default async function QuizPage({ searchParams }: Props) {
   const questions = getQuestionsByCert(db, "CLF-C02");
+  const { error } = await searchParams;
 
   if (questions.length === 0) {
     return (
-      <main className="max-w-2xl mx-auto px-6 py-12 sm:py-16">
+      <main className="max-w-4xl mx-auto px-6 py-12 sm:py-16">
         <h1 className="text-xl font-medium text-zinc-900">
           Keine Fragen vorhanden
         </h1>
@@ -27,11 +28,23 @@ export default async function QuizPage() {
     );
   }
 
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? "";
-  const roundId = cookieStore.get(ROUND_COOKIE)?.value ?? "";
-  const seed = seedFromString(`${sessionId}:${roundId}`);
-  const ordered = shuffle(questions, seed);
+  return (
+    <main className="max-w-4xl mx-auto px-6 py-6 sm:py-8">
+      <Link
+        href="/"
+        className="inline-block rounded-xl border border-zinc-300 px-6 py-3 text-center text-zinc-900 transition hover:bg-zinc-100"
+      >
+        Zurück zum Dashboard
+      </Link>
 
-  redirect(`/quiz/${ordered[0].id}`);
+      {error === "empty" && (
+        <p className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+          Für diese Auswahl wurden keine Fragen gefunden. Bitte Bereich oder
+          Anzahl anpassen.
+        </p>
+      )}
+
+      <QuizConfigForm />
+    </main>
+  );
 }

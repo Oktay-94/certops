@@ -19,7 +19,7 @@ export default function Home() {
         >
           <h2 className="text-lg font-semibold text-zinc-900">Quiz</h2>
           <p className="mt-2 text-sm text-zinc-600">
-            Übungsmodus mit 64 Fragen
+            Übungsmodus — Umfang & Fokus wählbar
           </p>
         </Link>
 

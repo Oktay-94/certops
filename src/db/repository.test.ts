@@ -16,6 +16,7 @@ import {
   getQuestionsByCert,
   insertAttempt,
   insertQuestion,
+  selectRoundQuestions,
 } from "./repository";
 import { flashcards } from "./schema";
 
@@ -521,6 +522,149 @@ describe("getNeverSeenQuestions", () => {
     const clf = getNeverSeenQuestions(db, "sA", "CLF-C02");
     expect(clf).toHaveLength(1);
     expect(clf[0].cert).toBe("CLF-C02");
+  });
+});
+
+describe("selectRoundQuestions", () => {
+  let db: DB;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  function seedPool(n: number, domain = "Cloud Concepts") {
+    const ids: number[] = [];
+    for (let i = 0; i < n; i++) {
+      const q = insertQuestion(db, {
+        ...sampleClf,
+        domain,
+        prompt: `Q${i}`,
+      });
+      ids.push(q.id);
+    }
+    return ids;
+  }
+
+  it("random: limits to count", () => {
+    seedPool(10);
+    const ids = selectRoundQuestions(db, {
+      cert: "CLF-C02",
+      sessionId: "s1",
+      count: 3,
+      mode: "random",
+      seed: 42,
+    });
+    expect(ids).toHaveLength(3);
+  });
+
+  it("count > pool: returns pool size, no padding", () => {
+    seedPool(5);
+    const ids = selectRoundQuestions(db, {
+      cert: "CLF-C02",
+      sessionId: "s1",
+      count: 100,
+      mode: "random",
+      seed: 42,
+    });
+    expect(ids).toHaveLength(5);
+  });
+
+  it("count = 'all' returns full pool", () => {
+    seedPool(7);
+    const ids = selectRoundQuestions(db, {
+      cert: "CLF-C02",
+      sessionId: "s1",
+      count: "all",
+      mode: "random",
+      seed: 42,
+    });
+    expect(ids).toHaveLength(7);
+  });
+
+  it("filters by domain", () => {
+    seedPool(3, "Cloud Concepts");
+    const secIds = seedPool(2, "Security and Compliance");
+    const ids = selectRoundQuestions(db, {
+      cert: "CLF-C02",
+      sessionId: "s1",
+      domain: "Security and Compliance",
+      count: "all",
+      mode: "random",
+      seed: 42,
+    });
+    expect(ids.sort()).toEqual(secIds.sort());
+  });
+
+  it("weakest-first with no attempts falls back to non-empty random order", () => {
+    seedPool(5);
+    const ids = selectRoundQuestions(db, {
+      cert: "CLF-C02",
+      sessionId: "s1",
+      count: 5,
+      mode: "weakest-first",
+      seed: 42,
+    });
+    expect(ids).toHaveLength(5);
+  });
+
+  it("weakest-first: unseen first, then weakest practiced", () => {
+    const [a, b, c] = seedPool(3);
+    // B: 2× falsch → avg = 0
+    insertAttempt(db, {
+      questionId: b,
+      selected: ["B"],
+      correct: false,
+      sessionId: "s1",
+    });
+    insertAttempt(db, {
+      questionId: b,
+      selected: ["B"],
+      correct: false,
+      sessionId: "s1",
+    });
+    // C: 2× richtig → avg = 1
+    insertAttempt(db, {
+      questionId: c,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+    });
+    insertAttempt(db, {
+      questionId: c,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+    });
+    // A bleibt unseen
+
+    const ids = selectRoundQuestions(db, {
+      cert: "CLF-C02",
+      sessionId: "s1",
+      count: 3,
+      mode: "weakest-first",
+      seed: 42,
+    });
+    expect(ids).toEqual([a, b, c]);
+  });
+
+  it("weakest-first respects session isolation", () => {
+    const [a] = seedPool(1);
+    // sessionB beantwortet richtig — sessionA sieht A trotzdem als unseen
+    insertAttempt(db, {
+      questionId: a,
+      selected: ["A"],
+      correct: true,
+      sessionId: "sB",
+    });
+
+    const ids = selectRoundQuestions(db, {
+      cert: "CLF-C02",
+      sessionId: "sA",
+      count: 1,
+      mode: "weakest-first",
+      seed: 42,
+    });
+    expect(ids).toEqual([a]);
   });
 });
 

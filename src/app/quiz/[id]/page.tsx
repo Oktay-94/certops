@@ -2,16 +2,31 @@ import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { db } from "@/db";
 import { getQuestionsByCert } from "@/db/repository";
-import type { QuestionDisplay } from "@/db/schema";
+import type { Question, QuestionDisplay } from "@/db/schema";
 import { seedFromString, shuffle } from "@/lib/shuffle";
 import { QuestionCard } from "../QuestionCard";
 
 const SESSION_COOKIE = "certops_session_id";
 const ROUND_COOKIE = "certops_round_id";
+const ROUND_QUESTIONS_COOKIE = "certops_round_questions";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
+
+function parseRoundIds(raw: string | undefined): number[] | null {
+  if (!raw) return null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    const ids = parsed.filter(
+      (v): v is number => typeof v === "number" && Number.isInteger(v) && v > 0,
+    );
+    return ids.length === parsed.length ? ids : null;
+  } catch {
+    return null;
+  }
+}
 
 export default async function QuizQuestionPage({ params }: Props) {
   const { id: idParam } = await params;
@@ -19,12 +34,24 @@ export default async function QuizQuestionPage({ params }: Props) {
   if (!Number.isInteger(id) || id <= 0) notFound();
 
   const all = getQuestionsByCert(db, "CLF-C02");
+  const byId = new Map<number, Question>(all.map((q) => [q.id, q]));
 
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? "";
-  const roundId = cookieStore.get(ROUND_COOKIE)?.value ?? "";
-  const seed = seedFromString(`${sessionId}:${roundId}`);
-  const ordered = shuffle(all, seed);
+  const roundIdsRaw = cookieStore.get(ROUND_QUESTIONS_COOKIE)?.value;
+  const roundIds = parseRoundIds(roundIdsRaw);
+
+  let ordered: Question[];
+  if (roundIds) {
+    ordered = roundIds
+      .map((rid) => byId.get(rid))
+      .filter((q): q is Question => q !== undefined);
+    if (ordered.length === 0) notFound();
+  } else {
+    const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? "";
+    const roundId = cookieStore.get(ROUND_COOKIE)?.value ?? "";
+    const seed = seedFromString(`${sessionId}:${roundId}`);
+    ordered = shuffle(all, seed);
+  }
 
   const idx = ordered.findIndex((q) => q.id === id);
   if (idx === -1) notFound();

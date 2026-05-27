@@ -1,5 +1,7 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import type { DB } from "./index";
+import { shuffle } from "@/lib/shuffle";
+import type { QuizMode } from "@/lib/domains";
 import {
   flashcards,
   questionAttempts,
@@ -227,6 +229,84 @@ export function getFlashcards(
     .where(eq(flashcards.cert, cert))
     .orderBy(asc(flashcards.id))
     .all();
+}
+
+type RoundCandidateRow = {
+  id: number;
+  avg_correct_last3: number | null;
+  total_attempts: number | null;
+};
+
+export function selectRoundQuestions(
+  db: DB,
+  opts: {
+    cert: Question["cert"];
+    sessionId: string;
+    domain?: string;
+    count: number | "all";
+    mode: QuizMode;
+    seed: number;
+  },
+): number[] {
+  const { cert, sessionId, domain, count, mode, seed } = opts;
+
+  const rawRows = db.all(sql`
+    WITH ranked AS (
+      SELECT question_id, correct, answered_at,
+        ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
+      FROM question_attempts
+      WHERE session_id = ${sessionId}
+    ),
+    per_question AS (
+      SELECT question_id,
+             AVG(CAST(correct AS REAL)) FILTER (WHERE rn <= 3) AS avg_correct_last3,
+             COUNT(*) AS total_attempts
+      FROM ranked
+      GROUP BY question_id
+    )
+    SELECT q.id,
+           p.avg_correct_last3,
+           p.total_attempts
+    FROM questions q
+    LEFT JOIN per_question p ON p.question_id = q.id
+    WHERE q.cert = ${cert}
+      AND (${domain ?? null} IS NULL OR q.domain = ${domain ?? null})
+    ORDER BY q.id ASC
+  `) as RoundCandidateRow[];
+
+  const ids = rawRows.map((r) => Number(r.id));
+  if (ids.length === 0) return [];
+
+  let ordered: number[];
+  if (mode === "weakest-first") {
+    // Tiebreaker-Shuffle der Pool-IDs (stabil per seed) — ohne fällt bei
+    // gleichem total_attempts/avg_correct_last3 die ursprüngliche ID-Reihenfolge
+    // immer gleich aus.
+    const shuffledIndex = new Map<number, number>();
+    shuffle(ids, seed).forEach((id, idx) => shuffledIndex.set(id, idx));
+
+    ordered = [...rawRows]
+      .sort((a, b) => {
+        const aUnseen = a.total_attempts === null ? 1 : 0;
+        const bUnseen = b.total_attempts === null ? 1 : 0;
+        if (aUnseen !== bUnseen) return bUnseen - aUnseen; // unseen first
+        const aAvg = a.avg_correct_last3 ?? 1;
+        const bAvg = b.avg_correct_last3 ?? 1;
+        if (aAvg !== bAvg) return aAvg - bAvg; // weakest first
+        const aTotal = a.total_attempts ?? 0;
+        const bTotal = b.total_attempts ?? 0;
+        if (aTotal !== bTotal) return aTotal - bTotal; // less practiced first
+        return (
+          (shuffledIndex.get(a.id) ?? 0) - (shuffledIndex.get(b.id) ?? 0)
+        );
+      })
+      .map((r) => Number(r.id));
+  } else {
+    ordered = shuffle(ids, seed);
+  }
+
+  const limit = count === "all" ? ordered.length : Math.min(count, ordered.length);
+  return ordered.slice(0, limit);
 }
 
 export function getNeverSeenQuestions(
