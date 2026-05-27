@@ -30,6 +30,8 @@ const ICON_MAP: Record<string, string> = {
   lightsail: "Arch_Compute/64/Arch_Amazon-Lightsail_64.svg",
   fargate: "Arch_Containers/64/Arch_AWS-Fargate_64.svg",
   batch: "Arch_Compute/64/Arch_AWS-Batch_64.svg",
+  "auto-scaling": "Arch_Management-Tools/64/Arch_AWS-Auto-Scaling_64.svg",
+  outposts: "Arch_Compute/64/Arch_AWS-Outposts-family_64.svg",
   // Container
   ecs: "Arch_Containers/64/Arch_Amazon-Elastic-Container-Service_64.svg",
   eks: "Arch_Containers/64/Arch_Amazon-Elastic-Kubernetes-Service_64.svg",
@@ -65,6 +67,7 @@ const ICON_MAP: Record<string, string> = {
   waf: "Arch_Security-Identity/64/Arch_AWS-WAF_64.svg",
   inspector: "Arch_Security-Identity/64/Arch_Amazon-Inspector_64.svg",
   macie: "Arch_Security-Identity/64/Arch_Amazon-Macie_64.svg",
+  artifact: "Arch_Security-Identity/64/Arch_AWS-Artifact_64.svg",
   // Monitoring & Management
   cloudwatch: "Arch_Management-Tools/64/Arch_Amazon-CloudWatch_64.svg",
   cloudtrail: "Arch_Management-Tools/64/Arch_AWS-CloudTrail_64.svg",

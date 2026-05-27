@@ -1,7 +1,9 @@
 [
   "api-gateway",
+  "artifact",
   "athena",
   "aurora",
+  "auto-scaling",
   "batch",
   "budgets",
   "cloudformation",
@@ -37,6 +39,7 @@
   "lightsail",
   "macie",
   "organizations",
+  "outposts",
   "quicksight",
   "rds",
   "redshift",

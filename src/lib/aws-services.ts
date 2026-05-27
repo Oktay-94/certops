@@ -19,16 +19,20 @@ export const AWS_SERVICES: AwsService[] = [
     aliases: ["Elastic Beanstalk", "Beanstalk"] },
   { slug: "lightsail", displayName: "Amazon Lightsail",
     aliases: ["Amazon Lightsail", "Lightsail"] },
-  { slug: "fargate", displayName: "AWS Fargate",
-    aliases: ["AWS Fargate", "Fargate"] },
   { slug: "batch", displayName: "AWS Batch",
     aliases: ["AWS Batch"] },
+  { slug: "auto-scaling", displayName: "AWS Auto Scaling",
+    aliases: ["EC2 Auto Scaling", "Auto Scaling Group", "Auto Scaling"] },
+  { slug: "outposts", displayName: "AWS Outposts",
+    aliases: ["AWS Outposts", "Outposts"] },
 
   // ── Container
   { slug: "ecs", displayName: "Amazon ECS",
     aliases: ["Elastic Container Service", "Amazon ECS", "ECS"] },
   { slug: "eks", displayName: "Amazon EKS",
     aliases: ["Elastic Kubernetes Service", "Amazon EKS", "EKS"] },
+  { slug: "fargate", displayName: "AWS Fargate",
+    aliases: ["AWS Fargate", "Fargate"] },
 
   // ── Storage
   { slug: "s3-glacier", displayName: "Amazon S3 Glacier",
@@ -89,6 +93,8 @@ export const AWS_SERVICES: AwsService[] = [
     aliases: ["Amazon Inspector"] },
   { slug: "macie", displayName: "Amazon Macie",
     aliases: ["Amazon Macie", "Macie"] },
+  { slug: "artifact", displayName: "AWS Artifact",
+    aliases: ["AWS Artifact"] },
 
   // ── Monitoring & Management
   { slug: "cloudwatch", displayName: "Amazon CloudWatch",
