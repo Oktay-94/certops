@@ -85,6 +85,8 @@ export const flashcards = sqliteTable(
 
     iconSlugs: text("icon_slugs", { mode: "json" }).$type<string[]>(),
 
+    lastSeenAt: integer("last_seen_at", { mode: "timestamp" }),
+
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),

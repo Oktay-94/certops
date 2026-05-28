@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
 import type { DB } from "./index";
 import { shuffle } from "@/lib/shuffle";
 import type { QuizMode } from "@/lib/domains";
@@ -229,6 +229,64 @@ export function getFlashcards(
     .where(eq(flashcards.cert, cert))
     .orderBy(asc(flashcards.id))
     .all();
+}
+
+export function countSeenFlashcards(
+  db: DB,
+  cert: Flashcard["cert"],
+): number {
+  const row = db
+    .select({ n: sql<number>`count(*)`.as("n") })
+    .from(flashcards)
+    .where(and(eq(flashcards.cert, cert), isNotNull(flashcards.lastSeenAt)))
+    .get();
+  return Number(row?.n ?? 0);
+}
+
+export function markFlashcardSeen(db: DB, id: number): void {
+  db.update(flashcards)
+    .set({ lastSeenAt: new Date() })
+    .where(eq(flashcards.id, id))
+    .run();
+}
+
+export function resetFlashcardViews(
+  db: DB,
+  cert: Flashcard["cert"],
+): void {
+  db.update(flashcards)
+    .set({ lastSeenAt: null })
+    .where(eq(flashcards.cert, cert))
+    .run();
+}
+
+export function getOverallAvgLast3(
+  db: DB,
+  sessionId: string,
+  cert: Question["cert"],
+): number | null {
+  const row = db.get(sql`
+    WITH ranked AS (
+      SELECT question_id, correct, answered_at,
+        ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
+      FROM question_attempts
+      WHERE session_id = ${sessionId}
+    ),
+    per_question AS (
+      SELECT r.question_id,
+             AVG(CAST(r.correct AS REAL)) FILTER (WHERE r.rn <= 3) AS avg_correct_last3,
+             COUNT(*) AS total_attempts
+      FROM ranked r
+      GROUP BY r.question_id
+    )
+    SELECT AVG(CASE WHEN p.total_attempts >= 2 THEN p.avg_correct_last3 END) AS avg_correct_rate
+    FROM questions q
+    LEFT JOIN per_question p ON p.question_id = q.id
+    WHERE q.cert = ${cert}
+  `) as { avg_correct_rate: number | null } | undefined;
+
+  if (!row || row.avg_correct_rate === null) return null;
+  return Number(row.avg_correct_rate);
 }
 
 type RoundCandidateRow = {

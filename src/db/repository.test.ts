@@ -6,16 +6,20 @@ import { beforeEach, describe, expect, it } from "vitest";
 import type { DB } from "./index";
 import * as schema from "./schema";
 import {
+  countSeenFlashcards,
   getAttemptStats,
   getAttemptsBySession,
   getDomainStats,
   getFlashcards,
   getLastNAttempts,
   getNeverSeenQuestions,
+  getOverallAvgLast3,
   getQuestionStats,
   getQuestionsByCert,
   insertAttempt,
   insertQuestion,
+  markFlashcardSeen,
+  resetFlashcardViews,
   selectRoundQuestions,
 } from "./repository";
 import { flashcards } from "./schema";
@@ -738,5 +742,103 @@ describe("getFlashcards", () => {
     const withIcons = rows.find((r) => r.front === "with icons")!;
     expect(noIcons.iconSlugs).toBeNull();
     expect(withIcons.iconSlugs).toEqual(["ec2", "s3"]);
+  });
+});
+
+describe("flashcard view tracking", () => {
+  let db: DB;
+
+  beforeEach(() => {
+    db = createTestDb();
+    db.insert(flashcards)
+      .values([
+        { cert: "CLF-C02", domain: "Cloud Concepts", front: "F1", back: "B1" },
+        { cert: "CLF-C02", domain: "Cloud Concepts", front: "F2", back: "B2" },
+        {
+          cert: "SAA-C03",
+          domain: "Design Secure Architectures",
+          front: "F3",
+          back: "B3",
+        },
+      ])
+      .run();
+  });
+
+  it("counts only flashcards whose last_seen_at is set, scoped by cert", () => {
+    const [c1, c2] = getFlashcards(db, "CLF-C02");
+    expect(countSeenFlashcards(db, "CLF-C02")).toBe(0);
+
+    markFlashcardSeen(db, c1.id);
+    expect(countSeenFlashcards(db, "CLF-C02")).toBe(1);
+
+    // marking the same card again keeps the count at 1
+    markFlashcardSeen(db, c1.id);
+    expect(countSeenFlashcards(db, "CLF-C02")).toBe(1);
+
+    markFlashcardSeen(db, c2.id);
+    expect(countSeenFlashcards(db, "CLF-C02")).toBe(2);
+
+    resetFlashcardViews(db, "CLF-C02");
+    expect(countSeenFlashcards(db, "CLF-C02")).toBe(0);
+  });
+
+  it("does not affect other certs when resetting", () => {
+    const [c1] = getFlashcards(db, "CLF-C02");
+    const [s1] = getFlashcards(db, "SAA-C03");
+    markFlashcardSeen(db, c1.id);
+    markFlashcardSeen(db, s1.id);
+
+    resetFlashcardViews(db, "CLF-C02");
+    expect(countSeenFlashcards(db, "CLF-C02")).toBe(0);
+    expect(countSeenFlashcards(db, "SAA-C03")).toBe(1);
+  });
+});
+
+describe("getOverallAvgLast3", () => {
+  let db: DB;
+
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("returns null when no attempts exist", () => {
+    insertQuestion(db, sampleClf);
+    expect(getOverallAvgLast3(db, "s1", "CLF-C02")).toBeNull();
+  });
+
+  it("averages last-3 across questions with >=2 attempts", () => {
+    const q1 = insertQuestion(db, sampleClf);
+    const q2 = insertQuestion(db, { ...sampleClf, prompt: "Q2" });
+
+    // q1: 2 attempts, 1 correct → 0.5
+    insertAttempt(db, {
+      questionId: q1.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+    });
+    insertAttempt(db, {
+      questionId: q1.id,
+      selected: ["B"],
+      correct: false,
+      sessionId: "s1",
+    });
+    // q2: 2 attempts, 2 correct → 1.0
+    insertAttempt(db, {
+      questionId: q2.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+    });
+    insertAttempt(db, {
+      questionId: q2.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+    });
+
+    const avg = getOverallAvgLast3(db, "s1", "CLF-C02");
+    expect(avg).not.toBeNull();
+    expect(avg).toBeCloseTo(0.75, 4);
   });
 });
