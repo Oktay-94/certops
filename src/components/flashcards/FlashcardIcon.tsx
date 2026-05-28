@@ -8,9 +8,12 @@ import {
   type FallbackIconName,
 } from "@/lib/domain-colors";
 
+type Variant = "hero" | "compact";
+
 type Props = {
   iconSlugs: string[] | null;
   domain: string;
+  variant?: Variant;
 };
 
 const KNOWN_SLUGS: Set<string> = new Set(
@@ -24,18 +27,32 @@ const FALLBACK_ICONS: Record<FallbackIconName, typeof Cloud> = {
   DollarSign,
 };
 
+type SizeSpec = {
+  single: number;
+  pair: number;
+  lucide: number;
+  gap: string;
+};
+
+const SIZES: Record<Variant, SizeSpec> = {
+  hero: { single: 56, pair: 44, lucide: 32, gap: "gap-2" },
+  compact: { single: 32, pair: 28, lucide: 19, gap: "gap-1" },
+};
+
 function ServiceIcon({
   slug,
   size,
+  lucide,
   domain,
 }: {
   slug: string;
   size: number;
+  lucide: number;
   domain: string;
 }) {
   const [errored, setErrored] = useState(false);
   if (errored) {
-    return <DomainFallback domain={domain} size={size} />;
+    return <DomainFallback domain={domain} size={size} lucide={lucide} />;
   }
   return (
     <span
@@ -56,7 +73,15 @@ function ServiceIcon({
   );
 }
 
-function DomainFallback({ domain, size }: { domain: string; size: number }) {
+function DomainFallback({
+  domain,
+  size,
+  lucide,
+}: {
+  domain: string;
+  size: number;
+  lucide: number;
+}) {
   const color = getDomainColor(domain);
   const Icon = FALLBACK_ICONS[color.fallbackIconName];
   return (
@@ -67,28 +92,52 @@ function DomainFallback({ domain, size }: { domain: string; size: number }) {
       className={`inline-flex items-center justify-center rounded-[5px] ${color.iconBg}`}
       style={{ width: size, height: size }}
     >
-      <Icon size={19} className="text-white" />
+      <Icon size={lucide} className="text-white" />
     </span>
   );
 }
 
-export function FlashcardIcon({ iconSlugs, domain }: Props) {
+export function FlashcardIcon({ iconSlugs, domain, variant = "hero" }: Props) {
+  const spec = SIZES[variant];
   const valid = (iconSlugs ?? [])
     .filter((s): s is string => typeof s === "string" && KNOWN_SLUGS.has(s))
     .slice(0, 2);
 
   if (valid.length === 0) {
-    return <DomainFallback domain={domain} size={32} />;
+    return (
+      <DomainFallback
+        domain={domain}
+        size={spec.single}
+        lucide={spec.lucide}
+      />
+    );
   }
 
   if (valid.length === 1) {
-    return <ServiceIcon slug={valid[0]} size={32} domain={domain} />;
+    return (
+      <ServiceIcon
+        slug={valid[0]}
+        size={spec.single}
+        lucide={spec.lucide}
+        domain={domain}
+      />
+    );
   }
 
   return (
-    <span className="inline-flex items-center gap-1" aria-hidden>
-      <ServiceIcon slug={valid[0]} size={28} domain={domain} />
-      <ServiceIcon slug={valid[1]} size={28} domain={domain} />
+    <span className={`inline-flex items-center ${spec.gap}`} aria-hidden>
+      <ServiceIcon
+        slug={valid[0]}
+        size={spec.pair}
+        lucide={spec.lucide}
+        domain={domain}
+      />
+      <ServiceIcon
+        slug={valid[1]}
+        size={spec.pair}
+        lucide={spec.lucide}
+        domain={domain}
+      />
     </span>
   );
 }

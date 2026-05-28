@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowLeft,
   Lightbulb,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { getDomainColor } from "@/lib/domain-colors";
 import { FlashcardIcon } from "@/components/flashcards/FlashcardIcon";
+import { markFlashcardSeen, resetFlashcardViews } from "./actions";
 
 export type FlashcardItem = {
   id: number;
@@ -88,52 +89,20 @@ export function FlashcardGrid({ cards, domains }: Props) {
     setDomain("all");
     setFlipped(new Set());
     setOrder(initialOrder);
+    void resetFlashcardViews().catch(() => {});
   }
 
   function toggleCard(id: number) {
+    const wasUnflipped = !flipped.has(id);
     setFlipped((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  }
-
-  // Equal-height: measure all card wrappers, apply max as inline style.
-  const gridRef = useRef<HTMLDivElement | null>(null);
-  const cardRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
-  const [cardHeight, setCardHeight] = useState<number | null>(null);
-
-  const measure = useCallback(() => {
-    let max = 0;
-    for (const c of visible) {
-      const el = cardRefs.current.get(c.id);
-      if (!el) continue;
-      // Temporär Inline-Höhe entfernen, um die natürliche Höhe zu messen.
-      const prev = el.style.height;
-      el.style.height = "auto";
-      const h = el.offsetHeight;
-      el.style.height = prev;
-      if (h > max) max = h;
+    if (wasUnflipped) {
+      void markFlashcardSeen(id).catch(() => {});
     }
-    if (max > 0) setCardHeight(max);
-  }, [visible]);
-
-  useLayoutEffect(() => {
-    measure();
-  }, [measure, flipped]);
-
-  useEffect(() => {
-    const el = gridRef.current;
-    if (!el || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => measure());
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [measure]);
-
-  function setCardRef(id: number, el: HTMLButtonElement | null) {
-    if (el) cardRefs.current.set(id, el);
-    else cardRefs.current.delete(id);
   }
 
   const btnBase =
@@ -222,56 +191,74 @@ export function FlashcardGrid({ cards, domains }: Props) {
           Keine Karten gefunden.
         </p>
       ) : (
-        <div
-          ref={gridRef}
-          className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        >
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map((c) => {
             const isFlipped = flipped.has(c.id);
             const color = getDomainColor(c.domain);
             return (
               <button
                 key={c.id}
-                ref={(el) => setCardRef(c.id, el)}
                 type="button"
                 onClick={() => toggleCard(c.id)}
-                style={cardHeight ? { height: `${cardHeight}px` } : undefined}
-                className={`flex min-h-[180px] flex-col rounded-xl border border-l-4 border-zinc-200 ${color.borderAccent} bg-white p-4 text-left transition hover:border-zinc-400`}
+                className={`flex h-80 flex-col rounded-xl border border-l-4 border-zinc-200 ${color.borderAccent} bg-white p-4 text-left transition hover:border-zinc-400`}
               >
-                <div className="flex items-start justify-between gap-2">
+                {/* Header */}
+                <div className="flex shrink-0 items-center justify-between gap-2 border-b-[0.5px] border-zinc-200 pb-2.5">
                   <span
                     className={`rounded-full border px-2 py-0.5 text-xs font-medium ${color.tag}`}
                   >
                     {c.domain}
                   </span>
-                  <FlashcardIcon iconSlugs={c.iconSlugs} domain={c.domain} />
+                  <span className="text-[15px] font-bold text-zinc-900">
+                    #{c.id}
+                  </span>
                 </div>
-                <hr className="my-3 border-zinc-200" />
-                {isFlipped ? (
-                  <div className="flex flex-1 flex-col rounded-lg bg-zinc-50 p-3">
-                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-800">
-                      {c.back}
-                    </p>
-                    <div className="mt-auto flex justify-end pt-2 text-xs text-zinc-400">
-                      #{c.id}
+
+                {/* Content */}
+                <div className="flex min-h-0 flex-1 flex-col">
+                  {isFlipped ? (
+                    <div className="flex h-full min-h-0 flex-col">
+                      <div className="my-2.5 shrink-0 rounded-md border-l-2 border-amber-500 bg-amber-100 px-2.5 py-1.5">
+                        <p className="text-[11.5px] leading-snug text-amber-900">
+                          {c.front}
+                        </p>
+                      </div>
+                      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                        <p className="whitespace-pre-wrap text-[12.5px] leading-relaxed text-zinc-800">
+                          {c.back}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-1 flex-col">
-                    <p className="whitespace-pre-wrap text-sm font-medium leading-relaxed text-zinc-900">
-                      {c.front}
-                    </p>
-                    <div
-                      className={`mt-3 flex items-center justify-between gap-2 text-xs ${color.textAccent}`}
-                    >
-                      <span className="flex items-center gap-1">
-                        <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
-                        Klicken für Antwort
-                      </span>
-                      <span className="text-zinc-400">#{c.id}</span>
+                  ) : (
+                    <div className="flex h-full flex-col items-center justify-center gap-3.5 py-2.5">
+                      <FlashcardIcon
+                        iconSlugs={c.iconSlugs}
+                        domain={c.domain}
+                        variant="hero"
+                      />
+                      <p className="whitespace-pre-wrap text-center text-[15px] font-semibold leading-relaxed text-zinc-900">
+                        {c.front}
+                      </p>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div
+                  className={`flex shrink-0 items-center gap-1 border-t-[0.5px] border-zinc-200 pt-2.5 text-[11px] italic ${color.textAccent}`}
+                >
+                  {isFlipped ? (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                      Klicken zum Umdrehen
+                    </>
+                  ) : (
+                    <>
+                      <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
+                      Klicken für Antwort
+                    </>
+                  )}
+                </div>
               </button>
             );
           })}
