@@ -11,9 +11,30 @@ import {
   Search,
   Shuffle,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { getDomainColor } from "@/lib/domain-colors";
 import { FlashcardIcon } from "@/components/flashcards/FlashcardIcon";
 import { markFlashcardSeen, resetFlashcardViews } from "./actions";
+
+const MARKDOWN_COMPONENTS = {
+  strong: (props: React.HTMLAttributes<HTMLElement>) => (
+    <strong className="font-semibold" {...props} />
+  ),
+  ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
+    <ul className="list-disc pl-4" {...props} />
+  ),
+  ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
+    <ol className="list-decimal pl-4" {...props} />
+  ),
+  code: (props: React.HTMLAttributes<HTMLElement>) => (
+    <code className="rounded bg-zinc-100 px-1 text-[13px]" {...props} />
+  ),
+  p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
+    <p className="text-zinc-800" {...props} />
+  ),
+};
+
+const MARKDOWN_ALLOWED = ["p", "strong", "em", "ul", "ol", "li", "code"];
 
 export type FlashcardItem = {
   id: number;
@@ -43,6 +64,11 @@ export function FlashcardGrid({ cards, domains }: Props) {
   const byId = useMemo(() => {
     const m = new Map<number, FlashcardItem>();
     for (const c of cards) m.set(c.id, c);
+    return m;
+  }, [cards]);
+  const displayNumberById = useMemo(() => {
+    const m = new Map<number, number>();
+    cards.forEach((c, i) => m.set(c.id, i + 1));
     return m;
   }, [cards]);
 
@@ -162,21 +188,19 @@ export function FlashcardGrid({ cards, domains }: Props) {
       </div>
 
       {/* Stats */}
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold">
         <div className="flex flex-wrap gap-x-6 gap-y-1">
-          <span className="text-zinc-600">
+          <span className="text-zinc-900">
             Karten gesamt:{" "}
-            <span className="font-medium text-zinc-900">{cards.length}</span>
+            <span className="text-zinc-900">{cards.length}</span>
           </span>
-          <span className="text-zinc-600">
+          <span className="text-zinc-900">
             Angezeigt:{" "}
-            <span className="font-medium text-blue-600">{visible.length}</span>
+            <span className="text-blue-600">{visible.length}</span>
           </span>
-          <span className="text-zinc-600">
+          <span className="text-zinc-900">
             Umgedreht:{" "}
-            <span className="font-medium text-emerald-600">
-              {flippedVisibleCount}
-            </span>
+            <span className="text-emerald-600">{flippedVisibleCount}</span>
           </span>
         </div>
         <span className="flex items-center gap-1.5 text-xs text-zinc-500">
@@ -210,7 +234,7 @@ export function FlashcardGrid({ cards, domains }: Props) {
                     {c.domain}
                   </span>
                   <span className="text-[15px] font-bold text-zinc-900">
-                    #{c.id}
+                    #{displayNumberById.get(c.id)}
                   </span>
                 </div>
 
@@ -223,10 +247,14 @@ export function FlashcardGrid({ cards, domains }: Props) {
                           {c.front}
                         </p>
                       </div>
-                      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-                        <p className="whitespace-pre-wrap text-[12.5px] leading-relaxed text-zinc-800">
+                      <div className="min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-relaxed text-zinc-800">
+                        <ReactMarkdown
+                          allowedElements={MARKDOWN_ALLOWED}
+                          unwrapDisallowed
+                          components={MARKDOWN_COMPONENTS}
+                        >
                           {c.back}
-                        </p>
+                        </ReactMarkdown>
                       </div>
                     </div>
                   ) : (
