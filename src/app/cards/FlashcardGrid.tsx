@@ -12,6 +12,7 @@ import {
   Shuffle,
 } from "lucide-react";
 import { getDomainColor } from "@/lib/domain-colors";
+import { FlashcardIcon } from "@/components/flashcards/FlashcardIcon";
 
 export type FlashcardItem = {
   id: number;
@@ -19,6 +20,7 @@ export type FlashcardItem = {
   domain: string;
   front: string;
   back: string;
+  iconSlugs: string[] | null;
 };
 
 type Props = {
@@ -236,31 +238,37 @@ export function FlashcardGrid({ cards, domains }: Props) {
                 style={cardHeight ? { height: `${cardHeight}px` } : undefined}
                 className={`flex min-h-[180px] flex-col rounded-xl border border-l-4 border-zinc-200 ${color.borderAccent} bg-white p-4 text-left transition hover:border-zinc-400`}
               >
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-start justify-between gap-2">
                   <span
                     className={`rounded-full border px-2 py-0.5 text-xs font-medium ${color.tag}`}
                   >
                     {c.domain}
                   </span>
-                  <span className="text-xs text-zinc-500">#{c.id}</span>
+                  <FlashcardIcon iconSlugs={c.iconSlugs} domain={c.domain} />
                 </div>
                 <hr className="my-3 border-zinc-200" />
                 {isFlipped ? (
                   <div className="flex flex-1 flex-col rounded-lg bg-zinc-50 p-3">
-                    <p className="whitespace-pre-wrap text-sm text-zinc-800">
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-800">
                       {c.back}
                     </p>
+                    <div className="mt-auto flex justify-end pt-2 text-xs text-zinc-400">
+                      #{c.id}
+                    </div>
                   </div>
                 ) : (
                   <div className="flex flex-1 flex-col">
-                    <p className="whitespace-pre-wrap text-sm font-medium text-zinc-900">
+                    <p className="whitespace-pre-wrap text-sm font-medium leading-relaxed text-zinc-900">
                       {c.front}
                     </p>
                     <div
-                      className={`mt-3 flex items-center gap-1 text-xs ${color.textAccent}`}
+                      className={`mt-3 flex items-center justify-between gap-2 text-xs ${color.textAccent}`}
                     >
-                      <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
-                      Klicken für Antwort
+                      <span className="flex items-center gap-1">
+                        <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
+                        Klicken für Antwort
+                      </span>
+                      <span className="text-zinc-400">#{c.id}</span>
                     </div>
                   </div>
                 )}

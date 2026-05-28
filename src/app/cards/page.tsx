@@ -26,6 +26,7 @@ export default function CardsPage() {
           domain: c.domain,
           front: c.front,
           back: c.back,
+          iconSlugs: c.iconSlugs ?? null,
         }))}
         domains={domains}
       />
