@@ -3,9 +3,9 @@
 import { useState, useTransition } from "react";
 import {
   Cloud,
+  DollarSign,
   GraduationCap,
   LayoutGrid,
-  Receipt,
   Server,
   Shield,
   Shuffle,
@@ -19,6 +19,10 @@ import {
   type QuizCount,
   type QuizMode,
 } from "@/lib/domains";
+import {
+  getDomainColor,
+  type FallbackIconName,
+} from "@/lib/domain-colors";
 import { startRound } from "./actions";
 
 const COUNT_LABEL: Record<string, string> = {
@@ -32,12 +36,18 @@ const COUNT_LABEL: Record<string, string> = {
 
 type DomainChoice = ClfC02Domain | "all";
 
-const DOMAIN_LIST: { value: DomainChoice; label: string; icon: LucideIcon }[] = [
-  { value: "all", label: "Alle Bereiche", icon: LayoutGrid },
-  { value: "Cloud Concepts", label: "Cloud Concepts", icon: Cloud },
-  { value: "Security and Compliance", label: "Security and Compliance", icon: Shield },
-  { value: "Cloud Technology and Services", label: "Cloud Technology and Services", icon: Server },
-  { value: "Billing, Pricing, and Support", label: "Billing, Pricing, and Support", icon: Receipt },
+const DOMAIN_ICONS: Record<FallbackIconName, LucideIcon> = {
+  Cloud,
+  Shield,
+  Server,
+  DollarSign,
+};
+
+const SPECIFIC_DOMAINS: { value: ClfC02Domain; label: string }[] = [
+  { value: "Cloud Concepts", label: "Cloud Concepts" },
+  { value: "Security and Compliance", label: "Security and Compliance" },
+  { value: "Cloud Technology and Services", label: "Cloud Technology and Services" },
+  { value: "Billing, Pricing, and Support", label: "Billing, Pricing, and Support" },
 ];
 
 // satisfy unused-import linter while keeping CLF_C02_DOMAINS as source of truth
@@ -56,6 +66,11 @@ function previewSentence(
   const dText = domain === "all" ? "aus allen Bereichen" : `aus ${domain}`;
   const mText = mode === "random" ? "zufällig" : "schwache zuerst";
   return `Du startest: ${cText} ${dText}, ${mText}.`;
+}
+
+function selectionBorderAccent(domain: DomainChoice): string {
+  if (domain === "all") return "border-l-emerald-500";
+  return getDomainColor(domain).borderAccent;
 }
 
 export function QuizConfigForm() {
@@ -101,7 +116,7 @@ export function QuizConfigForm() {
 
   function modeClass(active: boolean): string {
     const base =
-      "flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm transition disabled:cursor-not-allowed disabled:opacity-50";
+      "flex flex-1 flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50";
     return active
       ? `${base} border-zinc-200 bg-zinc-100 text-zinc-900 ring-2 ring-emerald-500`
       : `${base} border-zinc-200 text-zinc-900 hover:border-zinc-400`;
@@ -110,8 +125,12 @@ export function QuizConfigForm() {
   return (
     <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
       <header className="flex items-center gap-3">
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700">
-          <GraduationCap className="h-5 w-5" aria-hidden />
+        <span
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px]"
+          style={{ backgroundColor: "#ED7100" }}
+          aria-hidden
+        >
+          <GraduationCap size={19} className="text-white" />
         </span>
         <div>
           <h2 className="text-xl sm:text-2xl font-medium text-zinc-900">
@@ -145,50 +164,47 @@ export function QuizConfigForm() {
 
         <section>
           <h3 className="text-sm font-medium text-zinc-900">Bereich</h3>
-          {(() => {
-            const [allOption, ...specificDomains] = DOMAIN_LIST;
-            const AllIcon = allOption.icon;
-            return (
-              <div className="mt-3 flex flex-col gap-2">
-                <button
-                  key={allOption.value}
-                  type="button"
-                  onClick={() => onDomainChange(allOption.value)}
-                  disabled={isPending}
-                  aria-pressed={domain === allOption.value}
-                  className={rowClass(domain === allOption.value)}
-                >
-                  <AllIcon
-                    className={`h-4 w-4 shrink-0 ${
-                      domain === allOption.value ? "text-emerald-600" : ""
-                    }`}
-                    aria-hidden
-                  />
-                  <span>{allOption.label}</span>
-                </button>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {specificDomains.map(({ value, label, icon: Icon }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => onDomainChange(value)}
-                      disabled={isPending}
-                      aria-pressed={domain === value}
-                      className={rowClass(domain === value)}
+          <div className="mt-3 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => onDomainChange("all")}
+              disabled={isPending}
+              aria-pressed={domain === "all"}
+              className={rowClass(domain === "all")}
+            >
+              <LayoutGrid
+                className={`h-4 w-4 shrink-0 ${
+                  domain === "all" ? "text-emerald-600" : ""
+                }`}
+                aria-hidden
+              />
+              <span>Alle Bereiche</span>
+            </button>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {SPECIFIC_DOMAINS.map(({ value, label }) => {
+                const color = getDomainColor(value);
+                const Icon = DOMAIN_ICONS[color.fallbackIconName];
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => onDomainChange(value)}
+                    disabled={isPending}
+                    aria-pressed={domain === value}
+                    className={rowClass(domain === value)}
+                  >
+                    <span
+                      className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] ${color.iconBg}`}
+                      aria-hidden
                     >
-                      <Icon
-                        className={`h-4 w-4 shrink-0 ${
-                          domain === value ? "text-emerald-600" : ""
-                        }`}
-                        aria-hidden
-                      />
-                      <span>{label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
+                      <Icon size={16} className="text-white" />
+                    </span>
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </section>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -202,11 +218,16 @@ export function QuizConfigForm() {
                 aria-pressed={mode === "random"}
                 className={modeClass(mode === "random")}
               >
-                <Shuffle
-                  className={`h-4 w-4 ${mode === "random" ? "text-emerald-600" : ""}`}
-                  aria-hidden
-                />
-                Zufällig
+                <span className="flex items-center gap-2">
+                  <Shuffle
+                    className={`h-4 w-4 ${mode === "random" ? "text-emerald-600" : ""}`}
+                    aria-hidden
+                  />
+                  Zufällig
+                </span>
+                <span className="text-xs text-zinc-500">
+                  Zufällige Auswahl aus dem Pool
+                </span>
               </button>
               <button
                 type="button"
@@ -215,15 +236,22 @@ export function QuizConfigForm() {
                 aria-pressed={mode === "weakest-first"}
                 className={modeClass(mode === "weakest-first")}
               >
-                <TriangleAlert className="h-4 w-4 text-amber-500" aria-hidden />
-                Schwache zuerst
+                <span className="flex items-center gap-2">
+                  <TriangleAlert className="h-4 w-4 text-amber-500" aria-hidden />
+                  Schwache zuerst
+                </span>
+                <span className="text-xs text-zinc-500">
+                  Priorisiert Karten mit niedriger Trefferquote
+                </span>
               </button>
             </div>
           </section>
 
           <section>
             <h3 className="text-sm font-medium text-zinc-900">Auswahl</h3>
-            <div className="mt-3 flex min-h-[4.5rem] items-center rounded-xl bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+            <div
+              className={`mt-3 flex min-h-[5.5rem] items-center rounded-xl border-l-[3px] bg-zinc-50 px-3 py-2 text-sm text-zinc-700 ${selectionBorderAccent(domain)}`}
+            >
               {previewSentence(count, domain, mode)}
             </div>
           </section>
