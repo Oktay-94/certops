@@ -12,6 +12,7 @@ import {
   Shuffle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkFlexibleMarkers from "remark-flexible-markers";
 import { getDomainColor } from "@/lib/domain-colors";
 import { FlashcardIcon } from "@/components/flashcards/FlashcardIcon";
 import { markFlashcardSeen, resetFlashcardViews } from "./actions";
@@ -32,9 +33,29 @@ const MARKDOWN_COMPONENTS = {
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p className="text-zinc-800" {...props} />
   ),
+  mark: ({
+    className: _ignored,
+    ...rest
+  }: React.HTMLAttributes<HTMLElement>) => (
+    <mark
+      {...rest}
+      className="rounded bg-orange-100 px-1 text-orange-900"
+    />
+  ),
 };
 
-const MARKDOWN_ALLOWED = ["p", "strong", "em", "ul", "ol", "li", "code"];
+const MARKDOWN_ALLOWED = [
+  "p",
+  "strong",
+  "em",
+  "ul",
+  "ol",
+  "li",
+  "code",
+  "mark",
+];
+
+const REMARK_PLUGINS = [remarkFlexibleMarkers];
 
 export type FlashcardItem = {
   id: number;
@@ -249,6 +270,7 @@ export function FlashcardGrid({ cards, domains }: Props) {
                       </div>
                       <div className="min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-relaxed text-zinc-800">
                         <ReactMarkdown
+                          remarkPlugins={REMARK_PLUGINS}
                           allowedElements={MARKDOWN_ALLOWED}
                           unwrapDisallowed
                           components={MARKDOWN_COMPONENTS}

@@ -4,6 +4,7 @@ import { clfC02Questions } from "./seed/index";
 import { clfC02QuestionsBatch2 } from "./seed/questions/index";
 import { clfC02Flashcards } from "./seed/cards/index";
 import { addBoldedTerms } from "../lib/markdown-bold";
+import { addServiceMarkers } from "../lib/markdown-marks";
 
 // CLF-C02 domains (AWS Exam Guide):
 //   1. Cloud Concepts
@@ -30,7 +31,7 @@ async function seed() {
   db.insert(questions).values(all).run();
   const markdownCards = clfC02Flashcards.map((c) => ({
     ...c,
-    back: addBoldedTerms(c.back),
+    back: addServiceMarkers(addBoldedTerms(c.back)),
   }));
   db.insert(flashcards).values(markdownCards).run();
   console.log(

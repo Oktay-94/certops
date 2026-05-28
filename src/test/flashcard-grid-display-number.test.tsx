@@ -76,4 +76,32 @@ describe("FlashcardGrid markdown answer", () => {
       expect(strong?.textContent).toBe("EC2:");
     });
   });
+
+  it("renders ==text== in answers as <mark> with orange styling", async () => {
+    const md: FlashcardItem[] = [
+      {
+        id: 1,
+        cert: "CLF-C02",
+        domain: "Cloud Concepts",
+        front: "Q",
+        back: "==EC2== ist Compute.",
+        iconSlugs: null,
+      },
+    ];
+    const { container } = render(
+      <FlashcardGrid cards={md} domains={["Cloud Concepts"]} />,
+    );
+    const cardBtn = Array.from(container.querySelectorAll("button")).find((b) =>
+      b.className.includes("h-80"),
+    );
+    await act(async () => {
+      cardBtn!.click();
+    });
+    await waitFor(() => {
+      const mark = container.querySelector("mark");
+      expect(mark).not.toBeNull();
+      expect(mark?.textContent).toBe("EC2");
+      expect(mark?.className).toContain("bg-orange-100");
+    });
+  });
 });
