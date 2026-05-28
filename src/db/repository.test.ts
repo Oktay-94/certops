@@ -124,7 +124,49 @@ describe("question_attempts", () => {
     expect(row.correct).toBe(true);
     expect(row.sessionId).toBe("session-1");
     expect(row.timeTakenMs).toBeNull();
+    expect(row.roundId).toBeNull();
     expect(row.answeredAt).toBeInstanceOf(Date);
+  });
+
+  it("persists roundId when provided and allows grouping by it", () => {
+    const q = insertQuestion(db, sampleClf);
+
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+      roundId: "r1",
+    });
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+      roundId: "r1",
+    });
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+      roundId: "r2",
+    });
+    insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "s1",
+      // omitted -> NULL
+    });
+
+    const all = getAttemptsBySession(db, "s1");
+    const r1 = all.filter((a) => a.roundId === "r1");
+    const r2 = all.filter((a) => a.roundId === "r2");
+    const noRound = all.filter((a) => a.roundId === null);
+    expect(r1.length).toBe(2);
+    expect(r2.length).toBe(1);
+    expect(noRound.length).toBe(1);
   });
 
   it("throws on FK violation when question_id does not exist", () => {

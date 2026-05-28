@@ -54,6 +54,7 @@ export const questionAttempts = sqliteTable(
     correct: integer("correct", { mode: "boolean" }).notNull(),
 
     sessionId: text("session_id").notNull(),
+    roundId: text("round_id"),
     timeTakenMs: integer("time_taken_ms"),
 
     answeredAt: integer("answered_at", { mode: "timestamp" })
@@ -63,6 +64,7 @@ export const questionAttempts = sqliteTable(
   (t) => [
     index("idx_question_attempts_session").on(t.sessionId),
     index("idx_question_attempts_question").on(t.questionId),
+    index("idx_question_attempts_round").on(t.roundId),
   ],
 );
 

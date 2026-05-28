@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { getQuestionById, insertAttempt } from "@/db/repository";
 
 const SESSION_COOKIE = "certops_session_id";
+const ROUND_COOKIE = "certops_round_id";
 
 export type SubmitAnswerResult = {
   correct: boolean;
@@ -28,6 +29,7 @@ export async function submitAnswer(input: {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
   if (!sessionId) throw new Error("Missing session cookie");
+  const roundId = cookieStore.get(ROUND_COOKIE)?.value ?? null;
 
   const question = getQuestionById(db, questionId);
   if (!question) throw new Error(`Question ${questionId} not found`);
@@ -43,6 +45,7 @@ export async function submitAnswer(input: {
     selected,
     correct: isCorrect,
     sessionId,
+    roundId,
   });
 
   return {
