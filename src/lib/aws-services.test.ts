@@ -63,6 +63,15 @@ describe("matchServices", () => {
     expect(matchServices("DNS via Route 53")).toEqual(["route53"]);
     expect(matchServices("DNS via Route53")).toEqual(["route53"]);
   });
+
+  it("excludes services flagged hasIcon=false (no shipped icon)", () => {
+    // pricing-calculator has hasIcon: false because the Q2 2026 AWS icon
+    // package ships no SVG for it — the alias must not produce a suggestion.
+    expect(matchServices("AWS Pricing Calculator hilft beim Schätzen")).toEqual([]);
+    expect(
+      matchServices("Pricing Calculator vs Cost Explorer vs AWS Budgets"),
+    ).toEqual(["cost-explorer", "budgets"]);
+  });
 });
 
 describe("AWS_SERVICES registry", () => {

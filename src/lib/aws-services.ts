@@ -2,6 +2,10 @@ export type AwsService = {
   slug: string;
   displayName: string;
   aliases: string[];
+  // Set to false for services whose icon is not shipped in the current AWS
+  // icon package. Those services are excluded from matchServices() so they
+  // never end up as a suggested slug pointing at a non-existent SVG.
+  hasIcon?: boolean;
 };
 
 // Aliases are matched case-sensitive with word boundaries (\bALIAS\b).
@@ -152,19 +156,21 @@ export const AWS_SERVICES: AwsService[] = [
   { slug: "budgets", displayName: "AWS Budgets",
     aliases: ["AWS Budgets"] },
   { slug: "pricing-calculator", displayName: "AWS Pricing Calculator",
-    aliases: ["Pricing Calculator"] },
+    aliases: ["Pricing Calculator"], hasIcon: false },
   { slug: "support", displayName: "AWS Support",
     aliases: ["AWS Support"] },
 ];
 
 const SLUG_BY_ALIAS: { alias: string; slug: string; regex: RegExp }[] =
-  AWS_SERVICES.flatMap((s) =>
-    s.aliases.map((alias) => ({
-      alias,
-      slug: s.slug,
-      regex: new RegExp(`\\b${escapeRegex(alias)}\\b`, "g"),
-    })),
-  ).sort((a, b) => b.alias.length - a.alias.length);
+  AWS_SERVICES.filter((s) => s.hasIcon !== false)
+    .flatMap((s) =>
+      s.aliases.map((alias) => ({
+        alias,
+        slug: s.slug,
+        regex: new RegExp(`\\b${escapeRegex(alias)}\\b`, "g"),
+      })),
+    )
+    .sort((a, b) => b.alias.length - a.alias.length);
 
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
