@@ -8,6 +8,11 @@ export type DomainColor = {
   borderAccent: string;
   textAccent: string;
   iconBg: string;
+  bgSoft: string;
+  barTrack: string;
+  barFill: string;
+  textStrong: string;
+  textMuted: string;
   fallbackIconName: FallbackIconName;
 };
 
@@ -16,6 +21,11 @@ const FALLBACK: DomainColor = {
   borderAccent: "border-l-zinc-400",
   textAccent: "text-zinc-600",
   iconBg: "bg-zinc-500",
+  bgSoft: "bg-zinc-50",
+  barTrack: "bg-zinc-100",
+  barFill: "bg-zinc-500",
+  textStrong: "text-zinc-900",
+  textMuted: "text-zinc-700",
   fallbackIconName: "Cloud",
 };
 
@@ -25,6 +35,11 @@ const MAP: Record<string, DomainColor> = {
     borderAccent: "border-l-blue-600",
     textAccent: "text-blue-600",
     iconBg: "bg-blue-600",
+    bgSoft: "bg-blue-50",
+    barTrack: "bg-blue-100",
+    barFill: "bg-blue-600",
+    textStrong: "text-blue-900",
+    textMuted: "text-blue-700",
     fallbackIconName: "Cloud",
   },
   "Security and Compliance": {
@@ -32,6 +47,11 @@ const MAP: Record<string, DomainColor> = {
     borderAccent: "border-l-rose-600",
     textAccent: "text-rose-600",
     iconBg: "bg-rose-600",
+    bgSoft: "bg-rose-50",
+    barTrack: "bg-rose-100",
+    barFill: "bg-rose-600",
+    textStrong: "text-rose-900",
+    textMuted: "text-rose-700",
     fallbackIconName: "Shield",
   },
   "Cloud Technology and Services": {
@@ -39,6 +59,11 @@ const MAP: Record<string, DomainColor> = {
     borderAccent: "border-l-violet-600",
     textAccent: "text-violet-600",
     iconBg: "bg-violet-600",
+    bgSoft: "bg-violet-50",
+    barTrack: "bg-violet-100",
+    barFill: "bg-violet-600",
+    textStrong: "text-violet-900",
+    textMuted: "text-violet-700",
     fallbackIconName: "Server",
   },
   "Billing, Pricing, and Support": {
@@ -46,6 +71,11 @@ const MAP: Record<string, DomainColor> = {
     borderAccent: "border-l-amber-600",
     textAccent: "text-amber-600",
     iconBg: "bg-amber-600",
+    bgSoft: "bg-amber-50",
+    barTrack: "bg-amber-100",
+    barFill: "bg-amber-600",
+    textStrong: "text-amber-900",
+    textMuted: "text-amber-700",
     fallbackIconName: "DollarSign",
   },
 };

@@ -367,6 +367,158 @@ export function selectRoundQuestions(
   return ordered.slice(0, limit);
 }
 
+export type DomainPerformance = {
+  domain: string;
+  attempts: number;
+  correct: number;
+  questionsCount: number;
+  rate: number | null;
+};
+
+type DomainPerformanceRow = {
+  domain: string;
+  attempts: number | null;
+  correct: number | null;
+  questions_count: number;
+};
+
+export function getDomainPerformance(
+  db: DB,
+  sessionId: string,
+  cert: Question["cert"],
+): DomainPerformance[] {
+  const rows = db.all(sql`
+    SELECT q.domain,
+           SUM(CASE WHEN qa.id IS NOT NULL THEN 1 ELSE 0 END) AS attempts,
+           SUM(CASE WHEN qa.correct THEN 1 ELSE 0 END) AS correct,
+           COUNT(DISTINCT q.id) AS questions_count
+    FROM questions q
+    LEFT JOIN question_attempts qa
+      ON qa.question_id = q.id AND qa.session_id = ${sessionId}
+    WHERE q.cert = ${cert}
+    GROUP BY q.domain
+    ORDER BY q.domain ASC
+  `) as DomainPerformanceRow[];
+
+  return rows.map((r) => {
+    const attempts = Number(r.attempts ?? 0);
+    const correct = Number(r.correct ?? 0);
+    return {
+      domain: r.domain,
+      attempts,
+      correct,
+      questionsCount: Number(r.questions_count),
+      rate: attempts > 0 ? correct / attempts : null,
+    };
+  });
+}
+
+export type WeakestQuestion = {
+  id: number;
+  prompt: string;
+  domain: string;
+  attempts: number;
+  rate: number;
+};
+
+type WeakestQuestionRow = {
+  id: number;
+  prompt: string;
+  domain: string;
+  attempts: number;
+  rate: number;
+};
+
+export function getWeakestQuestions(
+  db: DB,
+  sessionId: string,
+  cert: Question["cert"],
+  limit = 10,
+): WeakestQuestion[] {
+  const rows = db.all(sql`
+    SELECT q.id, q.prompt, q.domain,
+           COUNT(*) AS attempts,
+           AVG(CAST(qa.correct AS REAL)) AS rate,
+           MAX(qa.answered_at) AS last_at
+    FROM question_attempts qa
+    JOIN questions q ON q.id = qa.question_id
+    WHERE qa.session_id = ${sessionId}
+      AND q.cert = ${cert}
+    GROUP BY q.id
+    HAVING COUNT(*) >= 2
+    ORDER BY rate ASC, attempts DESC, last_at DESC
+    LIMIT ${limit}
+  `) as WeakestQuestionRow[];
+
+  return rows.map((r) => ({
+    id: Number(r.id),
+    prompt: r.prompt,
+    domain: r.domain,
+    attempts: Number(r.attempts),
+    rate: Number(r.rate),
+  }));
+}
+
+export function countAnsweredQuestions(
+  db: DB,
+  sessionId: string,
+  cert: Question["cert"],
+): number {
+  const row = db.get(sql`
+    SELECT COUNT(DISTINCT qa.question_id) AS n
+    FROM question_attempts qa
+    JOIN questions q ON q.id = qa.question_id
+    WHERE qa.session_id = ${sessionId}
+      AND q.cert = ${cert}
+  `) as { n: number } | undefined;
+  return Number(row?.n ?? 0);
+}
+
+export type RoundTrendPoint = {
+  roundId: string;
+  rate: number;
+  attempts: number;
+  lastAt: Date;
+};
+
+type RoundTrendRow = {
+  round: string;
+  rate: number;
+  attempts: number;
+  last_at: number;
+};
+
+export function getRoundTrend(
+  db: DB,
+  sessionId: string,
+  cert: Question["cert"],
+  limit = 10,
+): RoundTrendPoint[] {
+  const rows = db.all(sql`
+    SELECT qa.round_id AS round,
+           AVG(CAST(qa.correct AS REAL)) AS rate,
+           COUNT(*) AS attempts,
+           MAX(qa.answered_at) AS last_at
+    FROM question_attempts qa
+    JOIN questions q ON q.id = qa.question_id
+    WHERE qa.session_id = ${sessionId}
+      AND q.cert = ${cert}
+      AND qa.round_id IS NOT NULL
+    GROUP BY qa.round_id
+    ORDER BY last_at DESC
+    LIMIT ${limit}
+  `) as RoundTrendRow[];
+
+  return rows
+    .map((r) => ({
+      roundId: String(r.round),
+      rate: Number(r.rate),
+      attempts: Number(r.attempts),
+      lastAt: new Date(Number(r.last_at) * 1000),
+    }))
+    .reverse();
+}
+
 export function getNeverSeenQuestions(
   db: DB,
   sessionId: string,

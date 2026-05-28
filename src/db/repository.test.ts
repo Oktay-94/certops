@@ -6,9 +6,11 @@ import { beforeEach, describe, expect, it } from "vitest";
 import type { DB } from "./index";
 import * as schema from "./schema";
 import {
+  countAnsweredQuestions,
   countSeenFlashcards,
   getAttemptStats,
   getAttemptsBySession,
+  getDomainPerformance,
   getDomainStats,
   getFlashcards,
   getLastNAttempts,
@@ -16,6 +18,8 @@ import {
   getOverallAvgLast3,
   getQuestionStats,
   getQuestionsByCert,
+  getRoundTrend,
+  getWeakestQuestions,
   insertAttempt,
   insertQuestion,
   markFlashcardSeen,
@@ -882,5 +886,181 @@ describe("getOverallAvgLast3", () => {
     const avg = getOverallAvgLast3(db, "s1", "CLF-C02");
     expect(avg).not.toBeNull();
     expect(avg).toBeCloseTo(0.75, 4);
+  });
+});
+
+describe("getDomainPerformance", () => {
+  let db: DB;
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("aggregates attempts/correct/distinct questions per domain", () => {
+    const q1 = insertQuestion(db, { ...sampleClf, domain: "Cloud Concepts", prompt: "q1" });
+    const q2 = insertQuestion(db, { ...sampleClf, domain: "Cloud Concepts", prompt: "q2" });
+    const q3 = insertQuestion(db, { ...sampleClf, domain: "Security and Compliance", prompt: "q3" });
+    // unused-but-present question to confirm questionsCount counts all cert questions
+    insertQuestion(db, { ...sampleClf, domain: "Billing, Pricing, and Support", prompt: "q4" });
+
+    insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: q1.id, selected: ["B"], correct: false, sessionId: "s1" });
+    insertAttempt(db, { questionId: q2.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
+
+    const perf = getDomainPerformance(db, "s1", "CLF-C02");
+    const byDomain = Object.fromEntries(perf.map((p) => [p.domain, p]));
+
+    expect(byDomain["Cloud Concepts"].attempts).toBe(3);
+    expect(byDomain["Cloud Concepts"].correct).toBe(2);
+    expect(byDomain["Cloud Concepts"].rate).toBeCloseTo(2 / 3, 4);
+    expect(byDomain["Cloud Concepts"].questionsCount).toBe(2);
+
+    expect(byDomain["Security and Compliance"].attempts).toBe(3);
+    expect(byDomain["Security and Compliance"].correct).toBe(2);
+    expect(byDomain["Security and Compliance"].rate).toBeCloseTo(2 / 3, 4);
+    expect(byDomain["Security and Compliance"].questionsCount).toBe(1);
+
+    expect(byDomain["Billing, Pricing, and Support"].attempts).toBe(0);
+    expect(byDomain["Billing, Pricing, and Support"].rate).toBeNull();
+    expect(byDomain["Billing, Pricing, and Support"].questionsCount).toBe(1);
+  });
+
+  it("ignores attempts from other certs and other sessions", () => {
+    const qClf = insertQuestion(db, { ...sampleClf, prompt: "clf" });
+    const qSaa = insertQuestion(db, { ...sampleSaa, prompt: "saa" });
+
+    insertAttempt(db, { questionId: qClf.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: qClf.id, selected: ["B"], correct: false, sessionId: "s2" });
+    insertAttempt(db, { questionId: qSaa.id, selected: ["A"], correct: true, sessionId: "s1" });
+
+    const perf = getDomainPerformance(db, "s1", "CLF-C02");
+    const cc = perf.find((p) => p.domain === "Cloud Concepts")!;
+    expect(cc.attempts).toBe(1);
+    expect(cc.correct).toBe(1);
+  });
+});
+
+describe("getWeakestQuestions", () => {
+  let db: DB;
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("returns questions with ≥2 attempts sorted by rate ASC", () => {
+    const q1 = insertQuestion(db, { ...sampleClf, prompt: "q1" });
+    const q2 = insertQuestion(db, { ...sampleClf, prompt: "q2" });
+    const q3 = insertQuestion(db, { ...sampleClf, prompt: "q3" });
+    const qOnce = insertQuestion(db, { ...sampleClf, prompt: "qOnce" });
+
+    // q1: 1/2 = 0.5
+    insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: q1.id, selected: ["B"], correct: false, sessionId: "s1" });
+    // q2: 0/2 = 0
+    insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
+    insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
+    // q3: 2/2 = 1
+    insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
+    // qOnce: only 1 attempt
+    insertAttempt(db, { questionId: qOnce.id, selected: ["B"], correct: false, sessionId: "s1" });
+
+    const weakest = getWeakestQuestions(db, "s1", "CLF-C02");
+    expect(weakest.map((w) => w.id)).toEqual([q2.id, q1.id, q3.id]);
+    expect(weakest[0].rate).toBe(0);
+    expect(weakest[1].rate).toBeCloseTo(0.5, 4);
+    expect(weakest[2].rate).toBe(1);
+  });
+
+  it("respects the limit parameter", () => {
+    for (let i = 0; i < 5; i++) {
+      const q = insertQuestion(db, { ...sampleClf, prompt: `q${i}` });
+      insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
+      insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
+    }
+    const weakest = getWeakestQuestions(db, "s1", "CLF-C02", 3);
+    expect(weakest).toHaveLength(3);
+  });
+});
+
+describe("countAnsweredQuestions", () => {
+  let db: DB;
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  it("counts distinct questions answered in this cert+session", () => {
+    const q1 = insertQuestion(db, { ...sampleClf, prompt: "q1" });
+    const q2 = insertQuestion(db, { ...sampleClf, prompt: "q2" });
+    const qSaa = insertQuestion(db, { ...sampleSaa, prompt: "saa" });
+
+    insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: q2.id, selected: ["A"], correct: true, sessionId: "s1" });
+    insertAttempt(db, { questionId: qSaa.id, selected: ["A"], correct: true, sessionId: "s1" });
+
+    expect(countAnsweredQuestions(db, "s1", "CLF-C02")).toBe(2);
+    expect(countAnsweredQuestions(db, "s1", "SAA-C03")).toBe(1);
+    expect(countAnsweredQuestions(db, "s2", "CLF-C02")).toBe(0);
+  });
+});
+
+describe("getRoundTrend", () => {
+  let db: DB;
+  beforeEach(() => {
+    db = createTestDb();
+  });
+
+  const t = (offsetSec: number) => new Date(1_700_000_000_000 + offsetSec * 1000);
+
+  it("groups by round_id and returns chronological order by lastAt", () => {
+    const q = insertQuestion(db, { ...sampleClf, prompt: "q" });
+
+    // r1: 2/2
+    insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(10) });
+    insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(20) });
+    // r2: 1/2
+    insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r2", answeredAt: t(30) });
+    insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r2", answeredAt: t(40) });
+    // r3: 0/2
+    insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r3", answeredAt: t(50) });
+    insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r3", answeredAt: t(60) });
+
+    const trend = getRoundTrend(db, "s1", "CLF-C02");
+    expect(trend.map((p) => p.roundId)).toEqual(["r1", "r2", "r3"]);
+    expect(trend[0].rate).toBe(1);
+    expect(trend[1].rate).toBeCloseTo(0.5, 4);
+    expect(trend[2].rate).toBe(0);
+    expect(trend[0].attempts).toBe(2);
+  });
+
+  it("ignores attempts with NULL round_id", () => {
+    const q = insertQuestion(db, { ...sampleClf, prompt: "q" });
+    insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", answeredAt: t(10) });
+    insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(20) });
+
+    const trend = getRoundTrend(db, "s1", "CLF-C02");
+    expect(trend).toHaveLength(1);
+    expect(trend[0].roundId).toBe("r1");
+  });
+
+  it("returns only the most recent N rounds", () => {
+    const q = insertQuestion(db, { ...sampleClf, prompt: "q" });
+    for (let i = 0; i < 15; i++) {
+      insertAttempt(db, {
+        questionId: q.id,
+        selected: ["A"],
+        correct: true,
+        sessionId: "s1",
+        roundId: `r${i}`,
+        answeredAt: t(i * 10),
+      });
+    }
+    const trend = getRoundTrend(db, "s1", "CLF-C02", 10);
+    expect(trend).toHaveLength(10);
+    // chronological: oldest of the 10 youngest first → r5..r14
+    expect(trend[0].roundId).toBe("r5");
+    expect(trend[9].roundId).toBe("r14");
   });
 });
