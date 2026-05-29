@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default async function QuizPage({ searchParams }: Props) {
-  const questions = getQuestionsByCert(db, "CLF-C02");
+  const questions = await getQuestionsByCert(db, "CLF-C02");
   const { error } = await searchParams;
 
   if (questions.length === 0) {

@@ -1,16 +1,28 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import * as schema from "./schema";
 
-const DB_PATH = process.env.DATABASE_URL ?? "./data/certops.db";
+const url = process.env.DATABASE_URL ?? "file:./data/certops.db";
+const authToken = process.env.DATABASE_AUTH_TOKEN;
 
-mkdirSync(dirname(DB_PATH), { recursive: true });
+if (url.startsWith("file:")) {
+  const path = url.slice("file:".length);
+  if (path && path !== ":memory:") {
+    mkdirSync(dirname(path), { recursive: true });
+  }
+}
 
-const sqlite = new Database(DB_PATH);
-sqlite.pragma("journal_mode = WAL");
-sqlite.pragma("foreign_keys = ON");
+const client = createClient({
+  url,
+  ...(authToken ? { authToken } : {}),
+});
 
-export const db = drizzle(sqlite, { schema });
+if (url.startsWith("file:")) {
+  await client.execute("PRAGMA journal_mode = WAL");
+  await client.execute("PRAGMA foreign_keys = ON");
+}
+
+export const db = drizzle(client, { schema });
 export type DB = typeof db;

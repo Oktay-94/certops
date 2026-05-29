@@ -7,9 +7,9 @@ import {
 } from "@/db/repository";
 
 export async function markFlashcardSeen(id: number): Promise<void> {
-  repoMarkFlashcardSeen(db, id);
+  await repoMarkFlashcardSeen(db, id);
 }
 
 export async function resetFlashcardViews(): Promise<void> {
-  repoResetFlashcardViews(db, "CLF-C02");
+  await repoResetFlashcardViews(db, "CLF-C02");
 }

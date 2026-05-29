@@ -24,17 +24,17 @@ export default async function QuizDonePage() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? null;
 
-  const pool = getQuestionsByCert(db, "CLF-C02");
+  const pool = await getQuestionsByCert(db, "CLF-C02");
   const poolSize = pool.length;
 
   // Aktuelle Heuristik für "diese Runde" = letzte N Attempts.
   // Falls sich das als problematisch erweist (Pause mittendrin, etc.),
   // aufrüsten auf round_number-Spalte in question_attempts.
   const roundAttempts = sessionId
-    ? getLastNAttempts(db, sessionId, poolSize)
+    ? await getLastNAttempts(db, sessionId, poolSize)
     : [];
   const stats = sessionId
-    ? getAttemptStats(db, sessionId)
+    ? await getAttemptStats(db, sessionId)
     : { total: 0, correct: 0, byDomain: [] };
 
   const roundCorrect = roundAttempts.filter((a) => a.correct).length;

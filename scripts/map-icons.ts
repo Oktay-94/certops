@@ -20,7 +20,7 @@ type Entry = {
   suggestedSlugs: string[];
 };
 
-const cards = getFlashcards(db, "CLF-C02");
+const cards = await getFlashcards(db, "CLF-C02");
 const entries: Entry[] = cards.map((c) => ({
   id: c.id,
   domain: c.domain,

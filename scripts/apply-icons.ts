@@ -29,7 +29,7 @@ let withIcons = 0;
 let cleared = 0;
 for (const e of entries) {
   const value = e.suggestedSlugs.length > 0 ? e.suggestedSlugs : null;
-  db.update(flashcards)
+  await db.update(flashcards)
     .set({ iconSlugs: value })
     .where(eq(flashcards.id, e.id))
     .run();

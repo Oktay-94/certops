@@ -57,12 +57,12 @@ export default async function StatsPage() {
 
   if (!sessionId) return <EmptyState />;
 
-  const overall = getOverallAvgLast3(db, sessionId, CERT);
-  const totalQuestions = getQuestionsByCert(db, CERT).length;
-  const answered = countAnsweredQuestions(db, sessionId, CERT);
-  const perf = getDomainPerformance(db, sessionId, CERT);
-  const weakest = getWeakestQuestions(db, sessionId, CERT, 10);
-  const trend = getRoundTrend(db, sessionId, CERT, 10);
+  const overall = await getOverallAvgLast3(db, sessionId, CERT);
+  const totalQuestions = (await getQuestionsByCert(db, CERT)).length;
+  const answered = await countAnsweredQuestions(db, sessionId, CERT);
+  const perf = await getDomainPerformance(db, sessionId, CERT);
+  const weakest = await getWeakestQuestions(db, sessionId, CERT, 10);
+  const trend = await getRoundTrend(db, sessionId, CERT, 10);
 
   if (answered === 0) return <EmptyState />;
 

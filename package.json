@@ -13,10 +13,12 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "mkdir -p data && drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "mkdir -p data && tsx src/db/seed.ts"
+    "db:seed": "mkdir -p data && tsx src/db/seed.ts",
+    "db:migrate:remote": "node --env-file=.env.turso ./node_modules/.bin/drizzle-kit migrate --config=drizzle.config.turso.ts",
+    "db:seed:remote": "tsx --env-file=.env.turso src/db/seed.ts"
   },
   "dependencies": {
-    "better-sqlite3": "^12.10.0",
+    "@libsql/client": "^0.17.3",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
@@ -29,7 +31,6 @@
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

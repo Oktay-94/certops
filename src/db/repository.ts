@@ -13,11 +13,11 @@ import {
   type QuestionAttempt,
 } from "./schema";
 
-export function getQuestionsByCert(
+export async function getQuestionsByCert(
   db: DB,
   cert: Question["cert"],
   opts?: { domain?: string },
-): Question[] {
+): Promise<Question[]> {
   const where = opts?.domain
     ? and(eq(questions.cert, cert), eq(questions.domain, opts.domain))
     : eq(questions.cert, cert);
@@ -25,27 +25,30 @@ export function getQuestionsByCert(
   return db.select().from(questions).where(where).orderBy(asc(questions.id)).all();
 }
 
-export function getQuestionById(db: DB, id: number): Question | undefined {
+export async function getQuestionById(
+  db: DB,
+  id: number,
+): Promise<Question | undefined> {
   return db.select().from(questions).where(eq(questions.id, id)).get();
 }
 
-export function insertQuestion(db: DB, q: NewQuestion): Question {
-  const [row] = db.insert(questions).values(q).returning().all();
+export async function insertQuestion(db: DB, q: NewQuestion): Promise<Question> {
+  const [row] = await db.insert(questions).values(q).returning().all();
   return row;
 }
 
-export function insertAttempt(
+export async function insertAttempt(
   db: DB,
   attempt: NewQuestionAttempt,
-): QuestionAttempt {
-  const [row] = db.insert(questionAttempts).values(attempt).returning().all();
+): Promise<QuestionAttempt> {
+  const [row] = await db.insert(questionAttempts).values(attempt).returning().all();
   return row;
 }
 
-export function getAttemptsBySession(
+export async function getAttemptsBySession(
   db: DB,
   sessionId: string,
-): QuestionAttempt[] {
+): Promise<QuestionAttempt[]> {
   return db
     .select()
     .from(questionAttempts)
@@ -54,11 +57,11 @@ export function getAttemptsBySession(
     .all();
 }
 
-export function getLastNAttempts(
+export async function getLastNAttempts(
   db: DB,
   sessionId: string,
   n: number,
-): QuestionAttempt[] {
+): Promise<QuestionAttempt[]> {
   return db
     .select()
     .from(questionAttempts)
@@ -75,8 +78,11 @@ export type AttemptStats = {
   byDomain: DomainStat[];
 };
 
-export function getAttemptStats(db: DB, sessionId: string): AttemptStats {
-  const rows = db
+export async function getAttemptStats(
+  db: DB,
+  sessionId: string,
+): Promise<AttemptStats> {
+  const rows = await db
     .select({
       domain: questions.domain,
       total: sql<number>`count(*)`.as("total"),
@@ -123,8 +129,11 @@ type QuestionStatRow = {
   last_answered_at: number;
 };
 
-export function getQuestionStats(db: DB, sessionId: string): QuestionStat[] {
-  const rows = db.all(sql`
+export async function getQuestionStats(
+  db: DB,
+  sessionId: string,
+): Promise<QuestionStat[]> {
+  const rows = (await db.all(sql`
     WITH ranked AS (
       SELECT question_id, correct, answered_at,
         ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
@@ -154,7 +163,7 @@ export function getQuestionStats(db: DB, sessionId: string): QuestionStat[] {
     JOIN last3 l ON l.question_id = t.question_id
     JOIN questions q ON q.id = t.question_id
     ORDER BY l.avg_correct_last3 ASC, t.last_answered_at DESC
-  `) as QuestionStatRow[];
+  `)) as QuestionStatRow[];
 
   return rows.map((r) => ({
     id: Number(r.id),
@@ -181,12 +190,12 @@ type DomainOverviewRow = {
   questions_unseen: number;
 };
 
-export function getDomainStats(
+export async function getDomainStats(
   db: DB,
   sessionId: string,
   cert: Question["cert"],
-): DomainOverview[] {
-  const rows = db.all(sql`
+): Promise<DomainOverview[]> {
+  const rows = (await db.all(sql`
     WITH ranked AS (
       SELECT question_id, correct, answered_at,
         ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
@@ -209,7 +218,7 @@ export function getDomainStats(
     WHERE q.cert = ${cert}
     GROUP BY q.domain
     ORDER BY q.domain
-  `) as DomainOverviewRow[];
+  `)) as DomainOverviewRow[];
 
   return rows.map((r) => ({
     domain: r.domain,
@@ -219,10 +228,10 @@ export function getDomainStats(
   }));
 }
 
-export function getFlashcards(
+export async function getFlashcards(
   db: DB,
   cert: Flashcard["cert"],
-): Flashcard[] {
+): Promise<Flashcard[]> {
   return db
     .select()
     .from(flashcards)
@@ -231,11 +240,11 @@ export function getFlashcards(
     .all();
 }
 
-export function countSeenFlashcards(
+export async function countSeenFlashcards(
   db: DB,
   cert: Flashcard["cert"],
-): number {
-  const row = db
+): Promise<number> {
+  const row = await db
     .select({ n: sql<number>`count(*)`.as("n") })
     .from(flashcards)
     .where(and(eq(flashcards.cert, cert), isNotNull(flashcards.lastSeenAt)))
@@ -243,29 +252,29 @@ export function countSeenFlashcards(
   return Number(row?.n ?? 0);
 }
 
-export function markFlashcardSeen(db: DB, id: number): void {
-  db.update(flashcards)
+export async function markFlashcardSeen(db: DB, id: number): Promise<void> {
+  await db.update(flashcards)
     .set({ lastSeenAt: new Date() })
     .where(eq(flashcards.id, id))
     .run();
 }
 
-export function resetFlashcardViews(
+export async function resetFlashcardViews(
   db: DB,
   cert: Flashcard["cert"],
-): void {
-  db.update(flashcards)
+): Promise<void> {
+  await db.update(flashcards)
     .set({ lastSeenAt: null })
     .where(eq(flashcards.cert, cert))
     .run();
 }
 
-export function getOverallAvgLast3(
+export async function getOverallAvgLast3(
   db: DB,
   sessionId: string,
   cert: Question["cert"],
-): number | null {
-  const row = db.get(sql`
+): Promise<number | null> {
+  const row = (await db.get(sql`
     WITH ranked AS (
       SELECT question_id, correct, answered_at,
         ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
@@ -283,7 +292,7 @@ export function getOverallAvgLast3(
     FROM questions q
     LEFT JOIN per_question p ON p.question_id = q.id
     WHERE q.cert = ${cert}
-  `) as { avg_correct_rate: number | null } | undefined;
+  `)) as { avg_correct_rate: number | null } | undefined;
 
   if (!row || row.avg_correct_rate === null) return null;
   return Number(row.avg_correct_rate);
@@ -295,7 +304,7 @@ type RoundCandidateRow = {
   total_attempts: number | null;
 };
 
-export function selectRoundQuestions(
+export async function selectRoundQuestions(
   db: DB,
   opts: {
     cert: Question["cert"];
@@ -305,10 +314,10 @@ export function selectRoundQuestions(
     mode: QuizMode;
     seed: number;
   },
-): number[] {
+): Promise<number[]> {
   const { cert, sessionId, domain, count, mode, seed } = opts;
 
-  const rawRows = db.all(sql`
+  const rawRows = (await db.all(sql`
     WITH ranked AS (
       SELECT question_id, correct, answered_at,
         ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
@@ -330,7 +339,7 @@ export function selectRoundQuestions(
     WHERE q.cert = ${cert}
       AND (${domain ?? null} IS NULL OR q.domain = ${domain ?? null})
     ORDER BY q.id ASC
-  `) as RoundCandidateRow[];
+  `)) as RoundCandidateRow[];
 
   const ids = rawRows.map((r) => Number(r.id));
   if (ids.length === 0) return [];
@@ -382,12 +391,12 @@ type DomainPerformanceRow = {
   questions_count: number;
 };
 
-export function getDomainPerformance(
+export async function getDomainPerformance(
   db: DB,
   sessionId: string,
   cert: Question["cert"],
-): DomainPerformance[] {
-  const rows = db.all(sql`
+): Promise<DomainPerformance[]> {
+  const rows = (await db.all(sql`
     SELECT q.domain,
            SUM(CASE WHEN qa.id IS NOT NULL THEN 1 ELSE 0 END) AS attempts,
            SUM(CASE WHEN qa.correct THEN 1 ELSE 0 END) AS correct,
@@ -398,7 +407,7 @@ export function getDomainPerformance(
     WHERE q.cert = ${cert}
     GROUP BY q.domain
     ORDER BY q.domain ASC
-  `) as DomainPerformanceRow[];
+  `)) as DomainPerformanceRow[];
 
   return rows.map((r) => {
     const attempts = Number(r.attempts ?? 0);
@@ -429,13 +438,13 @@ type WeakestQuestionRow = {
   rate: number;
 };
 
-export function getWeakestQuestions(
+export async function getWeakestQuestions(
   db: DB,
   sessionId: string,
   cert: Question["cert"],
   limit = 10,
-): WeakestQuestion[] {
-  const rows = db.all(sql`
+): Promise<WeakestQuestion[]> {
+  const rows = (await db.all(sql`
     SELECT q.id, q.prompt, q.domain,
            COUNT(*) AS attempts,
            AVG(CAST(qa.correct AS REAL)) AS rate,
@@ -448,7 +457,7 @@ export function getWeakestQuestions(
     HAVING COUNT(*) >= 2
     ORDER BY rate ASC, attempts DESC, last_at DESC
     LIMIT ${limit}
-  `) as WeakestQuestionRow[];
+  `)) as WeakestQuestionRow[];
 
   return rows.map((r) => ({
     id: Number(r.id),
@@ -459,18 +468,18 @@ export function getWeakestQuestions(
   }));
 }
 
-export function countAnsweredQuestions(
+export async function countAnsweredQuestions(
   db: DB,
   sessionId: string,
   cert: Question["cert"],
-): number {
-  const row = db.get(sql`
+): Promise<number> {
+  const row = (await db.get(sql`
     SELECT COUNT(DISTINCT qa.question_id) AS n
     FROM question_attempts qa
     JOIN questions q ON q.id = qa.question_id
     WHERE qa.session_id = ${sessionId}
       AND q.cert = ${cert}
-  `) as { n: number } | undefined;
+  `)) as { n: number } | undefined;
   return Number(row?.n ?? 0);
 }
 
@@ -488,13 +497,13 @@ type RoundTrendRow = {
   last_at: number;
 };
 
-export function getRoundTrend(
+export async function getRoundTrend(
   db: DB,
   sessionId: string,
   cert: Question["cert"],
   limit = 10,
-): RoundTrendPoint[] {
-  const rows = db.all(sql`
+): Promise<RoundTrendPoint[]> {
+  const rows = (await db.all(sql`
     SELECT qa.round_id AS round,
            AVG(CAST(qa.correct AS REAL)) AS rate,
            COUNT(*) AS attempts,
@@ -507,7 +516,7 @@ export function getRoundTrend(
     GROUP BY qa.round_id
     ORDER BY last_at DESC
     LIMIT ${limit}
-  `) as RoundTrendRow[];
+  `)) as RoundTrendRow[];
 
   return rows
     .map((r) => ({
@@ -519,13 +528,13 @@ export function getRoundTrend(
     .reverse();
 }
 
-export function getNeverSeenQuestions(
+export async function getNeverSeenQuestions(
   db: DB,
   sessionId: string,
   cert: Question["cert"],
   limit = 20,
-): Pick<Question, "id" | "cert" | "domain" | "prompt">[] {
-  const rows = db.all(sql`
+): Promise<Pick<Question, "id" | "cert" | "domain" | "prompt">[]> {
+  const rows = (await db.all(sql`
     SELECT q.id, q.cert, q.domain, q.prompt
     FROM questions q
     WHERE q.cert = ${cert}
@@ -535,7 +544,7 @@ export function getNeverSeenQuestions(
       )
     ORDER BY q.id ASC
     LIMIT ${limit}
-  `) as Array<{ id: number; cert: Question["cert"]; domain: string; prompt: string }>;
+  `)) as Array<{ id: number; cert: Question["cert"]; domain: string; prompt: string }>;
 
   return rows.map((r) => ({
     id: Number(r.id),

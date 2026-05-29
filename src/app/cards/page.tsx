@@ -3,8 +3,8 @@ import { db } from "@/db";
 import { getFlashcards } from "@/db/repository";
 import { FlashcardGrid } from "./FlashcardGrid";
 
-export default function CardsPage() {
-  const cards = getFlashcards(db, "CLF-C02");
+export default async function CardsPage() {
+  const cards = await getFlashcards(db, "CLF-C02");
 
   if (cards.length === 0) return <EmptyState />;
 

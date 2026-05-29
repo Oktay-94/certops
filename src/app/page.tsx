@@ -23,10 +23,10 @@ export default async function Home() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? null;
 
-  const cardsTotal = getFlashcards(db, "CLF-C02").length;
-  const seenCount = countSeenFlashcards(db, "CLF-C02");
+  const cardsTotal = (await getFlashcards(db, "CLF-C02")).length;
+  const seenCount = await countSeenFlashcards(db, "CLF-C02");
   const avgLast3 = sessionId
-    ? getOverallAvgLast3(db, sessionId, "CLF-C02")
+    ? await getOverallAvgLast3(db, sessionId, "CLF-C02")
     : null;
 
   const now = new Date();

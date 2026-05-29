@@ -25,15 +25,15 @@ async function seed() {
 
   // FK (question_attempts.question_id -> questions.id, ON DELETE RESTRICT)
   // forces us to clear attempts before reseeding questions.
-  db.delete(questionAttempts).run();
-  db.delete(questions).run();
-  db.delete(flashcards).run();
-  db.insert(questions).values(all).run();
+  await db.delete(questionAttempts).run();
+  await db.delete(questions).run();
+  await db.delete(flashcards).run();
+  await db.insert(questions).values(all).run();
   const markdownCards = clfC02Flashcards.map((c) => ({
     ...c,
     back: addServiceMarkers(addBoldedTerms(c.back)),
   }));
-  db.insert(flashcards).values(markdownCards).run();
+  await db.insert(flashcards).values(markdownCards).run();
   console.log(
     `Seeded ${all.length} question(s), ${clfC02Flashcards.length} flashcard(s).`,
   );

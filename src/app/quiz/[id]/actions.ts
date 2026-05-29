@@ -31,7 +31,7 @@ export async function submitAnswer(input: {
   if (!sessionId) throw new Error("Missing session cookie");
   const roundId = cookieStore.get(ROUND_COOKIE)?.value ?? null;
 
-  const question = getQuestionById(db, questionId);
+  const question = await getQuestionById(db, questionId);
   if (!question) throw new Error(`Question ${questionId} not found`);
 
   const correctSet = new Set(question.correct);
@@ -40,7 +40,7 @@ export async function submitAnswer(input: {
     correctSet.size === selectedSet.size &&
     [...selectedSet].every((id) => correctSet.has(id));
 
-  insertAttempt(db, {
+  await insertAttempt(db, {
     questionId: question.id,
     selected,
     correct: isCorrect,

@@ -40,7 +40,7 @@ export async function startRound(input: StartRoundInput): Promise<void> {
   const roundId = cookieStore.get(ROUND_COOKIE)?.value ?? "";
   const seed = seedFromString(`${sessionId}:${roundId}`);
 
-  const ids = selectRoundQuestions(db, {
+  const ids = await selectRoundQuestions(db, {
     cert: "CLF-C02",
     sessionId,
     domain: input.domain === "all" ? undefined : input.domain,

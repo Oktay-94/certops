@@ -33,7 +33,7 @@ export default async function QuizQuestionPage({ params }: Props) {
   const id = Number.parseInt(idParam, 10);
   if (!Number.isInteger(id) || id <= 0) notFound();
 
-  const all = getQuestionsByCert(db, "CLF-C02");
+  const all = await getQuestionsByCert(db, "CLF-C02");
   const byId = new Map<number, Question>(all.map((q) => [q.id, q]));
 
   const cookieStore = await cookies();
