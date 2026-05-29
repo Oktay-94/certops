@@ -1,3 +1,4 @@
+import "./load-env-turso";
 import { db } from "./index";
 import { flashcards, questionAttempts, questions } from "./schema";
 import { clfC02Questions } from "./seed/index";

@@ -20,8 +20,11 @@ const client = createClient({
 });
 
 if (url.startsWith("file:")) {
-  await client.execute("PRAGMA journal_mode = WAL");
-  await client.execute("PRAGMA foreign_keys = ON");
+  // Fire-and-forget — libsql serializes statements per client, so any
+  // subsequent drizzle query queues behind these PRAGMAs. Avoids top-level
+  // await for tsx/CJS transpile compatibility (seed scripts).
+  void client.execute("PRAGMA journal_mode = WAL");
+  void client.execute("PRAGMA foreign_keys = ON");
 }
 
 export const db = drizzle(client, { schema });
