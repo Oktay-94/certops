@@ -26,6 +26,8 @@ import {
   scoreColorHex,
 } from "@/lib/scoreColor";
 import { LastRoundBox } from "./LastRoundBox";
+import { TrendCompactBars } from "./TrendCompactBars";
+import { TrendLineChart } from "./TrendLineChart";
 import { WeakestBox } from "./WeakestBox";
 
 const SESSION_COOKIE = "certops_session_id";
@@ -124,6 +126,24 @@ export default async function StatsPage() {
         </h2>
         <div className="mt-4">
           <WeakestBox items={weakest} />
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700">
+          Verlauf
+        </h2>
+        <div className="mt-4 space-y-4">
+          <TrendLineChart trend={trend} />
+          <TrendCompactBars
+            lastRoundRate={
+              lastRound.correctCount + lastRound.incorrectCount > 0
+                ? lastRound.correctCount /
+                  (lastRound.correctCount + lastRound.incorrectCount)
+                : null
+            }
+            overallRate={overall}
+          />
         </div>
       </section>
 
