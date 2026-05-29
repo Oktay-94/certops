@@ -236,7 +236,7 @@ export function FlashcardGrid({ cards, domains }: Props) {
           Keine Karten gefunden.
         </p>
       ) : (
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map((c) => {
             const isFlipped = flipped.has(c.id);
             const color = getDomainColor(c.domain);
@@ -245,69 +245,78 @@ export function FlashcardGrid({ cards, domains }: Props) {
                 key={c.id}
                 type="button"
                 onClick={() => toggleCard(c.id)}
-                className={`flex h-80 flex-col rounded-xl border border-l-4 border-zinc-200 ${color.borderAccent} bg-white p-4 text-left transition hover:border-zinc-400`}
+                className="flex h-80 overflow-hidden rounded-[18px] bg-white text-left shadow-[0_18px_40px_-12px_rgba(24,24,27,0.22),0_6px_14px_-6px_rgba(24,24,27,0.12)] transition hover:shadow-[0_24px_50px_-12px_rgba(24,24,27,0.28),0_8px_18px_-6px_rgba(24,24,27,0.16)]"
               >
-                {/* Header */}
-                <div className="flex shrink-0 items-center justify-between gap-2 border-b-[0.5px] border-zinc-200 pb-2.5">
-                  <span
-                    className={`rounded-full border px-2 py-0.5 text-xs font-medium ${color.tag}`}
-                  >
-                    {c.domain}
-                  </span>
-                  <span className="text-[15px] font-bold text-zinc-900">
-                    #{displayNumberById.get(c.id)}
-                  </span>
-                </div>
+                {/* Left domain stripe — clipped into the card rounding via overflow-hidden */}
+                <div className={`w-[5px] shrink-0 ${color.iconBg}`} aria-hidden />
 
-                {/* Content */}
+                {/* Content column */}
                 <div className="flex min-h-0 flex-1 flex-col">
-                  {isFlipped ? (
-                    <div className="flex h-full min-h-0 flex-col">
-                      <div className="my-2.5 shrink-0 rounded-md border-l-2 border-amber-500 bg-amber-100 px-2.5 py-1.5">
-                        <p className="text-[11.5px] leading-snug text-amber-900">
-                          {c.front}
-                        </p>
-                      </div>
-                      <div className="min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-relaxed text-zinc-800">
-                        <ReactMarkdown
-                          remarkPlugins={REMARK_PLUGINS}
-                          allowedElements={MARKDOWN_ALLOWED}
-                          unwrapDisallowed
-                          components={MARKDOWN_COMPONENTS}
-                        >
-                          {c.back}
-                        </ReactMarkdown>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex h-full flex-col items-center justify-center gap-3.5 py-2.5">
-                      <FlashcardIcon
-                        iconSlugs={c.iconSlugs}
-                        domain={c.domain}
-                        variant="hero"
-                      />
-                      <p className="whitespace-pre-wrap text-center text-[15px] font-semibold leading-relaxed text-zinc-900">
-                        {c.front}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                  {/* Header: domain pill with the card number prefixed */}
+                  <div className="flex shrink-0 items-center px-5 pb-3.5 pt-5">
+                    <span
+                      className={`min-w-0 truncate rounded-full border px-3.5 py-1.5 text-sm font-medium ${color.tag}`}
+                    >
+                      <span className="font-bold">
+                        {displayNumberById.get(c.id)}.
+                      </span>{" "}
+                      {c.domain}
+                    </span>
+                  </div>
 
-                {/* Footer */}
-                <div
-                  className={`flex shrink-0 items-center gap-1 border-t-[0.5px] border-zinc-200 pt-2.5 text-[11px] italic ${color.textAccent}`}
-                >
-                  {isFlipped ? (
-                    <>
-                      <RefreshCw className="h-3.5 w-3.5" aria-hidden />
-                      Klicken zum Umdrehen
-                    </>
-                  ) : (
-                    <>
-                      <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
-                      Klicken für Antwort
-                    </>
-                  )}
+                  {/* Neutral divider, inset from edges (not touching stripe) */}
+                  <div className="mx-5 shrink-0 border-t border-zinc-200" />
+
+                  {/* Body */}
+                  <div className="flex min-h-0 flex-1 flex-col p-5">
+                    <div className="flex min-h-0 flex-1 flex-col">
+                      {isFlipped ? (
+                        <div className="flex h-full min-h-0 flex-col">
+                          <div className="mb-2.5 shrink-0 rounded-md border-l-2 border-amber-500 bg-amber-100 px-2.5 py-1.5">
+                            <p className="text-[11.5px] leading-snug text-amber-900">
+                              {c.front}
+                            </p>
+                          </div>
+                          <div className="min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-relaxed text-zinc-800">
+                            <ReactMarkdown
+                              remarkPlugins={REMARK_PLUGINS}
+                              allowedElements={MARKDOWN_ALLOWED}
+                              unwrapDisallowed
+                              components={MARKDOWN_COMPONENTS}
+                            >
+                              {c.back}
+                            </ReactMarkdown>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex h-full flex-col items-center justify-center gap-3.5">
+                          <FlashcardIcon
+                            iconSlugs={c.iconSlugs}
+                            domain={c.domain}
+                            variant="hero"
+                          />
+                          <p className="whitespace-pre-wrap text-center text-[15px] font-semibold leading-relaxed text-zinc-900">
+                            {c.front}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Flip hint */}
+                    <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-zinc-400">
+                      {isFlipped ? (
+                        <>
+                          <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                          Klicken zum Umdrehen
+                        </>
+                      ) : (
+                        <>
+                          <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
+                          Klicken für Antwort
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </button>
             );

@@ -67,7 +67,7 @@ const MAP: Record<string, DomainColor> = {
     fallbackIconName: "Server",
   },
   "Billing, Pricing, and Support": {
-    tag: "bg-amber-100 text-amber-800 border-amber-200",
+    tag: "bg-amber-100 text-amber-900 border-amber-200",
     borderAccent: "border-l-amber-600",
     textAccent: "text-amber-600",
     iconBg: "bg-amber-600",
