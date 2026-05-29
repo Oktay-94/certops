@@ -19,10 +19,18 @@ const client = createClient({
   ...(authToken ? { authToken } : {}),
 });
 
+// PRAGMAs are only set for file: URLs. Turso (libsql://) runs each
+// client.execute() as a separate HTTP request — the server treats each as
+// a fresh session, so a one-shot PRAGMA foreign_keys=ON does NOT carry
+// over to subsequent statements, and libsql has no init-statement option
+// to fix that. FK enforcement on Turso is therefore an accepted limitation
+// (local dev + tests do enforce FKs; see scripts/verify-fk.ts).
+//
+// Fire-and-forget is safe here because libsql's node/file backend
+// serializes statements on the embedded connection — subsequent drizzle
+// queries queue behind these PRAGMAs. Verified empirically in
+// scripts/verify-fk.ts. Avoids top-level await for tsx/CJS compatibility.
 if (url.startsWith("file:")) {
-  // Fire-and-forget — libsql serializes statements per client, so any
-  // subsequent drizzle query queues behind these PRAGMAs. Avoids top-level
-  // await for tsx/CJS transpile compatibility (seed scripts).
   void client.execute("PRAGMA journal_mode = WAL");
   void client.execute("PRAGMA foreign_keys = ON");
 }
