@@ -6,12 +6,28 @@ import {
   flashcards,
   questionAttempts,
   questions,
+  type Choice,
   type Flashcard,
   type NewQuestion,
   type NewQuestionAttempt,
   type Question,
   type QuestionAttempt,
 } from "./schema";
+
+function parseJsonField<T>(value: unknown): T {
+  return typeof value === "string" ? (JSON.parse(value) as T) : (value as T);
+}
+
+function resolveCorrectAnswerText(
+  choices: Choice[],
+  correctIds: string[],
+): string {
+  const correctSet = new Set(correctIds);
+  return choices
+    .filter((c) => correctSet.has(c.id))
+    .map((c) => c.text)
+    .join(", ");
+}
 
 export async function getQuestionsByCert(
   db: DB,
@@ -426,16 +442,17 @@ export type WeakestQuestion = {
   id: number;
   prompt: string;
   domain: string;
-  attempts: number;
-  rate: number;
+  wrongCount: number;
+  correctAnswerText: string;
 };
 
 type WeakestQuestionRow = {
   id: number;
   prompt: string;
   domain: string;
-  attempts: number;
-  rate: number;
+  choices: unknown;
+  correct: unknown;
+  wrong_count: number;
 };
 
 export async function getWeakestQuestions(
@@ -445,17 +462,16 @@ export async function getWeakestQuestions(
   limit = 10,
 ): Promise<WeakestQuestion[]> {
   const rows = (await db.all(sql`
-    SELECT q.id, q.prompt, q.domain,
-           COUNT(*) AS attempts,
-           AVG(CAST(qa.correct AS REAL)) AS rate,
+    SELECT q.id, q.prompt, q.domain, q.choices, q.correct,
+           SUM(CASE WHEN qa.correct THEN 0 ELSE 1 END) AS wrong_count,
            MAX(qa.answered_at) AS last_at
     FROM question_attempts qa
     JOIN questions q ON q.id = qa.question_id
     WHERE qa.session_id = ${sessionId}
       AND q.cert = ${cert}
     GROUP BY q.id
-    HAVING COUNT(*) >= 2
-    ORDER BY rate ASC, attempts DESC, last_at DESC
+    HAVING SUM(CASE WHEN qa.correct THEN 0 ELSE 1 END) >= 1
+    ORDER BY wrong_count DESC, last_at DESC
     LIMIT ${limit}
   `)) as WeakestQuestionRow[];
 
@@ -463,9 +479,109 @@ export async function getWeakestQuestions(
     id: Number(r.id),
     prompt: r.prompt,
     domain: r.domain,
-    attempts: Number(r.attempts),
-    rate: Number(r.rate),
+    wrongCount: Number(r.wrong_count),
+    correctAnswerText: resolveCorrectAnswerText(
+      parseJsonField<Choice[]>(r.choices),
+      parseJsonField<string[]>(r.correct),
+    ),
   }));
+}
+
+export type LastRoundQuestion = {
+  questionId: number;
+  questionText: string;
+  correctAnswerText: string;
+  isCorrect: boolean;
+};
+
+export type LastRoundReview = {
+  roundId: string | null;
+  correct: LastRoundQuestion[];
+  incorrect: LastRoundQuestion[];
+  correctCount: number;
+  incorrectCount: number;
+};
+
+type LastRoundAttemptRow = {
+  question_id: number;
+  prompt: string;
+  choices: unknown;
+  correct_ids: unknown;
+  is_correct: number;
+};
+
+export async function getLastRoundReview(
+  db: DB,
+  sessionId: string,
+  cert: Question["cert"],
+): Promise<LastRoundReview> {
+  const empty: LastRoundReview = {
+    roundId: null,
+    correct: [],
+    incorrect: [],
+    correctCount: 0,
+    incorrectCount: 0,
+  };
+
+  const latestRows = (await db.all(sql`
+    SELECT qa.round_id AS round_id
+    FROM question_attempts qa
+    JOIN questions q ON q.id = qa.question_id
+    WHERE qa.session_id = ${sessionId}
+      AND q.cert = ${cert}
+      AND qa.round_id IS NOT NULL
+    ORDER BY qa.answered_at DESC
+    LIMIT 1
+  `)) as Array<{ round_id: string }>;
+
+  const latest = latestRows[0];
+  if (!latest?.round_id) return empty;
+
+  // One row per question — newest attempt wins if a question was retried
+  // within the same round.
+  const rows = (await db.all(sql`
+    SELECT qa.question_id AS question_id,
+           q.prompt AS prompt,
+           q.choices AS choices,
+           q.correct AS correct_ids,
+           qa.correct AS is_correct
+    FROM question_attempts qa
+    JOIN questions q ON q.id = qa.question_id
+    WHERE qa.session_id = ${sessionId}
+      AND qa.round_id = ${latest.round_id}
+      AND qa.id IN (
+        SELECT MAX(qa2.id)
+        FROM question_attempts qa2
+        WHERE qa2.session_id = ${sessionId}
+          AND qa2.round_id = ${latest.round_id}
+        GROUP BY qa2.question_id
+      )
+    ORDER BY qa.answered_at ASC
+  `)) as LastRoundAttemptRow[];
+
+  const correct: LastRoundQuestion[] = [];
+  const incorrect: LastRoundQuestion[] = [];
+  for (const r of rows) {
+    const item: LastRoundQuestion = {
+      questionId: Number(r.question_id),
+      questionText: r.prompt,
+      correctAnswerText: resolveCorrectAnswerText(
+        parseJsonField<Choice[]>(r.choices),
+        parseJsonField<string[]>(r.correct_ids),
+      ),
+      isCorrect: Boolean(Number(r.is_correct)),
+    };
+    if (item.isCorrect) correct.push(item);
+    else incorrect.push(item);
+  }
+
+  return {
+    roundId: latest.round_id,
+    correct,
+    incorrect,
+    correctCount: correct.length,
+    incorrectCount: incorrect.length,
+  };
 }
 
 export async function countAnsweredQuestions(

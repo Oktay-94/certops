@@ -11,13 +11,13 @@ import { db } from "@/db";
 import {
   countAnsweredQuestions,
   getDomainPerformance,
+  getLastRoundReview,
   getOverallAvgLast3,
   getQuestionsByCert,
   getRoundTrend,
   getWeakestQuestions,
   type DomainPerformance,
   type RoundTrendPoint,
-  type WeakestQuestion,
 } from "@/db/repository";
 import { getDomainColor, type FallbackIconName } from "@/lib/domain-colors";
 import {
@@ -25,6 +25,8 @@ import {
   scoreColorClass,
   scoreColorHex,
 } from "@/lib/scoreColor";
+import { LastRoundBox } from "./LastRoundBox";
+import { WeakestBox } from "./WeakestBox";
 
 const SESSION_COOKIE = "certops_session_id";
 const CERT = "CLF-C02" as const;
@@ -47,22 +49,23 @@ function pct(rate: number): string {
   return `${Math.round(rate * 100)}%`;
 }
 
-function truncate(s: string, max = 90): string {
-  return s.length <= max ? s : s.slice(0, max - 1).trimEnd() + "…";
-}
-
 export default async function StatsPage() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? null;
 
   if (!sessionId) return <EmptyState />;
 
-  const overall = await getOverallAvgLast3(db, sessionId, CERT);
-  const totalQuestions = (await getQuestionsByCert(db, CERT)).length;
-  const answered = await countAnsweredQuestions(db, sessionId, CERT);
-  const perf = await getDomainPerformance(db, sessionId, CERT);
-  const weakest = await getWeakestQuestions(db, sessionId, CERT, 10);
-  const trend = await getRoundTrend(db, sessionId, CERT, 10);
+  const [overall, allQuestions, answered, perf, weakest, trend, lastRound] =
+    await Promise.all([
+      getOverallAvgLast3(db, sessionId, CERT),
+      getQuestionsByCert(db, CERT),
+      countAnsweredQuestions(db, sessionId, CERT),
+      getDomainPerformance(db, sessionId, CERT),
+      getWeakestQuestions(db, sessionId, CERT, 10),
+      getRoundTrend(db, sessionId, CERT, 10),
+      getLastRoundReview(db, sessionId, CERT),
+    ]);
+  const totalQuestions = allQuestions.length;
 
   if (answered === 0) return <EmptyState />;
 
@@ -108,19 +111,20 @@ export default async function StatsPage() {
 
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700">
-          Schwächste 10 Fragen
+          Fragen der letzten Runde
         </h2>
-        {weakest.length === 0 ? (
-          <p className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-500">
-            Noch keine Frage mit ≥2 Versuchen — übe ein paar Runden.
-          </p>
-        ) : (
-          <ul className="mt-4 space-y-2">
-            {weakest.map((q) => (
-              <WeakestCard key={q.id} q={q} />
-            ))}
-          </ul>
-        )}
+        <div className="mt-4">
+          <LastRoundBox review={lastRound} />
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700">
+          Schwächste Fragen
+        </h2>
+        <div className="mt-4">
+          <WeakestBox items={weakest} />
+        </div>
       </section>
 
       <Link
@@ -284,34 +288,6 @@ function DomainBar({
         />
       </div>
     </div>
-  );
-}
-
-function WeakestCard({ q }: { q: WeakestQuestion }) {
-  const color = getDomainColor(q.domain);
-  return (
-    <li className="rounded-lg border border-zinc-200 bg-white p-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm text-zinc-900" title={q.prompt}>
-            {truncate(q.prompt)}
-          </p>
-          <span
-            className={`mt-2 inline-block rounded-full border px-2 py-0.5 text-xs ${color.tag}`}
-          >
-            {q.domain}
-          </span>
-        </div>
-        <div className="text-right">
-          <p
-            className={`text-lg font-semibold tabular-nums ${scoreColorClass(q.rate)}`}
-          >
-            {pct(q.rate)}
-          </p>
-          <p className="text-xs text-zinc-400">{q.attempts} Versuche</p>
-        </div>
-      </div>
-    </li>
   );
 }
 

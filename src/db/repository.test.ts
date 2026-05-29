@@ -14,6 +14,7 @@ import {
   getDomainStats,
   getFlashcards,
   getLastNAttempts,
+  getLastRoundReview,
   getNeverSeenQuestions,
   getOverallAvgLast3,
   getQuestionStats,
@@ -951,29 +952,42 @@ describe("getWeakestQuestions", () => {
     db = await createTestDb();
   });
 
-  it("returns questions with ≥2 attempts sorted by rate ASC", async () => {
+  it("returns questions with >=1 wrong attempt sorted by wrongCount DESC", async () => {
     const q1 = await insertQuestion(db, { ...sampleClf, prompt: "q1" });
     const q2 = await insertQuestion(db, { ...sampleClf, prompt: "q2" });
     const q3 = await insertQuestion(db, { ...sampleClf, prompt: "q3" });
-    const qOnce = await insertQuestion(db, { ...sampleClf, prompt: "qOnce" });
+    const qAllCorrect = await insertQuestion(db, { ...sampleClf, prompt: "qAllCorrect" });
 
-    // q1: 1/2 = 0.5
+    // q1: 1 wrong
     await insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
     await insertAttempt(db, { questionId: q1.id, selected: ["B"], correct: false, sessionId: "s1" });
-    // q2: 0/2 = 0
+    // q2: 3 wrong
     await insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
     await insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
-    // q3: 2/2 = 1
+    await insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
+    // q3: 2 wrong (also includes a correct attempt — shouldn't count)
     await insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
-    // qOnce: only 1 attempt
-    await insertAttempt(db, { questionId: qOnce.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await insertAttempt(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await insertAttempt(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
+    // qAllCorrect: 2 right, 0 wrong → excluded
+    await insertAttempt(db, { questionId: qAllCorrect.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await insertAttempt(db, { questionId: qAllCorrect.id, selected: ["A"], correct: true, sessionId: "s1" });
 
     const weakest = await getWeakestQuestions(db, "s1", "CLF-C02");
-    expect(weakest.map((w) => w.id)).toEqual([q2.id, q1.id, q3.id]);
-    expect(weakest[0].rate).toBe(0);
-    expect(weakest[1].rate).toBeCloseTo(0.5, 4);
-    expect(weakest[2].rate).toBe(1);
+    expect(weakest.map((w) => w.id)).toEqual([q2.id, q3.id, q1.id]);
+    expect(weakest[0].wrongCount).toBe(3);
+    expect(weakest[1].wrongCount).toBe(2);
+    expect(weakest[2].wrongCount).toBe(1);
+    // correctAnswerText resolved from choices + correct ("A" -> "Auto-scaling capacity")
+    expect(weakest[0].correctAnswerText).toBe("Auto-scaling capacity");
+  });
+
+  it("includes attempts with round_id NULL", async () => {
+    const q = await insertQuestion(db, { ...sampleClf, prompt: "qNoRound" });
+    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
+    const weakest = await getWeakestQuestions(db, "s1", "CLF-C02");
+    expect(weakest).toHaveLength(1);
+    expect(weakest[0].wrongCount).toBe(1);
   });
 
   it("respects the limit parameter", async () => {
@@ -984,6 +998,107 @@ describe("getWeakestQuestions", () => {
     }
     const weakest = await getWeakestQuestions(db, "s1", "CLF-C02", 3);
     expect(weakest).toHaveLength(3);
+  });
+});
+
+describe("getLastRoundReview", () => {
+  let db: DB;
+  beforeEach(async () => {
+    db = await createTestDb();
+  });
+
+  it("returns empty review when no round_id has been recorded", async () => {
+    const q = await insertQuestion(db, sampleClf);
+    await insertAttempt(db, {
+      questionId: q.id, selected: ["A"], correct: true, sessionId: "s1",
+    });
+    const review = await getLastRoundReview(db, "s1", "CLF-C02");
+    expect(review.roundId).toBeNull();
+    expect(review.correct).toEqual([]);
+    expect(review.incorrect).toEqual([]);
+    expect(review.correctCount).toBe(0);
+    expect(review.incorrectCount).toBe(0);
+  });
+
+  it("returns the latest round's attempts split into correct/incorrect", async () => {
+    const q1 = await insertQuestion(db, { ...sampleClf, prompt: "q1" });
+    const q2 = await insertQuestion(db, { ...sampleClf, prompt: "q2" });
+    const q3 = await insertQuestion(db, { ...sampleClf, prompt: "q3" });
+
+    // Older round r-old: all correct
+    await insertAttempt(db, {
+      questionId: q1.id, selected: ["A"], correct: true,
+      sessionId: "s1", roundId: "r-old",
+      answeredAt: new Date(1_700_000_000_000),
+    });
+    // Latest round r-new: q1 right, q2 wrong, q3 wrong
+    await insertAttempt(db, {
+      questionId: q1.id, selected: ["A"], correct: true,
+      sessionId: "s1", roundId: "r-new",
+      answeredAt: new Date(1_700_000_100_000),
+    });
+    await insertAttempt(db, {
+      questionId: q2.id, selected: ["B"], correct: false,
+      sessionId: "s1", roundId: "r-new",
+      answeredAt: new Date(1_700_000_200_000),
+    });
+    await insertAttempt(db, {
+      questionId: q3.id, selected: ["B"], correct: false,
+      sessionId: "s1", roundId: "r-new",
+      answeredAt: new Date(1_700_000_300_000),
+    });
+
+    const review = await getLastRoundReview(db, "s1", "CLF-C02");
+    expect(review.roundId).toBe("r-new");
+    expect(review.correctCount).toBe(1);
+    expect(review.incorrectCount).toBe(2);
+    expect(review.correct.map((q) => q.questionId)).toEqual([q1.id]);
+    expect(review.incorrect.map((q) => q.questionId).sort()).toEqual(
+      [q2.id, q3.id].sort(),
+    );
+    expect(review.correct[0].correctAnswerText).toBe("Auto-scaling capacity");
+    expect(review.correct[0].isCorrect).toBe(true);
+    expect(review.incorrect[0].isCorrect).toBe(false);
+  });
+
+  it("uses the latest attempt per question when a round retried it", async () => {
+    const q = await insertQuestion(db, sampleClf);
+    // q answered wrong, then re-attempted right within the same round
+    await insertAttempt(db, {
+      questionId: q.id, selected: ["B"], correct: false,
+      sessionId: "s1", roundId: "r1",
+      answeredAt: new Date(1_700_000_000_000),
+    });
+    await insertAttempt(db, {
+      questionId: q.id, selected: ["A"], correct: true,
+      sessionId: "s1", roundId: "r1",
+      answeredAt: new Date(1_700_000_010_000),
+    });
+
+    const review = await getLastRoundReview(db, "s1", "CLF-C02");
+    expect(review.roundId).toBe("r1");
+    expect(review.correctCount).toBe(1);
+    expect(review.incorrectCount).toBe(0);
+  });
+
+  it("ignores rounds from other certs", async () => {
+    const clf = await insertQuestion(db, sampleClf);
+    const saa = await insertQuestion(db, sampleSaa);
+
+    await insertAttempt(db, {
+      questionId: saa.id, selected: ["B"], correct: false,
+      sessionId: "s1", roundId: "r-saa-newer",
+      answeredAt: new Date(1_700_000_500_000),
+    });
+    await insertAttempt(db, {
+      questionId: clf.id, selected: ["A"], correct: true,
+      sessionId: "s1", roundId: "r-clf-older",
+      answeredAt: new Date(1_700_000_100_000),
+    });
+
+    const review = await getLastRoundReview(db, "s1", "CLF-C02");
+    expect(review.roundId).toBe("r-clf-older");
+    expect(review.correctCount).toBe(1);
   });
 });
 
