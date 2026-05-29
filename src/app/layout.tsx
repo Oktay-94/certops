@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 // themeColor belongs in viewport (metadata.themeColor deprecated since Next 14).
 export const viewport: Viewport = {
   themeColor: BRAND_ORANGE,
+  colorScheme: "light", // light-only app; ignore OS dark mode
 };
 
 export default function RootLayout({
