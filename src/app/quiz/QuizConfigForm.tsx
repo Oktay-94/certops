@@ -23,6 +23,7 @@ import {
   getDomainColor,
   type FallbackIconName,
 } from "@/lib/domain-colors";
+import { BRAND_ORANGE } from "@/lib/brand";
 import { startRound } from "./actions";
 
 const COUNT_LABEL: Record<string, string> = {
@@ -127,7 +128,7 @@ export function QuizConfigForm() {
       <header className="flex items-center gap-3">
         <span
           className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px]"
-          style={{ backgroundColor: "#ED7100" }}
+          style={{ backgroundColor: BRAND_ORANGE }}
           aria-hidden
         >
           <GraduationCap size={19} className="text-white" />

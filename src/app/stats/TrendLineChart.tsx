@@ -1,5 +1,6 @@
 import type { RoundTrendPoint } from "@/db/repository";
 import { LEARNING_TARGET, scoreColorHex } from "@/lib/scoreColor";
+import { BRAND_ORANGE } from "@/lib/brand";
 
 const W = 640;
 const H = 140;
@@ -11,7 +12,7 @@ const PAD_B = 22;
 const PLOT_W = W - PAD_L - PAD_R;
 const PLOT_H = H - PAD_T - PAD_B;
 
-const LINE_COLOR = "#ED7100"; // AWS-Compute-Orange
+const LINE_COLOR = BRAND_ORANGE;
 const AVG_COLOR = "#a1a1aa"; // zinc-400
 const TARGET_COLOR = "#52525b"; // zinc-600
 
