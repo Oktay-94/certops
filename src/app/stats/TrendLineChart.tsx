@@ -1,7 +1,7 @@
 import type { RoundTrendPoint } from "@/db/repository";
 import { LEARNING_TARGET, scoreColorHex } from "@/lib/scoreColor";
 
-const W = 320;
+const W = 640;
 const H = 140;
 const PAD_L = 30;
 const PAD_R = 24;
@@ -48,7 +48,7 @@ export function TrendLineChart({ trend }: { trend: RoundTrendPoint[] }) {
     <div className="rounded-lg border border-zinc-200 bg-white p-4">
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full h-auto"
+        className="block w-full h-auto"
         role="img"
         aria-label="Trefferquote der letzten Runden"
       >

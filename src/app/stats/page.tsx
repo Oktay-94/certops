@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
+  ArrowLeft,
   Cloud,
   DollarSign,
   Server,
@@ -75,9 +76,18 @@ export default async function StatsPage() {
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12 sm:py-16">
-      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
-        Statistik
-      </h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
+          Statistik
+        </h1>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Dashboard
+        </Link>
+      </div>
       <p className="mt-3 text-zinc-600">
         Dein Lernstand auf einen Blick — Trend der letzten Runden, Stärken
         und Schwächen pro Bereich.
@@ -86,7 +96,11 @@ export default async function StatsPage() {
       <section className="mt-8 grid gap-3 sm:grid-cols-[1.4fr_1fr_1fr]">
         <StatCardAvg overall={overall} trend={trend} />
         <StatCard label="Fragen gesamt" value={String(totalQuestions)} />
-        <StatCard label="Beantwortet" value={String(answered)} />
+        <StatCard
+          label="Beantwortet"
+          value={String(answered)}
+          valueClass="text-emerald-700"
+        />
       </section>
 
       <section className="mt-10">
@@ -157,13 +171,21 @@ export default async function StatsPage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function StatCard({
+  label,
+  value,
+  valueClass = "text-zinc-900",
+}: {
+  label: string;
+  value: string;
+  valueClass?: string;
+}) {
   return (
     <div className="rounded-xl border border-zinc-200 bg-white p-4">
       <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
         {label}
       </h3>
-      <p className="mt-2 text-3xl font-semibold tabular-nums text-zinc-900">
+      <p className={`mt-2 text-3xl font-semibold tabular-nums ${valueClass}`}>
         {value}
       </p>
     </div>
