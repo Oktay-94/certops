@@ -13,6 +13,7 @@ import {
   type QuizMode,
 } from "@/lib/domains";
 import { seedFromString } from "@/lib/shuffle";
+import { getActiveProfileId } from "@/lib/profile-cookie";
 
 const SESSION_COOKIE = "certops_session_id";
 const ROUND_COOKIE = "certops_round_id";
@@ -35,14 +36,19 @@ export async function startRound(input: StartRoundInput): Promise<void> {
     throw new Error("Invalid mode");
   }
 
+  const userId = await getActiveProfileId();
+  if (!userId) redirect("/?error=no-profile");
+
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? "";
   const roundId = cookieStore.get(ROUND_COOKIE)?.value ?? "";
+  // Shuffle seed only — session keeps the per-device round order stable across
+  // reloads; identity/filtering is user_id.
   const seed = seedFromString(`${sessionId}:${roundId}`);
 
   const ids = await selectRoundQuestions(db, {
     cert: "CLF-C02",
-    sessionId,
+    userId,
     domain: input.domain === "all" ? undefined : input.domain,
     count: input.count,
     mode: input.mode,

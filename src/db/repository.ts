@@ -1,8 +1,9 @@
-import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import type { DB } from "./index";
 import { shuffle } from "@/lib/shuffle";
 import type { QuizMode } from "@/lib/domains";
 import {
+  flashcardViews,
   flashcards,
   questionAttempts,
   questions,
@@ -61,27 +62,27 @@ export async function insertAttempt(
   return row;
 }
 
-export async function getAttemptsBySession(
+export async function getAttemptsByUser(
   db: DB,
-  sessionId: string,
+  userId: string,
 ): Promise<QuestionAttempt[]> {
   return db
     .select()
     .from(questionAttempts)
-    .where(eq(questionAttempts.sessionId, sessionId))
+    .where(eq(questionAttempts.userId, userId))
     .orderBy(asc(questionAttempts.answeredAt))
     .all();
 }
 
 export async function getLastNAttempts(
   db: DB,
-  sessionId: string,
+  userId: string,
   n: number,
 ): Promise<QuestionAttempt[]> {
   return db
     .select()
     .from(questionAttempts)
-    .where(eq(questionAttempts.sessionId, sessionId))
+    .where(eq(questionAttempts.userId, userId))
     .orderBy(desc(questionAttempts.answeredAt))
     .limit(n)
     .all();
@@ -96,7 +97,7 @@ export type AttemptStats = {
 
 export async function getAttemptStats(
   db: DB,
-  sessionId: string,
+  userId: string,
 ): Promise<AttemptStats> {
   const rows = await db
     .select({
@@ -108,7 +109,7 @@ export async function getAttemptStats(
     })
     .from(questionAttempts)
     .innerJoin(questions, eq(questionAttempts.questionId, questions.id))
-    .where(eq(questionAttempts.sessionId, sessionId))
+    .where(eq(questionAttempts.userId, userId))
     .groupBy(questions.domain)
     .orderBy(asc(questions.domain))
     .all();
@@ -147,14 +148,14 @@ type QuestionStatRow = {
 
 export async function getQuestionStats(
   db: DB,
-  sessionId: string,
+  userId: string,
 ): Promise<QuestionStat[]> {
   const rows = (await db.all(sql`
     WITH ranked AS (
       SELECT question_id, correct, answered_at,
         ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
       FROM question_attempts
-      WHERE session_id = ${sessionId}
+      WHERE user_id = ${userId}
     ),
     last3 AS (
       SELECT question_id,
@@ -168,7 +169,7 @@ export async function getQuestionStats(
              COUNT(*) AS total_attempts,
              MAX(answered_at) AS last_answered_at
       FROM question_attempts
-      WHERE session_id = ${sessionId}
+      WHERE user_id = ${userId}
       GROUP BY question_id
     )
     SELECT q.id, q.cert, q.domain, q.prompt,
@@ -208,7 +209,7 @@ type DomainOverviewRow = {
 
 export async function getDomainStats(
   db: DB,
-  sessionId: string,
+  userId: string,
   cert: Question["cert"],
 ): Promise<DomainOverview[]> {
   const rows = (await db.all(sql`
@@ -216,7 +217,7 @@ export async function getDomainStats(
       SELECT question_id, correct, answered_at,
         ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
       FROM question_attempts
-      WHERE session_id = ${sessionId}
+      WHERE user_id = ${userId}
     ),
     per_question AS (
       SELECT r.question_id,
@@ -259,35 +260,53 @@ export async function getFlashcards(
 export async function countSeenFlashcards(
   db: DB,
   cert: Flashcard["cert"],
+  userId: string,
 ): Promise<number> {
   const row = await db
     .select({ n: sql<number>`count(*)`.as("n") })
-    .from(flashcards)
-    .where(and(eq(flashcards.cert, cert), isNotNull(flashcards.lastSeenAt)))
+    .from(flashcardViews)
+    .innerJoin(flashcards, eq(flashcardViews.cardId, flashcards.id))
+    .where(and(eq(flashcards.cert, cert), eq(flashcardViews.userId, userId)))
     .get();
   return Number(row?.n ?? 0);
 }
 
-export async function markFlashcardSeen(db: DB, id: number): Promise<void> {
-  await db.update(flashcards)
-    .set({ lastSeenAt: new Date() })
-    .where(eq(flashcards.id, id))
+export async function markFlashcardSeen(
+  db: DB,
+  id: number,
+  userId: string,
+): Promise<void> {
+  // Upsert on (card_id, user_id): first view inserts, re-views refresh seen_at.
+  await db
+    .insert(flashcardViews)
+    .values({ cardId: id, userId, seenAt: new Date() })
+    .onConflictDoUpdate({
+      target: [flashcardViews.cardId, flashcardViews.userId],
+      set: { seenAt: new Date() },
+    })
     .run();
 }
 
 export async function resetFlashcardViews(
   db: DB,
   cert: Flashcard["cert"],
+  userId: string,
 ): Promise<void> {
-  await db.update(flashcards)
-    .set({ lastSeenAt: null })
-    .where(eq(flashcards.cert, cert))
+  // Only this user's views for the given cert — the other profile is untouched.
+  await db
+    .delete(flashcardViews)
+    .where(
+      and(
+        eq(flashcardViews.userId, userId),
+        sql`${flashcardViews.cardId} IN (SELECT id FROM flashcards WHERE cert = ${cert})`,
+      ),
+    )
     .run();
 }
 
 export async function getOverallAvgLast3(
   db: DB,
-  sessionId: string,
+  userId: string,
   cert: Question["cert"],
 ): Promise<number | null> {
   const row = (await db.get(sql`
@@ -295,7 +314,7 @@ export async function getOverallAvgLast3(
       SELECT question_id, correct, answered_at,
         ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
       FROM question_attempts
-      WHERE session_id = ${sessionId}
+      WHERE user_id = ${userId}
     ),
     per_question AS (
       SELECT r.question_id,
@@ -324,21 +343,21 @@ export async function selectRoundQuestions(
   db: DB,
   opts: {
     cert: Question["cert"];
-    sessionId: string;
+    userId: string;
     domain?: string;
     count: number | "all";
     mode: QuizMode;
     seed: number;
   },
 ): Promise<number[]> {
-  const { cert, sessionId, domain, count, mode, seed } = opts;
+  const { cert, userId, domain, count, mode, seed } = opts;
 
   const rawRows = (await db.all(sql`
     WITH ranked AS (
       SELECT question_id, correct, answered_at,
         ROW_NUMBER() OVER (PARTITION BY question_id ORDER BY answered_at DESC) AS rn
       FROM question_attempts
-      WHERE session_id = ${sessionId}
+      WHERE user_id = ${userId}
     ),
     per_question AS (
       SELECT question_id,
@@ -409,7 +428,7 @@ type DomainPerformanceRow = {
 
 export async function getDomainPerformance(
   db: DB,
-  sessionId: string,
+  userId: string,
   cert: Question["cert"],
 ): Promise<DomainPerformance[]> {
   const rows = (await db.all(sql`
@@ -419,7 +438,7 @@ export async function getDomainPerformance(
            COUNT(DISTINCT q.id) AS questions_count
     FROM questions q
     LEFT JOIN question_attempts qa
-      ON qa.question_id = q.id AND qa.session_id = ${sessionId}
+      ON qa.question_id = q.id AND qa.user_id = ${userId}
     WHERE q.cert = ${cert}
     GROUP BY q.domain
     ORDER BY q.domain ASC
@@ -457,7 +476,7 @@ type WeakestQuestionRow = {
 
 export async function getWeakestQuestions(
   db: DB,
-  sessionId: string,
+  userId: string,
   cert: Question["cert"],
   limit = 10,
 ): Promise<WeakestQuestion[]> {
@@ -467,7 +486,7 @@ export async function getWeakestQuestions(
            MAX(qa.answered_at) AS last_at
     FROM question_attempts qa
     JOIN questions q ON q.id = qa.question_id
-    WHERE qa.session_id = ${sessionId}
+    WHERE qa.user_id = ${userId}
       AND q.cert = ${cert}
     GROUP BY q.id
     HAVING SUM(CASE WHEN qa.correct THEN 0 ELSE 1 END) >= 1
@@ -512,7 +531,7 @@ type LastRoundAttemptRow = {
 
 export async function getLastRoundReview(
   db: DB,
-  sessionId: string,
+  userId: string,
   cert: Question["cert"],
 ): Promise<LastRoundReview> {
   const empty: LastRoundReview = {
@@ -527,7 +546,7 @@ export async function getLastRoundReview(
     SELECT qa.round_id AS round_id
     FROM question_attempts qa
     JOIN questions q ON q.id = qa.question_id
-    WHERE qa.session_id = ${sessionId}
+    WHERE qa.user_id = ${userId}
       AND q.cert = ${cert}
       AND qa.round_id IS NOT NULL
     ORDER BY qa.answered_at DESC
@@ -547,12 +566,12 @@ export async function getLastRoundReview(
            qa.correct AS is_correct
     FROM question_attempts qa
     JOIN questions q ON q.id = qa.question_id
-    WHERE qa.session_id = ${sessionId}
+    WHERE qa.user_id = ${userId}
       AND qa.round_id = ${latest.round_id}
       AND qa.id IN (
         SELECT MAX(qa2.id)
         FROM question_attempts qa2
-        WHERE qa2.session_id = ${sessionId}
+        WHERE qa2.user_id = ${userId}
           AND qa2.round_id = ${latest.round_id}
         GROUP BY qa2.question_id
       )
@@ -586,14 +605,14 @@ export async function getLastRoundReview(
 
 export async function countAnsweredQuestions(
   db: DB,
-  sessionId: string,
+  userId: string,
   cert: Question["cert"],
 ): Promise<number> {
   const row = (await db.get(sql`
     SELECT COUNT(DISTINCT qa.question_id) AS n
     FROM question_attempts qa
     JOIN questions q ON q.id = qa.question_id
-    WHERE qa.session_id = ${sessionId}
+    WHERE qa.user_id = ${userId}
       AND q.cert = ${cert}
   `)) as { n: number } | undefined;
   return Number(row?.n ?? 0);
@@ -615,7 +634,7 @@ type RoundTrendRow = {
 
 export async function getRoundTrend(
   db: DB,
-  sessionId: string,
+  userId: string,
   cert: Question["cert"],
   limit = 10,
 ): Promise<RoundTrendPoint[]> {
@@ -626,7 +645,7 @@ export async function getRoundTrend(
            MAX(qa.answered_at) AS last_at
     FROM question_attempts qa
     JOIN questions q ON q.id = qa.question_id
-    WHERE qa.session_id = ${sessionId}
+    WHERE qa.user_id = ${userId}
       AND q.cert = ${cert}
       AND qa.round_id IS NOT NULL
     GROUP BY qa.round_id
@@ -646,7 +665,7 @@ export async function getRoundTrend(
 
 export async function getNeverSeenQuestions(
   db: DB,
-  sessionId: string,
+  userId: string,
   cert: Question["cert"],
   limit = 20,
 ): Promise<Pick<Question, "id" | "cert" | "domain" | "prompt">[]> {
@@ -656,7 +675,7 @@ export async function getNeverSeenQuestions(
     WHERE q.cert = ${cert}
       AND NOT EXISTS (
         SELECT 1 FROM question_attempts a
-        WHERE a.question_id = q.id AND a.session_id = ${sessionId}
+        WHERE a.question_id = q.id AND a.user_id = ${userId}
       )
     ORDER BY q.id ASC
     LIMIT ${limit}

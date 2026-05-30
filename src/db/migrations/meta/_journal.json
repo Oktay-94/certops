@@ -43,6 +43,20 @@
       "when": 1779993439454,
       "tag": "0005_hard_shiva",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1780097757099,
+      "tag": "0006_ambitious_alex_wilder",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1780097774396,
+      "tag": "0007_giant_talon",
+      "breakpoints": true
     }
   ]
 }

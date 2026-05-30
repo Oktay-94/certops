@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { db } from "@/db";
 import { getQuestionById, insertAttempt } from "@/db/repository";
+import { getActiveProfileId } from "@/lib/profile-cookie";
 
 const SESSION_COOKIE = "certops_session_id";
 const ROUND_COOKIE = "certops_round_id";
@@ -26,6 +27,9 @@ export async function submitAnswer(input: {
     throw new Error("Invalid selected");
   }
 
+  const userId = await getActiveProfileId();
+  if (!userId) throw new Error("Kein Profil gewählt");
+
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
   if (!sessionId) throw new Error("Missing session cookie");
@@ -44,6 +48,7 @@ export async function submitAnswer(input: {
     questionId: question.id,
     selected,
     correct: isCorrect,
+    userId,
     sessionId,
     roundId,
   });

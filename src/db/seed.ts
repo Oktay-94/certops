@@ -1,6 +1,6 @@
 import "./load-env-turso";
 import { db } from "./index";
-import { flashcards, questionAttempts, questions } from "./schema";
+import { flashcardViews, flashcards, questionAttempts, questions } from "./schema";
 import { clfC02Questions } from "./seed/index";
 import { clfC02QuestionsBatch2 } from "./seed/questions/index";
 import { clfC02Flashcards } from "./seed/cards/index";
@@ -28,6 +28,9 @@ async function seed() {
   // forces us to clear attempts before reseeding questions.
   await db.delete(questionAttempts).run();
   await db.delete(questions).run();
+  // flashcard_views FK -> flashcards.id (ON DELETE CASCADE); clear explicitly
+  // since Turso doesn't enforce FKs, so cascade isn't guaranteed there.
+  await db.delete(flashcardViews).run();
   await db.delete(flashcards).run();
   await db.insert(questions).values(all).run();
   const markdownCards = clfC02Flashcards.map((c) => ({
