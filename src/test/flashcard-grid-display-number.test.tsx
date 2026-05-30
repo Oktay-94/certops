@@ -37,14 +37,16 @@ const cards: FlashcardItem[] = [
 ];
 
 describe("FlashcardGrid display numbers", () => {
-  it("renders #1..#N based on position in ASC-sorted cards prop, not DB id", () => {
+  it("renders 1.–N. based on position in ASC-sorted cards prop, not DB id", () => {
     render(<FlashcardGrid cards={cards} domains={["Cloud Concepts"]} />);
-    expect(screen.getByText("#1")).toBeInTheDocument();
-    expect(screen.getByText("#2")).toBeInTheDocument();
-    expect(screen.getByText("#3")).toBeInTheDocument();
-    expect(screen.queryByText("#5")).toBeNull();
-    expect(screen.queryByText("#17")).toBeNull();
-    expect(screen.queryByText("#42")).toBeNull();
+    // Redesign: the position number prefixes the domain pill as "N." (bold),
+    // no longer a "#N" badge.
+    expect(screen.getByText("1.")).toBeInTheDocument();
+    expect(screen.getByText("2.")).toBeInTheDocument();
+    expect(screen.getByText("3.")).toBeInTheDocument();
+    expect(screen.queryByText("5.")).toBeNull();
+    expect(screen.queryByText("17.")).toBeNull();
+    expect(screen.queryByText("42.")).toBeNull();
   });
 });
 
