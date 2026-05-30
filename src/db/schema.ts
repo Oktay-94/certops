@@ -1,4 +1,10 @@
-import { integer, sqliteTable, text, index } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  sqliteTable,
+  text,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
 export type Choice = { id: string; text: string };
 
@@ -53,6 +59,10 @@ export const questionAttempts = sqliteTable(
     selected: text("selected", { mode: "json" }).$type<string[]>().notNull(),
     correct: integer("correct", { mode: "boolean" }).notNull(),
 
+    // Identity for progress separation. user_id is the sole filter key for all
+    // stats/round reads; session_id stays written (notNull) purely as a
+    // gerätelokaler forensic breadcrumb, never filtered on.
+    userId: text("user_id"),
     sessionId: text("session_id").notNull(),
     roundId: text("round_id"),
     timeTakenMs: integer("time_taken_ms"),
@@ -65,6 +75,7 @@ export const questionAttempts = sqliteTable(
     index("idx_question_attempts_session").on(t.sessionId),
     index("idx_question_attempts_question").on(t.questionId),
     index("idx_question_attempts_round").on(t.roundId),
+    index("idx_question_attempts_user").on(t.userId),
   ],
 );
 
@@ -87,8 +98,6 @@ export const flashcards = sqliteTable(
 
     iconSlugs: text("icon_slugs", { mode: "json" }).$type<string[]>(),
 
-    lastSeenAt: integer("last_seen_at", { mode: "timestamp" }),
-
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),
@@ -105,3 +114,29 @@ export const flashcards = sqliteTable(
 
 export type Flashcard = typeof flashcards.$inferSelect;
 export type NewFlashcard = typeof flashcards.$inferInsert;
+
+// Per-user "seen" tracking. Was a global flashcards.last_seen_at column, which
+// two learners would overwrite for each other — so it moves into its own table
+// keyed by (card_id, user_id). seen_at is upserted on each view.
+export const flashcardViews = sqliteTable(
+  "flashcard_views",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    cardId: integer("card_id")
+      .notNull()
+      .references(() => flashcards.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+
+    seenAt: integer("seen_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (t) => [
+    uniqueIndex("idx_flashcard_views_card_user").on(t.cardId, t.userId),
+    index("idx_flashcard_views_user").on(t.userId),
+  ],
+);
+
+export type FlashcardView = typeof flashcardViews.$inferSelect;
+export type NewFlashcardView = typeof flashcardViews.$inferInsert;

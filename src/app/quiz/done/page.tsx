@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { db } from "@/db";
 import {
   getAttemptStats,
@@ -7,8 +6,7 @@ import {
   getQuestionsByCert,
 } from "@/db/repository";
 import { scoreColorClass } from "@/lib/scoreColor";
-
-const SESSION_COOKIE = "certops_session_id";
+import { getActiveProfileId } from "@/lib/profile-cookie";
 
 function pct(correct: number, total: number): number {
   if (total === 0) return 0;
@@ -21,8 +19,7 @@ function domainToneClass(correct: number, total: number): string {
 }
 
 export default async function QuizDonePage() {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? null;
+  const userId = await getActiveProfileId();
 
   const pool = await getQuestionsByCert(db, "CLF-C02");
   const poolSize = pool.length;
@@ -30,11 +27,11 @@ export default async function QuizDonePage() {
   // Aktuelle Heuristik für "diese Runde" = letzte N Attempts.
   // Falls sich das als problematisch erweist (Pause mittendrin, etc.),
   // aufrüsten auf round_number-Spalte in question_attempts.
-  const roundAttempts = sessionId
-    ? await getLastNAttempts(db, sessionId, poolSize)
+  const roundAttempts = userId
+    ? await getLastNAttempts(db, userId, poolSize)
     : [];
-  const stats = sessionId
-    ? await getAttemptStats(db, sessionId)
+  const stats = userId
+    ? await getAttemptStats(db, userId)
     : { total: 0, correct: 0, byDomain: [] };
 
   const roundCorrect = roundAttempts.filter((a) => a.correct).length;

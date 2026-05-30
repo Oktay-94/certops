@@ -1,6 +1,7 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import type { DB } from "./index";
@@ -9,7 +10,7 @@ import {
   countAnsweredQuestions,
   countSeenFlashcards,
   getAttemptStats,
-  getAttemptsBySession,
+  getAttemptsByUser,
   getDomainPerformance,
   getDomainStats,
   getFlashcards,
@@ -27,7 +28,7 @@ import {
   resetFlashcardViews,
   selectRoundQuestions,
 } from "./repository";
-import { flashcards } from "./schema";
+import { flashcardViews, flashcards } from "./schema";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -63,6 +64,17 @@ const sampleSaa: schema.NewQuestion = {
   domain: "Design Secure Architectures",
   prompt: "Different question",
 };
+
+// Test helper: user_id is the sole filter key for all reads now. Default it to
+// the session string so the existing isolation tests (keyed on "s1"/"sA"/…)
+// keep their intent without touching every call site. Tests that need user/
+// session decoupled call insertAttempt directly with an explicit userId.
+async function ins(
+  database: DB,
+  a: schema.NewQuestionAttempt,
+): Promise<schema.QuestionAttempt> {
+  return insertAttempt(database, { ...a, userId: a.userId ?? a.sessionId });
+}
 
 describe("repository", () => {
   let db: DB;
@@ -119,7 +131,7 @@ describe("question_attempts", () => {
   it("inserts an attempt and returns the persisted row", async () => {
     const q = await insertQuestion(db, sampleClf);
 
-    const row = await insertAttempt(db, {
+    const row = await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
@@ -139,28 +151,28 @@ describe("question_attempts", () => {
   it("persists roundId when provided and allows grouping by it", async () => {
     const q = await insertQuestion(db, sampleClf);
 
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
       roundId: "r1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
       roundId: "r1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
       roundId: "r2",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
@@ -168,7 +180,7 @@ describe("question_attempts", () => {
       // omitted -> NULL
     });
 
-    const all = await getAttemptsBySession(db, "s1");
+    const all = await getAttemptsByUser(db, "s1");
     const r1 = all.filter((a) => a.roundId === "r1");
     const r2 = all.filter((a) => a.roundId === "r2");
     const noRound = all.filter((a) => a.roundId === null);
@@ -179,7 +191,7 @@ describe("question_attempts", () => {
 
   it("throws on FK violation when question_id does not exist (verifies FK pragma is active)", async () => {
     await expect(
-      insertAttempt(db, {
+      ins(db, {
         questionId: 9999,
         selected: ["A"],
         correct: false,
@@ -188,39 +200,39 @@ describe("question_attempts", () => {
     ).rejects.toThrow();
   });
 
-  it("getAttemptsBySession returns only attempts for the requested session", async () => {
+  it("getAttemptsByUser returns only attempts for the requested session", async () => {
     const q = await insertQuestion(db, sampleClf);
 
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
       sessionId: "session-a",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["B"],
       correct: false,
       sessionId: "session-a",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
       sessionId: "session-b",
     });
 
-    const a = await getAttemptsBySession(db, "session-a");
+    const a = await getAttemptsByUser(db, "session-a");
     expect(a).toHaveLength(2);
     expect(a.every((r) => r.sessionId === "session-a")).toBe(true);
 
-    expect(await getAttemptsBySession(db, "session-unknown")).toEqual([]);
+    expect(await getAttemptsByUser(db, "session-unknown")).toEqual([]);
   });
 
   it("roundtrips multi-select selected JSON array", async () => {
     const q = await insertQuestion(db, sampleClf);
 
-    const row = await insertAttempt(db, {
+    const row = await ins(db, {
       questionId: q.id,
       selected: ["A", "C"],
       correct: false,
@@ -231,7 +243,7 @@ describe("question_attempts", () => {
     expect(row.selected).toEqual(["A", "C"]);
     expect(row.timeTakenMs).toBe(4200);
 
-    const [reloaded] = await getAttemptsBySession(db, "session-multi");
+    const [reloaded] = await getAttemptsByUser(db, "session-multi");
     expect(reloaded.selected).toEqual(["A", "C"]);
   });
 });
@@ -251,7 +263,7 @@ describe("getLastNAttempts", () => {
     const q = await insertQuestion(db, sampleClf);
 
     for (let i = 0; i < 5; i++) {
-      await insertAttempt(db, {
+      await ins(db, {
         questionId: q.id,
         selected: ["A"],
         correct: i % 2 === 0,
@@ -272,13 +284,13 @@ describe("getLastNAttempts", () => {
   it("isolates by session", async () => {
     const q = await insertQuestion(db, sampleClf);
 
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
       sessionId: "session-a",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
@@ -312,19 +324,19 @@ describe("getAttemptStats", () => {
       prompt: "S?",
     });
 
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: cloud.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: cloud.id,
       selected: ["B"],
       correct: false,
       sessionId: "s1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: security.id,
       selected: ["B"],
       correct: false,
@@ -354,13 +366,13 @@ describe("getAttemptStats", () => {
   it("does not leak attempts from other sessions", async () => {
     const q = await insertQuestion(db, sampleClf);
 
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
@@ -387,7 +399,7 @@ describe("getQuestionStats", () => {
 
   it("returns avgCorrectLast3 = 1 and totalAttempts = 1 for a single correct attempt", async () => {
     const q = await insertQuestion(db, sampleClf);
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
@@ -403,7 +415,7 @@ describe("getQuestionStats", () => {
   it("averages exactly 3 attempts (2 right, 1 wrong → ≈0.6667)", async () => {
     const q = await insertQuestion(db, sampleClf);
     for (const correct of [true, false, true]) {
-      await insertAttempt(db, {
+      await ins(db, {
         questionId: q.id,
         selected: ["A"],
         correct,
@@ -426,7 +438,7 @@ describe("getQuestionStats", () => {
     const base = Math.floor(Date.now() / 1000);
     const sequence = [false, false, true, true, true];
     for (let i = 0; i < sequence.length; i++) {
-      await insertAttempt(db, {
+      await ins(db, {
         questionId: q.id,
         selected: ["A"],
         correct: sequence[i],
@@ -442,13 +454,13 @@ describe("getQuestionStats", () => {
 
   it("isolates by session", async () => {
     const q = await insertQuestion(db, sampleClf);
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
       sessionId: "sA",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["B"],
       correct: false,
@@ -481,21 +493,21 @@ describe("getDomainStats", () => {
     });
 
     // cloud: 2 attempts, both correct → avg 1.0
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: cloud.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
     });
     await sleep(5);
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: cloud.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
     });
     // cloud2: only 1 attempt → excluded from avgCorrectRate
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: cloud2.id,
       selected: ["B"],
       correct: false,
@@ -542,7 +554,7 @@ describe("getNeverSeenQuestions", () => {
     const q2 = await insertQuestion(db, { ...sampleClf, prompt: "Q2" });
     await insertQuestion(db, { ...sampleClf, prompt: "Q3" });
 
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q1.id,
       selected: ["A"],
       correct: true,
@@ -557,7 +569,7 @@ describe("getNeverSeenQuestions", () => {
 
   it("treats a question as unseen for session-a even if session-b answered it", async () => {
     const q = await insertQuestion(db, sampleClf);
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id,
       selected: ["A"],
       correct: true,
@@ -603,7 +615,7 @@ describe("selectRoundQuestions", () => {
     await seedPool(10);
     const ids = await selectRoundQuestions(db, {
       cert: "CLF-C02",
-      sessionId: "s1",
+      userId: "s1",
       count: 3,
       mode: "random",
       seed: 42,
@@ -615,7 +627,7 @@ describe("selectRoundQuestions", () => {
     await seedPool(5);
     const ids = await selectRoundQuestions(db, {
       cert: "CLF-C02",
-      sessionId: "s1",
+      userId: "s1",
       count: 100,
       mode: "random",
       seed: 42,
@@ -627,7 +639,7 @@ describe("selectRoundQuestions", () => {
     await seedPool(7);
     const ids = await selectRoundQuestions(db, {
       cert: "CLF-C02",
-      sessionId: "s1",
+      userId: "s1",
       count: "all",
       mode: "random",
       seed: 42,
@@ -640,7 +652,7 @@ describe("selectRoundQuestions", () => {
     const secIds = await seedPool(2, "Security and Compliance");
     const ids = await selectRoundQuestions(db, {
       cert: "CLF-C02",
-      sessionId: "s1",
+      userId: "s1",
       domain: "Security and Compliance",
       count: "all",
       mode: "random",
@@ -653,7 +665,7 @@ describe("selectRoundQuestions", () => {
     await seedPool(5);
     const ids = await selectRoundQuestions(db, {
       cert: "CLF-C02",
-      sessionId: "s1",
+      userId: "s1",
       count: 5,
       mode: "weakest-first",
       seed: 42,
@@ -664,26 +676,26 @@ describe("selectRoundQuestions", () => {
   it("weakest-first: unseen first, then weakest practiced", async () => {
     const [a, b, c] = await seedPool(3);
     // B: 2× falsch → avg = 0
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: b,
       selected: ["B"],
       correct: false,
       sessionId: "s1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: b,
       selected: ["B"],
       correct: false,
       sessionId: "s1",
     });
     // C: 2× richtig → avg = 1
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: c,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: c,
       selected: ["A"],
       correct: true,
@@ -693,7 +705,7 @@ describe("selectRoundQuestions", () => {
 
     const ids = await selectRoundQuestions(db, {
       cert: "CLF-C02",
-      sessionId: "s1",
+      userId: "s1",
       count: 3,
       mode: "weakest-first",
       seed: 42,
@@ -704,7 +716,7 @@ describe("selectRoundQuestions", () => {
   it("weakest-first respects session isolation", async () => {
     const [a] = await seedPool(1);
     // sessionB beantwortet richtig — sessionA sieht A trotzdem als unseen
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: a,
       selected: ["A"],
       correct: true,
@@ -713,7 +725,7 @@ describe("selectRoundQuestions", () => {
 
     const ids = await selectRoundQuestions(db, {
       cert: "CLF-C02",
-      sessionId: "sA",
+      userId: "sA",
       count: 1,
       mode: "weakest-first",
       seed: 42,
@@ -814,33 +826,70 @@ describe("flashcard view tracking", () => {
       .run();
   });
 
-  it("counts only flashcards whose last_seen_at is set, scoped by cert", async () => {
+  it("counts only seen flashcards for this user, scoped by cert", async () => {
     const [c1, c2] = await getFlashcards(db, "CLF-C02");
-    expect(await countSeenFlashcards(db, "CLF-C02")).toBe(0);
+    expect(await countSeenFlashcards(db, "CLF-C02", "oktay")).toBe(0);
 
-    await markFlashcardSeen(db, c1.id);
-    expect(await countSeenFlashcards(db, "CLF-C02")).toBe(1);
+    await markFlashcardSeen(db, c1.id, "oktay");
+    expect(await countSeenFlashcards(db, "CLF-C02", "oktay")).toBe(1);
 
-    // marking the same card again keeps the count at 1
-    await markFlashcardSeen(db, c1.id);
-    expect(await countSeenFlashcards(db, "CLF-C02")).toBe(1);
+    // marking the same card again keeps the count at 1 (upsert on card+user)
+    await markFlashcardSeen(db, c1.id, "oktay");
+    expect(await countSeenFlashcards(db, "CLF-C02", "oktay")).toBe(1);
 
-    await markFlashcardSeen(db, c2.id);
-    expect(await countSeenFlashcards(db, "CLF-C02")).toBe(2);
+    await markFlashcardSeen(db, c2.id, "oktay");
+    expect(await countSeenFlashcards(db, "CLF-C02", "oktay")).toBe(2);
 
-    await resetFlashcardViews(db, "CLF-C02");
-    expect(await countSeenFlashcards(db, "CLF-C02")).toBe(0);
+    await resetFlashcardViews(db, "CLF-C02", "oktay");
+    expect(await countSeenFlashcards(db, "CLF-C02", "oktay")).toBe(0);
   });
 
   it("does not affect other certs when resetting", async () => {
     const [c1] = await getFlashcards(db, "CLF-C02");
     const [s1] = await getFlashcards(db, "SAA-C03");
-    await markFlashcardSeen(db, c1.id);
-    await markFlashcardSeen(db, s1.id);
+    await markFlashcardSeen(db, c1.id, "oktay");
+    await markFlashcardSeen(db, s1.id, "oktay");
 
-    await resetFlashcardViews(db, "CLF-C02");
-    expect(await countSeenFlashcards(db, "CLF-C02")).toBe(0);
-    expect(await countSeenFlashcards(db, "SAA-C03")).toBe(1);
+    await resetFlashcardViews(db, "CLF-C02", "oktay");
+    expect(await countSeenFlashcards(db, "CLF-C02", "oktay")).toBe(0);
+    expect(await countSeenFlashcards(db, "SAA-C03", "oktay")).toBe(1);
+  });
+
+  it("tracks the same card separately per user, with independent seen_at", async () => {
+    const [c1] = await getFlashcards(db, "CLF-C02");
+
+    await markFlashcardSeen(db, c1.id, "oktay");
+    await markFlashcardSeen(db, c1.id, "merve");
+
+    // Both users have one seen card — no cross-overwrite.
+    expect(await countSeenFlashcards(db, "CLF-C02", "oktay")).toBe(1);
+    expect(await countSeenFlashcards(db, "CLF-C02", "merve")).toBe(1);
+
+    // Two distinct rows for the same card, one per user.
+    const rows = await db
+      .select()
+      .from(flashcardViews)
+      .where(eq(flashcardViews.cardId, c1.id))
+      .all();
+    expect(rows).toHaveLength(2);
+    expect(new Set(rows.map((r) => r.userId))).toEqual(
+      new Set(["oktay", "merve"]),
+    );
+    expect(rows.every((r) => r.seenAt instanceof Date)).toBe(true);
+  });
+
+  it("resetting one user's views leaves the other user untouched", async () => {
+    const [c1] = await getFlashcards(db, "CLF-C02");
+    await markFlashcardSeen(db, c1.id, "oktay");
+    await markFlashcardSeen(db, c1.id, "merve");
+
+    await resetFlashcardViews(db, "CLF-C02", "oktay");
+    expect(await countSeenFlashcards(db, "CLF-C02", "oktay")).toBe(0);
+    expect(await countSeenFlashcards(db, "CLF-C02", "merve")).toBe(1);
+  });
+
+  it("throws on FK violation when card_id does not exist", async () => {
+    await expect(markFlashcardSeen(db, 9999, "oktay")).rejects.toThrow();
   });
 });
 
@@ -861,26 +910,26 @@ describe("getOverallAvgLast3", () => {
     const q2 = await insertQuestion(db, { ...sampleClf, prompt: "Q2" });
 
     // q1: 2 attempts, 1 correct → 0.5
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q1.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q1.id,
       selected: ["B"],
       correct: false,
       sessionId: "s1",
     });
     // q2: 2 attempts, 2 correct → 1.0
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q2.id,
       selected: ["A"],
       correct: true,
       sessionId: "s1",
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q2.id,
       selected: ["A"],
       correct: true,
@@ -906,12 +955,12 @@ describe("getDomainPerformance", () => {
     // unused-but-present question to confirm questionsCount counts all cert questions
     await insertQuestion(db, { ...sampleClf, domain: "Billing, Pricing, and Support", prompt: "q4" });
 
-    await insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q1.id, selected: ["B"], correct: false, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q2.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q1.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q2.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
 
     const perf = await getDomainPerformance(db, "s1", "CLF-C02");
     const byDomain = Object.fromEntries(perf.map((p) => [p.domain, p]));
@@ -935,9 +984,9 @@ describe("getDomainPerformance", () => {
     const qClf = await insertQuestion(db, { ...sampleClf, prompt: "clf" });
     const qSaa = await insertQuestion(db, { ...sampleSaa, prompt: "saa" });
 
-    await insertAttempt(db, { questionId: qClf.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: qClf.id, selected: ["B"], correct: false, sessionId: "s2" });
-    await insertAttempt(db, { questionId: qSaa.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: qClf.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: qClf.id, selected: ["B"], correct: false, sessionId: "s2" });
+    await ins(db, { questionId: qSaa.id, selected: ["A"], correct: true, sessionId: "s1" });
 
     const perf = await getDomainPerformance(db, "s1", "CLF-C02");
     const cc = perf.find((p) => p.domain === "Cloud Concepts")!;
@@ -959,19 +1008,19 @@ describe("getWeakestQuestions", () => {
     const qAllCorrect = await insertQuestion(db, { ...sampleClf, prompt: "qAllCorrect" });
 
     // q1: 1 wrong
-    await insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q1.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q1.id, selected: ["B"], correct: false, sessionId: "s1" });
     // q2: 3 wrong
-    await insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q2.id, selected: ["B"], correct: false, sessionId: "s1" });
     // q3: 2 wrong (also includes a correct attempt — shouldn't count)
-    await insertAttempt(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q3.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q3.id, selected: ["B"], correct: false, sessionId: "s1" });
     // qAllCorrect: 2 right, 0 wrong → excluded
-    await insertAttempt(db, { questionId: qAllCorrect.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: qAllCorrect.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: qAllCorrect.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: qAllCorrect.id, selected: ["A"], correct: true, sessionId: "s1" });
 
     const weakest = await getWeakestQuestions(db, "s1", "CLF-C02");
     expect(weakest.map((w) => w.id)).toEqual([q2.id, q3.id, q1.id]);
@@ -984,7 +1033,7 @@ describe("getWeakestQuestions", () => {
 
   it("includes attempts with round_id NULL", async () => {
     const q = await insertQuestion(db, { ...sampleClf, prompt: "qNoRound" });
-    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
     const weakest = await getWeakestQuestions(db, "s1", "CLF-C02");
     expect(weakest).toHaveLength(1);
     expect(weakest[0].wrongCount).toBe(1);
@@ -993,8 +1042,8 @@ describe("getWeakestQuestions", () => {
   it("respects the limit parameter", async () => {
     for (let i = 0; i < 5; i++) {
       const q = await insertQuestion(db, { ...sampleClf, prompt: `q${i}` });
-      await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
-      await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
+      await ins(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
+      await ins(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1" });
     }
     const weakest = await getWeakestQuestions(db, "s1", "CLF-C02", 3);
     expect(weakest).toHaveLength(3);
@@ -1009,7 +1058,7 @@ describe("getLastRoundReview", () => {
 
   it("returns empty review when no round_id has been recorded", async () => {
     const q = await insertQuestion(db, sampleClf);
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id, selected: ["A"], correct: true, sessionId: "s1",
     });
     const review = await getLastRoundReview(db, "s1", "CLF-C02");
@@ -1026,23 +1075,23 @@ describe("getLastRoundReview", () => {
     const q3 = await insertQuestion(db, { ...sampleClf, prompt: "q3" });
 
     // Older round r-old: all correct
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q1.id, selected: ["A"], correct: true,
       sessionId: "s1", roundId: "r-old",
       answeredAt: new Date(1_700_000_000_000),
     });
     // Latest round r-new: q1 right, q2 wrong, q3 wrong
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q1.id, selected: ["A"], correct: true,
       sessionId: "s1", roundId: "r-new",
       answeredAt: new Date(1_700_000_100_000),
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q2.id, selected: ["B"], correct: false,
       sessionId: "s1", roundId: "r-new",
       answeredAt: new Date(1_700_000_200_000),
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q3.id, selected: ["B"], correct: false,
       sessionId: "s1", roundId: "r-new",
       answeredAt: new Date(1_700_000_300_000),
@@ -1064,12 +1113,12 @@ describe("getLastRoundReview", () => {
   it("uses the latest attempt per question when a round retried it", async () => {
     const q = await insertQuestion(db, sampleClf);
     // q answered wrong, then re-attempted right within the same round
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id, selected: ["B"], correct: false,
       sessionId: "s1", roundId: "r1",
       answeredAt: new Date(1_700_000_000_000),
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: q.id, selected: ["A"], correct: true,
       sessionId: "s1", roundId: "r1",
       answeredAt: new Date(1_700_000_010_000),
@@ -1085,12 +1134,12 @@ describe("getLastRoundReview", () => {
     const clf = await insertQuestion(db, sampleClf);
     const saa = await insertQuestion(db, sampleSaa);
 
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: saa.id, selected: ["B"], correct: false,
       sessionId: "s1", roundId: "r-saa-newer",
       answeredAt: new Date(1_700_000_500_000),
     });
-    await insertAttempt(db, {
+    await ins(db, {
       questionId: clf.id, selected: ["A"], correct: true,
       sessionId: "s1", roundId: "r-clf-older",
       answeredAt: new Date(1_700_000_100_000),
@@ -1113,10 +1162,10 @@ describe("countAnsweredQuestions", () => {
     const q2 = await insertQuestion(db, { ...sampleClf, prompt: "q2" });
     const qSaa = await insertQuestion(db, { ...sampleSaa, prompt: "saa" });
 
-    await insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: q2.id, selected: ["A"], correct: true, sessionId: "s1" });
-    await insertAttempt(db, { questionId: qSaa.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q1.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: q2.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: qSaa.id, selected: ["A"], correct: true, sessionId: "s1" });
 
     expect(await countAnsweredQuestions(db, "s1", "CLF-C02")).toBe(2);
     expect(await countAnsweredQuestions(db, "s1", "SAA-C03")).toBe(1);
@@ -1136,14 +1185,14 @@ describe("getRoundTrend", () => {
     const q = await insertQuestion(db, { ...sampleClf, prompt: "q" });
 
     // r1: 2/2
-    await insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(10) });
-    await insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(20) });
+    await ins(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(10) });
+    await ins(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(20) });
     // r2: 1/2
-    await insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r2", answeredAt: t(30) });
-    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r2", answeredAt: t(40) });
+    await ins(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r2", answeredAt: t(30) });
+    await ins(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r2", answeredAt: t(40) });
     // r3: 0/2
-    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r3", answeredAt: t(50) });
-    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r3", answeredAt: t(60) });
+    await ins(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r3", answeredAt: t(50) });
+    await ins(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "s1", roundId: "r3", answeredAt: t(60) });
 
     const trend = await getRoundTrend(db, "s1", "CLF-C02");
     expect(trend.map((p) => p.roundId)).toEqual(["r1", "r2", "r3"]);
@@ -1155,8 +1204,8 @@ describe("getRoundTrend", () => {
 
   it("ignores attempts with NULL round_id", async () => {
     const q = await insertQuestion(db, { ...sampleClf, prompt: "q" });
-    await insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", answeredAt: t(10) });
-    await insertAttempt(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(20) });
+    await ins(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", answeredAt: t(10) });
+    await ins(db, { questionId: q.id, selected: ["A"], correct: true, sessionId: "s1", roundId: "r1", answeredAt: t(20) });
 
     const trend = await getRoundTrend(db, "s1", "CLF-C02");
     expect(trend).toHaveLength(1);
@@ -1166,7 +1215,7 @@ describe("getRoundTrend", () => {
   it("returns only the most recent N rounds", async () => {
     const q = await insertQuestion(db, { ...sampleClf, prompt: "q" });
     for (let i = 0; i < 15; i++) {
-      await insertAttempt(db, {
+      await ins(db, {
         questionId: q.id,
         selected: ["A"],
         correct: true,
@@ -1180,5 +1229,85 @@ describe("getRoundTrend", () => {
     // chronological: oldest of the 10 youngest first → r5..r14
     expect(trend[0].roundId).toBe("r5");
     expect(trend[9].roundId).toBe("r14");
+  });
+});
+
+// Guard for the kept-but-unfiltered session_id column: one user learning on two
+// devices (two session_ids) must see ALL their progress, regardless of session.
+// If any read query secretly (re-)added an `AND session_id = ?` filter, it would
+// see only one device's attempts and these counts would drop — making the test
+// red. The browser smoke test runs on a single device (one session_id) and so
+// CANNOT distinguish user_id-only from additive filtering; this is that proof.
+describe("read queries filter by user_id only, never session_id", () => {
+  let db: DB;
+  beforeEach(async () => {
+    db = await createTestDb();
+  });
+
+  const t = (offsetSec: number) =>
+    new Date(1_700_000_000_000 + offsetSec * 1000);
+
+  // Same user, two different sessions/devices. q1 always right, q2 always wrong.
+  async function seedTwoDeviceUser() {
+    const q1 = await insertQuestion(db, { ...sampleClf, prompt: "q1" });
+    const q2 = await insertQuestion(db, { ...sampleClf, prompt: "q2" });
+    // device A → round rA
+    await insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, userId: "oktay", sessionId: "device-a", roundId: "rA", answeredAt: t(10) });
+    await insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, userId: "oktay", sessionId: "device-a", roundId: "rA", answeredAt: t(20) });
+    // device B → round rB (different session, SAME user)
+    await insertAttempt(db, { questionId: q1.id, selected: ["A"], correct: true, userId: "oktay", sessionId: "device-b", roundId: "rB", answeredAt: t(30) });
+    await insertAttempt(db, { questionId: q2.id, selected: ["B"], correct: false, userId: "oktay", sessionId: "device-b", roundId: "rB", answeredAt: t(40) });
+    return { q1, q2 };
+  }
+
+  it("getAttemptStats / getLastNAttempts span both sessions of the user", async () => {
+    await seedTwoDeviceUser();
+    const stats = await getAttemptStats(db, "oktay");
+    expect(stats.total).toBe(4); // not 2 — both devices counted
+    expect(stats.correct).toBe(2);
+    expect(await getLastNAttempts(db, "oktay", 10)).toHaveLength(4);
+  });
+
+  it("countAnsweredQuestions / getOverallAvgLast3 span both sessions", async () => {
+    await seedTwoDeviceUser();
+    expect(await countAnsweredQuestions(db, "oktay", "CLF-C02")).toBe(2);
+    // q1 (2× right)=1, q2 (2× wrong)=0 → overall 0.5, only possible if both
+    // sessions' attempts contribute to each question's last-3.
+    expect(await getOverallAvgLast3(db, "oktay", "CLF-C02")).toBeCloseTo(0.5, 4);
+  });
+
+  it("getDomainPerformance / getWeakestQuestions span both sessions", async () => {
+    const { q2 } = await seedTwoDeviceUser();
+    const perf = await getDomainPerformance(db, "oktay", "CLF-C02");
+    const cc = perf.find((p) => p.domain === "Cloud Concepts")!;
+    expect(cc.attempts).toBe(4);
+    expect(cc.correct).toBe(2);
+
+    const weakest = await getWeakestQuestions(db, "oktay", "CLF-C02");
+    const q2Weak = weakest.find((w) => w.id === q2.id)!;
+    expect(q2Weak.wrongCount).toBe(2); // both sessions' wrong attempts
+  });
+
+  it("getRoundTrend / getLastRoundReview span both sessions", async () => {
+    await seedTwoDeviceUser();
+    const trend = await getRoundTrend(db, "oktay", "CLF-C02");
+    // Both rounds visible despite living on different sessions.
+    expect(trend.map((p) => p.roundId)).toEqual(["rA", "rB"]);
+
+    const review = await getLastRoundReview(db, "oktay", "CLF-C02");
+    expect(review.roundId).toBe("rB"); // latest round, on device-b
+    expect(review.correctCount).toBe(1);
+    expect(review.incorrectCount).toBe(1);
+  });
+
+  it("a different user_id sees none of oktay's two-session data", async () => {
+    await seedTwoDeviceUser();
+    expect(await getAttemptStats(db, "merve")).toEqual({
+      total: 0,
+      correct: 0,
+      byDomain: [],
+    });
+    expect(await countAnsweredQuestions(db, "merve", "CLF-C02")).toBe(0);
+    expect(await getLastNAttempts(db, "merve", 10)).toHaveLength(0);
   });
 });

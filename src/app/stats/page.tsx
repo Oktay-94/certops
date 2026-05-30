@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import {
   ArrowLeft,
   Cloud,
@@ -26,12 +25,12 @@ import {
   scoreColorClass,
   scoreColorHex,
 } from "@/lib/scoreColor";
+import { getActiveProfileId } from "@/lib/profile-cookie";
 import { LastRoundBox } from "./LastRoundBox";
 import { TrendCompactBars } from "./TrendCompactBars";
 import { TrendLineChart } from "./TrendLineChart";
 import { WeakestBox } from "./WeakestBox";
 
-const SESSION_COOKIE = "certops_session_id";
 const CERT = "CLF-C02" as const;
 
 const DOMAINS = [
@@ -53,20 +52,19 @@ function pct(rate: number): string {
 }
 
 export default async function StatsPage() {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? null;
+  const userId = await getActiveProfileId();
 
-  if (!sessionId) return <EmptyState />;
+  if (!userId) return <EmptyState />;
 
   const [overall, allQuestions, answered, perf, weakest, trend, lastRound] =
     await Promise.all([
-      getOverallAvgLast3(db, sessionId, CERT),
+      getOverallAvgLast3(db, userId, CERT),
       getQuestionsByCert(db, CERT),
-      countAnsweredQuestions(db, sessionId, CERT),
-      getDomainPerformance(db, sessionId, CERT),
-      getWeakestQuestions(db, sessionId, CERT, 10),
-      getRoundTrend(db, sessionId, CERT, 10),
-      getLastRoundReview(db, sessionId, CERT),
+      countAnsweredQuestions(db, userId, CERT),
+      getDomainPerformance(db, userId, CERT),
+      getWeakestQuestions(db, userId, CERT, 10),
+      getRoundTrend(db, userId, CERT, 10),
+      getLastRoundReview(db, userId, CERT),
     ]);
   const totalQuestions = allQuestions.length;
 

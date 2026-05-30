@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import {
   BarChart3,
   BookOpen,
@@ -16,17 +15,18 @@ import {
   getOverallAvgLast3,
 } from "@/db/repository";
 import { EXAM_DATE, daysUntil } from "@/lib/config";
-
-const SESSION_COOKIE = "certops_session_id";
+import { getActiveProfileId } from "@/lib/profile-cookie";
+import { ProfileSwitcher } from "@/components/profile/ProfileSwitcher";
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? null;
+  const userId = await getActiveProfileId();
 
   const cardsTotal = (await getFlashcards(db, "CLF-C02")).length;
-  const seenCount = await countSeenFlashcards(db, "CLF-C02");
-  const avgLast3 = sessionId
-    ? await getOverallAvgLast3(db, sessionId, "CLF-C02")
+  const seenCount = userId
+    ? await countSeenFlashcards(db, "CLF-C02", userId)
+    : 0;
+  const avgLast3 = userId
+    ? await getOverallAvgLast3(db, userId, "CLF-C02")
     : null;
 
   const now = new Date();
@@ -38,10 +38,21 @@ export default async function Home() {
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12 sm:py-16">
-      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
-        CertOps
-      </h1>
-      <p className="mt-3 text-zinc-600">AWS-Zertifikats-Vorbereitung</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
+            CertOps
+          </h1>
+          <p className="mt-3 text-zinc-600">AWS-Zertifikats-Vorbereitung</p>
+        </div>
+        {userId && <ProfileSwitcher activeProfileId={userId} />}
+      </div>
+
+      {!userId && (
+        <div className="mt-8">
+          <ProfileSwitcher activeProfileId={null} />
+        </div>
+      )}
 
       <section className="mt-8 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         <StatCard
