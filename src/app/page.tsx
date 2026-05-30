@@ -2,12 +2,14 @@ import Link from "next/link";
 import {
   BarChart3,
   BookOpen,
+  Boxes,
   Calendar,
   ClipboardCheck,
   Layers,
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
+import { BRAND_ORANGE } from "@/lib/brand";
 import { db } from "@/db";
 import {
   countSeenFlashcards,
@@ -113,6 +115,36 @@ export default async function Home() {
           squareBg="bg-amber-500"
           icon={BookOpen}
         />
+      </section>
+
+      {/* Separated block: standalone services island — no progress tracking */}
+      <section className="mt-10 border-t border-zinc-200 pt-8">
+        <Link
+          href="/services"
+          className="flex flex-col gap-4 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 p-5 transition hover:border-zinc-400 hover:bg-zinc-50 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-4">
+            <span
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[5px]"
+              style={{ backgroundColor: BRAND_ORANGE }}
+              aria-hidden
+            >
+              <Boxes size={20} className="text-white" />
+            </span>
+            <div>
+              <h2 className="text-base font-semibold text-zinc-900">
+                AWS Dienste (Karteikarten &amp; Quiz)
+              </h2>
+              <p className="mt-1 text-[12.5px] text-zinc-500">
+                152 Service-Karten + generatives Quiz — freies Üben, kein
+                gespeicherter Fortschritt.
+              </p>
+            </div>
+          </div>
+          <span className="shrink-0 rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-medium text-zinc-600">
+            freies Üben
+          </span>
+        </Link>
       </section>
     </main>
   );
