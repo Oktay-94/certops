@@ -3,8 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { UserRound } from "lucide-react";
-import { BRAND_ORANGE } from "@/lib/brand";
 import { PROFILES, getOtherProfile, getProfileById } from "@/lib/profiles";
+import { getProfileBranding } from "@/lib/profile-branding";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { setActiveProfile } from "@/app/profile-actions";
 
 type Props = { activeProfileId: string | null };
@@ -48,23 +49,22 @@ export function ProfileSwitcher({ activeProfileId }: Props) {
 
   const active = getProfileById(activeProfileId);
   const other = getOtherProfile(activeProfileId);
+  const branding = getProfileBranding(activeProfileId);
+  const pill = branding
+    ? `${branding.pill.bg} ${branding.pill.border} ${branding.pill.text}`
+    : "bg-white border-zinc-200 text-zinc-900";
 
   // Active indicator — click switches to the other fixed profile.
+  // Avatar inherits the pill text color via fill="currentColor".
   return (
     <button
       type="button"
       disabled={pending}
       onClick={() => other && choose(other.id)}
       title={other ? `Zu ${other.name} wechseln` : undefined}
-      className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white py-1.5 pl-1.5 pr-3 text-sm font-medium text-zinc-900 transition hover:border-zinc-400 disabled:opacity-50"
+      className={`inline-flex items-center gap-2 rounded-full border py-1.5 pl-3 pr-3 text-sm font-medium transition hover:border-zinc-400 disabled:opacity-50 ${pill}`}
     >
-      <span
-        className="inline-flex h-6 w-6 items-center justify-center rounded-full text-white"
-        style={{ backgroundColor: BRAND_ORANGE }}
-        aria-hidden
-      >
-        <UserRound className="h-3.5 w-3.5" />
-      </span>
+      <ProfileAvatar profileId={activeProfileId} />
       <span>{active?.name ?? "Profil"}</span>
       {other && (
         <span className="text-xs text-zinc-400">→ {other.name}</span>

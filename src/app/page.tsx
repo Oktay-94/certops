@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   BarChart3,
   BookOpen,
@@ -18,10 +19,12 @@ import {
 } from "@/db/repository";
 import { EXAM_DATE, daysUntil } from "@/lib/config";
 import { getActiveProfileId } from "@/lib/profile-cookie";
+import { getProfileBranding } from "@/lib/profile-branding";
 import { ProfileSwitcher } from "@/components/profile/ProfileSwitcher";
 
 export default async function Home() {
   const userId = await getActiveProfileId();
+  const branding = getProfileBranding(userId);
 
   const cardsTotal = (await getFlashcards(db, "CLF-C02")).length;
   const seenCount = userId
@@ -42,10 +45,25 @@ export default async function Home() {
     <main className="max-w-4xl mx-auto px-6 py-12 sm:py-16">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
-            CertOps
-          </h1>
-          <p className="mt-3 text-zinc-600">AWS-Zertifikats-Vorbereitung</p>
+          {branding ? (
+            // Logo already contains the "AWS-Zertifikats-Vorbereitung" subtitle.
+            <Image
+              src={branding.logoSrc}
+              alt="CertOps"
+              width={1200}
+              height={428}
+              priority
+              className="h-auto w-full max-w-[200px] sm:max-w-[260px]"
+            />
+          ) : (
+            // Fallback: no active profile — keep the plain text header.
+            <>
+              <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
+                CertOps
+              </h1>
+              <p className="mt-3 text-zinc-600">AWS-Zertifikats-Vorbereitung</p>
+            </>
+          )}
         </div>
         {userId && <ProfileSwitcher activeProfileId={userId} />}
       </div>

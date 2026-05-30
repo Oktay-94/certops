@@ -42,6 +42,7 @@ Stack: Next.js 16 (App Router), React 19, Tailwind 4, SQLite via Drizzle ORM, Ty
 - Dashboard-Karteikarten-Untertitel „Compute & Storage" veraltet.
 - Stale Round-Cookie bei Reseed → notFound (akzeptabler Dev-Edge-Case).
 - proxy.ts-Migration (kosmetisch).
+- Switcher-Pill nutzt blue (sonst Cloud-Concepts) / rose (sonst Security) bewusst doppelt — Profil-Branding-Kontext, nicht Domain-Farbe (`src/lib/profile-branding.ts`).
 
 ## Out of Scope (bewusst nicht jetzt)
 - Riesen-Batches (195 Fragen / 150 Karten in einem Lauf).
