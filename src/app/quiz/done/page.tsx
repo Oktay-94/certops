@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { db } from "@/db";
-import {
-  getAttemptStats,
-  getLastNAttempts,
-  getQuestionsByCert,
-} from "@/db/repository";
+import { getAttemptStats, getLastRoundReview } from "@/db/repository";
 import { scoreColorClass } from "@/lib/scoreColor";
 import { getActiveProfileId } from "@/lib/profile-cookie";
+
+const CERT = "CLF-C02" as const;
 
 function pct(correct: number, total: number): number {
   if (total === 0) return 0;
@@ -21,21 +19,16 @@ function domainToneClass(correct: number, total: number): string {
 export default async function QuizDonePage() {
   const userId = await getActiveProfileId();
 
-  const pool = await getQuestionsByCert(db, "CLF-C02");
-  const poolSize = pool.length;
-
-  // Aktuelle Heuristik für "diese Runde" = letzte N Attempts.
-  // Falls sich das als problematisch erweist (Pause mittendrin, etc.),
-  // aufrüsten auf round_number-Spalte in question_attempts.
-  const roundAttempts = userId
-    ? await getLastNAttempts(db, userId, poolSize)
-    : [];
+  // "Diese Runde" filtert über die round_id der zuletzt gespielten Runde,
+  // nicht über die letzten N Attempts — sonst zeigt sie bei wenigen
+  // Gesamt-Attempts denselben Wert wie der Gesamt-Stand.
+  const round = userId ? await getLastRoundReview(db, userId, CERT) : null;
   const stats = userId
     ? await getAttemptStats(db, userId)
     : { total: 0, correct: 0, byDomain: [] };
 
-  const roundCorrect = roundAttempts.filter((a) => a.correct).length;
-  const roundTotal = roundAttempts.length;
+  const roundCorrect = round?.correctCount ?? 0;
+  const roundTotal = (round?.correctCount ?? 0) + (round?.incorrectCount ?? 0);
 
   return (
     <main className="max-w-2xl mx-auto px-6 py-12 sm:py-16">
