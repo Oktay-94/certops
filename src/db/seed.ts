@@ -3,6 +3,7 @@ import { db } from "./index";
 import { flashcardViews, flashcards, questionAttempts, questions } from "./schema";
 import { clfC02Questions } from "./seed/index";
 import { clfC02QuestionsBatch2 } from "./seed/questions/index";
+import { clfC02QuestionsBatch3 } from "./seed/questions/index-batch3";
 import { clfC02Flashcards } from "./seed/cards/index";
 import { addBoldedTerms } from "../lib/markdown-bold";
 import { addServiceMarkers } from "../lib/markdown-marks";
@@ -18,7 +19,7 @@ async function seed() {
     throw new Error("Refusing to seed: NODE_ENV is production.");
   }
 
-  const all = [...clfC02Questions, ...clfC02QuestionsBatch2];
+  const all = [...clfC02Questions, ...clfC02QuestionsBatch2, ...clfC02QuestionsBatch3];
   if (all.length === 0) {
     console.log("No seed data defined yet — skipping insert.");
     return;
