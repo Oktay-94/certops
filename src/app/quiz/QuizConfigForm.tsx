@@ -74,7 +74,7 @@ function selectionBorderAccent(domain: DomainChoice): string {
   return getDomainColor(domain).borderAccent;
 }
 
-export function QuizConfigForm() {
+export function QuizConfigForm({ questionCount }: { questionCount: number }) {
   const [count, setCount] = useState<QuizCount>(20);
   const [domain, setDomain] = useState<DomainChoice>("all");
   const [mode, setMode] = useState<QuizMode>("random");
@@ -138,7 +138,7 @@ export function QuizConfigForm() {
             Quiz konfigurieren
           </h2>
           <p className="mt-1 text-sm text-zinc-500">
-            164 CLF-C02-Fragen verfügbar — Umfang und Fokus wählen
+            {questionCount} CLF-C02-Fragen verfügbar — Umfang und Fokus wählen
           </p>
         </div>
       </header>
