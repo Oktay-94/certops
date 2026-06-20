@@ -18,6 +18,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Amazon EC2 (Elastic Compute Cloud) stellt virtuelle Server (Instanzen) bereit, auf denen Anwendungen laufen. Der Kunde wählt Instanztyp, Betriebssystem und Größe.",
     difficulty: 1,
+    seedKey: "clf-c02-q-119",
     sourceRef: "AWS EC2 Documentation",
   },
   {
@@ -36,6 +37,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Spot Instances bieten die größten Rabatte (bis ~90%), können aber mit kurzer Vorwarnung zurückgenommen werden. Für unterbrechbare, fehlertolerante Workloads wie Batch-Jobs sind sie ideal.",
     difficulty: 2,
+    seedKey: "clf-c02-q-120",
     sourceRef: "AWS EC2 Pricing",
   },
   {
@@ -54,6 +56,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Bei konstanter, vorhersehbarer Last über 1–3 Jahre bieten Reserved Instances bzw. Savings Plans erhebliche Rabatte gegenüber On-Demand, im Austausch für eine Nutzungsverpflichtung.",
     difficulty: 2,
+    seedKey: "clf-c02-q-121",
     sourceRef: "AWS EC2 Pricing",
   },
   {
@@ -73,6 +76,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Die EC2-Pricing-Modelle sind On-Demand, Reserved Instances, Savings Plans, Spot Instances und Dedicated Hosts. On-Demand und Spot gehören dazu; die übrigen Optionen existieren nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-122",
     sourceRef: "AWS EC2 Pricing",
   },
   {
@@ -91,6 +95,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "AWS Lambda ist ein serverloser Compute-Service: Code läuft als Reaktion auf Ereignisse, ohne dass man Server verwaltet. Man zahlt nur für die tatsächliche Ausführungszeit und Anzahl der Aufrufe.",
     difficulty: 1,
+    seedKey: "clf-c02-q-123",
     sourceRef: "AWS Lambda Documentation",
   },
   {
@@ -109,6 +114,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Für kurze, ereignisgesteuerte Aufgaben ohne dauerhaften Serverbedarf ist Lambda ideal — es wird durch das S3-Upload-Event ausgelöst und man zahlt nur für die kurze Ausführung.",
     difficulty: 2,
+    seedKey: "clf-c02-q-124",
     sourceRef: "AWS Lambda Documentation",
   },
   {
@@ -127,6 +133,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "AWS Fargate ist eine serverlose Compute-Engine für Container (mit ECS oder EKS), bei der man keine EC2-Instanzen verwaltet. AWS kümmert sich um die zugrundeliegende Infrastruktur.",
     difficulty: 2,
+    seedKey: "clf-c02-q-125",
     sourceRef: "AWS Fargate Documentation",
   },
   {
@@ -144,6 +151,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Amazon S3 (Simple Storage Service) ist ein hoch skalierbarer Objektspeicher für beliebige Dateien (Objekte) wie Bilder, Videos, Backups — mit sehr hoher Haltbarkeit.",
     difficulty: 1,
+    seedKey: "clf-c02-q-126",
     sourceRef: "AWS S3 Documentation",
   },
   {
@@ -162,6 +170,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "S3 Glacier und Glacier Deep Archive sind für selten benötigte Langzeitarchivierung zu sehr niedrigen Kosten gedacht — im Austausch für längere Abrufzeiten.",
     difficulty: 2,
+    seedKey: "clf-c02-q-127",
     sourceRef: "AWS S3 Storage Classes",
   },
   {
@@ -181,6 +190,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "S3 ist Objektspeicher; EFS ist ein gemeinsam nutzbares Dateisystem (mehrere Instanzen gleichzeitig); EBS ist Block-Speicher, der typischerweise an eine Instanz in derselben AZ angehängt wird.",
     difficulty: 2,
+    seedKey: "clf-c02-q-128",
     sourceRef: "AWS Storage Comparison",
   },
   {
@@ -199,6 +209,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Amazon EBS (Elastic Block Store) liefert persistente Block-Speicher-Volumes, die wie Festplatten an EC2-Instanzen angehängt werden (innerhalb derselben Availability Zone).",
     difficulty: 1,
+    seedKey: "clf-c02-q-129",
     sourceRef: "AWS EBS Documentation",
   },
   {
@@ -217,6 +228,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Amazon EFS ist ein verwaltetes, gemeinsam nutzbares Dateisystem (NFS), auf das mehrere EC2-Instanzen gleichzeitig zugreifen können — anders als EBS, das typischerweise an eine Instanz gebunden ist.",
     difficulty: 2,
+    seedKey: "clf-c02-q-130",
     sourceRef: "AWS EFS Documentation",
   },
   {
@@ -235,6 +247,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Eine S3 Lifecycle Policy automatisiert das Verschieben von Objekten in günstigere Speicherklassen (z.B. nach Glacier) oder deren Löschen nach festgelegten Regeln — spart Kosten.",
     difficulty: 2,
+    seedKey: "clf-c02-q-131",
     sourceRef: "AWS S3 Lifecycle",
   },
   {
@@ -253,6 +266,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Amazon RDS (Relational Database Service) ist eine verwaltete relationale Datenbank (MySQL, PostgreSQL, MariaDB, Oracle, SQL Server, Db2). AWS übernimmt Verwaltung, Patching, Backups und Failover.",
     difficulty: 1,
+    seedKey: "clf-c02-q-132",
     sourceRef: "AWS RDS Documentation",
   },
   {
@@ -271,6 +285,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Amazon DynamoDB ist eine serverlose NoSQL-Datenbank mit einstelliger Millisekunden-Latenz und automatischer Skalierung — ideal für massive, einfache Zugriffsmuster mit flexiblem Schema.",
     difficulty: 2,
+    seedKey: "clf-c02-q-133",
     sourceRef: "AWS DynamoDB Documentation",
   },
   {
@@ -289,6 +304,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Amazon Aurora ist eine cloud-native relationale Datenbank, kompatibel mit MySQL und PostgreSQL, mit deutlich höherer Performance und automatischer 6-facher Replikation über 3 Availability Zones.",
     difficulty: 2,
+    seedKey: "clf-c02-q-134",
     sourceRef: "AWS Aurora Documentation",
   },
   {
@@ -307,6 +323,7 @@ export const clfC02QCloudTech1: NewQuestion[] = [
     explanation:
       "Multi-AZ stellt einen synchronen Standby in einer anderen AZ für automatischen Failover bereit (Hochverfügbarkeit). Read Replicas sind asynchrone, lesbare Kopien zur Verteilung der Leselast (Skalierung).",
     difficulty: 2,
+    seedKey: "clf-c02-q-135",
     sourceRef: "AWS RDS High Availability",
   },
 ];

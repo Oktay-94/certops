@@ -25,6 +25,13 @@ export const questions = sqliteTable(
     difficulty: integer("difficulty"),
     sourceRef: text("source_ref"),
 
+    // Stable, content-independent upsert key (PR: seed_key foundation).
+    // Distinct from source_ref, which is a non-unique citation field. Values
+    // are fixed literals in the seed files (clf-c02-q-NNN), never derived at
+    // runtime. Nullable for now; uniqueness via idx_questions_seed_key, NULL-
+    // freeness enforced by the backfill completeness gate + guard tests.
+    seedKey: text("seed_key"),
+
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),
@@ -36,6 +43,11 @@ export const questions = sqliteTable(
   (t) => [
     index("idx_questions_cert").on(t.cert),
     index("idx_questions_cert_domain").on(t.cert, t.domain),
+    // Migration B (cutover): conflict target for the PR-2 upsert. UNIQUE allows
+    // multiple NULLs in SQLite, so it is safe to apply before the backfill has
+    // filled every row — duplicates only become possible once values exist, and
+    // the seed keys are unique by construction (guard-tested).
+    uniqueIndex("idx_questions_seed_key").on(t.seedKey),
   ],
 );
 
@@ -96,6 +108,10 @@ export const flashcards = sqliteTable(
     difficulty: integer("difficulty"),
     sourceRef: text("source_ref"),
 
+    // Stable, content-independent upsert key (PR: seed_key foundation).
+    // See questions.seedKey. Values are fixed literals (clf-c02-card-NNN).
+    seedKey: text("seed_key"),
+
     iconSlugs: text("icon_slugs", { mode: "json" }).$type<string[]>(),
 
     createdAt: integer("created_at", { mode: "timestamp" })
@@ -109,6 +125,8 @@ export const flashcards = sqliteTable(
   (t) => [
     index("idx_flashcards_cert").on(t.cert),
     index("idx_flashcards_cert_domain").on(t.cert, t.domain),
+    // Migration B (cutover): see questions.idx_questions_seed_key.
+    uniqueIndex("idx_flashcards_seed_key").on(t.seedKey),
   ],
 );
 

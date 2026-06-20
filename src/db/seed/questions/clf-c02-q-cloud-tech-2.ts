@@ -18,6 +18,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Eine Amazon VPC (Virtual Private Cloud) ist ein logisch isoliertes virtuelles Netzwerk in AWS, in dem man IP-Bereiche, Subnetze, Routing und Gateways selbst definiert.",
     difficulty: 1,
+    seedKey: "clf-c02-q-136",
     sourceRef: "AWS VPC Documentation",
   },
   {
@@ -36,6 +37,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon Route 53 ist der verwaltete DNS-Service von AWS: Domain-Registrierung, DNS-Auflösung, Health Checks und verschiedene Routing-Policies (z.B. Latency-based, Failover).",
     difficulty: 1,
+    seedKey: "clf-c02-q-137",
     sourceRef: "AWS Route 53 Documentation",
   },
   {
@@ -54,6 +56,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon CloudFront ist ein Content Delivery Network (CDN), das Inhalte an Edge Locations nahe den Nutzern cached und so weltweit mit niedriger Latenz ausliefert.",
     difficulty: 2,
+    seedKey: "clf-c02-q-138",
     sourceRef: "AWS CloudFront Documentation",
   },
   {
@@ -72,6 +75,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "AWS Direct Connect stellt eine dedizierte physische Leitung zwischen dem eigenen Rechenzentrum und AWS bereit — mit konsistenter Latenz und Bandbreite, nicht über das öffentliche Internet.",
     difficulty: 2,
+    seedKey: "clf-c02-q-139",
     sourceRef: "AWS Direct Connect Documentation",
   },
   {
@@ -90,6 +94,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "CloudFront ist ein CDN, das Inhalte (HTTP/HTTPS) an Edge Locations cached. Global Accelerator leitet Traffic (auch TCP/UDP) optimiert über das AWS-Backbone zu den nächstgelegenen Endpunkten und liefert statische Anycast-IPs.",
     difficulty: 2,
+    seedKey: "clf-c02-q-140",
     sourceRef: "AWS Networking Services",
   },
   {
@@ -108,6 +113,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon SQS (Simple Queue Service) ist eine verwaltete Nachrichten-Warteschlange, die Komponenten entkoppelt: Producer legen Nachrichten ab, Consumer holen sie ab — asynchron und ausfalltolerant.",
     difficulty: 2,
+    seedKey: "clf-c02-q-141",
     sourceRef: "AWS SQS Documentation",
   },
   {
@@ -127,6 +133,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "SQS ist eine Pull-basierte Warteschlange (eine Nachricht pro Consumer). SNS ist ein Pub/Sub-Dienst, der eine Nachricht per Push an viele Abonnenten gleichzeitig verteilt.",
     difficulty: 2,
+    seedKey: "clf-c02-q-142",
     sourceRef: "AWS Messaging Comparison",
   },
   {
@@ -145,6 +152,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon Athena ist ein serverloser Abfrage-Service, der SQL direkt auf Daten in S3 ausführt — ohne Server oder vorheriges Laden. Man zahlt pro gescannter Datenmenge.",
     difficulty: 2,
+    seedKey: "clf-c02-q-143",
     sourceRef: "AWS Athena Documentation",
   },
   {
@@ -163,6 +171,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon Redshift ist ein verwaltetes Data Warehouse für analytische Abfragen (OLAP) über große, strukturierte Datenmengen mit spaltenbasierter Speicherung und Parallelverarbeitung.",
     difficulty: 2,
+    seedKey: "clf-c02-q-144",
     sourceRef: "AWS Redshift Documentation",
   },
   {
@@ -181,6 +190,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon Kinesis nimmt Echtzeit-Streaming-Daten in großem Umfang auf und ermöglicht deren Verarbeitung nahezu in Echtzeit — im Gegensatz zu Batch-orientierten Analysen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-145",
     sourceRef: "AWS Kinesis Documentation",
   },
   {
@@ -198,6 +208,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon Polly ist der Text-to-Speech-Service: er wandelt Text in natürlich klingende Sprache um. (Transcribe macht das Umgekehrte: Sprache in Text.)",
     difficulty: 2,
+    seedKey: "clf-c02-q-146",
     sourceRef: "AWS Polly Documentation",
   },
   {
@@ -216,6 +227,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon Transcribe ist der Speech-to-Text-Service: er wandelt gesprochene Sprache (Audio) in geschriebenen Text um — ideal für Transkripte und Call-Center-Analysen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-147",
     sourceRef: "AWS Transcribe Documentation",
   },
   {
@@ -234,6 +246,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon Rekognition ist der Bild- und Videoanalyse-Service: er erkennt Objekte, Szenen, Gesichter, Text in Bildern und unangemessene Inhalte (Content Moderation).",
     difficulty: 2,
+    seedKey: "clf-c02-q-148",
     sourceRef: "AWS Rekognition Documentation",
   },
   {
@@ -253,6 +266,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Textract extrahiert Text/Tabellen/Formulare aus Dokumenten (OCR). Lex baut Chatbots/Conversational Interfaces. Translate übersetzt Text, Polly macht Text-to-Speech, Comprehend ist NLP — die anderen Zuordnungen sind falsch.",
     difficulty: 2,
+    seedKey: "clf-c02-q-149",
     sourceRef: "AWS AI Services Comparison",
   },
   {
@@ -271,6 +285,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Amazon CloudWatch ist der Monitoring-Service: er sammelt Metriken (CPU, Netzwerk etc.), Logs und Events, ermöglicht Dashboards und Alarme. (CloudTrail protokolliert dagegen API-Aktivitäten.)",
     difficulty: 2,
+    seedKey: "clf-c02-q-150",
     sourceRef: "AWS CloudWatch Documentation",
   },
   {
@@ -289,6 +304,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "AWS CloudFormation ist das Infrastructure-as-Code-Tool: Infrastruktur wird in einer Vorlage (JSON/YAML) beschrieben und automatisch, wiederholbar und konsistent bereitgestellt.",
     difficulty: 2,
+    seedKey: "clf-c02-q-151",
     sourceRef: "AWS CloudFormation Documentation",
   },
   {
@@ -307,6 +323,7 @@ export const clfC02QCloudTech2: NewQuestion[] = [
     explanation:
       "Elastic Load Balancing (ELB) verteilt eingehenden Traffic automatisch auf mehrere Ziele (z.B. EC2-Instanzen) über Availability Zones hinweg. Das erhöht Verfügbarkeit und Fehlertoleranz und arbeitet typischerweise mit Auto Scaling zusammen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-152",
     sourceRef: "AWS Elastic Load Balancing Documentation",
   },
 ];

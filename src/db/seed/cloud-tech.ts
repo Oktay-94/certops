@@ -18,6 +18,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "AWS Lambda ist serverless, event-getrieben und wird pro Ausführungszeit (ms) + Requests abgerechnet — perfekt für kurze HTTP-getriggerte Funktionen. EC2 und ECS-on-EC2 erfordern Server-Management; Elastic Beanstalk verwaltet zwar Server für dich, läuft aber dauerhaft.",
     difficulty: 2,
+    seedKey: "clf-c02-q-039",
     sourceRef: "AWS Exam Guide CLF-C02, Domain 3.2",
   },
 
@@ -38,6 +39,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "S3 Glacier Instant Retrieval (seit 2021): niedrige Speicherkosten + Millisekunden-Zugriff, ideal für quartalsweise genutzte Archivdaten mit Notfall-Zugriff. S3 Standard = Millisekunden, aber teurer. Glacier Flexible Retrieval = Minuten bis 12h. Glacier Deep Archive = 12-48h. Merksatz: 'Instant' = Millisekunden, 'Flexible' = Minuten/Stunden, 'Deep' = halber Tag oder mehr.",
     difficulty: 2,
+    seedKey: "clf-c02-q-040",
     sourceRef: "Amazon S3 Storage Classes",
   },
   {
@@ -67,6 +69,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Lambda ist Serverless: Pay-per-Request + Pay-per-Execution-Time, bei Inaktivität keine Kosten. Aktuelle Limits (2026): max. 15 Min Laufzeit, max. 10 GB RAM. Unterstützte Sprachen nativ: Node.js, Python, Java, .NET, Go, Ruby + Custom Runtimes via Layers. Lambda ist stateless für kurze Aufgaben — kein Anti-Pattern für Datenbanken (dafür RDS/DynamoDB).",
     difficulty: 2,
+    seedKey: "clf-c02-q-041",
     sourceRef: "AWS Lambda Documentation",
   },
   {
@@ -85,6 +88,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Amazon RDS unterstützt sechs Engines: Aurora (AWS-eigene MySQL/PostgreSQL-kompatibel), MySQL, PostgreSQL, MariaDB, Oracle, SQL Server. RDS übernimmt Backups, Patches, Multi-AZ, Read Replicas, Monitoring. DynamoDB = NoSQL ohne SQL-Joins. S3 = Object Storage, keine Datenbank. ElastiCache = In-Memory Cache (Redis/Memcached) vor einer DB, kein primärer Datenspeicher.",
     difficulty: 2,
+    seedKey: "clf-c02-q-042",
     sourceRef: "Amazon RDS Documentation",
   },
   {
@@ -115,6 +119,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Eine VPC ist dein eigenes, logisch isoliertes Netzwerk in AWS. Du kontrollierst CIDR-Block, Subnetze (Public/Private), Route Tables, Internet Gateway, NAT Gateway, Security Groups, NACLs, VPC Peering und Transit Gateway. Globales CDN = CloudFront. DNS + Routing-Policies = Route 53. Auto Scaling = EC2 Auto Scaling Groups.",
     difficulty: 2,
+    seedKey: "clf-c02-q-043",
     sourceRef: "Amazon VPC Documentation",
   },
   {
@@ -134,6 +139,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Standard-Pattern für HA-Webanwendungen: ELB verteilt Traffic auf mehrere EC2-Instanzen in mehreren AZs (ALB Layer 7, NLB Layer 4, GWLB für Network-Appliances). EC2 Auto Scaling passt Instanz-Anzahl automatisch an Last an (Scale Out / Scale In via Scaling Policies). ELB = Vorderseite, Auto Scaling = Hinterseite. S3 Glacier = Archiv-Storage, Snowball = physische Datenmigration, Athena = SQL-Queries auf S3.",
     difficulty: 2,
+    seedKey: "clf-c02-q-044",
     sourceRef: "AWS Auto Scaling, Elastic Load Balancing Documentation",
   },
   {
@@ -152,6 +158,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Route 53 Routing-Policies: Geolocation = basierend auf Herkunftsland des Users (z. B. DSGVO-Compliance, Content-Lokalisierung). Simple = ein Endpunkt. Weighted = Traffic nach %-Verteilung (A/B-Tests). Latency-Based = niedrigste Netzwerk-Latenz. Failover = Primär+Sekundär (Disaster Recovery). Geoproximity = geografische Distanz mit Bias. Multi-Value Answer = mehrere gesunde Endpunkte.",
     difficulty: 2,
+    seedKey: "clf-c02-q-045",
     sourceRef: "Amazon Route 53 Routing Policies",
   },
   {
@@ -173,6 +180,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "AWS Fargate ist Serverless-Compute für Container. AWS verwaltet Infrastruktur (Server, Skalierung, Patching), du zahlst nur für genutzte Ressourcen. Funktioniert mit ECS (AWS-eigene Orchestrierung) und EKS (Managed Kubernetes). EKS auf EC2-Worker-Nodes = Eigenverwaltung der Nodes. EC2 mit Docker manuell = komplette Eigenverwaltung. Lambda mit Container-Images = max. 15 Min Laufzeit, für kurze Aufgaben, nicht für lang laufende Container-Services.",
     difficulty: 2,
+    seedKey: "clf-c02-q-046",
     sourceRef: "AWS Fargate Documentation, Amazon ECS Documentation",
   },
   {
@@ -191,6 +199,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Amazon Bedrock (seit Oktober 2023) ist verwalteter Service für generative KI mit einheitlicher API für Foundation Models: Anthropic Claude, Meta Llama, Mistral, Cohere, AI21 Jurassic, Amazon Titan, Stability AI. Serverless, Pay-per-Token, Knowledge Bases für RAG, Agents, Guardrails. SageMaker = eigene ML-Modelle trainieren/deployen. Rekognition = Bild-/Video-Analyse. Comprehend = NLP (Sentiment, Entities). Bedrock = 'fertige Modelle nutzen', SageMaker = 'eigene Modelle bauen'.",
     difficulty: 2,
+    seedKey: "clf-c02-q-047",
     sourceRef: "Amazon Bedrock Documentation",
   },
 
@@ -213,6 +222,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "AWS CloudFormation ist der native IaC-Service: Templates in JSON/YAML, Stacks für gebündelte Ressourcen, Drift-Detection, StackSets für Multi-Account-Multi-Region-Deployments, Rollback bei Fehlern. CloudFormation selbst ist kostenlos — Kosten entstehen nur durch die provisionierten Ressourcen. Systems Manager = Operations und Konfigurations-Management bestehender Ressourcen. Cloud9 = browser-basierte IDE. Elastic Beanstalk = PaaS, deployed Anwendungen, nutzt CloudFormation intern, ist aber nicht selbst der IaC-Service.",
     difficulty: 1,
+    seedKey: "clf-c02-q-048",
     sourceRef: "AWS CloudFormation Documentation",
   },
 
@@ -233,6 +243,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Die AWS CLI ist das richtige Werkzeug für skriptbare, automatisierte AWS-Operationen aus Shell-Skripten heraus. Authentifizierung idealerweise über IAM Role am EC2-Instance-Profile (keine Access Keys im Skript!). Alternativen: AWS SDK (programmatisch in Python/Java/JS/Go/etc. — wenn Code direkt mit AWS reden soll), CloudFormation/Terraform (wenn IaC gewünscht). Die Management Console (A) ist interaktiv, nicht skriptbar. Browser-Login (C) ist manuell. Briefpost (D) ist Quatsch.",
     difficulty: 1,
+    seedKey: "clf-c02-q-049",
     sourceRef: "AWS CLI Documentation",
   },
 
@@ -253,6 +264,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "AWS Direct Connect stellt eine dedizierte Glasfaser-Verbindung von einer AWS-Direct-Connect-Location zum Kunden bereit — 1/10/100 Gbps, konsistente Latenz, Traffic NICHT über öffentliches Internet. Aufbau dauert Wochen, dafür stabile Performance + reduzierte Data-Transfer-Kosten. Site-to-Site VPN (A) läuft über das öffentliche Internet (verschlüsselt via IPsec) — schnell aufgesetzt, aber Latenz/Bandbreite hängen vom Internet ab. Client VPN (C) = einzelne Nutzer-Geräte. NAT Gateways (D) = ausgehender Internet-Traffic aus privaten Subnetzen, keine Hybrid-Verbindung.",
     difficulty: 2,
+    seedKey: "clf-c02-q-050",
     sourceRef: "AWS Direct Connect Documentation",
   },
 
@@ -273,6 +285,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Amazon DynamoDB ist eine vollständig verwaltete, serverless NoSQL-Datenbank: einstellige Millisekunden-Latenz im Standard-Modus, sub-Millisekunden mit DAX-Cache, automatische Skalierung (On-Demand) auf Millionen Requests/Sek., Multi-Region (Global Tables) optional. Ideal für Key-Value- und Document-Workloads, Gaming, IoT, Session-Stores, Shopping Carts. RDS PostgreSQL/Aurora = relational mit SQL-Joins und ACID — andere Stärken, höhere Latenz. Redshift = Data Warehouse für Analytics über große Datenmengen, nicht für Low-Latency-Transaktional.",
     difficulty: 2,
+    seedKey: "clf-c02-q-051",
     sourceRef: "Amazon DynamoDB Documentation",
   },
 
@@ -292,6 +305,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "ElastiCache (für Valkey, Redis OSS oder Memcached) ist ein klassischer Cache vor einer Primär-Datenbank (z. B. RDS) — Daten sind transient, bei Knoten-Ausfall können Schreibvorgänge verloren gehen. MemoryDB nutzt dieselbe Redis/Valkey-API, persistiert aber jeden Schreibvorgang in einem Multi-AZ Transaction Log — durable, geeignet als Primär-Datenbank für Workloads, die Mikrosekunden-Lese-Latenz UND Persistenz brauchen. Faustregel: brauchst du nur Caching → ElastiCache; brauchst du Cache-Geschwindigkeit als Primary Store → MemoryDB.",
     difficulty: 2,
+    seedKey: "clf-c02-q-052",
     sourceRef: "Amazon ElastiCache and MemoryDB Documentation",
   },
 
@@ -311,6 +325,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Amazon CloudFront ist das AWS Content Delivery Network (CDN): über 600 Edge Locations weltweit cachen Inhalte aus dem Origin (z. B. S3-Bucket, ALB, EC2 oder externer Server) und liefern sie mit niedriger Latenz an Endnutzer aus. Reduziert Origin-Last und Data-Transfer-Kosten. Integriert mit Shield (DDoS) und WAF. Datenbank-Backups (A) = Aurora Cross-Region, RDS Snapshots. Vulnerability Scans (C) = Inspector. Encryption in Transit (D) = TLS, ACM — keine CDN-Funktion.",
     difficulty: 1,
+    seedKey: "clf-c02-q-053",
     sourceRef: "Amazon CloudFront Documentation",
   },
 
@@ -330,6 +345,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "EBS = Block Storage, einer AZ zugeordnet, an eine EC2-Instanz attached (Multi-Attach für io1/io2 ausnahmsweise möglich). Wie eine virtuelle Festplatte. EFS = NFS-basiertes File System, gleichzeitig von tausenden EC2-Instanzen, Lambda-Funktionen oder On-Premises über mehrere AZs nutzbar. Linux-Workloads. FSx = managed file systems für spezielle Protokolle: FSx for Windows (SMB), FSx for Lustre (HPC), FSx for NetApp ONTAP (Enterprise-NAS), FSx for OpenZFS. Keiner davon ist Object Storage (das ist S3).",
     difficulty: 2,
+    seedKey: "clf-c02-q-054",
     sourceRef: "AWS Storage Services Documentation",
   },
 
@@ -351,6 +367,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "S3 Lifecycle Policies automatisieren zwei Kategorien: Transition Actions (A) verschieben Objekte zwischen Storage-Klassen (Standard → IA → Glacier Instant/Flexible Retrieval → Deep Archive) basierend auf Alter; Expiration Actions (C) löschen Objekte nach einer Frist (oft Compliance-getrieben, z. B. Logs nach 7 Jahren). Public-Schalten (B) wird über Bucket-Policy gesteuert, nicht Lifecycle. Cross-Account-Migration (D) = S3 Replication, nicht Lifecycle. Bucket-Namen (E) sind unveränderlich nach Erstellung.",
     difficulty: 2,
+    seedKey: "clf-c02-q-055",
     sourceRef: "Amazon S3 Lifecycle Configuration Documentation",
   },
 
@@ -371,6 +388,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Amazon Athena ist serverless Interactive Query Service: SQL direkt auf Daten in S3 (CSV, JSON, Parquet, ORC, Avro), keine Cluster-Verwaltung, Pay-per-Query (etwa 5 USD pro TB gescannter Daten). Ideal für ad-hoc-Analysen, Log-Auswertung, einmalige Berichte. Redshift = managed Data Warehouse, erfordert Cluster (provisioned oder Serverless), günstiger für regelmäßige komplexe Analysen über große Datenmengen, aber Daten müssen erst geladen werden. RDS = transaktionale DB. DynamoDB = NoSQL Key-Value, nicht für SQL-Analytics.",
     difficulty: 2,
+    seedKey: "clf-c02-q-056",
     sourceRef: "Amazon Athena Documentation",
   },
 
@@ -391,6 +409,7 @@ export const cloudTechQuestions: NewQuestion[] = [
     explanation:
       "Amazon SQS ist eine vollständig verwaltete Message-Queue (Pull-Modell): Producer legen Messages in die Queue, Consumer pollen und arbeiten sie eigenständig ab. Decoupling von Producer/Consumer, Retries, Visibility Timeouts, Dead-Letter-Queues. Genau das beschriebene Bestellungs-Worker-Pattern. SNS (A) = Pub/Sub Fan-Out (Push), eine Message an viele Subscriber gleichzeitig. EventBridge (C) = Event-Bus mit Content-Based Routing, ideal für Multi-Source-Event-Verteilung mit Regeln. Kinesis Data Streams (D) = High-Throughput-Streaming mit Replay-Fähigkeit, andere Anwendungsfälle (z. B. Real-Time-Analytics).",
     difficulty: 2,
+    seedKey: "clf-c02-q-057",
     sourceRef: "Amazon SQS Documentation",
   },
 ];

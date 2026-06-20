@@ -19,6 +19,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Die Cloud verschiebt hohe Vorab-Investitionen in eigene Hardware (CapEx) hin zu nutzungsbasierten, variablen Betriebskosten (OpEx). Du zahlst nur, was du verbrauchst.",
     difficulty: 1,
+    seedKey: "clf-c02-q-065",
     sourceRef: "AWS Cloud Economics",
   },
   {
@@ -37,6 +38,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Dank elastischer Skalierung kommen Ressourcen bei Bedarf hinzu und werden bei Flaute abgebaut — man muss die Kapazität nicht mehr vorab raten und über- oder unterdimensionieren.",
     difficulty: 1,
+    seedKey: "clf-c02-q-066",
     sourceRef: "AWS Cloud Value Framework",
   },
   {
@@ -55,6 +57,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "AWS bündelt die Nachfrage von Millionen Kunden und erzielt dadurch massive Skaleneffekte. Diese niedrigeren Stückkosten werden in Form sinkender Preise weitergegeben.",
     difficulty: 1,
+    seedKey: "clf-c02-q-067",
     sourceRef: "AWS Cloud Economics",
   },
   {
@@ -73,6 +76,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Elastizität ermöglicht das automatische Hoch- und Runterskalieren von Ressourcen je nach Nachfrage — bei Lastspitzen mehr, in ruhigen Zeiten weniger (und damit geringere Kosten).",
     difficulty: 1,
+    seedKey: "clf-c02-q-068",
     sourceRef: "AWS Cloud Concepts",
   },
   {
@@ -91,6 +95,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Agilität bedeutet, Ressourcen in Minuten bereitstellen zu können. Das ermöglicht schnelles Experimentieren mit geringem Risiko — Fehlschläge sind billig, da Ressourcen einfach wieder abgeschaltet werden.",
     difficulty: 1,
+    seedKey: "clf-c02-q-069",
     sourceRef: "AWS Cloud Benefits",
   },
   {
@@ -108,6 +113,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "EC2 stellt grundlegende Recheninfrastruktur (virtuelle Server) bereit, bei der der Kunde Betriebssystem und Anwendungen selbst verwaltet — das ist IaaS.",
     difficulty: 2,
+    seedKey: "clf-c02-q-070",
     sourceRef: "AWS Cloud Computing Models",
   },
   {
@@ -126,6 +132,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Bei SaaS nutzt der Kunde fertige Software und verwaltet weder Infrastruktur noch Plattform. Eine webbasierte E-Mail-Anwendung ist ein klassisches SaaS-Beispiel.",
     difficulty: 1,
+    seedKey: "clf-c02-q-071",
     sourceRef: "AWS Cloud Computing Models",
   },
   {
@@ -144,6 +151,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Durch das Verteilen von Ressourcen über mehrere Availability Zones bleibt die Anwendung verfügbar, selbst wenn eine AZ ausfällt — das ist die Grundlage für Hochverfügbarkeit.",
     difficulty: 2,
+    seedKey: "clf-c02-q-072",
     sourceRef: "AWS High Availability",
   },
   {
@@ -161,6 +169,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Fault Tolerance bedeutet, dass das System ohne spürbare Unterbrechung weiterläuft, selbst bei Komponentenausfall. High Availability erlaubt eine sehr kurze Downtime mit schneller Erholung. Fault Tolerance ist aufwändiger und teurer.",
     difficulty: 2,
+    seedKey: "clf-c02-q-073",
     sourceRef: "AWS Reliability Concepts",
   },
   {
@@ -179,6 +188,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Horizontale Skalierung (scale out) bedeutet, mehr Ressourcen hinzuzufügen (weitere Instanzen). Vertikale Skalierung würde eine bestehende Instanz vergrößern. Die Cloud bevorzugt horizontale Skalierung.",
     difficulty: 2,
+    seedKey: "clf-c02-q-074",
     sourceRef: "AWS Scalability Concepts",
   },
   {
@@ -197,6 +207,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Loose Coupling entkoppelt Komponenten (z.B. über Message Queues wie SQS), sodass ein Ausfall isoliert bleibt und nicht das gesamte System lahmlegt.",
     difficulty: 2,
+    seedKey: "clf-c02-q-075",
     sourceRef: "AWS Architecture Best Practices",
   },
   {
@@ -216,6 +227,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Die 6 Säulen sind: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization und Sustainability. Security und Cost Optimization gehören dazu; die anderen Optionen sind keine Säulen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-076",
     sourceRef: "AWS Well-Architected Framework",
   },
   {
@@ -234,6 +246,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Die Säule Cost Optimization fokussiert darauf, den niedrigsten Preis für den Geschäftswert zu erzielen — durch Verbrauchsmodelle, Messen der Effizienz und Vermeiden unnötiger Ausgaben.",
     difficulty: 2,
+    seedKey: "clf-c02-q-077",
     sourceRef: "AWS Well-Architected",
   },
   {
@@ -252,6 +265,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Die Sustainability-Säule (seit 2021 die sechste Säule) fokussiert auf die Minimierung des ökologischen Fußabdrucks — durch effiziente Ressourcennutzung und Reduktion des Energieverbrauchs.",
     difficulty: 2,
+    seedKey: "clf-c02-q-078",
     sourceRef: "AWS Well-Architected",
   },
   {
@@ -271,6 +285,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Die sechs CAF-Perspektiven sind: Business, People, Governance (geschäftlich) sowie Platform, Security, Operations (technisch). Business und Operations gehören dazu.",
     difficulty: 2,
+    seedKey: "clf-c02-q-079",
     sourceRef: "AWS Cloud Adoption Framework",
   },
   {
@@ -290,6 +305,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Bei der Region-Auswahl zählen: Compliance/Datenschutz (Datenresidenz), Latenz/Nähe zu Nutzern, Service-Verfügbarkeit und Kosten. Compliance und Latenz sind hier korrekt.",
     difficulty: 2,
+    seedKey: "clf-c02-q-080",
     sourceRef: "AWS Region Selection",
   },
   {
@@ -307,6 +323,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Eine AZ besteht aus einem oder mehreren physisch isolierten Rechenzentren innerhalb einer Region, mit eigener Strom-/Kühlungs-/Netzwerkversorgung, aber schnell mit den anderen AZs verbunden.",
     difficulty: 2,
+    seedKey: "clf-c02-q-081",
     sourceRef: "AWS Global Infrastructure",
   },
   {
@@ -325,6 +342,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Edge Locations sind zahlreiche Standorte nahe bei den Endnutzern, die von CloudFront (CDN) genutzt werden, um Inhalte mit niedriger Latenz auszuliefern.",
     difficulty: 2,
+    seedKey: "clf-c02-q-082",
     sourceRef: "AWS Global Infrastructure",
   },
   {
@@ -343,6 +361,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Ein hybrides Deployment kombiniert eigene On-Premises-Infrastruktur mit der Cloud, typischerweise verbunden über VPN oder Direct Connect — häufig bei Migration oder regulatorischen Anforderungen.",
     difficulty: 1,
+    seedKey: "clf-c02-q-083",
     sourceRef: "AWS Cloud Deployment Models",
   },
   {
@@ -361,6 +380,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "'Design for Failure' geht davon aus, dass alles ausfallen kann, und baut Redundanz und automatischen Failover ein, statt zu hoffen, dass nichts kaputtgeht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-084",
     sourceRef: "AWS Architecture Best Practices",
   },
   {
@@ -379,6 +399,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "'Go global in minutes' bedeutet, dass man Anwendungen mit wenigen Klicks in mehreren AWS-Regionen weltweit bereitstellen kann, um Nutzer mit niedriger Latenz zu bedienen.",
     difficulty: 1,
+    seedKey: "clf-c02-q-085",
     sourceRef: "AWS Cloud Value Framework",
   },
   {
@@ -397,6 +418,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Ein Single Point of Failure ist eine Komponente ohne Redundanz, deren Ausfall das ganze System stoppt. Man vermeidet ihn durch Redundanz über mehrere AZs und automatischen Failover.",
     difficulty: 2,
+    seedKey: "clf-c02-q-086",
     sourceRef: "AWS Reliability Concepts",
   },
   {
@@ -415,6 +437,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "Das AWS Well-Architected Tool ist eine kostenlose, fragebasierte Selbstbewertung in der Konsole, die Workloads gegen die sechs Säulen prüft und Verbesserungsvorschläge liefert.",
     difficulty: 2,
+    seedKey: "clf-c02-q-087",
     sourceRef: "AWS Well-Architected Tool",
   },
   {
@@ -433,6 +456,7 @@ export const clfC02QCloudConcepts: NewQuestion[] = [
     explanation:
       "AWS DMS migriert Datenbanken in die Cloud mit minimaler Downtime, da die Quell-Datenbank während der Migration verfügbar bleibt — passend zum Cloud-Migrations-Konzept.",
     difficulty: 2,
+    seedKey: "clf-c02-q-088",
     sourceRef: "AWS Migration",
   },
 ];

@@ -28,6 +28,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon API Gateway erstellt, veröffentlicht, sichert und überwacht APIs (REST, HTTP, WebSocket) im großen Maßstab und dient häufig als Front-Door für Lambda-Funktionen oder andere Backends — inklusive Drosselung, Autorisierung und Caching. Route 53 ist DNS, Direct Connect eine Netzwerk-Leitung, CloudFront ein CDN.",
     difficulty: 1,
+    seedKey: "clf-c02-q-236",
     sourceRef: "Amazon API Gateway",
   },
   {
@@ -46,6 +47,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "AWS Transit Gateway wirkt als zentraler Hub (Hub-and-Spoke), der viele VPCs und On-Premises-Netzwerke über eine einzige, zentral verwaltete Stelle verbindet — statt eines schwer wartbaren Vollvermaschungs-Netzes aus vielen einzelnen Peering-Verbindungen (die Zahl der Peerings wächst sonst quadratisch). Mehr Peerings (A) verschärfen das Problem; CloudFront (CDN) und NAT Gateway (Internet-Ausgang) lösen die Aufgabe nicht.",
     difficulty: 3,
+    seedKey: "clf-c02-q-237",
     sourceRef: "AWS Transit Gateway",
   },
   {
@@ -64,6 +66,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "AWS PrivateLink (über VPC-Endpunkte) ermöglicht privaten Zugriff auf AWS-Dienste oder Partner-/eigene Services innerhalb des AWS-Netzwerks — der Traffic verlässt das öffentliche Internet nicht, was Sicherheit und Datenschutz erhöht. Ein Internet Gateway oder öffentliche IPs würden den Verkehr gerade übers Internet leiten; Route 53 Health Checks prüfen die Erreichbarkeit, lösen die Aufgabe aber nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-238",
     sourceRef: "AWS PrivateLink / VPC Endpoints",
   },
   {
@@ -82,6 +85,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Ein NAT Gateway (in einem öffentlichen Subnetz) erlaubt Instanzen in privaten Subnetzen ausgehende Verbindungen ins Internet (z. B. für Updates), verhindert aber eingehende, unaufgeforderte Verbindungen aus dem Internet. So bleiben die Instanzen privat. S3 (Storage), Security Groups (Firewall-Regeln, kein Routing ins Internet) und Athena (Abfragen) leisten das nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-239",
     sourceRef: "Amazon VPC — NAT Gateway",
   },
   {
@@ -101,6 +105,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Ein öffentliches Subnetz besitzt eine Route zu einem Internet Gateway (daher 'öffentlich'); Instanzen in privaten Subnetzen erreichen das Internet ausgehend über einen NAT Gateway. Ein Subnetz liegt immer in genau EINER Availability Zone (nicht über Regionen hinweg, C falsch; und es ist einer AZ zugeordnet, E falsch). Private Subnetze sind nicht direkt aus dem Internet erreichbar (D falsch).",
     difficulty: 2,
+    seedKey: "clf-c02-q-240",
     sourceRef: "Amazon VPC — Public vs Private Subnets",
   },
   {
@@ -119,6 +124,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Latency-based Routing leitet Nutzer an die AWS-Region mit der geringsten Latenz für sie weiter und verbessert so die Antwortzeiten global verteilter Anwendungen. Simple Routing gibt nur einen festen Wert zurück, Multivalue Answer liefert mehrere gesunde Endpunkte (einfache Lastverteilung), Failover Routing schaltet bei Ausfall auf einen Standby um.",
     difficulty: 2,
+    seedKey: "clf-c02-q-241",
     sourceRef: "Amazon Route 53 — Routing Policies",
   },
 
@@ -139,6 +145,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon SageMaker ist die verwaltete Plattform, um eigene ML-Modelle zu erstellen, zu trainieren, zu tunen und bereitzustellen (Deployment als Endpunkt). Rekognition (vortrainierte Bild-/Video-Analyse), Polly (Text-to-Speech) und Connect (Contact Center) sind fertige Dienste für spezifische Aufgaben, kein Baukasten für eigene Modelle. (Für vortrainierte Generative-AI-Foundation-Models nutzt man dagegen Amazon Bedrock.)",
     difficulty: 2,
+    seedKey: "clf-c02-q-242",
     sourceRef: "Amazon SageMaker",
   },
   {
@@ -157,6 +164,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon Comprehend ist ein NLP-Dienst, der aus Texten Stimmung (Sentiment), Schlüsselbegriffe, Entitäten, Sprache und mehr extrahiert — ideal zur Analyse von Kundenfeedback. Translate übersetzt zwischen Sprachen, Textract extrahiert Text/Daten aus gescannten Dokumenten, QuickSight ist ein BI-Visualisierungsdienst.",
     difficulty: 2,
+    seedKey: "clf-c02-q-243",
     sourceRef: "Amazon Comprehend",
   },
   {
@@ -175,6 +183,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon Translate ist ein neuronaler maschineller Übersetzungsdienst, der Text zwischen Sprachen übersetzt. Zur Abgrenzung: Transcribe wandelt gesprochene Sprache in Text (Speech-to-Text), Polly wandelt Text in Sprache (Text-to-Speech), Comprehend analysiert Text (NLP), übersetzt aber nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-244",
     sourceRef: "Amazon Translate",
   },
   {
@@ -193,6 +202,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon Kendra ist ein ML-gestützter, intelligenter Unternehmens-Suchdienst: Er durchsucht verschiedene Inhaltsquellen und beantwortet natürliche Suchanfragen mit präzisen Treffern/Antworten. Rekognition analysiert Bilder/Videos, Polly erzeugt Sprache, Glue ist ein ETL-/Datenkatalog-Dienst — keiner davon ist eine Suchmaschine.",
     difficulty: 2,
+    seedKey: "clf-c02-q-245",
     sourceRef: "Amazon Kendra",
   },
   {
@@ -211,6 +221,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon Personalize liefert in Echtzeit individualisierte Empfehlungen (Produkte, Inhalte) auf Basis von Nutzerverhalten und -daten — dieselbe Art Technologie, die Amazon.com verwendet, ohne dass man ML-Expertise aufbauen muss. Athena (SQL-Abfragen), Macie (PII-Erkennung) und CloudTrail (API-Audit) sind für Empfehlungen nicht vorgesehen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-246",
     sourceRef: "Amazon Personalize",
   },
 
@@ -231,6 +242,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "AWS Glue ist ein serverloser ETL-Dienst: Er erkennt, bereitet und integriert Daten aus verschiedenen Quellen und stellt mit dem Glue Data Catalog ein zentrales Metadaten-Verzeichnis bereit — ohne dass man Infrastruktur verwalten muss. EC2 (Compute), Route 53 (DNS) und Shield (DDoS-Schutz) sind keine ETL-Dienste.",
     difficulty: 2,
+    seedKey: "clf-c02-q-247",
     sourceRef: "AWS Glue",
   },
   {
@@ -249,6 +261,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon QuickSight ist der Cloud-BI-Dienst von AWS zum Erstellen, Veröffentlichen und Teilen interaktiver Dashboards und Visualisierungen. SQS (Message-Queue), Lambda (Compute) und EBS (Block-Speicher) sind keine BI-Werkzeuge.",
     difficulty: 1,
+    seedKey: "clf-c02-q-248",
     sourceRef: "Amazon QuickSight",
   },
   {
@@ -267,6 +280,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon EMR ist eine verwaltete Big-Data-Plattform, die Frameworks wie Apache Spark, Hadoop, Hive und Presto auf skalierbaren Clustern betreibt — für umfangreiche Datenverarbeitung, ETL und Analysen. Polly (Sprache), Cognito (Identitäten) und ACM (Zertifikate) haben damit nichts zu tun.",
     difficulty: 2,
+    seedKey: "clf-c02-q-249",
     sourceRef: "Amazon EMR",
   },
 
@@ -287,6 +301,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "AWS Step Functions orchestriert mehrere Dienste (z. B. Lambda, ECS, SNS) zu serverlosen Workflows mittels State Machines — inklusive Schritten, Verzweigungen, Wiederholungen und Fehlerbehandlung, visuell modellierbar. S3 (Storage), CloudFront (CDN) und Direct Connect (Netzwerk) sind keine Workflow-Orchestrierung.",
     difficulty: 2,
+    seedKey: "clf-c02-q-250",
     sourceRef: "AWS Step Functions",
   },
   {
@@ -305,6 +320,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon SES (Simple Email Service) ist ein skalierbarer Dienst zum Versenden (und Empfangen) von E-Mails — sowohl transaktional (z. B. Bestätigungen) als auch für Marketing. SQS ist eine Message-Queue, Kinesis ein Streaming-Dienst, Neptune eine Graph-Datenbank — keiner versendet E-Mails.",
     difficulty: 1,
+    seedKey: "clf-c02-q-251",
     sourceRef: "Amazon SES",
   },
   {
@@ -323,6 +339,7 @@ export const clfC02QCloudTech2B3: NewQuestion[] = [
     explanation:
       "Amazon EventBridge ist ein serverloser Event-Bus für ereignisgesteuerte Architekturen: Er empfängt Ereignisse von AWS-Diensten, vielen SaaS-Anwendungen und eigenen Apps und leitet sie anhand von Regeln an Ziele wie Lambda, SQS oder Step Functions weiter. RDS (Datenbank), Glacier (Archiv-Storage) und Trusted Advisor (Best-Practice-Checks) sind keine Event-Busse.",
     difficulty: 2,
+    seedKey: "clf-c02-q-252",
     sourceRef: "Amazon EventBridge",
   },
 ];

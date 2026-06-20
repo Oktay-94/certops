@@ -28,6 +28,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "AWS Elastic Beanstalk ist ein Platform-as-a-Service (PaaS): Man lädt den Anwendungscode hoch, und Beanstalk übernimmt Provisioning, Load Balancing, Auto Scaling und Health-Monitoring — während der Kunde weiterhin Zugriff auf die erzeugten AWS-Ressourcen (EC2, ELB usw.) behält. S3 (Objektspeicher), Route 53 (DNS) und Snowball (Datenmigration) leisten das nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-219",
     sourceRef: "AWS Elastic Beanstalk",
   },
   {
@@ -46,6 +47,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Amazon EC2 Auto Scaling passt die Anzahl der EC2-Instanzen automatisch an die Last an (Scale Out / Scale In nach Richtlinien), hält die gewünschte Kapazität und ersetzt unhealthy Instanzen. Es arbeitet typischerweise mit einem Load Balancer zusammen. CloudFront (CDN), Config (Konfigurations-Tracking) und Athena (SQL auf S3) skalieren keine EC2-Flotte.",
     difficulty: 2,
+    seedKey: "clf-c02-q-220",
     sourceRef: "Amazon EC2 Auto Scaling",
   },
   {
@@ -64,6 +66,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Memory-optimized-Instanzen bieten besonders viel RAM pro vCPU und eignen sich für arbeitsspeicherintensive Workloads wie In-Memory-Datenbanken, große Caches oder Echtzeit-Big-Data-Analysen. Compute-optimized passt für CPU-lastige Aufgaben, Storage-optimized für hohen lokalen Durchsatz/IOPS, General Purpose für ausgewogene Workloads.",
     difficulty: 2,
+    seedKey: "clf-c02-q-221",
     sourceRef: "Amazon EC2 — Instance Type Families",
   },
   {
@@ -82,6 +85,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Amazon Lightsail ist der vereinfachte Einstieg: vordefinierte Pakete aus Compute, Storage und Netzwerk zu einem vorhersehbaren, niedrigen Monatspreis — ideal für einfache Websites, Blogs, kleine Apps oder Dev/Test, ohne sich tief in EC2/VPC einarbeiten zu müssen. Redshift (Data Warehouse), Lambda (serverless Functions) und EMR (Big Data) dienen anderen Zwecken.",
     difficulty: 1,
+    seedKey: "clf-c02-q-222",
     sourceRef: "Amazon Lightsail",
   },
   {
@@ -100,6 +104,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Amazon EKS ist der verwaltete Kubernetes-Dienst von AWS — passend, wenn man bewusst das Kubernetes-Ökosystem nutzen möchte. Amazon ECS ist AWS' eigene Container-Orchestrierung (oft einfacher, ohne Kubernetes). Beide können EC2 oder Fargate als Compute nutzen. Lambda ist für ereignisgesteuerte Funktionen, Lightsail für einfache Apps.",
     difficulty: 2,
+    seedKey: "clf-c02-q-223",
     sourceRef: "Amazon EKS vs Amazon ECS",
   },
   {
@@ -118,6 +123,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "AWS Batch ist ein vollständig verwalteter Dienst für Batch-Computing: Er plant Jobs ein und stellt dynamisch die passende Rechenkapazität (EC2, inkl. Spot, oder Fargate) bereit, skaliert mit der Job-Menge und baut sie danach wieder ab. CloudFront (CDN), Cognito (End-User-Identitäten) und Artifact (Compliance-Berichte) sind dafür nicht vorgesehen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-224",
     sourceRef: "AWS Batch",
   },
 
@@ -138,6 +144,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "AWS Storage Gateway verbindet On-Premises-Umgebungen mit AWS-Cloud-Speicher (File, Volume und Tape Gateway) und hält häufig genutzte Daten lokal im Cache — für hybride Storage-Szenarien, Backups und schrittweise Migration. Direct Connect ist eine Netzwerk-Leitung (kein Storage-Dienst), CloudFront ein CDN, DynamoDB eine NoSQL-Datenbank.",
     difficulty: 2,
+    seedKey: "clf-c02-q-225",
     sourceRef: "AWS Storage Gateway",
   },
   {
@@ -156,6 +163,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "AWS Backup ist ein zentraler, richtlinienbasierter Backup-Dienst, der Sicherungen über viele AWS-Services hinweg (EBS, RDS, Aurora, DynamoDB, EFS, FSx, Storage Gateway u. a.) plant, ausführt, aufbewahrt und überwacht. Glacier Deep Archive ist nur eine Storage-Klasse (ein mögliches Backup-Ziel), CloudFormation ist IaC, Athena ist ein Abfrage-Dienst.",
     difficulty: 2,
+    seedKey: "clf-c02-q-226",
     sourceRef: "AWS Backup",
   },
   {
@@ -174,6 +182,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "S3 Intelligent-Tiering verschiebt Objekte automatisch zwischen Zugriffs-Stufen (häufig/selten/archiviert) je nach tatsächlicher Nutzung und optimiert so die Kosten — ideal bei unbekannten oder wechselnden Zugriffsmustern, ohne Abrufgebühren für die Tier-Wechsel. Deep Archive ist nur für selten genutzte Archivdaten, durchgängig Standard ist teuer, durchgängig One Zone-IA wäre riskant für wichtige Daten.",
     difficulty: 2,
+    seedKey: "clf-c02-q-227",
     sourceRef: "Amazon S3 — Intelligent-Tiering",
   },
   {
@@ -192,6 +201,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "S3 One Zone-IA speichert Daten in einer einzelnen AZ und ist deshalb günstiger als S3 Standard-IA (das über mehrere AZs repliziert). Der Trade-off: Geht diese AZ verloren, sind die Daten weg. Daher nur für selten genutzte, unkritische oder leicht wiederherstellbare Daten (z. B. sekundäre Backups, reproduzierbare Zwischenergebnisse). S3 Standard und Glacier Instant Retrieval replizieren über mehrere AZs.",
     difficulty: 2,
+    seedKey: "clf-c02-q-228",
     sourceRef: "Amazon S3 — One Zone-IA",
   },
   {
@@ -211,6 +221,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Der EC2 Instance Store ist physisch an den Host gebundener, EPHEMERER Speicher — beim Stoppen/Beenden der Instanz gehen die Daten verloren (gut für Caches/Scratch-Daten). Amazon EBS ist dagegen PERSISTENTER, netzgebundener Block-Speicher, der unabhängig von der Instanz bestehen bleibt und sich an andere Instanzen anhängen lässt. EBS ist kein Objektspeicher (das ist S3), und die beiden sind nicht austauschbar.",
     difficulty: 2,
+    seedKey: "clf-c02-q-229",
     sourceRef: "Amazon EC2 — Instance Store vs EBS",
   },
 
@@ -231,6 +242,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Amazon Neptune ist ein verwalteter Graph-Datenbankdienst, optimiert für stark vernetzte Daten und Beziehungs-Abfragen (Property Graph / RDF) — typisch für soziale Netzwerke, Betrugserkennung, Wissensgraphen und Empfehlungen. Eine relationale DB (RDS) oder ein Data Warehouse (Redshift) sind für tiefe Graph-Traversierung weniger geeignet; S3 ist Objektspeicher.",
     difficulty: 2,
+    seedKey: "clf-c02-q-230",
     sourceRef: "Amazon Neptune",
   },
   {
@@ -249,6 +261,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Amazon DocumentDB ist ein verwalteter Dokumenten-Datenbankdienst mit MongoDB-Kompatibilität — passend für Workloads, die das MongoDB-Modell/API nutzen. DynamoDB ist eine (eigene) NoSQL-Key-Value/Document-DB ohne MongoDB-Kompatibilität, RDS for SQL Server ist relational, ElastiCache ist ein In-Memory-Cache.",
     difficulty: 2,
+    seedKey: "clf-c02-q-231",
     sourceRef: "Amazon DocumentDB",
   },
   {
@@ -267,6 +280,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "DynamoDB Global Tables replizieren eine Tabelle automatisch und aktiv-aktiv über mehrere AWS-Regionen — das liefert lokale Lese-/Schreib-Latenz für globale Nutzer und erhöht die Ausfallsicherheit (eine Region kann ausfallen, andere übernehmen). Ein Single-Region-Tisch bietet das nicht; CloudFront ist ein CDN; S3-Lifecycle betrifft Objektspeicher.",
     difficulty: 2,
+    seedKey: "clf-c02-q-232",
     sourceRef: "Amazon DynamoDB — Global Tables",
   },
   {
@@ -285,6 +299,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Amazon ElastiCache (für Valkey, Redis OSS oder Memcached) legt häufig gelesene Daten im Arbeitsspeicher ab. Wiederkehrende Lese-Anfragen werden aus dem Cache bedient — das senkt die Latenz drastisch und entlastet die Primär-Datenbank. S3/Glacier sind kein Datenbank-Cache; Shield ist DDoS-Schutz.",
     difficulty: 1,
+    seedKey: "clf-c02-q-233",
     sourceRef: "Amazon ElastiCache — Caching",
   },
   {
@@ -303,6 +318,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "Aurora Serverless skaliert die Datenbank-Kapazität automatisch je nach Last hoch und runter, sodass man nicht dauerhaft für fest bereitgestellte Kapazität zahlt — ideal für schwankende, intermittierende oder unvorhersehbare Workloads. Eine fest dimensionierte Instanz wäre für sporadische Last unwirtschaftlich; Redshift ist ein Data Warehouse, S3 ein Objektspeicher.",
     difficulty: 2,
+    seedKey: "clf-c02-q-234",
     sourceRef: "Amazon Aurora Serverless",
   },
   {
@@ -322,6 +338,7 @@ export const clfC02QCloudTech1B3: NewQuestion[] = [
     explanation:
       "AWS empfiehlt, je Workload die passende Datenbank zu wählen: Graph → Neptune, Key-Value im großen Maßstab → DynamoDB, relational/ACID → RDS/Aurora, In-Memory-Cache → ElastiCache/MemoryDB, Data Warehouse → Redshift, Dokument → DocumentDB. Datei-Objekte gehören nach S3 (nicht RDS), relationale Transaktionen nicht nach S3, und Redshift ist kein In-Memory-Cache — daher sind C, D und E falsch.",
     difficulty: 2,
+    seedKey: "clf-c02-q-235",
     sourceRef: "AWS Purpose-Built Databases",
   },
 ];
