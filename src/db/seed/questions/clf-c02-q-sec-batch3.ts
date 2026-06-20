@@ -29,6 +29,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Fargate ist serverlos für Container: AWS übernimmt Host-OS, Laufzeitumgebung, Skalierung und die darunterliegende Infrastruktur. Der Kunde verantwortet das eigene Container-Image (inkl. der darin enthaltenen Software/Dependencies), den Anwendungscode und die IAM-Berechtigungen (Task-Role, welche AWS-Ressourcen die Aufgabe nutzen darf). Wie bei Lambda ist die Kunden-Verantwortung damit deutlich schmaler als bei EC2.",
     difficulty: 2,
+    seedKey: "clf-c02-q-189",
     sourceRef: "AWS Fargate Security / Shared Responsibility Model",
   },
   {
@@ -47,6 +48,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Die Konfiguration der Verschlüsselung in Transit für die eigenen Anwendungen liegt beim Kunden ('Security IN the cloud') — er aktiviert TLS/HTTPS auf seinen Endpunkten, z. B. mit kostenlosen Zertifikaten aus AWS Certificate Manager (ACM) an CloudFront/ALB/API Gateway. AWS stellt die Werkzeuge und das sichere Netzwerk bereit, verschlüsselt aber nicht automatisch jeglichen Anwendungs-Traffic des Kunden.",
     difficulty: 2,
+    seedKey: "clf-c02-q-190",
     sourceRef: "AWS Shared Responsibility Model — Encryption in Transit",
   },
   {
@@ -65,6 +67,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "'Inherited controls' sind Kontrollen, die der Kunde vollständig von AWS übernimmt — vor allem die physische und umgebungsbezogene Sicherheit der Rechenzentren (Zutrittskontrollen, Stromversorgung, Kühlung, Brandschutz). IAM, Datenverschlüsselung und Netzwerk-Konfiguration bleiben dagegen Kunden-Verantwortung ('Security IN the cloud').",
     difficulty: 2,
+    seedKey: "clf-c02-q-191",
     sourceRef: "AWS Shared Responsibility Model — Inherited Controls",
   },
   {
@@ -84,6 +87,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "'Security IN the cloud' umfasst alles, was der Kunde konfiguriert und steuert: IAM (Identitäten und Berechtigungen), Klassifizierung und Verschlüsselung der eigenen Daten, OS-/Netzwerk-/Firewall-Konfiguration und Anwendungssicherheit. Physische Sicherheit (B), Hypervisor (D) und das globale Netzwerk (E) sind 'Security OF the cloud' — AWS.",
     difficulty: 2,
+    seedKey: "clf-c02-q-192",
     sourceRef: "AWS Shared Responsibility Model",
   },
 
@@ -104,6 +108,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Die effektive Berechtigung ist die SCHNITTMENGE aus SCP und IAM-Policy. SCPs gewähren keine Rechte, sondern begrenzen, was IAM-Policies maximal erlauben können. Verweigert die SCP S3, kann selbst ein ausdrückliches Allow in der IAM-Policy das nicht aufheben — der Zugriff bleibt blockiert (gilt sogar für den Root-User des Member-Accounts). Merksatz: SCP = Leitplanke/Obergrenze, IAM = konkrete Erlaubnis innerhalb dieser Grenze.",
     difficulty: 3,
+    seedKey: "clf-c02-q-193",
     sourceRef: "AWS Organizations — SCPs and IAM Policy Evaluation",
   },
   {
@@ -122,6 +127,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "In der IAM-Auswertung gilt: standardmäßig ist alles verboten (implicit Deny); ein Allow hebt das auf; ein explizites Deny überschreibt aber JEDES Allow. Ein explizites Deny gewinnt also immer. Das ist die Grundlage, um Berechtigungen sicher einzugrenzen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-194",
     sourceRef: "AWS IAM — Policy Evaluation Logic",
   },
   {
@@ -140,6 +146,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Eine ressourcenbasierte Policy wird direkt an eine Ressource (z. B. S3-Bucket, SQS-Queue, Lambda-Funktion) angehängt und legt fest, welche Prinzipale darauf zugreifen dürfen — inklusive Cross-Account-Zugriff. Identitätsbasierte Policies hängen dagegen an IAM-Usern, -Gruppen oder -Rollen und legen fest, was diese Identität tun darf.",
     difficulty: 2,
+    seedKey: "clf-c02-q-195",
     sourceRef: "AWS IAM — Identity-based vs Resource-based Policies",
   },
   {
@@ -158,6 +165,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Mit der Account-Passwort-Richtlinie in IAM lassen sich Anforderungen für IAM-Benutzer-Passwörter erzwingen: Mindestlänge, Zeichentypen (Groß-/Kleinbuchstaben, Zahlen, Sonderzeichen), maximales Passwort-Alter (Rotation) und Verhinderung der Wiederverwendung. Shield (DDoS), Bucket-Policies (S3-Zugriff) und CloudFront (CDN) haben damit nichts zu tun.",
     difficulty: 2,
+    seedKey: "clf-c02-q-196",
     sourceRef: "AWS IAM — Account Password Policy",
   },
   {
@@ -176,6 +184,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "IAM Access Analyzer analysiert Ressourcen-Policies und meldet, wenn Ressourcen (S3, IAM-Rollen, KMS-Keys, Lambda u. a.) mit externen Entitäten geteilt werden — so lassen sich unbeabsichtigte oder ungenutzte Zugriffe erkennen und entfernen. Polly (Text-to-Speech), Budgets (Kosten) und CloudFront (CDN) sind dafür nicht zuständig.",
     difficulty: 2,
+    seedKey: "clf-c02-q-197",
     sourceRef: "AWS IAM Access Analyzer",
   },
   {
@@ -194,6 +203,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Identity Federation erlaubt es, einen externen Identitätsanbieter (Active Directory, Okta, Entra ID) via SAML 2.0 anzubinden — meist über AWS IAM Identity Center. Mitarbeiter melden sich mit ihren bestehenden Unternehmens-Identitäten an und erhalten über Rollen temporären Zugriff, ohne dass pro Person ein IAM-Benutzer nötig ist. Root-Credentials (B) und Access Keys im Code (C) sind Sicherheits-Antipattern; eine Security Group (D) ist eine Netzwerk-Firewall, kein Identitätsmechanismus.",
     difficulty: 2,
+    seedKey: "clf-c02-q-198",
     sourceRef: "AWS IAM — Identity Federation / SAML",
   },
   {
@@ -212,6 +222,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS STS (Security Token Service) stellt temporäre, eingeschränkte Anmeldedaten aus — etwa beim Annehmen einer IAM-Rolle (AssumeRole) oder bei Federation. Diese Credentials laufen automatisch ab, wodurch keine langlebigen Access Keys gespeichert werden müssen. Cognito ist für End-User-Identitäten, Secrets Manager für Geheimnis-Verwaltung, Config für Konfigurations-Tracking.",
     difficulty: 2,
+    seedKey: "clf-c02-q-199",
     sourceRef: "AWS Security Token Service (STS)",
   },
   {
@@ -230,6 +241,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Einige wenige Aufgaben sind dem Root-User vorbehalten — z. B. das Konto schließen, den Support-Plan ändern, bestimmte Konto-Einstellungen (Name/E-Mail/Root-Passwort) ändern oder versehentlich gesperrte IAM-Berechtigungen wiederherstellen. Alltägliche Aufgaben wie EC2 starten, S3-Buckets erstellen oder IAM-Policies zuweisen sollten über IAM-Benutzer/Rollen erfolgen, NICHT über Root.",
     difficulty: 1,
+    seedKey: "clf-c02-q-200",
     sourceRef: "AWS — Tasks that Require Root User Credentials",
   },
   {
@@ -249,6 +261,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS unterstützt als MFA u. a. virtuelle MFA-Apps (TOTP-Authenticator wie Google/Microsoft Authenticator), Hardware-TOTP-Token und FIDO2-Sicherheitsschlüssel/Passkeys. MFA kombiniert 'etwas, das man weiß' (Passwort) mit 'etwas, das man hat' (Gerät/Schlüssel). Eine zweite E-Mail (C), dasselbe Passwort (D) oder eine IP-Adresse (E) sind keine MFA-Faktoren.",
     difficulty: 2,
+    seedKey: "clf-c02-q-201",
     sourceRef: "AWS IAM — MFA Device Types",
   },
   {
@@ -267,6 +280,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Für kontoübergreifenden Zugriff erstellt man in Konto B eine IAM-Rolle mit einer Trust-Policy, die Konto A erlaubt, die Rolle anzunehmen. Die Anwendung in Konto A nimmt die Rolle via STS an und erhält temporäre Credentials — ohne langlebige Access Keys zu teilen. Access Keys kopieren (A), den Bucket öffentlich machen (C) oder Root nutzen (D) sind unsichere Antipattern.",
     difficulty: 2,
+    seedKey: "clf-c02-q-202",
     sourceRef: "AWS IAM — Cross-Account Access with Roles",
   },
 
@@ -287,6 +301,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Encryption in transit schützt Daten, während sie sich zwischen Endpunkten über ein Netzwerk bewegen — z. B. zwischen Browser und Webserver via HTTPS/TLS. Das Verschlüsseln gespeicherter Daten ist dagegen 'encryption at rest' (A). Komprimierung (C) und Löschung (D) haben nichts mit Verschlüsselung zu tun.",
     difficulty: 1,
+    seedKey: "clf-c02-q-203",
     sourceRef: "AWS Encryption Concepts — In Transit",
   },
   {
@@ -305,6 +320,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Customer Managed Keys (CMK) werden vom Kunden erstellt und vollständig kontrolliert: eigene Key-Policy, Aktivieren/Deaktivieren, Löschplanung und steuerbare Rotation. AWS Managed Keys werden automatisch von einem AWS-Service in deinem Konto erstellt und von AWS verwaltet — bequem, aber mit weniger Kontrolle (z. B. keine frei wählbare Key-Policy). Beide sind sicher; die Wahl hängt vom gewünschten Kontrollgrad ab.",
     difficulty: 2,
+    seedKey: "clf-c02-q-204",
     sourceRef: "AWS KMS — Customer Managed vs AWS Managed Keys",
   },
   {
@@ -323,6 +339,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS KMS verwaltet kryptografische SCHLÜSSEL (Erstellen, Kontrollieren, Integrieren in Services zur Verschlüsselung). AWS Secrets Manager speichert GEHEIMNISSE (DB-Zugangsdaten, API-Keys), ruft sie zur Laufzeit ab und kann sie automatisch rotieren. Secrets Manager nutzt KMS intern, um die abgelegten Geheimnisse zu verschlüsseln — sie ergänzen sich.",
     difficulty: 2,
+    seedKey: "clf-c02-q-205",
     sourceRef: "AWS KMS vs AWS Secrets Manager",
   },
   {
@@ -341,6 +358,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS Audit Manager automatisiert das Sammeln von Nachweisen (Evidence) aus der AWS-Nutzung und ordnet sie vordefinierten oder eigenen Compliance-Frameworks zu (z. B. PCI-DSS, CIS, HIPAA, DSGVO) — das vereinfacht und beschleunigt Audits erheblich. CloudFront (CDN), Lambda (Compute) und Polly (Text-to-Speech) sind dafür nicht vorgesehen. (Hinweis: AWS Artifact liefert die FERTIGEN AWS-Compliance-Berichte; Audit Manager unterstützt die EIGENE Audit-Vorbereitung des Kunden.)",
     difficulty: 2,
+    seedKey: "clf-c02-q-206",
     sourceRef: "AWS Audit Manager",
   },
   {
@@ -359,6 +377,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS Control Tower richtet eine 'Landing Zone' für eine Multi-Account-Umgebung nach AWS-Best-Practices ein: vordefinierte Guardrails (preventive/detective controls), ein zentrales Log-Archiv- und ein Audit-Konto, Account Factory zum standardisierten Bereitstellen neuer Konten und Anbindung an IAM Identity Center. Es baut auf AWS Organizations auf. Inspector (Schwachstellen), WAF (Web-Filter) und Athena (SQL auf S3) lösen andere Aufgaben.",
     difficulty: 2,
+    seedKey: "clf-c02-q-207",
     sourceRef: "AWS Control Tower",
   },
   {
@@ -377,6 +396,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Compliance ist geteilt: AWS erreicht und belegt Zertifizierungen für seine Infrastruktur (abrufbar über AWS Artifact) — der Kunde 'erbt' dieses Fundament. Aber der Kunde bleibt verantwortlich, seine eigenen Workloads, Daten und Konfigurationen compliant zu gestalten (z. B. Verschlüsselung, Zugriffskontrollen, Aufbewahrung). Die bloße AWS-Nutzung macht nicht automatisch compliant.",
     difficulty: 2,
+    seedKey: "clf-c02-q-208",
     sourceRef: "AWS Compliance — Shared Responsibility",
   },
   {
@@ -395,6 +415,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS-Regionen sind geografisch isoliert; der Kunde wählt die Region und kontrolliert damit, wo seine Daten gespeichert und verarbeitet werden. Für Datenresidenz/-souveränität legt man die Workloads in eine Region innerhalb der erforderlichen Rechtsordnung und schränkt ggf. via SCP die nutzbaren Regionen ein. Edge Locations (B), Support-Pläne (C) oder Glacier (D) adressieren die Anforderung nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-209",
     sourceRef: "AWS — Data Residency / Region Selection",
   },
   {
@@ -414,6 +435,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Über viele Konten hinweg setzt man Governance mit AWS Organizations (SCPs als kontenübergreifende Leitplanken) und AWS Control Tower (Landing Zone + automatisierte Guardrails) durch. Polly (Text-to-Speech), eine einzelne Security Group (nur eine Instanz/VPC) und Transcribe (Speech-to-Text) eignen sich dafür nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-210",
     sourceRef: "AWS Organizations / AWS Control Tower",
   },
 
@@ -434,6 +456,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS Firewall Manager verwaltet Sicherheitsregeln zentral über mehrere Konten und Ressourcen in einer AWS Organization — z. B. WAF-Regeln, AWS Shield Advanced, Security-Group-Richtlinien und AWS Network Firewall. So bleibt der Schutz konsistent, auch wenn neue Ressourcen hinzukommen. Route 53 (DNS), Cost Explorer (Kosten) und Comprehend (NLP) leisten das nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-211",
     sourceRef: "AWS Firewall Manager",
   },
   {
@@ -452,6 +475,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS Network Firewall ist eine verwaltete Netzwerk-Firewall (Layer 3/4, stateful) mit Intrusion-Prevention-Funktionen zum Filtern des Datenverkehrs in einer VPC. AWS WAF filtert dagegen Web-Anfragen auf Layer 7 (HTTP/HTTPS); GuardDuty erkennt Bedrohungen aus Logs; Artifact liefert Compliance-Berichte.",
     difficulty: 2,
+    seedKey: "clf-c02-q-212",
     sourceRef: "AWS Network Firewall",
   },
   {
@@ -470,6 +494,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "Amazon Detective sammelt und korreliert automatisch Log- und Ereignisdaten (u. a. aus GuardDuty, CloudTrail, VPC Flow Logs) und stellt sie als Visualisierungen dar, um Sicherheitsvorfälle zu untersuchen und die Ursache schneller zu finden. GuardDuty ERKENNT Bedrohungen, Detective hilft, sie zu UNTERSUCHEN. Budgets, Polly und ACM sind dafür nicht gedacht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-213",
     sourceRef: "Amazon Detective",
   },
   {
@@ -488,6 +513,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS Secrets Manager speichert Geheimnisse und unterstützt automatische Rotation (kostenpflichtig pro Secret) — ideal für DB-Zugangsdaten. AWS Systems Manager Parameter Store speichert Konfigurationsdaten und Geheimnisse, hat eine kostenlose Standard-Stufe, bietet aber keine eingebaute automatische Rotation. Faustregel: automatische Rotation nötig → Secrets Manager; einfache/kostenlose Konfiguration → Parameter Store.",
     difficulty: 2,
+    seedKey: "clf-c02-q-214",
     sourceRef: "AWS Secrets Manager vs SSM Parameter Store",
   },
   {
@@ -507,6 +533,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS WAF filtert Web-Anfragen auf Layer 7 und lässt sich vor CloudFront, ALB, API Gateway oder AppSync schalten. Man kann AWS Managed Rules (vorgefertigte Regelgruppen, z. B. Core Rule Set, Known Bad Inputs, SQL-Injection) oder eigene Regeln einsetzen. WAF ist keine Datenbank (C), verschlüsselt keine Daten at rest (D, das ist KMS) und ersetzt nicht IAM (E).",
     difficulty: 2,
+    seedKey: "clf-c02-q-215",
     sourceRef: "AWS WAF — Managed Rules / Integrations",
   },
   {
@@ -525,6 +552,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS Security Hub ist ein Cloud Security Posture Management (CSPM): Es aggregiert Findings aus Diensten wie GuardDuty, Inspector und Macie UND führt automatisierte Checks gegen Sicherheitsstandards durch (AWS FSBP, CIS AWS Foundations, PCI-DSS, NIST) — mit zentralem Überblick über die Sicherheitslage. Polly, Direct Connect und SQS haben damit nichts zu tun.",
     difficulty: 2,
+    seedKey: "clf-c02-q-216",
     sourceRef: "AWS Security Hub — Security Standards",
   },
   {
@@ -543,6 +571,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS Trusted Advisor prüft das Konto u. a. in der Kategorie Security gegen Best Practices — z. B. Security Groups mit offenem Zugriff, fehlende MFA auf dem Root-User, exponierte Access Keys oder zu offene S3-Berechtigungen — und gibt konkrete Empfehlungen. (Umfang der Checks hängt vom Support-Plan ab.) Athena, Snowball und Polly bieten solche Sicherheits-Checks nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-217",
     sourceRef: "AWS Trusted Advisor — Security Checks",
   },
   {
@@ -561,6 +590,7 @@ export const clfC02QSecurityB3: NewQuestion[] = [
     explanation:
       "AWS Systems Manager (Patch Manager) automatisiert das Bereitstellen von Betriebssystem- und Software-Patches über viele EC2-Instanzen (und On-Premises-Server) hinweg — inkl. Patch-Baselines und Wartungsfenstern. Das adressiert direkt die Kunden-Verantwortung fürs OS-Patching aus dem Shared Responsibility Model. CloudFront (CDN), Artifact (Compliance-Berichte) und Comprehend (NLP) helfen dabei nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-218",
     sourceRef: "AWS Systems Manager — Patch Manager",
   },
 ];

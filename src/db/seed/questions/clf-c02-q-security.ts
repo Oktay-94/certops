@@ -19,6 +19,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Bei EC2 (IaaS) liegt das Patchen des Gastbetriebssystems beim Kunden ('Security IN the cloud'). AWS ist für die zugrundeliegende Hardware und Infrastruktur zuständig ('Security OF the cloud').",
     difficulty: 2,
+    seedKey: "clf-c02-q-089",
     sourceRef: "AWS Shared Responsibility Model",
   },
   {
@@ -38,6 +39,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS verantwortet 'Security OF the cloud': physische Rechenzentren, Hardware, globale Infrastruktur, Virtualisierung. IAM-Rechte, Datenverschlüsselung und Security Groups liegen beim Kunden.",
     difficulty: 2,
+    seedKey: "clf-c02-q-090",
     sourceRef: "AWS Shared Responsibility Model",
   },
   {
@@ -56,6 +58,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Egal ob IaaS, PaaS oder SaaS — die eigenen Daten und die Verwaltung der Zugriffsrechte (IAM) bleiben immer in der Verantwortung des Kunden.",
     difficulty: 2,
+    seedKey: "clf-c02-q-091",
     sourceRef: "AWS Shared Responsibility Model",
   },
   {
@@ -74,6 +77,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Eine IAM Role liefert der Instanz temporäre, automatisch rotierte Credentials, ohne dass langlebige Access Keys im Code gespeichert werden müssen — das ist die sichere Best Practice.",
     difficulty: 2,
+    seedKey: "clf-c02-q-092",
     sourceRef: "AWS IAM Roles",
   },
   {
@@ -91,6 +95,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Least Privilege bedeutet, jeder Identität nur die minimal nötigen Rechte zu geben. Das begrenzt den möglichen Schaden, falls Credentials kompromittiert werden.",
     difficulty: 1,
+    seedKey: "clf-c02-q-093",
     sourceRef: "AWS IAM Best Practices",
   },
   {
@@ -110,6 +115,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Best Practices: MFA für Root aktivieren und für den Alltag IAM-User/Roles mit minimalen Rechten nutzen. Der Root User sollte nur für die wenigen Aufgaben verwendet werden, die ihn zwingend erfordern.",
     difficulty: 2,
+    seedKey: "clf-c02-q-094",
     sourceRef: "AWS Root User Best Practices",
   },
   {
@@ -128,6 +134,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "MFA fügt eine zweite Sicherheitsebene hinzu: etwas, das man weiß (Passwort) plus etwas, das man hat (Code/Token). Selbst ein gestohlenes Passwort reicht dann nicht für den Zugriff.",
     difficulty: 1,
+    seedKey: "clf-c02-q-095",
     sourceRef: "AWS MFA Documentation",
   },
   {
@@ -146,6 +153,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS IAM Identity Center (früher AWS SSO) bietet zentrales Single Sign-On über mehrere AWS-Accounts und Anwendungen, oft in Kombination mit AWS Organizations.",
     difficulty: 2,
+    seedKey: "clf-c02-q-096",
     sourceRef: "AWS IAM Identity Center",
   },
   {
@@ -164,6 +172,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Amazon Cognito verwaltet Identitäten für die Endnutzer von Anwendungen (App-Login, soziale Logins). IAM verwaltet dagegen den Zugriff AUF AWS-Ressourcen, nicht App-Nutzer.",
     difficulty: 2,
+    seedKey: "clf-c02-q-097",
     sourceRef: "AWS Cognito Documentation",
   },
   {
@@ -182,6 +191,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "SCPs in AWS Organizations definieren Leitplanken für die maximal erlaubten Berechtigungen eines Accounts oder einer OU — selbst der Root User eines Accounts kann nicht darüber hinausgehen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-098",
     sourceRef: "AWS Organizations Documentation",
   },
   {
@@ -200,6 +210,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Amazon GuardDuty ist der Threat-Detection-Service, der Logs (CloudTrail, VPC Flow, DNS) per ML auf verdächtige Aktivitäten untersucht — ganz ohne Agents.",
     difficulty: 2,
+    seedKey: "clf-c02-q-099",
     sourceRef: "AWS GuardDuty Documentation",
   },
   {
@@ -218,6 +229,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Amazon Inspector ist der Vulnerability-Management-Service: er scannt EC2, Container-Images (ECR) und Lambda automatisch auf bekannte Schwachstellen und Netzwerk-Exposition.",
     difficulty: 2,
+    seedKey: "clf-c02-q-100",
     sourceRef: "AWS Inspector Documentation",
   },
   {
@@ -236,6 +248,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Amazon Macie nutzt Machine Learning, um sensible Daten (PII) in S3-Buckets zu entdecken und zu klassifizieren — wichtig für Datenschutz und Compliance.",
     difficulty: 2,
+    seedKey: "clf-c02-q-101",
     sourceRef: "AWS Macie Documentation",
   },
   {
@@ -254,6 +267,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS Shield bietet DDoS-Schutz. Shield Standard ist automatisch und kostenlos für alle Kunden; Shield Advanced (kostenpflichtig) bietet erweiterten Schutz und ein Response-Team.",
     difficulty: 2,
+    seedKey: "clf-c02-q-102",
     sourceRef: "AWS Shield Documentation",
   },
   {
@@ -272,6 +286,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS WAF (Web Application Firewall) filtert HTTP/HTTPS-Anfragen auf Application-Layer-Ebene und schützt vor Angriffen wie SQL Injection und XSS über regelbasiertes Filtern.",
     difficulty: 2,
+    seedKey: "clf-c02-q-103",
     sourceRef: "AWS WAF Documentation",
   },
   {
@@ -291,6 +306,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Shield wehrt DDoS-Angriffe (Volumen) ab; WAF filtert bösartige HTTP-Anfragen auf Layer 7. Zertifikate verwaltet ACM, Verschlüsselung von Daten übernimmt KMS.",
     difficulty: 2,
+    seedKey: "clf-c02-q-104",
     sourceRef: "AWS Security Comparison",
   },
   {
@@ -309,6 +325,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS KMS erstellt und verwaltet kryptografische Schlüssel und ist mit den meisten AWS-Services für Verschlüsselung im Ruhezustand integriert. Der Zugriff auf Keys wird über IAM gesteuert.",
     difficulty: 2,
+    seedKey: "clf-c02-q-105",
     sourceRef: "AWS KMS Documentation",
   },
   {
@@ -327,6 +344,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS Secrets Manager speichert Geheimnisse (z.B. DB-Passwörter, API-Keys) sicher und kann sie automatisch rotieren. Anwendungen rufen sie zur Laufzeit ab, statt sie im Code zu hinterlegen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-106",
     sourceRef: "AWS Secrets Manager Documentation",
   },
   {
@@ -345,6 +363,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS Certificate Manager (ACM) stellt SSL/TLS-Zertifikate für HTTPS bereit, integriert mit CloudFront, ALB und API Gateway, und erneuert sie automatisch — keine abgelaufenen Zertifikate mehr.",
     difficulty: 1,
+    seedKey: "clf-c02-q-107",
     sourceRef: "AWS Certificate Manager",
   },
   {
@@ -363,6 +382,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS Security Hub sammelt und standardisiert Sicherheits-Findings aus mehreren Services und Partner-Tools und bietet automatisierte Best-Practice-Checks — ein zentraler Überblick über die Sicherheitslage.",
     difficulty: 2,
+    seedKey: "clf-c02-q-108",
     sourceRef: "AWS Security Hub Documentation",
   },
   {
@@ -381,6 +401,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS CloudTrail protokolliert alle API-Aufrufe und Aktivitäten im Account (wer, wann, was). Damit lässt sich nachvollziehen, welcher Benutzer welche Aktion ausgeführt hat.",
     difficulty: 2,
+    seedKey: "clf-c02-q-109",
     sourceRef: "AWS CloudTrail Documentation",
   },
   {
@@ -399,6 +420,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS Config verfolgt die Konfiguration von Ressourcen über die Zeit und prüft sie gegen Regeln (Compliance) — z.B. 'sind alle S3-Buckets verschlüsselt?' — und meldet Abweichungen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-110",
     sourceRef: "AWS Config Documentation",
   },
   {
@@ -416,6 +438,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "CloudTrail beantwortet 'wer hat welchen API-Call gemacht' (Aktivitäts-Audit). AWS Config beantwortet 'wie sind Ressourcen konfiguriert und sind sie compliant' (Konfigurations-Audit).",
     difficulty: 2,
+    seedKey: "clf-c02-q-111",
     sourceRef: "AWS Management Tools Comparison",
   },
   {
@@ -435,6 +458,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Security Groups sind auf Instanz-Ebene und stateful (nur Allow-Regeln). NACLs sind auf Subnetz-Ebene und stateless (Allow und Deny). Damit sind A und B korrekt.",
     difficulty: 2,
+    seedKey: "clf-c02-q-112",
     sourceRef: "AWS VPC Security",
   },
   {
@@ -453,6 +477,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS Artifact ist das Self-Service-Portal für AWS-Compliance-Berichte und -Vereinbarungen (z.B. SOC, PCI, ISO), die Kunden für ihre eigenen Audits herunterladen können.",
     difficulty: 2,
+    seedKey: "clf-c02-q-113",
     sourceRef: "AWS Artifact Documentation",
   },
   {
@@ -471,6 +496,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Encryption at rest verschlüsselt gespeicherte Daten (z.B. in S3, EBS, RDS). Encryption in transit verschlüsselt dagegen Daten während der Übertragung (z.B. via TLS).",
     difficulty: 2,
+    seedKey: "clf-c02-q-114",
     sourceRef: "AWS Encryption Concepts",
   },
   {
@@ -489,6 +515,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS Organizations ermöglicht die zentrale Verwaltung mehrerer Accounts, Gruppierung in OUs, Consolidated Billing und das Durchsetzen von Richtlinien über Service Control Policies (SCPs).",
     difficulty: 2,
+    seedKey: "clf-c02-q-115",
     sourceRef: "AWS Organizations Documentation",
   },
   {
@@ -507,6 +534,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "GuardDuty erkennt ungewöhnliche Aktivitäten wie Krypto-Mining oder verdächtige API-Calls durch die ML-Analyse von Logs und meldet sie als Findings.",
     difficulty: 2,
+    seedKey: "clf-c02-q-116",
     sourceRef: "AWS GuardDuty Documentation",
   },
   {
@@ -525,6 +553,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "Eine IAM Group ist eine Sammlung von Usern mit gemeinsamen Berechtigungen. Eine IAM Role hat keine festen Credentials und wird temporär 'angenommen' (z.B. von Services oder für Cross-Account-Zugriff).",
     difficulty: 2,
+    seedKey: "clf-c02-q-117",
     sourceRef: "AWS IAM Documentation",
   },
   {
@@ -543,6 +572,7 @@ export const clfC02QSecurity: NewQuestion[] = [
     explanation:
       "AWS erlaubt Kunden, gegen eine Reihe genehmigter Services (z.B. EC2) Penetration Tests der eigenen Ressourcen ohne vorherige Genehmigung durchzuführen — im Rahmen der AWS-Richtlinien. Angriffe auf fremde Ressourcen bleiben verboten.",
     difficulty: 2,
+    seedKey: "clf-c02-q-118",
     sourceRef: "AWS Penetration Testing Policy",
   },
 ];

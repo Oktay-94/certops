@@ -19,6 +19,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Best Practice: MFA aktivieren (A) und den Root-User nur für die wenigen Aufgaben nutzen, die ihn explizit verlangen (D), z. B. Account-Schließung oder Support-Plan-Wechsel. Access Keys für Root sollen NICHT existieren, und tägliche Arbeit erfolgt über IAM-User/Roles. E ist falsch: eine IP-Whitelist ersetzt MFA nicht — AWS empfiehlt explizit MFA für den Root-User, da eine Netzwerk-Einschränkung allein keinen Schutz gegen kompromittierte Credentials (Phishing, Leak) bietet.",
     difficulty: 2,
+    seedKey: "clf-c02-q-020",
     sourceRef: "AWS Exam Guide CLF-C02, Domain 2.2",
   },
 
@@ -39,6 +40,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "AWS verantwortet die 'Security OF the Cloud' — physische Sicherheit der Rechenzentren (Zugangskontrollen, Wachpersonal, Brandschutz), Hardware, globales Netzwerk, Virtualisierungs-Hypervisor. Der Kunde verantwortet 'Security IN the Cloud' — alles was er konfiguriert: OS-Patches auf EC2, Security Groups, Verschlüsselung in S3. Bei verwalteten Services (RDS, Lambda) übernimmt AWS mehr, bei IaaS (EC2) der Kunde mehr.",
     difficulty: 1,
+    seedKey: "clf-c02-q-021",
     sourceRef: "AWS Shared Responsibility Model — https://aws.amazon.com/compliance/shared-responsibility-model/",
   },
   {
@@ -69,6 +71,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "IAM Roles sind der AWS Best Practice für Anwendungen. Wenn eine Rolle einer EC2-Instanz zugewiesen wird (Instance Profile), bekommt die Anwendung temporäre Credentials, die AWS automatisch verwaltet und rotiert. Keine Access Keys im Code. Access Keys einbetten ist klassischer Sicherheits-Fehler (Git-Leaks). Root-Credentials niemals nutzen. IAM Groups sind für Menschen-User gedacht, nicht für EC2.",
     difficulty: 2,
+    seedKey: "clf-c02-q-022",
     sourceRef: "AWS IAM Best Practices",
   },
   {
@@ -88,6 +91,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "AWS KMS ist vollständig verwalteter Service für Schlüsselverwaltung, integriert mit über 100 AWS-Services, geteilte HSM-Hardware aber kryptografisch isoliert. AWS CloudHSM bietet dedizierte HSMs (FIPS 140-2 Level 3), Single-Tenant — für regulatorische Anforderungen. Trusted Advisor = Best-Practice-Checks, Config = Konfigurations-Tracking, Inspector = Schwachstellen-Scanning. KMS ist die Standard-Wahl, CloudHSM nur wenn dediziertes HSM verlangt.",
     difficulty: 2,
+    seedKey: "clf-c02-q-023",
     sourceRef: "AWS KMS Documentation, AWS CloudHSM Documentation",
   },
   {
@@ -106,6 +110,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Amazon GuardDuty ist verwalteter Threat-Detection-Service. Analysiert kontinuierlich CloudTrail, VPC Flow Logs und DNS-Logs via Machine Learning, Anomalie-Erkennung und Threat Intelligence. Erkennt ungewöhnliche API-Calls, kompromittierte Instanzen, Bitcoin-Mining. Inspector = Vulnerability Scanning für EC2/Container, Shield = DDoS-Schutz, WAF = Web Application Firewall (SQL Injection, XSS).",
     difficulty: 2,
+    seedKey: "clf-c02-q-024",
     sourceRef: "Amazon GuardDuty Documentation",
   },
   {
@@ -124,6 +129,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "AWS Artifact ist das zentrale Self-Service-Portal für AWS-Compliance-Berichte (SOC 1/2/3, ISO 27001, PCI-DSS, FedRAMP, BSI C5) und Vereinbarungen (z. B. HIPAA BAA). Kostenlos zugänglich. Config trackt Konfigurationsänderungen, Audit Manager automatisiert eigene Audit-Vorbereitung, Trusted Advisor gibt Best-Practice-Empfehlungen.",
     difficulty: 1,
+    seedKey: "clf-c02-q-025",
     sourceRef: "AWS Artifact Documentation",
   },
   {
@@ -154,6 +160,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Security Groups: Instanz-Ebene (ENI), stateful (Antwort-Traffic automatisch erlaubt), nur Allow-Rules. NACLs: Subnetz-Ebene, stateless (Inbound/Outbound separat definieren), Allow- UND Deny-Rules, Auswertung nach Regelnummer. Merksatz: SG = Stateful, Instanz, nur Allow. NACL = Not Stateful, Network/Subnetz, Allow + Deny.",
     difficulty: 2,
+    seedKey: "clf-c02-q-026",
     sourceRef: "Amazon VPC Security Documentation",
   },
   {
@@ -172,6 +179,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Service Control Policies (SCPs) in AWS Organizations setzen maximale Berechtigungsgrenzen für ganze Konten oder OUs. SCPs gewähren keine Berechtigungen, sondern limitieren was IAM-Policies maximal erlauben können. Greifen auch beim Root-Account der Member Accounts. IAM Policies pro Konto = unskalierbar. Config Rules = Detection nach Verstoß, nicht Prevention. Security Groups wirken auf Netzwerk, nicht auf Service-Verwendung.",
     difficulty: 2,
+    seedKey: "clf-c02-q-027",
     sourceRef: "AWS Organizations — Service Control Policies",
   },
   {
@@ -202,6 +210,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Der AWS-Root-Account hat unbeschränkten Zugriff. Best Practices: MFA aktivieren (idealerweise Hardware-MFA), starkes Passwort, KEINE Access Keys, nur für Root-only-Aufgaben (Account schließen, Support-Plan ändern, Steuerinformationen). Für alles andere IAM-User oder IAM Identity Center. Root täglich nutzen erhöht Angriffsfläche dramatisch, Credentials teilen zerstört Audit-Spur, Root-Access-Keys in CI/CD sind ein Desaster.",
     difficulty: 1,
+    seedKey: "clf-c02-q-028",
     sourceRef: "AWS IAM Best Practices — Root User",
   },
   {
@@ -220,6 +229,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "AWS IAM Identity Center (umbenannt von AWS SSO im Juli 2022) ist die empfohlene zentrale Lösung für Workforce-Identitätsmanagement: SSO über alle AWS-Konten, Integration mit AWS Organizations, Permission Sets, Anbindung an externe IdPs (Active Directory, Okta, Entra ID via SAML), kostenlos. IAM-User pro Konto = unskalierbar. Cognito = End-User-Authentifizierung in eigenen Apps, NICHT für Mitarbeiter-Zugriff. Directory Service = Managed AD.",
     difficulty: 2,
+    seedKey: "clf-c02-q-029",
     sourceRef: "AWS IAM Identity Center Documentation",
   },
 
@@ -242,6 +252,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Bei Managed Services wie RDS verschiebt sich die Verantwortungsgrenze: AWS übernimmt OS, Hardware, Hypervisor, Patches der DB-Engine, automatische Backups und Multi-AZ-Failover. Der Kunde verantwortet das, was 'in' der Datenbank passiert: DB-Schema, User/Rollen innerhalb der DB, Tabellen-Berechtigungen, IAM-Policies für RDS-API-Zugriff, Wahl der Verschlüsselungsoptionen, Backup-Aufbewahrungsdauer. Merksatz: AWS = Engine läuft, Kunde = Daten + Zugriff.",
     difficulty: 2,
+    seedKey: "clf-c02-q-030",
     sourceRef: "AWS Shared Responsibility Model — Managed Services",
   },
 
@@ -262,6 +273,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Lambda ist Serverless: AWS übernimmt Server, OS, Runtime-Patches, Hypervisor, automatisches Skalieren, HA. Der Kunde verantwortet ausschließlich den Function-Code (inkl. Logik-Sicherheit, Dependency-Updates der eigenen Libraries) und die IAM-Execution-Role (welche AWS-Ressourcen die Funktion zugreifen darf). Lambda hat die schmalste Kunden-Verantwortung aller Compute-Services — deshalb auch der schnellste Sicherheits-Gewinn bei Migration von EC2 zu Lambda.",
     difficulty: 2,
+    seedKey: "clf-c02-q-031",
     sourceRef: "AWS Lambda Security / Shared Responsibility Model",
   },
 
@@ -282,6 +294,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "S3-Buckets sind seit 2023 standardmäßig nicht-öffentlich (Block Public Access on by default), aber der Kunde bleibt verantwortlich für die korrekte Konfiguration: Bucket-Policies, IAM-Policies, Verschlüsselung, Replikation. AWS sichert die Infrastruktur ('Security OF the Cloud') und stellt Sicherheitsfunktionen bereit — aber der Kunde muss sie aktivieren und korrekt konfigurieren ('Security IN the Cloud'). Öffentliche S3-Buckets bleiben eine der häufigsten Ursachen für Daten-Leaks.",
     difficulty: 2,
+    seedKey: "clf-c02-q-032",
     sourceRef: "Amazon S3 Security Best Practices / AWS Shared Responsibility Model",
   },
 
@@ -303,6 +316,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "AWS verantwortet bei RDS: physische Sicherheit der DCs (D), OS- und Hypervisor-Patches, DB-Engine-Patches und Minor-Version-Upgrades (A), Hardware-Wartung, Netzwerk-Infrastruktur. Der Kunde verantwortet: Verschlüsselungs-Konfiguration aktivieren (B — AWS stellt die Funktion bereit, Kunde muss sie einschalten), IAM-Policies und DB-Zugriffskontrolle (C), Schema-Design und Daten-Modell (E), Wahl der Engine und Instance-Größe, Backup-Strategie. AWS macht die Engine sicher; was IN der DB passiert, ist Kundensache.",
     difficulty: 2,
+    seedKey: "clf-c02-q-033",
     sourceRef: "AWS Shared Responsibility Model — Amazon RDS",
   },
 
@@ -323,6 +337,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "AWS CloudTrail loggt API-Aktivität: Wer (Identity), Wann (Timestamp), Was (API Action), Wovon (Source IP), Worauf (Resource). Standardmäßig 90 Tage Event History; für längere Aufbewahrung Trail in S3 anlegen. CloudWatch = Metriken, Logs, Alarms (Performance/Operations, nicht Audit-Aktivität pro User). AWS Config = Tracking von Konfigurationsänderungen an Ressourcen (z. B. 'wurde Security Group X jemals modifiziert?'), nicht primär API-Aktor. Trusted Advisor = Best-Practice-Empfehlungen. Merksatz: CloudTrail = WHO did WHAT, Config = WHAT changed HOW.",
     difficulty: 2,
+    seedKey: "clf-c02-q-034",
     sourceRef: "AWS CloudTrail Documentation",
   },
 
@@ -343,6 +358,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "AWS WAF ist die Web Application Firewall für Layer-7-Schutz: SQL Injection, XSS, Bad Bots, Rate Limiting, Geo-Blocking. Wird vor CloudFront, ALB, API Gateway oder AppSync geschaltet. Verwendet AWS Managed Rules (z. B. OWASP Top 10) oder eigene Rules. Shield Standard = automatisch aktiv, DDoS-Schutz auf Layer 3/4 (Netzwerk), nicht Layer 7. GuardDuty = Threat Detection via Logs (CloudTrail/VPC Flow/DNS), nicht inline Web-Filtering. Inspector = Vulnerability Scanner für EC2/ECR/Lambda, kein Traffic-Filter.",
     difficulty: 2,
+    seedKey: "clf-c02-q-035",
     sourceRef: "AWS WAF Documentation",
   },
 
@@ -362,6 +378,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Shield Standard ist immer aktiv und kostenlos — schützt gegen häufige Netzwerk- und Transport-Layer-DDoS-Angriffe (Layer 3/4). Shield Advanced kostet ~3.000 USD/Monat pro Organisation und bietet zusätzlich: erweiterten Schutz auch auf Layer 7, 24/7-Zugang zum AWS DDoS Response Team (DRT), Cost Protection (Abrechnung skalierter Ressourcen während Angriff), Echtzeit-Metriken. Shield schützt vor DDoS; WAF filtert Web-Angriffe wie SQL Injection — die beiden ergänzen sich, ersetzen sich nicht.",
     difficulty: 2,
+    seedKey: "clf-c02-q-036",
     sourceRef: "AWS Shield Documentation",
   },
 
@@ -382,6 +399,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Amazon Macie nutzt Machine Learning und Pattern Matching, um sensible Daten (PII, PHI, Finanzdaten, Credentials, AWS-Access-Keys) in S3-Buckets automatisch zu klassifizieren und zu kennzeichnen. Standard Managed Identifiers für gängige Typen + Custom Identifiers via Regex. Erzeugt Findings in Security Hub. GuardDuty = Threat Detection (verdächtige API-Calls, Crypto-Mining), nicht Daten-Klassifizierung. CloudTrail = API-Audit-Logs. Config = Konfigurations-Tracking. Macie ist auf S3 spezialisiert.",
     difficulty: 2,
+    seedKey: "clf-c02-q-037",
     sourceRef: "Amazon Macie Documentation",
   },
 
@@ -403,6 +421,7 @@ export const securityQuestions: NewQuestion[] = [
     explanation:
       "Amazon Inspector (A) scannt automatisch und kontinuierlich EC2-Instanzen, Container-Images in ECR und Lambda-Funktionen auf Software-Schwachstellen (CVEs) und ungewollte Netzwerk-Exposure. Amazon GuardDuty (C) analysiert CloudTrail-, VPC-Flow- und DNS-Logs auf bösartige Verhaltensmuster (kompromittierte Credentials, Crypto-Mining, ungewöhnliche API-Calls). Trusted Advisor (B) = Best-Practice-Empfehlungen, kein Schwachstellen-Scanner. Artifact (D) = Self-Service-Portal für Compliance-Berichte (SOC, ISO). Config (E) = Konfigurations-Tracking, kein aktiver Scan auf Bedrohungen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-038",
     sourceRef: "Amazon Inspector / Amazon GuardDuty Documentation",
   },
 ];

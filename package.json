@@ -14,6 +14,7 @@
     "db:migrate": "mkdir -p data && drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "mkdir -p data && tsx src/db/seed.ts",
+    "db:backfill-seed-key": "tsx src/db/backfill-seed-key.ts",
     "db:migrate:remote": "drizzle-kit migrate --config=drizzle.config.turso.ts",
     "db:seed:remote": "tsx src/db/seed.ts"
   },

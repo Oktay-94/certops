@@ -18,6 +18,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Pay-as-you-go bedeutet, dass man nur für die tatsächlich verbrauchten Ressourcen zahlt — keine Vorab-Investition, keine Kosten für ungenutzte Kapazität.",
     difficulty: 1,
+    seedKey: "clf-c02-q-153",
     sourceRef: "AWS Pricing Principles",
   },
   {
@@ -37,6 +38,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Die drei grundlegenden Kostentreiber sind Compute, Storage und Data Transfer (ausgehend). Compute und Storage gehören dazu; IAM-Benutzer und Tags sind kostenlos.",
     difficulty: 2,
+    seedKey: "clf-c02-q-154",
     sourceRef: "AWS Pricing Fundamentals",
   },
   {
@@ -55,6 +57,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Eingehender Datenverkehr (z.B. Upload nach S3) ist in der Regel kostenlos. Ausgehender Datenverkehr (aus AWS ins Internet) wird berechnet — ein häufig übersehener Kostenpunkt.",
     difficulty: 2,
+    seedKey: "clf-c02-q-155",
     sourceRef: "AWS Data Transfer Pricing",
   },
   {
@@ -73,6 +76,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Consolidated Billing liefert eine einzige Rechnung für alle Accounts einer Organisation, und die kombinierte Nutzung qualifiziert für Mengenrabatte und geteilte Reserved Instances / Savings Plans.",
     difficulty: 2,
+    seedKey: "clf-c02-q-156",
     sourceRef: "AWS Organizations Billing",
   },
   {
@@ -91,6 +95,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Der AWS Pricing Calculator schätzt die Kosten geplanter Services im Voraus — ideal für Budgetplanung, bevor Ressourcen tatsächlich bereitgestellt werden.",
     difficulty: 2,
+    seedKey: "clf-c02-q-157",
     sourceRef: "AWS Pricing Calculator",
   },
   {
@@ -109,6 +114,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "AWS Cost Explorer visualisiert und analysiert die tatsächlichen, vergangenen Kosten und die Nutzung über die Zeit, erkennt Trends und bietet Prognosen.",
     difficulty: 2,
+    seedKey: "clf-c02-q-158",
     sourceRef: "AWS Cost Explorer",
   },
   {
@@ -127,6 +133,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Mit AWS Budgets setzt man Kosten- oder Nutzungsgrenzen und erhält Alarme, wenn eine Schwelle erreicht oder voraussichtlich überschritten wird — proaktiv vor dem Überschreiten.",
     difficulty: 2,
+    seedKey: "clf-c02-q-159",
     sourceRef: "AWS Budgets",
   },
   {
@@ -145,6 +152,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Basic Support ist für alle AWS-Kunden kostenlos. Er umfasst Account-/Billing-Support, Dokumentation, Whitepapers, re:Post und Trusted Advisor (Core Checks), aber keinen technischen Support für Probleme.",
     difficulty: 1,
+    seedKey: "clf-c02-q-160",
     sourceRef: "AWS Support Plans",
   },
   {
@@ -163,6 +171,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Business Support ist das empfohlene Minimum für produktive Workloads: 24/7-Zugang zu Cloud Support Engineers per Telefon, Chat und E-Mail sowie voller Trusted Advisor.",
     difficulty: 2,
+    seedKey: "clf-c02-q-161",
     sourceRef: "AWS Business Support",
   },
   {
@@ -181,6 +190,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Enterprise Support bietet einen dedizierten (festen) Technical Account Manager, schnellste Reaktionszeiten (mission-critical < 15 Min), Concierge-Team und Architektur-Reviews. (Enterprise On-Ramp bietet einen TAM-Pool.)",
     difficulty: 2,
+    seedKey: "clf-c02-q-162",
     sourceRef: "AWS Enterprise Support",
   },
   {
@@ -200,6 +210,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Trusted Advisor prüft fünf Kategorien: Cost Optimization, Performance, Security, Fault Tolerance und Service Limits. Cost Optimization und Security gehören dazu; die anderen Optionen sind keine Kategorien.",
     difficulty: 2,
+    seedKey: "clf-c02-q-163",
     sourceRef: "AWS Trusted Advisor",
   },
   {
@@ -218,6 +229,7 @@ export const clfC02QBilling: NewQuestion[] = [
     explanation:
       "Das AWS Free Tier hat drei Typen: Always Free (dauerhaft bis zu einem Limit), 12 Months Free (erste 12 Monate ab Account-Erstellung) und Trials (kurze Testzeiträume). Nicht alle Services sind unbegrenzt kostenlos.",
     difficulty: 1,
+    seedKey: "clf-c02-q-164",
     sourceRef: "AWS Free Tier",
   },
 ];

@@ -57,6 +57,20 @@
       "when": 1780097774396,
       "tag": "0007_giant_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1781975213365,
+      "tag": "0008_brown_lifeguard",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1781975891228,
+      "tag": "0009_lucky_amazoness",
+      "breakpoints": true
     }
   ]
 }
