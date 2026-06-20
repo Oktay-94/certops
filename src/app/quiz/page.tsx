@@ -44,7 +44,7 @@ export default async function QuizPage({ searchParams }: Props) {
         </p>
       )}
 
-      <QuizConfigForm />
+      <QuizConfigForm questionCount={questions.length} />
     </main>
   );
 }
