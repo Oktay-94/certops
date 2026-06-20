@@ -1,12 +1,11 @@
 import "./load-env-turso";
 import { db } from "./index";
-import { flashcardViews, flashcards, questionAttempts, questions } from "./schema";
 import { clfC02Questions } from "./seed/index";
 import { clfC02QuestionsBatch2 } from "./seed/questions/index";
 import { clfC02QuestionsBatch3 } from "./seed/questions/index-batch3";
 import { clfC02Flashcards } from "./seed/cards/index";
-import { addBoldedTerms } from "../lib/markdown-bold";
-import { addServiceMarkers } from "../lib/markdown-marks";
+import { assertWritableTarget } from "./prod-guard";
+import { runSeed } from "./seed-core";
 
 // CLF-C02 domains (AWS Exam Guide):
 //   1. Cloud Concepts
@@ -18,6 +17,7 @@ async function seed() {
   if (process.env.NODE_ENV === "production") {
     throw new Error("Refusing to seed: NODE_ENV is production.");
   }
+  assertWritableTarget("seed");
 
   const all = [...clfC02Questions, ...clfC02QuestionsBatch2, ...clfC02QuestionsBatch3];
   if (all.length === 0) {
@@ -25,22 +25,9 @@ async function seed() {
     return;
   }
 
-  // FK (question_attempts.question_id -> questions.id, ON DELETE RESTRICT)
-  // forces us to clear attempts before reseeding questions.
-  await db.delete(questionAttempts).run();
-  await db.delete(questions).run();
-  // flashcard_views FK -> flashcards.id (ON DELETE CASCADE); clear explicitly
-  // since Turso doesn't enforce FKs, so cascade isn't guaranteed there.
-  await db.delete(flashcardViews).run();
-  await db.delete(flashcards).run();
-  await db.insert(questions).values(all).run();
-  const markdownCards = clfC02Flashcards.map((c) => ({
-    ...c,
-    back: addServiceMarkers(addBoldedTerms(c.back)),
-  }));
-  await db.insert(flashcards).values(markdownCards).run();
+  const result = await runSeed(db, { questions: all, cards: clfC02Flashcards });
   console.log(
-    `Seeded ${all.length} question(s), ${clfC02Flashcards.length} flashcard(s).`,
+    `Upserted ${result.questions} question(s), ${result.cards} flashcard(s).`,
   );
 }
 

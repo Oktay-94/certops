@@ -17,27 +17,10 @@ import {
   backfillSeedKeys,
   checkSeedKeyCompleteness,
 } from "./seed-key-backfill";
-
-function assertSafeTarget(): void {
-  const url = process.env.DATABASE_URL ?? "file:./data/certops.db";
-  const isRemote = !url.startsWith("file:");
-  if (!isRemote) return;
-
-  const confirmed =
-    process.env.ALLOW_PROD_SEED === "1" && process.argv.includes("--confirm");
-  if (!confirmed) {
-    console.error(
-      "Refusing to backfill a remote (non-file:) DB without explicit confirm.\n" +
-        "Set ALLOW_PROD_SEED=1 and pass --confirm to run against remote.\n" +
-        `Target was: ${url}`,
-    );
-    process.exit(1);
-  }
-  console.warn(`⚠️  Backfilling REMOTE DB: ${url}`);
-}
+import { assertWritableTarget } from "./prod-guard";
 
 async function main(): Promise<void> {
-  assertSafeTarget();
+  assertWritableTarget("backfill");
 
   const allQuestions = [
     ...clfC02Questions,
