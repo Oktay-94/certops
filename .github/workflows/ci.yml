@@ -1,0 +1,56 @@
+name: CI
+
+# Runs on every PR targeting main and on direct pushes to main.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Least privilege: the gate only needs to read the repo.
+permissions:
+  contents: read
+
+jobs:
+  # Job name "CI" is the status-check context referenced by branch protection.
+  # Keep it stable — renaming it would silently drop the required check.
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # pnpm before setup-node so the pnpm-store cache can be keyed.
+      # Version is read from package.json "packageManager".
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test:run
+
+      # next build statically renders /cards, which queries the DB at build
+      # time. Provide a schema-only local SQLite (no data, no secrets): migrate
+      # creates ./data/certops.db (drizzle.config.ts hardcodes that path), and
+      # build reads the same file via its default DATABASE_URL. NEVER inject
+      # real Turso/prod credentials into CI.
+      - name: Migrate (schema-only build DB)
+        run: pnpm db:migrate
+
+      - name: Build
+        run: pnpm build
