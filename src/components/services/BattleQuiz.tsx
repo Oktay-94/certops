@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import {
   Check,
   Clock,
@@ -12,6 +13,7 @@ import {
 import { SERVICES } from "@/lib/services-data";
 import { categoryStyle, tint } from "@/lib/category-style";
 import { BRAND_ORANGE } from "@/lib/brand";
+import { modeButtonVars } from "@/lib/mode-style";
 import {
   buildBattle,
   QUESTIONS_PER_ROUND,
@@ -25,11 +27,14 @@ type Phase = "config" | "running" | "result";
 const QUESTION_SECONDS = 60;
 const TIMEOUT_REVEAL_MS = 1500;
 
-const LEVELS: { value: Difficulty; label: string; hint: string }[] = [
-  { value: 1, label: "Leicht", hint: "4 Optionen · Distraktoren aus anderen Bereichen — grobes Domänen-Wissen reicht." },
-  { value: 2, label: "Mittel", hint: "4 Optionen · Kuratierte Falle + Beschreibungen aus demselben Bereich." },
-  { value: 3, label: "Schwer", hint: "4 Optionen · Die engsten Geschwister-Dienste — Feinheiten entscheiden." },
-  { value: "extreme", label: "Extrem", hint: "Duell · nur 2 Optionen: richtig vs. der ähnlichste Nachbar." },
+// Per-level Fluent 3D emoji (local assets under public/emoji, MIT-licensed —
+// see NOTICE). Replaces the old numbered circles; the difficulty signal is now
+// the icon, not the value.
+const LEVELS: { value: Difficulty; label: string; hint: string; emoji: string }[] = [
+  { value: 1, label: "Leicht", hint: "4 Optionen · Distraktoren aus anderen Bereichen — grobes Domänen-Wissen reicht.", emoji: "/emoji/seedling.png" },
+  { value: 2, label: "Mittel", hint: "4 Optionen · Kuratierte Falle + Beschreibungen aus demselben Bereich.", emoji: "/emoji/fire.png" },
+  { value: 3, label: "Schwer", hint: "4 Optionen · Die engsten Geschwister-Dienste — Feinheiten entscheiden.", emoji: "/emoji/skull.png" },
+  { value: "extreme", label: "Extrem", hint: "Duell · nur 2 Optionen: richtig vs. der ähnlichste Nachbar.", emoji: "/emoji/dragon.png" },
 ];
 
 function trophyLabel(pct: number): string {
@@ -162,10 +167,13 @@ export function BattleQuiz() {
       <button
         type="button"
         onClick={openQuiz}
-        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm text-white transition hover:bg-zinc-800"
+        style={modeButtonVars("battle")}
+        className="mode-start-btn mt-4 rounded-xl px-5 py-3 text-sm"
       >
-        <Swords className="h-4 w-4" aria-hidden />
-        Battle starten
+        <span className="mode-start-btn__content inline-flex items-center gap-2">
+          <Swords className="h-4 w-4" aria-hidden />
+          Battle starten
+        </span>
       </button>
     );
   }
@@ -260,9 +268,14 @@ function ConfigView({
                 }`}
               >
                 <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-zinc-900 text-[11px] text-white">
-                    {lvl.value}
-                  </span>
+                  <Image
+                    src={lvl.emoji}
+                    alt=""
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 shrink-0"
+                    style={{ filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.18))" }}
+                  />
                   {lvl.label}
                 </span>
                 <span className="mt-1 block text-xs text-zinc-500">{lvl.hint}</span>

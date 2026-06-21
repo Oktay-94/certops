@@ -1,12 +1,7 @@
 import Link from "next/link";
-import {
-  ArrowLeft,
-  GraduationCap,
-  Swords,
-  Puzzle,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowLeft, type LucideIcon } from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
+import { MODE_STYLE } from "@/lib/mode-style";
 import { ServiceCardGrid } from "@/components/services/ServiceCardGrid";
 import { ServiceQuiz } from "@/components/services/ServiceQuiz";
 import { BattleQuiz } from "@/components/services/BattleQuiz";
@@ -37,8 +32,8 @@ export default function ServicesPage() {
           "Accent Bar" style: top colour stripe + filled icon badge per mode. */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <ModeBox
-          color="#2563eb"
-          Icon={GraduationCap}
+          color={MODE_STYLE.quiz.base}
+          Icon={MODE_STYLE.quiz.Icon}
           title="Dienste-Quiz"
           desc="Dienst-Name gezeigt — wähle die passende Beschreibung. Zufällige Auswahl, kein gespeicherter Fortschritt."
         >
@@ -46,8 +41,8 @@ export default function ServicesPage() {
         </ModeBox>
 
         <ModeBox
-          color="#e11d48"
-          Icon={Swords}
+          color={MODE_STYLE.battle.base}
+          Icon={MODE_STYLE.battle.Icon}
           title="Battle Cards"
           desc="50 Fragen, 4 Optionen, 60s pro Frage — in vier Schwierigkeitsstufen. Freies Üben, kein Fortschritt."
         >
@@ -55,8 +50,8 @@ export default function ServicesPage() {
         </ModeBox>
 
         <ModeBox
-          color="#7c3aed"
-          Icon={Puzzle}
+          color={MODE_STYLE.puzzle.base}
+          Icon={MODE_STYLE.puzzle.Icon}
           title="Puzzle"
           desc="Begriff auf die passende Beschreibung ziehen oder antippen — gemischt oder nach Kategorie. Freies Üben, kein Fortschritt."
         >
