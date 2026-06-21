@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
-import { getServiceColor } from "@/lib/service-domain-colors";
+import { categoryStyle, tint } from "@/lib/category-style";
 import { BRAND_ORANGE } from "@/lib/brand";
 import {
   buildBattle,
@@ -302,7 +302,7 @@ function RunningView({
   onAnswer: (i: number) => void;
   onNext: () => void;
 }) {
-  const color = getServiceColor(question.card.domain);
+  const { color, Icon } = categoryStyle(question.card.domain);
   const answered = picked !== null;
   const timedOut = picked === -1;
   const lowTime = !answered && secondsLeft <= 10;
@@ -350,8 +350,14 @@ function RunningView({
       {/* Prompt */}
       <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
         <span
-          className={`inline-block rounded-full border px-3 py-1 text-xs font-medium ${color.tag}`}
+          className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
+          style={{
+            backgroundColor: tint(color, "14"),
+            color,
+            borderColor: tint(color, "33"),
+          }}
         >
+          <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {question.card.domain}
         </span>
         <h3 className="mt-3 text-lg font-semibold text-zinc-900">
