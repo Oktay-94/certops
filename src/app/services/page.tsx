@@ -4,6 +4,7 @@ import { SERVICES } from "@/lib/services-data";
 import { ServiceCardGrid } from "@/components/services/ServiceCardGrid";
 import { ServiceQuiz } from "@/components/services/ServiceQuiz";
 import { BattleQuiz } from "@/components/services/BattleQuiz";
+import { PuzzleGame } from "@/components/services/PuzzleGame";
 
 export default function ServicesPage() {
   return (
@@ -26,8 +27,8 @@ export default function ServicesPage() {
         </Link>
       </div>
 
-      {/* Quiz entries — pure client islands, each a full-screen overlay */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      {/* Quiz/practice entries — pure client islands, each a full-screen overlay */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-zinc-900">Dienste-Quiz</h2>
           <p className="mt-1 text-sm text-zinc-500">
@@ -40,10 +41,19 @@ export default function ServicesPage() {
         <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-zinc-900">Battle Cards</h2>
           <p className="mt-1 text-sm text-zinc-500">
-            50 Fragen, 4 Optionen, 60s pro Frage — in drei Schwierigkeitsstufen.
+            50 Fragen, 4 Optionen, 60s pro Frage — in vier Schwierigkeitsstufen.
             Freies Üben, kein Fortschritt.
           </p>
           <BattleQuiz />
+        </div>
+
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-zinc-900">Puzzle</h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Begriff auf die passende Beschreibung ziehen oder antippen — gemischt
+            oder nach Kategorie. Freies Üben, kein Fortschritt.
+          </p>
+          <PuzzleGame />
         </div>
       </div>
 
