@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
 import { ServiceCardGrid } from "@/components/services/ServiceCardGrid";
 import { ServiceQuiz } from "@/components/services/ServiceQuiz";
+import { BattleQuiz } from "@/components/services/BattleQuiz";
 
 export default function ServicesPage() {
   return (
@@ -25,14 +26,25 @@ export default function ServicesPage() {
         </Link>
       </div>
 
-      {/* Quiz entry — pure client island, full-screen overlay */}
-      <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-zinc-900">Dienste-Quiz</h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Dienst-Name gezeigt — wähle die passende Beschreibung. Zufällige
-          Auswahl, kein gespeicherter Fortschritt.
-        </p>
-        <ServiceQuiz />
+      {/* Quiz entries — pure client islands, each a full-screen overlay */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-zinc-900">Dienste-Quiz</h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Dienst-Name gezeigt — wähle die passende Beschreibung. Zufällige
+            Auswahl, kein gespeicherter Fortschritt.
+          </p>
+          <ServiceQuiz />
+        </div>
+
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-zinc-900">Battle Cards</h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            50 Fragen, 4 Optionen, 60s pro Frage — in drei Schwierigkeitsstufen.
+            Freies Üben, kein Fortschritt.
+          </p>
+          <BattleQuiz />
+        </div>
       </div>
 
       <ServiceCardGrid />
