@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  GraduationCap,
+  Swords,
+  Puzzle,
+  type LucideIcon,
+} from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
 import { ServiceCardGrid } from "@/components/services/ServiceCardGrid";
 import { ServiceQuiz } from "@/components/services/ServiceQuiz";
@@ -27,37 +33,71 @@ export default function ServicesPage() {
         </Link>
       </div>
 
-      {/* Quiz/practice entries — pure client islands, each a full-screen overlay */}
+      {/* Quiz/practice entries — pure client islands, each a full-screen overlay.
+          "Accent Bar" style: top colour stripe + filled icon badge per mode. */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-zinc-900">Dienste-Quiz</h2>
-          <p className="mt-1 text-sm text-zinc-500">
-            Dienst-Name gezeigt — wähle die passende Beschreibung. Zufällige
-            Auswahl, kein gespeicherter Fortschritt.
-          </p>
+        <ModeBox
+          color="#2563eb"
+          Icon={GraduationCap}
+          title="Dienste-Quiz"
+          desc="Dienst-Name gezeigt — wähle die passende Beschreibung. Zufällige Auswahl, kein gespeicherter Fortschritt."
+        >
           <ServiceQuiz />
-        </div>
+        </ModeBox>
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-zinc-900">Battle Cards</h2>
-          <p className="mt-1 text-sm text-zinc-500">
-            50 Fragen, 4 Optionen, 60s pro Frage — in vier Schwierigkeitsstufen.
-            Freies Üben, kein Fortschritt.
-          </p>
+        <ModeBox
+          color="#e11d48"
+          Icon={Swords}
+          title="Battle Cards"
+          desc="50 Fragen, 4 Optionen, 60s pro Frage — in vier Schwierigkeitsstufen. Freies Üben, kein Fortschritt."
+        >
           <BattleQuiz />
-        </div>
+        </ModeBox>
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-zinc-900">Puzzle</h2>
-          <p className="mt-1 text-sm text-zinc-500">
-            Begriff auf die passende Beschreibung ziehen oder antippen — gemischt
-            oder nach Kategorie. Freies Üben, kein Fortschritt.
-          </p>
+        <ModeBox
+          color="#7c3aed"
+          Icon={Puzzle}
+          title="Puzzle"
+          desc="Begriff auf die passende Beschreibung ziehen oder antippen — gemischt oder nach Kategorie. Freies Üben, kein Fortschritt."
+        >
           <PuzzleGame />
-        </div>
+        </ModeBox>
       </div>
 
       <ServiceCardGrid />
     </main>
+  );
+}
+
+function ModeBox({
+  color,
+  Icon,
+  title,
+  desc,
+  children,
+}: {
+  color: string;
+  Icon: LucideIcon;
+  title: string;
+  desc: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+      {/* Top accent stripe — clipped into the card rounding via overflow-hidden */}
+      <div className="h-[5px] w-full" style={{ backgroundColor: color }} aria-hidden />
+      <div className="flex flex-1 flex-col p-6">
+        <span
+          className="inline-flex h-[46px] w-[46px] items-center justify-center rounded-xl"
+          style={{ backgroundColor: color }}
+          aria-hidden
+        >
+          <Icon className="h-6 w-6 text-white" />
+        </span>
+        <h2 className="mt-4 text-lg font-semibold text-zinc-900">{title}</h2>
+        <p className="mt-1 text-sm text-zinc-500">{desc}</p>
+        {children}
+      </div>
+    </div>
   );
 }

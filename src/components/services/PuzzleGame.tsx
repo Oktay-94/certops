@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Check, Puzzle, RotateCcw, Shuffle, Trophy, X } from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
-import { getServiceColor } from "@/lib/service-domain-colors";
+import { categoryStyle, tint } from "@/lib/category-style";
 import { BRAND_ORANGE } from "@/lib/brand";
 import {
   buildRounds,
@@ -152,7 +152,7 @@ function ConfigView({ onStart }: { onStart: (v: PuzzleVariant) => void }) {
         <h3 className="text-sm font-medium text-zinc-900">Kategorie-Puzzles</h3>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {CATEGORY_GROUPS.map((g) => {
-            const color = getServiceColor(g.categories[0]);
+            const { color, Icon } = categoryStyle(g.categories[0]);
             return (
               <button
                 key={g.id}
@@ -160,7 +160,13 @@ function ConfigView({ onStart }: { onStart: (v: PuzzleVariant) => void }) {
                 onClick={() => onStart({ kind: "category", groupId: g.id })}
                 className="flex items-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-left text-sm text-zinc-900 transition hover:border-zinc-400"
               >
-                <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${color.iconBg}`} aria-hidden />
+                <span
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: tint(color, "1f"), color }}
+                  aria-hidden
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                </span>
                 {g.label}
               </button>
             );
@@ -285,7 +291,7 @@ function PlayingView({
           const isMatched = matched.has(p.num);
           const isSelected = selected === p.num;
           if (isMatched) return null;
-          const color = getServiceColor(p.domain);
+          const { color } = categoryStyle(p.domain);
           return (
             <button
               key={p.num}
@@ -293,11 +299,20 @@ function PlayingView({
               onPointerDown={(e) => onTermPointerDown(e, p.num)}
               onPointerMove={onTermPointerMove}
               onPointerUp={(e) => onTermPointerUp(e, p.num)}
-              style={{ touchAction: "none" }}
+              style={{
+                touchAction: "none",
+                ...(isSelected
+                  ? {}
+                  : {
+                      backgroundColor: tint(color, "14"),
+                      color,
+                      borderColor: tint(color, "33"),
+                    }),
+              }}
               className={`select-none rounded-xl border px-3 py-2 text-sm font-medium transition ${
                 isSelected
                   ? "border-emerald-400 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-400"
-                  : `${color.tag} hover:border-zinc-400`
+                  : "hover:brightness-95"
               }`}
             >
               {p.term}

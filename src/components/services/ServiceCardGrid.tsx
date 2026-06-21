@@ -10,7 +10,7 @@ import {
   Shuffle,
 } from "lucide-react";
 import { SERVICES, SERVICE_DOMAINS, type ServiceCard } from "@/lib/services-data";
-import { getServiceColor } from "@/lib/service-domain-colors";
+import { categoryStyle, tint } from "@/lib/category-style";
 
 function shuffleInPlace<T>(arr: T[]): T[] {
   const out = arr.slice();
@@ -169,7 +169,7 @@ export function ServiceCardGrid() {
         <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map((c) => {
             const isFlipped = flipped.has(c.num);
-            const color = getServiceColor(c.domain);
+            const { color, Icon } = categoryStyle(c.domain);
             // Presentational split: leading emoji shown large, mnemonic text below.
             const eselEmoji = c.eselsbruecke.split(" ")[0];
             const eselText = c.eselsbruecke.split(" ").slice(1).join(" ");
@@ -180,90 +180,95 @@ export function ServiceCardGrid() {
                 onClick={() => toggleCard(c.num)}
                 className="flex h-[24rem] overflow-hidden rounded-[18px] border border-zinc-200 bg-white text-left shadow-[0_18px_40px_-12px_rgba(24,24,27,0.22),0_6px_14px_-6px_rgba(24,24,27,0.12)] transition hover:shadow-[0_24px_50px_-12px_rgba(24,24,27,0.28),0_8px_18px_-6px_rgba(24,24,27,0.16)]"
               >
-                {/* Left domain stripe — clipped into the card rounding */}
-                <div className={`w-[5px] shrink-0 ${color.iconBg}`} aria-hidden />
+                {/* Left category stripe — clipped into the card rounding */}
+                <div
+                  className="w-[5px] shrink-0"
+                  style={{ backgroundColor: color }}
+                  aria-hidden
+                />
 
                 <div className="flex min-h-0 flex-1 flex-col">
-                  {/* Header: domain pill — always on top */}
-                  <div className="flex shrink-0 items-center px-5 pb-3.5 pt-5">
+                  {/* Header: category label (icon + name) left, number right */}
+                  <div className="flex shrink-0 items-center justify-between gap-2 px-5 pb-3.5 pt-5">
                     <span
-                      className={`min-w-0 truncate rounded-full border px-3.5 py-1.5 text-sm font-medium ${color.tag}`}
+                      className="inline-flex min-w-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium"
+                      style={{ backgroundColor: tint(color, "14"), color }}
                     >
-                      {c.domain}
+                      <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      <span className="truncate">{c.domain}</span>
+                    </span>
+                    <span
+                      className="shrink-0 text-sm font-bold tabular-nums"
+                      style={{ color }}
+                    >
+                      {c.num}.
                     </span>
                   </div>
 
-                  {isFlipped ? (
-                    /* BACK — unchanged: divider, title, core, 🔗 partner chips, hint box */
-                    <>
-                      <div className="mx-5 shrink-0 border-t border-zinc-200" />
-                      <div className="flex min-h-0 flex-1 flex-col p-5">
-                        <div className="flex min-h-0 flex-1 flex-col">
-                          <div className="flex h-full min-h-0 flex-col">
-                            <h3 className="mb-2 shrink-0 text-xl font-bold leading-snug text-zinc-900">
-                              <span className={color.textAccent}>{c.num}.</span>{" "}
-                              {c.title}
-                            </h3>
-                            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-                              <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-800">
-                                {c.core}
-                              </p>
-                              {c.partners.length > 0 && (
-                                <div className="mt-3 flex flex-wrap gap-1.5">
-                                  {c.partners.map((p) => (
-                                    <span
-                                      key={p}
-                                      className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${color.tag}`}
-                                    >
-                                      🔗 {p}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                              <div className="mt-3 rounded-md border-l-2 border-amber-500 bg-amber-100 px-2.5 py-1.5">
-                                <p className="text-[11.5px] leading-snug text-amber-900">
-                                  {c.hint}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                  <div className="mx-5 shrink-0 border-t border-zinc-200" />
 
-                        {/* Flip hint */}
-                        <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-zinc-400">
-                          <RefreshCw className="h-3.5 w-3.5" aria-hidden />
-                          Klicken zum Umdrehen
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    /* FRONT — title (left, bold) → divider → centered mnemonic → hint */
-                    <>
-                      <h3 className="shrink-0 px-5 pb-3.5 text-lg font-bold leading-snug text-zinc-900 sm:text-xl">
-                        <span className={color.textAccent}>{c.num}.</span>{" "}
+                  {isFlipped ? (
+                    /* BACK — core, 🔗 partner chips (category-tinted), hint box */
+                    <div className="flex min-h-0 flex-1 flex-col p-5">
+                      <h3 className="mb-2 shrink-0 text-xl font-bold leading-snug text-zinc-900">
                         {c.title}
                       </h3>
-
-                      <div className="mx-5 shrink-0 border-t border-zinc-200" />
-
-                      <div className="flex min-h-0 flex-1 flex-col p-5">
-                        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 text-center">
-                          <p className="text-3xl leading-none">{eselEmoji}</p>
-                          <p className="text-base font-medium leading-snug text-zinc-900">
-                            {eselText}
+                      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-800">
+                          {c.core}
+                        </p>
+                        {c.partners.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {c.partners.map((p) => (
+                              <span
+                                key={p}
+                                className="rounded-full border px-2.5 py-1 text-[11px] font-medium"
+                                style={{
+                                  backgroundColor: tint(color, "14"),
+                                  color,
+                                  borderColor: tint(color, "33"),
+                                }}
+                              >
+                                🔗 {p}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div className="mt-3 rounded-md border-l-2 border-amber-500 bg-amber-100 px-2.5 py-1.5">
+                          <p className="text-[11.5px] leading-snug text-amber-900">
+                            {c.hint}
                           </p>
-                          <p className="mt-1 text-sm italic leading-relaxed text-zinc-500">
-                            {c.front}
-                          </p>
-                        </div>
-
-                        {/* Flip hint */}
-                        <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-zinc-400">
-                          <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
-                          Klicken für Antwort
                         </div>
                       </div>
-                    </>
+
+                      {/* Flip hint */}
+                      <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-zinc-400">
+                        <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                        Klicken zum Umdrehen
+                      </div>
+                    </div>
+                  ) : (
+                    /* FRONT — big metaphor emoji center, then service name + mnemonic */
+                    <div className="flex min-h-0 flex-1 flex-col p-5">
+                      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 text-center">
+                        <p className="text-5xl leading-none">{eselEmoji}</p>
+                        <p className="text-lg font-bold leading-snug text-zinc-900">
+                          {c.title}
+                        </p>
+                        <p className="text-sm font-medium leading-snug text-zinc-700">
+                          {eselText}
+                        </p>
+                        <p className="mt-1 text-sm italic leading-relaxed text-zinc-500">
+                          {c.front}
+                        </p>
+                      </div>
+
+                      {/* Flip hint */}
+                      <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-zinc-400">
+                        <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
+                        Klicken für Antwort
+                      </div>
+                    </div>
                   )}
                 </div>
               </button>
