@@ -20,3 +20,46 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* /services practice-mode "start" buttons — Variant B: gradient base→hover with
+   a shine sweep on hover. Colours come in via CSS custom properties set from the
+   MODE_STYLE single source (see src/lib/mode-style.ts); this rule owns only the
+   motion. Keyboard focus is untouched (no JS hover state). */
+.mode-start-btn {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(135deg, var(--mode-bg), var(--mode-bg-hover));
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+/* Content wrapper sits above the sweep so the glance passes over, not through. */
+.mode-start-btn > .mode-start-btn__content {
+  position: relative;
+  z-index: 1;
+}
+.mode-start-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+.mode-start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px var(--mode-glow);
+}
+.mode-start-btn:hover::after {
+  left: 120%;
+}
+.mode-start-btn:active {
+  transform: translateY(0);
+}

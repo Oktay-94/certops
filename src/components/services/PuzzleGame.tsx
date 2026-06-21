@@ -5,6 +5,7 @@ import { Check, Puzzle, RotateCcw, Shuffle, Trophy, X } from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
 import { categoryStyle, tint } from "@/lib/category-style";
 import { BRAND_ORANGE } from "@/lib/brand";
+import { modeButtonVars } from "@/lib/mode-style";
 import {
   buildRounds,
   CATEGORY_GROUPS,
@@ -69,10 +70,13 @@ export function PuzzleGame() {
       <button
         type="button"
         onClick={openGame}
-        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm text-white transition hover:bg-zinc-800"
+        style={modeButtonVars("puzzle")}
+        className="mode-start-btn mt-4 rounded-xl px-5 py-3 text-sm"
       >
-        <Puzzle className="h-4 w-4" aria-hidden />
-        Puzzle starten
+        <span className="mode-start-btn__content inline-flex items-center gap-2">
+          <Puzzle className="h-4 w-4" aria-hidden />
+          Puzzle starten
+        </span>
       </button>
     );
   }

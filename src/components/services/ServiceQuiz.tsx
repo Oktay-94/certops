@@ -11,6 +11,7 @@ import {
 import { SERVICES, SERVICE_DOMAINS, type ServiceCard } from "@/lib/services-data";
 import { categoryStyle, tint } from "@/lib/category-style";
 import { BRAND_ORANGE } from "@/lib/brand";
+import { modeButtonVars } from "@/lib/mode-style";
 import {
   buildQuiz,
   hintExcerpt,
@@ -95,10 +96,13 @@ export function ServiceQuiz() {
       <button
         type="button"
         onClick={openQuiz}
-        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm text-white transition hover:bg-zinc-800"
+        style={modeButtonVars("quiz")}
+        className="mode-start-btn mt-4 rounded-xl px-5 py-3 text-sm"
       >
-        <GraduationCap className="h-4 w-4" aria-hidden />
-        Quiz starten
+        <span className="mode-start-btn__content inline-flex items-center gap-2">
+          <GraduationCap className="h-4 w-4" aria-hidden />
+          Quiz starten
+        </span>
       </button>
     );
   }
