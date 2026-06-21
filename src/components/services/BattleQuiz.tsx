@@ -26,9 +26,10 @@ const QUESTION_SECONDS = 60;
 const TIMEOUT_REVEAL_MS = 1500;
 
 const LEVELS: { value: Difficulty; label: string; hint: string }[] = [
-  { value: 1, label: "Leicht", hint: "Distraktoren aus anderen Bereichen — grobes Domänen-Wissen reicht." },
-  { value: 2, label: "Mittel", hint: "Kuratierte Falle + Beschreibungen aus demselben Bereich." },
-  { value: 3, label: "Schwer", hint: "Die engsten Geschwister-Dienste — Feinheiten entscheiden." },
+  { value: 1, label: "Leicht", hint: "4 Optionen · Distraktoren aus anderen Bereichen — grobes Domänen-Wissen reicht." },
+  { value: 2, label: "Mittel", hint: "4 Optionen · Kuratierte Falle + Beschreibungen aus demselben Bereich." },
+  { value: 3, label: "Schwer", hint: "4 Optionen · Die engsten Geschwister-Dienste — Feinheiten entscheiden." },
+  { value: "extreme", label: "Extrem", hint: "Duell · nur 2 Optionen: richtig vs. der ähnlichste Nachbar." },
 ];
 
 function trophyLabel(pct: number): string {
@@ -442,7 +443,8 @@ function ResultView({
             {s.accuracyPct}%
           </p>
           <p className="mt-1 text-sm text-zinc-500">
-            {trophyLabel(s.accuracyPct)} · Stufe {difficulty} ({levelLabel})
+            {trophyLabel(s.accuracyPct)} ·{" "}
+            {difficulty === "extreme" ? "Extrem" : `Stufe ${difficulty} (${levelLabel})`}
           </p>
         </div>
       </div>

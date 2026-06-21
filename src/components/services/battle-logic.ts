@@ -8,7 +8,9 @@
 import type { ServiceCard } from "@/lib/services-data";
 import { AWS_SERVICES } from "@/lib/aws-services";
 
-export type Difficulty = 1 | 2 | 3;
+// 1/2/3 = four-option modes; "extreme" = two-option duel (correct vs. the
+// single closest neighbour).
+export type Difficulty = 1 | 2 | 3 | "extreme";
 
 export type BattleOption = { text: string; isCorrect: boolean };
 
@@ -109,9 +111,33 @@ export function noteSiblings(
   return out;
 }
 
+// The sibling mentioned EARLIEST in card.note — the "primary" closest neighbour.
+// Ordered by first alias-match position in the note text (not pool order).
+export function primaryNoteSibling(
+  card: ServiceCard,
+  all: readonly ServiceCard[],
+): ServiceCard | null {
+  const note = card.hint;
+  if (!note) return null;
+  let best: ServiceCard | null = null;
+  let bestPos = Infinity;
+  for (const other of all) {
+    if (other.num === card.num) continue;
+    for (const a of serviceAliases(other)) {
+      const m = note.match(new RegExp(`\\b${escapeRegex(a)}\\b`));
+      if (m && m.index !== undefined && m.index < bestPos) {
+        bestPos = m.index;
+        best = other;
+      }
+    }
+  }
+  return best;
+}
+
 /**
- * Pick exactly 3 distractors for a question, per difficulty. Texts are
- * shortened and deduped against each other and the correct explanation.
+ * Pick the distractors for a question, per difficulty. Texts are shortened and
+ * deduped against each other and the correct explanation. Four-option modes
+ * return 3; "extreme" returns exactly 1.
  *
  * Stufe 1: explanations from OTHER categories (cross-domain).
  * Stufe 2: the curated distractor + 2 same-category explanations.
@@ -119,21 +145,24 @@ export function noteSiblings(
  *          same-category, then (defensively) cross-category. Encapsulated so
  *          its question source can later swap to real detail-questions from
  *          note without touching the engine.
+ * Extrem:  exactly ONE distractor — the single closest neighbour. Priority:
+ *          primary note-sibling → curated distractor(X) → same-category.
  *
  * Every branch ends with a same/cross-category fill so it can never return
- * fewer than 3 — even for IoT (only 4 services).
+ * fewer than `limit` — even for IoT (only 4 services).
  */
 export function pickDistractors(
   card: ServiceCard,
   difficulty: Difficulty,
   all: readonly ServiceCard[],
 ): Distractor[] {
+  const limit = difficulty === "extreme" ? 1 : 3;
   const correctText = shortExplanation(card.core);
   const seen = new Set<string>([correctText]);
   const out: Distractor[] = [];
 
   const tryAdd = (text: string, sourceNum: number | null, kind: DistractorKind) => {
-    if (out.length >= 3) return;
+    if (out.length >= limit) return;
     const t = shortExplanation(text);
     if (seen.has(t)) return;
     seen.add(t);
@@ -149,16 +178,22 @@ export function pickDistractors(
   } else if (difficulty === 2) {
     tryAdd(card.distractor, null, "curated");
     for (const c of sameCat()) tryAdd(c.core, c.num, "explanation");
-  } else {
+  } else if (difficulty === 3) {
     for (const c of shuffle(noteSiblings(card, all)))
       tryAdd(c.core, c.num, "explanation");
     for (const c of sameCat()) tryAdd(c.core, c.num, "explanation");
+  } else {
+    // Extrem — the single closest neighbour, by priority.
+    const primary = primaryNoteSibling(card, all);
+    if (primary) tryAdd(primary.core, primary.num, "explanation");
+    tryAdd(card.distractor, null, "curated");
+    for (const c of sameCat()) tryAdd(c.core, c.num, "explanation");
   }
 
-  // Defensive fill — guarantees 3 even if dedup/curated shrank the pool.
+  // Defensive fill — guarantees `limit` even if dedup/curated shrank the pool.
   for (const c of crossCat()) tryAdd(c.core, c.num, "explanation");
 
-  return out.slice(0, 3);
+  return out.slice(0, limit);
 }
 
 export function buildQuestion(

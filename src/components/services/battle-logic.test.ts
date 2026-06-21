@@ -5,6 +5,7 @@ import {
   buildQuestion,
   noteSiblings,
   pickDistractors,
+  primaryNoteSibling,
   shortExplanation,
   summarize,
   type BattleResult,
@@ -114,6 +115,40 @@ describe("Stufe 3 (schwer) — note siblings, then same-category fallback", () =
     const lean = ALL.find((s) => noteSiblings(s, ALL).length < 3);
     expect(lean).toBeDefined();
     expect(pickDistractors(lean!, 3, ALL)).toHaveLength(3);
+  });
+});
+
+describe("Extrem (Duell) — exactly 2 options, the single closest neighbour", () => {
+  it("every service yields exactly 1 distractor → 2 options, 1 correct, distinct", () => {
+    for (const card of ALL) {
+      const ds = pickDistractors(card, "extreme", ALL);
+      expect(ds).toHaveLength(1);
+      const q = buildQuestion(card, "extreme", ALL);
+      expect(q.options).toHaveLength(2);
+      expect(q.options.filter((o) => o.isCorrect)).toHaveLength(1);
+      expect(new Set(q.options.map((o) => o.text)).size).toBe(2); // distractor != explanation
+    }
+  });
+
+  it("prefers the PRIMARY note sibling when X names one", () => {
+    const withSibling = ALL.find((s) => primaryNoteSibling(s, ALL) !== null);
+    expect(withSibling).toBeDefined();
+    const primary = primaryNoteSibling(withSibling!, ALL)!;
+    const ds = pickDistractors(withSibling!, "extreme", ALL);
+    expect(ds[0].kind).toBe("explanation");
+    expect(ds[0].sourceNum).toBe(primary.num);
+  });
+
+  it("falls back (curated → same-category) for a service with no note siblings", () => {
+    const noSibling = ALL.find((s) => noteSiblings(s, ALL).length === 0);
+    expect(noSibling).toBeDefined();
+    const ds = pickDistractors(noSibling!, "extreme", ALL);
+    expect(ds).toHaveLength(1);
+    const d = ds[0];
+    const isCurated = d.kind === "curated";
+    const isSameCat =
+      d.sourceNum != null && byNum.get(d.sourceNum)!.domain === noSibling!.domain;
+    expect(isCurated || isSameCat).toBe(true);
   });
 });
 
