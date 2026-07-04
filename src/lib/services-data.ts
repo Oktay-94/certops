@@ -9,6 +9,7 @@
 //
 // To update content, edit the JSON, not this file.
 import raw from "./aws-services-172.json";
+import type { SkriptRef } from "./skript";
 
 export type ServiceCard = {
   num: number;
@@ -21,6 +22,8 @@ export type ServiceCard = {
   hint: string;
   /** Plausible-but-wrong description for the Battle Cards quiz (Task B). */
   distractor: string;
+  /** Deep-link target into the Lernskript (validated by skript-anchors.test.ts). */
+  skriptRef: SkriptRef;
 };
 
 type RawService = {
@@ -33,6 +36,7 @@ type RawService = {
   partners: string[];
   note: string;
   distractor: string;
+  skriptRef: SkriptRef;
 };
 
 type RawSource = {
@@ -53,6 +57,7 @@ export const SERVICES: ServiceCard[] = source.services.map((s) => ({
   partners: s.partners,
   hint: s.note,
   distractor: s.distractor,
+  skriptRef: s.skriptRef,
 }));
 
 // Canonical 12-category order straight from the source (NOT data-derived

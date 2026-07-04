@@ -28,7 +28,11 @@
         "Elastic Load Balancing (Fütterungsverteilung)"
       ],
       "note": "Merke: User Data = Bash-Skript beim ersten Start (z.B. Software installieren, Apache starten). Dedicated Host = physischer Server exklusiv für dich (Lizenz-Compliance, BYOL). Dedicated Instance = Instanz auf eigener Hardware, aber Server nicht exklusiv. Spot = bis 90% günstiger, aber unterbrechbar (2-Min-Warnung). Placement Groups: Cluster Placement Group (nah, hohe Bandbreite), Spread Placement Group (verteilt, max. 7/AZ), Partition Placement Group (getrennte Racks für Big Data). Stop/Start = neue öffentliche IP (alte verloren). Reboot = IP bleibt.",
-      "distractor": "Ein dauerhafter physischer Server der exklusiv für dich reserviert ist – du mietest ihn jahrelang und zahlst eine feste Monatsgebühr, unabhängig ob du ihn nutzt."
+      "distractor": "Ein dauerhafter physischer Server der exklusiv für dich reserviert ist – du mietest ihn jahrelang und zahlst eine feste Monatsgebühr, unabhängig ob du ihn nutzt.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "amazon-ec2-elastic-compute-cloud"
+      }
     },
     {
       "id": 2,
@@ -44,7 +48,11 @@
         "EventBridge (Ereignis-Bus)"
       ],
       "note": "Merke: Lambda = serverlos, kein Serverpflege, Bezahlung pro Aufruf (Millisekunden). Max. Laufzeit = 15 Minuten! Für längere Jobs: ECS/Fargate oder Batch. Max. RAM = 10 GB. Ideal für kurze, ereignisgesteuerte Aufgaben.",
-      "distractor": "Container-Orchestrierung auf Kubernetes-Basis – du packst deine App in Docker-Container und Kubernetes verteilt sie auf beliebig viele Maschinen."
+      "distractor": "Container-Orchestrierung auf Kubernetes-Basis – du packst deine App in Docker-Container und Kubernetes verteilt sie auf beliebig viele Maschinen.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "aws-lambda"
+      }
     },
     {
       "id": 3,
@@ -59,7 +67,11 @@
         "ECR (Container-Notenblätter)"
       ],
       "note": "Merke: Fargate = Container ohne Server-Kopfschmerzen. Ideal wenn man einfach eine Anwendung in der Cloud laufen lassen will.",
-      "distractor": "Ein Container-Management-Service der eigene Kubernetes-Cluster verwaltet – du konfigurierst selbst, welche EC2-Typen als Nodes laufen sollen."
+      "distractor": "Ein Container-Management-Service der eigene Kubernetes-Cluster verwaltet – du konfigurierst selbst, welche EC2-Typen als Nodes laufen sollen.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "container-grundlagen-docker-kubernetes-ecs-eks-fargate"
+      }
     },
     {
       "id": 4,
@@ -75,7 +87,11 @@
         "IAM (Zugangskontrolle)"
       ],
       "note": "Merke: ECS = Container orchestrieren auf AWS-Art. EKS = dasselbe aber mit Kubernetes. Fargate = kein Server nötig. EC2 Launch Type = mehr Kontrolle.",
-      "distractor": "Ein verwalteter Kubernetes-Service bei dem AWS die Kubernetes-Kontrollebene betreibt und du die Worker-Nodes selbst verwalten musst."
+      "distractor": "Ein verwalteter Kubernetes-Service bei dem AWS die Kubernetes-Kontrollebene betreibt und du die Worker-Nodes selbst verwalten musst.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "container-grundlagen-docker-kubernetes-ecs-eks-fargate"
+      }
     },
     {
       "id": 5,
@@ -91,7 +107,11 @@
         "VPC (Netzwerk)"
       ],
       "note": "Merke: EKS = verwaltetes Kubernetes. Gut wenn man bereits Kubernetes kennt. ECS = einfacher, AWS-eigener Weg.",
-      "distractor": "Eine serverlose Datenbank die automatisch skaliert und keine Server benötigt – du schreibst SQL-Abfragen wie bei einer normalen Datenbank."
+      "distractor": "Eine serverlose Datenbank die automatisch skaliert und keine Server benötigt – du schreibst SQL-Abfragen wie bei einer normalen Datenbank.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "container-grundlagen-docker-kubernetes-ecs-eks-fargate"
+      }
     },
     {
       "id": 6,
@@ -106,7 +126,11 @@
         "S3 (Datenspeicher)"
       ],
       "note": "Merke: Batch = Massenverarbeitung von Jobs. AWS wählt automatisch die passenden Ressourcen.",
-      "distractor": "Ein Messaging-Service für Echtzeit-Streaming von Millionen Events – du verarbeitest den Datenstrom mit angehängten Konsumenten wie Lambda."
+      "distractor": "Ein Messaging-Service für Echtzeit-Streaming von Millionen Events – du verarbeitest den Datenstrom mit angehängten Konsumenten wie Lambda.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "aws-batch"
+      }
     },
     {
       "id": 7,
@@ -122,7 +146,11 @@
         "CloudWatch (Überwachung)"
       ],
       "note": "Merke: Beanstalk = PaaS, Code rein - Infrastruktur kommt automatisch. Unterstützt Node.js, Python, Java, PHP, Docker u.v.m.",
-      "distractor": "Ein Event-basierter Compute-Service bei dem du Code schreibst und AWS diesen als Container-Image auf verwalteten Kubernetes-Nodes ausführt."
+      "distractor": "Ein Event-basierter Compute-Service bei dem du Code schreibst und AWS diesen als Container-Image auf verwalteten Kubernetes-Nodes ausführt.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "aws-elastic-beanstalk"
+      }
     },
     {
       "id": 8,
@@ -136,7 +164,11 @@
         "S3 (Backups)"
       ],
       "note": "Merke: Lightsail = einfachste Variante von AWS. Fester Monatspreis. Für Blogs, kleine Websites, einfache Apps.",
-      "distractor": "Eine Plattform-as-a-Service die deinen Code nimmt und automatisch einen Kubernetes-Cluster damit betreibt, inklusive CI/CD-Pipeline."
+      "distractor": "Eine Plattform-as-a-Service die deinen Code nimmt und automatisch einen Kubernetes-Cluster damit betreibt, inklusive CI/CD-Pipeline.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "amazon-lightsail"
+      }
     },
     {
       "id": 9,
@@ -152,7 +184,11 @@
         "RDS (Datenbank)"
       ],
       "note": "Merke: Outposts = AWS kommt zu dir. Gut für Compliance (Daten müssen im Haus bleiben) oder extrem niedrige Latenz.",
-      "distractor": "Ein Service der mehrere EC2-Instanzen nimmt und sie automatisch zu einem verteilten System verbindet mit gemeinsam genutztem Speicher."
+      "distractor": "Ein Service der mehrere EC2-Instanzen nimmt und sie automatisch zu einem verteilten System verbindet mit gemeinsam genutztem Speicher.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "hybrid-edge-local-zones-wavelength-outposts"
+      }
     },
     {
       "id": 10,
@@ -167,7 +203,11 @@
         "Lambda (Auslöser)"
       ],
       "note": "Merke: Bedrock = generative KI auf Knopfdruck. Kein ML-Expertenwissen nötig. Fertige Modelle, fertige Infrastruktur.",
-      "distractor": "Eine eigene Plattform zum Trainieren von Machine-Learning-Modellen auf deinen Daten – du wählst den Algorithmus und AWS kümmert sich um die GPU-Cluster."
+      "distractor": "Eine eigene Plattform zum Trainieren von Machine-Learning-Modellen auf deinen Daten – du wählst den Algorithmus und AWS kümmert sich um die GPU-Cluster.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-bedrock"
+      }
     },
     {
       "id": 11,
@@ -182,7 +222,11 @@
         "CodeCommit (Quellcode)"
       ],
       "note": "Merke: App Runner = maximale Einfachheit. Für kleine Web-Apps und APIs. Skaliert automatisch, auch auf 0 bei keinem Traffic.",
-      "distractor": "Ein vollständig verwalteter Message-Broker der AMQP und MQTT unterstützt – ideal für IoT-Geräte die Nachrichten in bestimmter Reihenfolge senden."
+      "distractor": "Ein vollständig verwalteter Message-Broker der AMQP und MQTT unterstützt – ideal für IoT-Geräte die Nachrichten in bestimmter Reihenfolge senden.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "aws-app-runner"
+      }
     },
     {
       "id": 12,
@@ -198,7 +242,11 @@
         "Athena (SQL-Abfragen)"
       ],
       "note": "Merke: S3 = Objekt-Speicher, unbegrenzt, sehr günstig. Unterschied zu EBS: S3 = Dateien, EBS = Festplatte für einen Server.",
-      "distractor": "Ein Service für schnelle In-Memory-Datenbanken der Redis-kompatibel ist und automatisch über mehrere Regionen repliziert."
+      "distractor": "Ein Service für schnelle In-Memory-Datenbanken der Redis-kompatibel ist und automatisch über mehrere Regionen repliziert.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "amazon-s3-simple-storage-service"
+      }
     },
     {
       "id": 13,
@@ -213,7 +261,11 @@
         "KMS (Verschlüsselung)"
       ],
       "note": "Merke: EBS = Block-Speicher, nur für einen Server gleichzeitig. EFS = gemeinsamer Netzwerkspeicher für mehrere Server. Snapshots in S3 sichern.",
-      "distractor": "Ein Content-Delivery-Network das statische Webinhalte auf Edge-Servern weltweit zwischenspeichert und bis zu 10 GB/s Durchsatz bietet."
+      "distractor": "Ein Content-Delivery-Network das statische Webinhalte auf Edge-Servern weltweit zwischenspeichert und bis zu 10 GB/s Durchsatz bietet.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "amazon-ebs-elastic-block-store"
+      }
     },
     {
       "id": 14,
@@ -228,7 +280,11 @@
         "Lambda (Serverlose Funktionen)"
       ],
       "note": "Merke: EFS = elastisches NFS, für Linux, mehrere Server gleichzeitig. Wächst automatisch. EBS = nur ein Server. FSx = für Windows oder spezielle Filesysteme.",
-      "distractor": "Ein Object-Storage-Service der Dateien in Hierarchien (Ordner/Unterordner) verwaltet und per SMB von Windows-Clients eingehängt werden kann."
+      "distractor": "Ein Object-Storage-Service der Dateien in Hierarchien (Ordner/Unterordner) verwaltet und per SMB von Windows-Clients eingehängt werden kann.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "amazon-efs-elastic-file-system"
+      }
     },
     {
       "id": 15,
@@ -243,7 +299,11 @@
         "S3 (Datenquelle für Lustre)"
       ],
       "note": "Merke: FSx for Windows = SMB, NTFS, Active Directory, DFS. FSx for Lustre = Hochleistung (HPC, ML), S3-Anbindung. FSx for NetApp ONTAP = Multi-Protokoll (NFS, SMB, iSCSI), On-Prem-Migration. FSx for OpenZFS = Linux NFS mit ZFS-Snapshots und niedrigster Latenz. EFS = Standard-NFS, automatisch skalierend.",
-      "distractor": "Ein Block-Storage-Service der wie eine NAS-Lösung funktioniert – mehrere EC2-Instanzen können gleichzeitig auf dieselben Daten zugreifen."
+      "distractor": "Ein Block-Storage-Service der wie eine NAS-Lösung funktioniert – mehrere EC2-Instanzen können gleichzeitig auf dieselben Daten zugreifen.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "amazon-fsx"
+      }
     },
     {
       "id": 16,
@@ -261,7 +321,11 @@
         "S3"
       ],
       "note": "Merke: AWS Backup = ein Plan für alles. Vault Lock = Backups einfrieren, niemand kann sie löschen (Compliance). Cross-Account = Backups in anderes Konto kopieren.",
-      "distractor": "Ein vollständig verwaltetes NFS-Dateisystem exklusiv für Windows-Workloads mit Active Directory Integration und SMB-Protokoll."
+      "distractor": "Ein vollständig verwaltetes NFS-Dateisystem exklusiv für Windows-Workloads mit Active Directory Integration und SMB-Protokoll.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "aws-backup"
+      }
     },
     {
       "id": 17,
@@ -276,7 +340,11 @@
         "EC2 (Cloud-Restore)"
       ],
       "note": "Merke: Storage Gateway = Hybrid-Speicher. File Gateway = NFS/SMB → S3. Volume Gateway = lokale Festplatten + Cloud-Backup. Tape Gateway = Bänder durch S3 Glacier ersetzen.",
-      "distractor": "Ein verwaltetes verteiltes Dateisystem für Linux das automatisch auf bis zu 64 TB skaliert und NFS-Protokoll verwendet."
+      "distractor": "Ein verwaltetes verteiltes Dateisystem für Linux das automatisch auf bis zu 64 TB skaliert und NFS-Protokoll verwendet.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "aws-storage-gateway"
+      }
     },
     {
       "id": 18,
@@ -292,7 +360,11 @@
         "On-Premises-NFS/SMB"
       ],
       "note": "Merke: DataSync = schnelle Online-Migration mit Agent. Snow Family = Offline-Migration (Petabyte). DataSync = Synchronisierung, nicht Backup.",
-      "distractor": "Ein verwalteter Service für relationale Datenbanken auf Basis von Postgres – du schreibst SQL-Abfragen und AWS kümmert sich um Backups."
+      "distractor": "Ein verwalteter Service für relationale Datenbanken auf Basis von Postgres – du schreibst SQL-Abfragen und AWS kümmert sich um Backups.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "aws-datasync"
+      }
     },
     {
       "id": 19,
@@ -308,7 +380,11 @@
         "Secrets Manager (Passwörter)"
       ],
       "note": "Merke: RDS = verwaltete relationale DB. Multi-AZ = Hochverfügbarkeit, synchrone Kopie auf Standby (NICHT lesbar!). Read Replica = LESBAR, aber asynchron. Standby ≠ Read Replica. Aurora = schnellste RDS-Variante.",
-      "distractor": "Eine vollständig verwaltete MySQL-kompatible Datenbank die automatisch zwischen 0 und unbegrenzt skaliert und nur nach Verbrauch abrechnet."
+      "distractor": "Eine vollständig verwaltete MySQL-kompatible Datenbank die automatisch zwischen 0 und unbegrenzt skaliert und nur nach Verbrauch abrechnet.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-rds-relational-database-service"
+      }
     },
     {
       "id": 20,
@@ -324,7 +400,11 @@
         "SageMaker (ML-Abfragen)"
       ],
       "note": "Merke: Aurora Serverless v2 = skaliert automatisch bis auf 0, ideal für unregelmäßige Last. Aurora Global Database = schreibt in Primärregion, repliziert in bis zu 5 Leseregionen (<1s Latenz, Failover <1 Minute). 6 Datenkopien in 3 AZs. Schnellste relationale DB auf AWS.",
-      "distractor": "Eine relationale Datenbank für große Datenmengen die auf Basis von Oracle-Technologie aufgebaut ist und in einer einzigen Verfügbarkeitszone läuft."
+      "distractor": "Eine relationale Datenbank für große Datenmengen die auf Basis von Oracle-Technologie aufgebaut ist und in einer einzigen Verfügbarkeitszone läuft.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-rds-relational-database-service"
+      }
     },
     {
       "id": 21,
@@ -340,7 +420,11 @@
         "AppSync (GraphQL)"
       ],
       "note": "Merke: DynamoDB = schnell, skalierbar, kein SQL. Global Tables = mehrere Regionen gleichzeitig schreibbar. TTL = abgelaufene Einträge automatisch löschen. DynamoDB Streams = Änderungen (INSERT, MODIFY, REMOVE) als Echtzeit-Stream, Lambda reagiert darauf. DAX = In-Memory-Cache für Mikrosekunden-Latenz. Max. Item-Größe = 400 KB. DynamoDB On-Demand = keine Kapazitätsplanung. DynamoDB Provisioned = feste RCU/WCU.",
-      "distractor": "Eine NoSQL-Datenbank die Dokumente im JSON-Format speichert und MongoDB vollständig ersetzen kann inklusive aller Abfrage-Operatoren."
+      "distractor": "Eine NoSQL-Datenbank die Dokumente im JSON-Format speichert und MongoDB vollständig ersetzen kann inklusive aller Abfrage-Operatoren.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-dynamodb"
+      }
     },
     {
       "id": 22,
@@ -355,7 +439,11 @@
         "EC2 (Anwendungsserver)"
       ],
       "note": "Merke: Redis = Persistenz (RDB-Snapshots + AOF-Log), Cluster Mode (horizontal skalieren, Daten auf Shards verteilen), Pub/Sub, Sorted Sets, Streams. Memcached = einfach, kein Persistenz, Multi-Thread. Cluster Mode Disabled = ein Primary + Replicas. Cluster Mode Enabled = mehrere Shards, jeder mit eigenem Primary + Replicas. ElastiCache Global Datastore = Redis Multi-Region für Lesezugriff. DAX = nur für DynamoDB!",
-      "distractor": "Eine verwaltete Graph-Datenbank die Beziehungen zwischen Millionen Knoten und Kanten effizient mit dem Cypher-Query-Language abfragt."
+      "distractor": "Eine verwaltete Graph-Datenbank die Beziehungen zwischen Millionen Knoten und Kanten effizient mit dem Cypher-Query-Language abfragt.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-elasticache"
+      }
     },
     {
       "id": 23,
@@ -370,7 +458,11 @@
         "IAM (Zugangskontrolle)"
       ],
       "note": "Merke: DocumentDB = MongoDB-Schnittstelle, AWS-verwaltet. JSON-Dokumente mit flexiblem Schema. \"MongoDB zu AWS migrieren ohne Code zu ändern\" = DocumentDB.",
-      "distractor": "Ein In-Memory-Cache der SQL-Abfragen zwischenspeichert und automatisch den Datenbankzugriff für häufige Anfragen abfängt."
+      "distractor": "Ein In-Memory-Cache der SQL-Abfragen zwischenspeichert und automatisch den Datenbankzugriff für häufige Anfragen abfängt.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-documentdb"
+      }
     },
     {
       "id": 24,
@@ -385,7 +477,11 @@
         "QuickSight (Visualisierung)"
       ],
       "note": "Merke: Neptune = Graph-Datenbank. Gut für: soziale Netzwerke, Empfehlungssysteme, Betrugserkennung. Unterstützt Gremlin und SPARQL.",
-      "distractor": "Eine vollständig verwaltete Suchmaschine für Text-Suchanfragen in S3 Buckets – du indexierst beliebige Textdokumente und suchst mit Elasticsearch."
+      "distractor": "Eine vollständig verwaltete Suchmaschine für Text-Suchanfragen in S3 Buckets – du indexierst beliebige Textdokumente und suchst mit Elasticsearch.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-neptune"
+      }
     },
     {
       "id": 25,
@@ -400,7 +496,11 @@
         "QuickSight (Dashboards)"
       ],
       "note": "Merke: Timestream = Zeitreihen für IoT und Metriken. Memory Store = aktuelle Daten (schnell). Magnetic Store = ältere Daten (günstig). Automatisches Tiering.",
-      "distractor": "Ein relationales Data-Warehouse das automatisch zwischen 0 und 128 Petabyte skaliert ohne dass du Cluster-Größe manuell anpassen musst."
+      "distractor": "Ein relationales Data-Warehouse das automatisch zwischen 0 und 128 Petabyte skaliert ohne dass du Cluster-Größe manuell anpassen musst.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-timestream"
+      }
     },
     {
       "id": 26,
@@ -415,7 +515,11 @@
         "API Gateway"
       ],
       "note": "Merke: MemoryDB = Redis-API + Datenpersistenz. Schneller als ElastiCache (kein separates Backend nötig). Für Apps die Redis als Hauptdatenbank nutzen.",
-      "distractor": "Ein vollständig verwalteter ETL-Service der Daten von On-Premises-Quellen in Echtzeit in AWS transportiert ohne Datenverlust."
+      "distractor": "Ein vollständig verwalteter ETL-Service der Daten von On-Premises-Quellen in Echtzeit in AWS transportiert ohne Datenverlust.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-memorydb"
+      }
     },
     {
       "id": 27,
@@ -431,7 +535,11 @@
         "Athena (Alternative für S3)"
       ],
       "note": "Merke: Redshift = Data Warehouse, spaltenorientiert, für Analysen. Spectrum = SQL direkt auf S3 (kein Import nötig). Für häufige komplexe Analysen besser als Athena.",
-      "distractor": "Ein Event-Streaming-Service der Kafka-kompatibel ist und Millionen Events pro Sekunde verarbeitet mit eingebautem Schema-Registry."
+      "distractor": "Ein Event-Streaming-Service der Kafka-kompatibel ist und Millionen Events pro Sekunde verarbeitet mit eingebautem Schema-Registry.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-redshift"
+      }
     },
     {
       "id": 76,
@@ -446,7 +554,11 @@
         "CloudTrail (ergänzend)"
       ],
       "note": "Merke: QLDB = unveränderliches Ledger, jede Änderung nachvollziehbar. Gut für: Finanztransaktionen, Lieferkette, Gesundheitsakte. PartiQL als Abfragesprache.",
-      "distractor": "Ein Service der Microservices per Service-Discovery miteinander verbindet ohne Load-Balancer oder API-Gateways konfigurieren zu müssen."
+      "distractor": "Ein Service der Microservices per Service-Discovery miteinander verbindet ohne Load-Balancer oder API-Gateways konfigurieren zu müssen.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-qldb-quantum-ledger-database"
+      }
     },
     {
       "id": 28,
@@ -462,7 +574,11 @@
         "NACLs (Zäune)"
       ],
       "note": "Merke: Security Group = stateful – Inbound-Regel erlaubt, Outbound-Antwort automatisch. NACLs = stateless – Inbound UND Outbound separat erlauben, nummerierte Regeln (niedrige Nummer zuerst). VPC Peering = nicht-transitiv. 5 IPs reserviert: .0 (Netz), .1 (Router), .2 (DNS), .3 (zukünftig), .255 (Broadcast). Public Subnet = eigene Route zu Internet Gateway, öffentliche IP. Private Subnet = kein direktes Internet, NAT Gateway für ausgehend. Route Table = bestimmt wohin Pakete gehen.",
-      "distractor": "Ein verwalteter Message-Bus der Point-to-Point-Kommunikation zwischen Microservices ermöglicht und garantiert jede Nachricht exakt einmal zu liefern."
+      "distractor": "Ein verwalteter Message-Bus der Point-to-Point-Kommunikation zwischen Microservices ermöglicht und garantiert jede Nachricht exakt einmal zu liefern.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "amazon-vpc-virtual-private-cloud"
+      }
     },
     {
       "id": 29,
@@ -478,7 +594,11 @@
         "WAF (Schutz)"
       ],
       "note": "Merke: Application Load Balancer (ALB) = Layer 7 (HTTP/HTTPS), Host- und Pfad-basiertes Routing, WAF und Cognito integrierbar. Network Load Balancer (NLB) = Layer 4 (TCP/UDP), extrem schnell, statische IP. Gateway Load Balancer (GWLB) = leitet Traffic durch Drittanbieter-Appliances (Firewall, IDS/IPS) – Inline Security, nutzt GENEVE-Protokoll Port 6081. WAF nur an ALB oder CloudFront!",
-      "distractor": "Ein visueller Workflow-Designer der Microservices grafisch verbindet und Transitionen zwischen Zuständen auf Basis von Metriken auslöst."
+      "distractor": "Ein visueller Workflow-Designer der Microservices grafisch verbindet und Transitionen zwischen Zuständen auf Basis von Metriken auslöst.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "elastic-load-balancing-elb"
+      }
     },
     {
       "id": 30,
@@ -495,7 +615,11 @@
         "ACM (HTTPS)"
       ],
       "note": "Merke: 600+ Edge-Standorte (PoPs) weltweit. OAC (neu) = S3-Schutz, ersetzt OAI (Origin Access Identity, alt). CloudFront Functions = leichtes JS am Edge (1ms). Lambda@Edge = Node.js/Python bis 5s. Signed URLs = 1 Objekt. Signed Cookies = viele Objekte. Invalidation = Cache leeren. SNI = mehrere HTTPS-Domains auf einer IP.",
-      "distractor": "Ein vollständig verwalteter API-Gateway-Service für WebSocket-Verbindungen der automatisch Session-State zwischen Verbindungen teilt."
+      "distractor": "Ein vollständig verwalteter API-Gateway-Service für WebSocket-Verbindungen der automatisch Session-State zwischen Verbindungen teilt.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "amazon-cloudfront"
+      }
     },
     {
       "id": 31,
@@ -511,7 +635,11 @@
         "ALB (Load Balancer)"
       ],
       "note": "Merke: Simple (1 Ziel). Weighted = prozentuale Verteilung (A/B-Test). Latency = nächste Region. Failover Routing = Active/Passive mit Health Check. Geolocation = nach Land/Kontinent. Geoproximity = nach Entfernung (Traffic Flow). Multi-Value = bis zu 8 gesunde Einträge. Alias Record = zeigt auf AWS-Ressource (ELB, CloudFront, S3), kostenlos, auch Apex-Domain. CNAME = normaler Alias, NICHT auf Apex-Domain verwendbar.",
-      "distractor": "Eine Datenbank-Migrationslösung die heterogene Datenbanktypen automatisch konvertiert und den gesamten ETL-Prozess ohne Ausfallzeit verwaltet."
+      "distractor": "Eine Datenbank-Migrationslösung die heterogene Datenbanktypen automatisch konvertiert und den gesamten ETL-Prozess ohne Ausfallzeit verwaltet.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "amazon-route-53"
+      }
     },
     {
       "id": 32,
@@ -525,7 +653,11 @@
         "EC2 (Server)"
       ],
       "note": "Merke: Global Accelerator = statische Anycast-IPs, TCP/UDP. CloudFront = CDN, HTTP-Caching. Accelerator = gut für Gaming, IoT, oder wenn feste IP-Adressen benötigt werden.",
-      "distractor": "Ein physisches Speichergerät das du per Netzwerk an On-Premises-Server anschließt und dann Daten per Glasfaser direkt zu AWS überträgst."
+      "distractor": "Ein physisches Speichergerät das du per Netzwerk an On-Premises-Server anschließt und dann Daten per Glasfaser direkt zu AWS überträgst.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-global-accelerator-die-schnellstrasse"
+      }
     },
     {
       "id": 33,
@@ -540,7 +672,11 @@
         "Site-to-Site VPN"
       ],
       "note": "Merke: Transit Gateway = Hub-and-Spoke-Netzwerk. VPC Peering = nur 1:1-Verbindung, kein Durchgangsverkehr. Bei vielen VPCs = Transit Gateway.",
-      "distractor": "Ein vollständig verwalteter Kubernetes-Cluster-Service bei dem du weder Master- noch Worker-Nodes konfigurieren oder verwalten musst."
+      "distractor": "Ein vollständig verwalteter Kubernetes-Cluster-Service bei dem du weder Master- noch Worker-Nodes konfigurieren oder verwalten musst.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-transit-gateway-der-knotenpunkt"
+      }
     },
     {
       "id": 34,
@@ -555,7 +691,11 @@
         "IAM (Zugangskontrolle)"
       ],
       "note": "Merke: PrivateLink = privater Dienst-Endpunkt. NLB als Backend Pflicht. Kein VPC-Peering nötig. IP-Adressbereiche dürfen sich überschneiden.",
-      "distractor": "Ein verwalteter Active-Directory-Service exklusiv für AWS-native Services ohne Verbindung zu On-Premises-Systemen, ideal für neue AWS-Deployments."
+      "distractor": "Ein verwalteter Active-Directory-Service exklusiv für AWS-native Services ohne Verbindung zu On-Premises-Systemen, ideal für neue AWS-Deployments.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-privatelink-der-geheimgang"
+      }
     },
     {
       "id": 35,
@@ -570,7 +710,11 @@
         "RDS / EC2 (Ziele)"
       ],
       "note": "Merke: Verified Access = Zero-Trust-Zugang ohne VPN. Auch für Nicht-HTTP-Ressourcen wie RDS (seit 2024). Gut für Homeoffice-Zugänge.",
-      "distractor": "Ein Service der temporäre AWS-Credentials direkt an Anwendungen ausgibt ohne IAM-Rollen oder Policies konfigurieren zu müssen."
+      "distractor": "Ein Service der temporäre AWS-Credentials direkt an Anwendungen ausgibt ohne IAM-Rollen oder Policies konfigurieren zu müssen.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-verified-access-der-sichere-zugang"
+      }
     },
     {
       "id": 36,
@@ -585,7 +729,11 @@
         "Cognito (App-Nutzer)"
       ],
       "note": "Merke: IAM = Wer darf was. Least Privilege = immer nur das nötigste vergeben. SCP = Organisations-weite Grenze. Rolle = temporäre Berechtigung für Dienste.",
-      "distractor": "Ein zentrales Identity-Management-System das IAM-Benutzer aus allen AWS-Accounts in einer Organisation zusammenfasst und einheitlich verwaltet."
+      "distractor": "Ein zentrales Identity-Management-System das IAM-Benutzer aus allen AWS-Accounts in einer Organisation zusammenfasst und einheitlich verwaltet.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-iam-identity-and-access-management"
+      }
     },
     {
       "id": 37,
@@ -602,7 +750,11 @@
         "Secrets Manager"
       ],
       "note": "Merke: AWS-managed key = automatisch von AWS, kein Preis, keine eigene Kontrolle (z.B. aws/s3). Customer managed key (CMK) = du erstellst und verwaltest ihn, eigene Key-Policy, Rotation konfigurierbar. Asymmetrische Schlüssel (RSA, ECC) für Signierung. BYOK = eigene Schlüssel importieren. KMS-Schlüssel verlassen NIE KMS. Multi-Region Keys = gleicher Schlüssel in mehreren Regionen.",
-      "distractor": "Eine Firewall die auf Subnetz-Ebene arbeitet, alle TCP/UDP-Verbindungen prüft und Machine Learning nutzt um Anomalien zu blockieren."
+      "distractor": "Eine Firewall die auf Subnetz-Ebene arbeitet, alle TCP/UDP-Verbindungen prüft und Machine Learning nutzt um Anomalien zu blockieren.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-kms-key-management-service"
+      }
     },
     {
       "id": 38,
@@ -618,7 +770,11 @@
         "IAM (Zugangskontrolle)"
       ],
       "note": "Merke: Secrets Manager = teurer, aber automatische Rotation. Parameter Store = günstig, keine Rotation, für einfache Konfigurationswerte. Beide verschlüsseln mit KMS.",
-      "distractor": "Ein Web Application Firewall Service der HTTPS-Traffic analysiert und bekannte Angriffsmuster auf Basis von IP-Reputationslisten blockiert."
+      "distractor": "Ein Web Application Firewall Service der HTTPS-Traffic analysiert und bekannte Angriffsmuster auf Basis von IP-Reputationslisten blockiert.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-secrets-manager"
+      }
     },
     {
       "id": 39,
@@ -634,7 +790,11 @@
         "EC2 (Shield Advanced)"
       ],
       "note": "Merke: Shield Standard = kostenlos, automatisch. Shield Advanced = teuer aber mit Unterstützung und SLA. Zusammen mit WAF für maximalen Schutz.",
-      "distractor": "Ein DDoS-Schutz-Service der ausschließlich für CloudFront und Route 53 verfügbar ist und Layer-7-Angriffe abwehrt."
+      "distractor": "Ein DDoS-Schutz-Service der ausschließlich für CloudFront und Route 53 verfügbar ist und Layer-7-Angriffe abwehrt.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-shield"
+      }
     },
     {
       "id": 40,
@@ -650,7 +810,11 @@
         "Shield (DDoS)"
       ],
       "note": "Merke: WAF (Web Application Firewall) = Angriffe auf Webanwendungen abwehren (Layer 7 / HTTP). Web ACL = Sammlung von WAF-Regeln, die auf eine Ressource angewendet wird. Nur mit ALB, CloudFront, API Gateway – NICHT mit NLB. Rate-based Rule = IPs mit zu vielen Requests blockieren. Managed Rules = fertige Regelsets von AWS oder Drittanbietern.",
-      "distractor": "Ein Verschlüsselungs-Service der Hardware-Sicherheitsmodule (HSMs) virtualisiert und Schlüssel automatisch über mehrere Regionen repliziert."
+      "distractor": "Ein Verschlüsselungs-Service der Hardware-Sicherheitsmodule (HSMs) virtualisiert und Schlüssel automatisch über mehrere Regionen repliziert.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-waf-web-application-firewall"
+      }
     },
     {
       "id": 41,
@@ -666,7 +830,11 @@
         "Lambda (Backend)"
       ],
       "note": "Merke: User Pool = Benutzerverzeichnis, gibt JWT-Token aus. Identity Pool = tauscht Token gegen temporäre IAM-Credentials. Hosted UI = fertige Login-Seite von Cognito ohne eigenes Frontend. OIDC = offener ID-Token-Standard (Cognito als OIDC-Provider). SAML 2.0 = Unternehmens-SSO (ADFS, Okta). Social Login + AWS-Zugriff = User Pool + Identity Pool kombinieren.",
-      "distractor": "Ein Service der alle ausgehenden API-Aufrufe von AWS-Diensten aufzeichnet und automatisch Alarme bei ungewöhnlichen Zugriffsmustern auslöst."
+      "distractor": "Ein Service der alle ausgehenden API-Aufrufe von AWS-Diensten aufzeichnet und automatisch Alarme bei ungewöhnlichen Zugriffsmustern auslöst.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "amazon-cognito"
+      }
     },
     {
       "id": 42,
@@ -682,7 +850,11 @@
         "Security Hub"
       ],
       "note": "Merke: GuardDuty = erkennt verdächtige AKTIVITÄTEN (reaktiv). IAM Access Analyzer = findet unbeabsichtigte ZUGRIFFSRECHTE (proaktiv). Kein Agent nötig.",
-      "distractor": "Ein Monitoring-Service der Metriken von EC2, RDS und Lambda sammelt und automatisch Anomalien erkennt ohne manuell Alarme konfigurieren zu müssen."
+      "distractor": "Ein Monitoring-Service der Metriken von EC2, RDS und Lambda sammelt und automatisch Anomalien erkennt ohne manuell Alarme konfigurieren zu müssen.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "amazon-guardduty"
+      }
     },
     {
       "id": 43,
@@ -698,7 +870,11 @@
         "Security Hub (zentrales Sicherheits-Dashboard)"
       ],
       "note": "Merke: OU (Organizational Unit) = Ordner für Konten, SCP wirkt auf gesamte OU. SCP = nur Einschränkung, kein Grant! Member Account Root Users SIND durch SCPs einschränkbar. Management Account Root = NICHT durch SCP einschränkbar. Konsolidierte Abrechnung = ein Zahlungskonto, Volume Discounts über alle Konten.",
-      "distractor": "Ein Service der Infrastructure-as-Code in YAML oder JSON verwaltert und Terraform-Dateien automatisch nach CloudFormation konvertiert."
+      "distractor": "Ein Service der Infrastructure-as-Code in YAML oder JSON verwaltert und Terraform-Dateien automatisch nach CloudFormation konvertiert.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-organizations"
+      }
     },
     {
       "id": 44,
@@ -713,7 +889,11 @@
         "API Gateway"
       ],
       "note": "Merke: ACM = kostenlose TLS-Zertifikate, automatische Erneuerung. DNS-Validierung bevorzugen. CloudFront = Zertifikat IMMER in us-east-1 ausstellen. SNI (Server Name Indication) = mehrere HTTPS-Domains auf einer IP / einem Endpunkt, jede mit eigenem Zertifikat. ACM Private CA = interne Zertifikate für private Dienste.",
-      "distractor": "Ein Service der Container-Images analysiert und Sicherheitslücken erkennt, indem er Images direkt aus dem Produktionssystem scannt."
+      "distractor": "Ein Service der Container-Images analysiert und Sicherheitslücken erkennt, indem er Images direkt aus dem Produktionssystem scannt.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-certificate-manager-acm"
+      }
     },
     {
       "id": 45,
@@ -728,7 +908,11 @@
         "Auto Scaling (basierend auf Metriken)"
       ],
       "note": "Merke: CloudWatch Metrics = Zahlen über Zeit. Namespace = Kategorie einer Metrik (z.B. AWS/EC2, AWS/RDS, eigene: MyApp/Requests). Custom Metrics = eigene Metriken per API/Agent senden. Alarm-Zustände: OK / ALARM / INSUFFICIENT_DATA. CloudWatch Logs = Text-Logs. Log Groups → Log Streams. Logs Insights = SQL auf Logs. CloudWatch Agent = Pflicht für RAM/Disk auf EC2. Dashboard = interaktive Visualisierung mehrerer Metriken.",
-      "distractor": "Eine Plattform für maschinelles Lernen die fertige Modelle für Sprach- und Bilderkennung bereitstellt und automatisch auf GPU-Clustern ausführt."
+      "distractor": "Eine Plattform für maschinelles Lernen die fertige Modelle für Sprach- und Bilderkennung bereitstellt und automatisch auf GPU-Clustern ausführt.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "amazon-cloudwatch"
+      }
     },
     {
       "id": 46,
@@ -743,7 +927,11 @@
         "CloudWatch (Logs auswerten)"
       ],
       "note": "Merke: CloudTrail = API-Protokoll (wer/was/wann/von-wo). Trail = Aufzeichnung dauerhaft in S3. CloudTrail Insights = erkennt ungewöhnliche API-Aktivitäten automatisch. CloudTrail Lake = SQL-Abfragen direkt auf Event-History (kein separates S3 nötig). Config = Ressourcen-Zustandsverfolgung + Compliance-Regeln.",
-      "distractor": "Ein Service für automatisierte Infrastruktur-Tests der CloudFormation-Templates auf Sicherheitslücken und Fehlkonfigurationen prüft."
+      "distractor": "Ein Service für automatisierte Infrastruktur-Tests der CloudFormation-Templates auf Sicherheitslücken und Fehlkonfigurationen prüft.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-cloudtrail"
+      }
     },
     {
       "id": 47,
@@ -758,7 +946,11 @@
         "CloudTrail (was hat die Änderung ausgelöst)"
       ],
       "note": "Merke: Config = Konfigurationshistorie + Compliance-Regeln. Managed Rules = fertige AWS-Checks. Remediation = automatische Korrektur bei Regelverstoß.",
-      "distractor": "Ein vollständig verwalteter CI/CD-Service der Code automatisch baut, testet und auf EC2-Instanzen deployed ohne weitere Konfiguration."
+      "distractor": "Ein vollständig verwalteter CI/CD-Service der Code automatisch baut, testet und auf EC2-Instanzen deployed ohne weitere Konfiguration.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-config"
+      }
     },
     {
       "id": 48,
@@ -772,7 +964,11 @@
         "CloudWatch (Service-Metriken)"
       ],
       "note": "Merke: Trusted Advisor = automatische Checks auf Best Practices. Business/Enterprise Support für alle Checks nötig. Compute Optimizer = detailliertere KI-Analyse für Rightsizing.",
-      "distractor": "Ein Service der DNS-Anfragen analysiert und verdächtige Domains blockiert bevor Verbindungen aufgebaut werden können."
+      "distractor": "Ein Service der DNS-Anfragen analysiert und verdächtige Domains blockiert bevor Verbindungen aufgebaut werden können.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-trusted-advisor"
+      }
     },
     {
       "id": 49,
@@ -788,7 +984,11 @@
         "CloudTrail (Protokollierung)"
       ],
       "note": "Merke: Session Manager = Browser-Shell, kein SSH, kein Bastion Host, kein Port 22 nötig. Parameter Store = Konfigurationswerte (Standard kostenlos, SecureString via KMS). Run Command = Befehle auf vielen Instanzen gleichzeitig. Patch Manager = OS-Patches automatisch einspielen. Bastion Host = veraltetes Konzept, durch Session Manager ersetzt.",
-      "distractor": "Eine zentrale Konsole die alle CloudWatch-Metriken aller EC2-Instanzen zusammenfasst und automatisch Patches für veraltete Software einspielt."
+      "distractor": "Eine zentrale Konsole die alle CloudWatch-Metriken aller EC2-Instanzen zusammenfasst und automatisch Patches für veraltete Software einspielt.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-systems-manager-ssm"
+      }
     },
     {
       "id": 50,
@@ -804,7 +1004,11 @@
         "Service Catalog (Account Factory)"
       ],
       "note": "Merke: Control Tower = Organizations + fertige Best Practices. Guardrails: Preventive (SCPs, verbieten) + Detective (Config, auffallen lassen). Account Factory = Konten nach Vorlage.",
-      "distractor": "Ein Service der mehrere AWS-Accounts in einer Hierarchie verwaltet und automatisch Kostenberichte für jedes Konto generiert."
+      "distractor": "Ein Service der mehrere AWS-Accounts in einer Hierarchie verwaltet und automatisch Kostenberichte für jedes Konto generiert.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-control-tower"
+      }
     },
     {
       "id": 51,
@@ -820,7 +1024,11 @@
         "IAM (Zugangskontrolle)"
       ],
       "note": "Merke: CodeCommit = Git in AWS. CodeBuild = Code kompilieren. CodeDeploy = Code ausliefern. CodePipeline = alles zusammen als CI/CD-Pipeline.",
-      "distractor": "Ein verwaltetes Git-Repository das automatisch Code-Reviews durchführt und Sicherheitslücken im Code erkennt bevor er gemergt wird."
+      "distractor": "Ein verwaltetes Git-Repository das automatisch Code-Reviews durchführt und Sicherheitslücken im Code erkennt bevor er gemergt wird.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-codecommit"
+      }
     },
     {
       "id": 52,
@@ -837,7 +1045,11 @@
         "Elastic Beanstalk (Ziel)"
       ],
       "note": "Merke: CodePipeline = Orchestrierung. Stages: Source → Build → Test → Deploy. Unterstützt auch GitHub, Bitbucket, Jenkins als externe Werkzeuge.",
-      "distractor": "Ein Service der Container-Images automatisch baut und in ECR hochlädt wenn neuer Code in CodeCommit eingecheckt wird."
+      "distractor": "Ein Service der Container-Images automatisch baut und in ECR hochlädt wenn neuer Code in CodeCommit eingecheckt wird.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-codepipeline"
+      }
     },
     {
       "id": 53,
@@ -851,7 +1063,11 @@
         "S3 / EC2 / RDS (Ziel-Ressourcen)"
       ],
       "note": "Merke: CDK = Code → CloudFormation. Abstraktionslevel höher als CloudFormation direkt. Gut für komplexe Infrastruktur mit Wiederverwendbarkeit.",
-      "distractor": "Eine Terraform-Alternative die AWS-spezifische Ressourcen in YAML definiert und automatisch CloudFormation-Stacks daraus generiert."
+      "distractor": "Eine Terraform-Alternative die AWS-spezifische Ressourcen in YAML definiert und automatisch CloudFormation-Stacks daraus generiert.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-cdk-cloud-development-kit"
+      }
     },
     {
       "id": 54,
@@ -866,7 +1082,11 @@
         "CodeWhisperer (Vorgänger)"
       ],
       "note": "Merke: Q Developer = KI für Entwickler. Q Business = KI für Unternehmensdaten. Beide Teil der Amazon Q-Familie. CodeWhisperer ist in Q Developer aufgegangen.",
-      "distractor": "Ein visueller Infrastructure-Designer der AWS-Architekturen als Diagramme darstellt und automatisch den besten Ressourcentyp empfiehlt."
+      "distractor": "Ein visueller Infrastructure-Designer der AWS-Architekturen als Diagramme darstellt und automatisch den besten Ressourcentyp empfiehlt.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "amazon-q-developer"
+      }
     },
     {
       "id": 55,
@@ -882,7 +1102,11 @@
         "Lake Formation (Data Lake)"
       ],
       "note": "Merke: Athena = serverlos, SQL auf S3, pay-per-scan. Parquet/ORC = viel günstiger als CSV. Gut für gelegentliche Abfragen. Redshift = für häufige, komplexe Analysen.",
-      "distractor": "Ein verwalteter Kubernetes-Cluster-Service der Container automatisch auf Spot-Instanzen verschiebt wenn On-Demand-Kapazität knapp wird."
+      "distractor": "Ein verwalteter Kubernetes-Cluster-Service der Container automatisch auf Spot-Instanzen verschiebt wenn On-Demand-Kapazität knapp wird.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "amazon-athena"
+      }
     },
     {
       "id": 56,
@@ -898,7 +1122,11 @@
         "Lake Formation (Governance)"
       ],
       "note": "Merke: Glue = ETL serverlos + Data Catalog. Crawler erkennen Schema automatisch. Data Catalog = zentrale Metadaten für Athena, Redshift Spectrum, EMR.",
-      "distractor": "Ein Netzwerk-Load-Balancer der IP-Adressen basierend auf einer Round-Robin-Liste den Clients zuweist ohne den Traffic weiterzuleiten."
+      "distractor": "Ein Netzwerk-Load-Balancer der IP-Adressen basierend auf einer Round-Robin-Liste den Clients zuweist ohne den Traffic weiterzuleiten.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "aws-glue"
+      }
     },
     {
       "id": 57,
@@ -913,7 +1141,11 @@
         "Glue Data Catalog (Metadaten)"
       ],
       "note": "Merke: EMR = Hadoop/Spark für Big Data. Spot-Instanzen = günstiger. EMRFS = S3 statt HDFS als Speicher. Glue = einfacher und serverlos für Standard-ETL.",
-      "distractor": "Ein klassischer Load-Balancer der ausschließlich TCP-Traffic auf Port 443 an EC2-Instanzen in einer einzigen Verfügbarkeitszone verteilt."
+      "distractor": "Ein klassischer Load-Balancer der ausschließlich TCP-Traffic auf Port 443 an EC2-Instanzen in einer einzigen Verfügbarkeitszone verteilt.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "amazon-emr"
+      }
     },
     {
       "id": 58,
@@ -929,7 +1161,11 @@
         "IoT Core (Sensordaten)"
       ],
       "note": "Merke: Kinesis Data Streams = Echtzeit, eigener Consumer-Code, Shard = Kapazitätseinheit, bis 365 Tage Retention. Kinesis Data Firehose = Near-Real-Time (mind. 60s Puffer!), kein Code, direkt in S3/Redshift/OpenSearch. Kinesis Data Analytics = SQL oder Apache Flink auf Streams. Kinesis Video Streams = Video von Kameras/IoT für Rekognition und ML.",
-      "distractor": "Ein Content Delivery Network das TCP-Verbindungen an den Ursprungsserver weiterleitet ohne den Traffic zwischen Protokollen zu konvertieren."
+      "distractor": "Ein Content Delivery Network das TCP-Verbindungen an den Ursprungsserver weiterleitet ohne den Traffic zwischen Protokollen zu konvertieren.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "amazon-kinesis"
+      }
     },
     {
       "id": 59,
@@ -944,7 +1180,11 @@
         "Lambda (Transformieren)"
       ],
       "note": "Merke: OpenSearch = Volltextsuche + Echtzeit-Logs + Dashboards. Athena = SQL auf S3 (nicht Volltextsuche). ELK-Stack = OpenSearch auf AWS.",
-      "distractor": "Ein verwalteter DNS-Service der ausschließlich für private Hosted Zones in VPCs verwendet werden kann ohne öffentliche Domänen zu unterstützen."
+      "distractor": "Ein verwalteter DNS-Service der ausschließlich für private Hosted Zones in VPCs verwendet werden kann ohne öffentliche Domänen zu unterstützen.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "amazon-opensearch-service"
+      }
     },
     {
       "id": 60,
@@ -960,7 +1200,11 @@
         "S3 (direkt)"
       ],
       "note": "Merke: QuickSight = BI-Dashboards. SPICE = In-Memory-Engine für schnelle Antworten. ML Insights = automatische Anomalie-Erkennung. Athena + QuickSight = serverloser Analytics-Stack.",
-      "distractor": "Ein Global-Anycast-Service der DNS-Abfragen auf Basis geographischer Nähe beantwortet und automatisch IP-Blacklisting durchführt."
+      "distractor": "Ein Global-Anycast-Service der DNS-Abfragen auf Basis geographischer Nähe beantwortet und automatisch IP-Blacklisting durchführt.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "amazon-quicksight"
+      }
     },
     {
       "id": 61,
@@ -976,7 +1220,11 @@
         "Ground Truth (Daten beschriften)"
       ],
       "note": "Merke: SageMaker Ground Truth = menschliches Labeling von Trainingsdaten (Bild-Annotationen, Text-Klassifizierung). SageMaker Pipelines = ML-Workflow orchestrieren (Daten prep → Training → Evaluation → Deploy). Canvas = No-Code-ML ohne Programmierung. Autopilot = AutoML. Feature Store = zentrale Features für Training und Inferenz. Serverless Inference = kein Server, zahle pro Anfrage. JumpStart = fertige vortrainierte Modelle.",
-      "distractor": "Eine private Netzwerkverbindung über das Internet die 10 Gbps garantiert und automatisch Failover auf eine andere Leitung durchführt."
+      "distractor": "Eine private Netzwerkverbindung über das Internet die 10 Gbps garantiert und automatisch Failover auf eine andere Leitung durchführt.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-sagemaker"
+      }
     },
     {
       "id": 62,
@@ -992,7 +1240,11 @@
         "SNS (Benachrichtigung)"
       ],
       "note": "Merke: Rekognition = fertige Bild-/Video-KI. DetectLabels = Objekte/Tiere. DetectFaces = Gesichter. DetectText = OCR. Moderation = unangemessene Inhalte. Kein Training nötig.",
-      "distractor": "Ein IPSec-VPN-Tunnel der physisch zwischen dem AWS-Rechenzentrum und deinem Büro verlegt wird und Latenz unter 1ms garantiert."
+      "distractor": "Ein IPSec-VPN-Tunnel der physisch zwischen dem AWS-Rechenzentrum und deinem Büro verlegt wird und Latenz unter 1ms garantiert.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-rekognition"
+      }
     },
     {
       "id": 63,
@@ -1008,7 +1260,11 @@
         "Comprehend (Textanalyse)"
       ],
       "note": "Merke: Amazon Lex = Chatbot. Amazon Polly = Text→Sprache. Amazon Transcribe = Sprache→Text. Zusammen: vollständiger Sprachassistent ohne eigenes ML-Wissen. Kette: Transcribe (Audio→Text) + Translate (übersetzen) + Polly (vorlesen) = Echtzeit-Dolmetscher.",
-      "distractor": "Ein virtueller Router im VPC der Routing-Tables automatisch aktualisiert wenn sich die Netzwerktopologie ändert."
+      "distractor": "Ein virtueller Router im VPC der Routing-Tables automatisch aktualisiert wenn sich die Netzwerktopologie ändert.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-lex-polly-transcribe"
+      }
     },
     {
       "id": 64,
@@ -1023,7 +1279,11 @@
         "SharePoint / Confluence (Konnektoren)"
       ],
       "note": "Merke: Q Business = generative KI für eigene Unternehmensdaten. Q Developer = KI für Programmierer. Beide nutzen Bedrock als Backend.",
-      "distractor": "Eine Firewall die auf Layer 3 und 4 arbeitet und ausschließlich eingehenden Traffic von bekannten IPv4-Adressen erlaubt."
+      "distractor": "Eine Firewall die auf Layer 3 und 4 arbeitet und ausschließlich eingehenden Traffic von bekannten IPv4-Adressen erlaubt.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-q-business"
+      }
     },
     {
       "id": 65,
@@ -1039,7 +1299,11 @@
         "EventBridge"
       ],
       "note": "Merke: Standard Queue = mindestens einmal, keine Reihenfolge. FIFO Queue = genau einmal, Reihenfolge garantiert. Visibility Timeout = Zeitfenster nach dem Abholen, in dem Nachricht für andere unsichtbar ist (Standard 30s, max. 12h). Dead Letter Queue (DLQ) = Nachrichten die X-mal fehlgeschlagen sind. Max. Retention = 14 Tage. FIFO = max. 300 Nachrichten/s (3.000 mit Batching). Standard = unbegrenzt.",
-      "distractor": "Ein verwalteter NACL-Service der automatisch Regeln basierend auf CloudWatch-Metriken und bekannten Angriffsmuster anpasst."
+      "distractor": "Ein verwalteter NACL-Service der automatisch Regeln basierend auf CloudWatch-Metriken und bekannten Angriffsmuster anpasst.",
+      "skriptRef": {
+        "chapter": 9,
+        "anchor": "amazon-sqs-simple-queue-service"
+      }
     },
     {
       "id": 66,
@@ -1055,7 +1319,11 @@
         "CloudWatch (Alarme)"
       ],
       "note": "Merke: SNS = Pub/Sub, ein Sender → viele Empfänger. Fan-out = SNS → mehrere SQS-Queues gleichzeitig. SNS FIFO Topic = garantierte Reihenfolge, genau einmal, nur SQS FIFO als Subscriber. Standard Topic = mehrere Subscriber-Typen. Message Filtering = jeder Subscriber wählt welche Nachrichten er bekommt.",
-      "distractor": "Ein Service der statische öffentliche IP-Adressen an AWS-Konten vergibt und automatisch Route-Tables in allen VPCs aktualisiert."
+      "distractor": "Ein Service der statische öffentliche IP-Adressen an AWS-Konten vergibt und automatisch Route-Tables in allen VPCs aktualisiert.",
+      "skriptRef": {
+        "chapter": 9,
+        "anchor": "amazon-sns-simple-notification-service"
+      }
     },
     {
       "id": 67,
@@ -1071,7 +1339,11 @@
         "SaaS-Dienste"
       ],
       "note": "Merke: EventBridge = ereignisgetriebene Architektur. Regeln filtern Ereignisse. Schema Registry = Strukturen der Ereignisse dokumentieren. Für SaaS-Integrationen und AWS-Dienste.",
-      "distractor": "Ein DNS-Service der Anfragen für private Domains in einem VPC verarbeitet und automatisch neue Domains für EC2-Instanzen erstellt."
+      "distractor": "Ein DNS-Service der Anfragen für private Domains in einem VPC verarbeitet und automatisch neue Domains für EC2-Instanzen erstellt.",
+      "skriptRef": {
+        "chapter": 9,
+        "anchor": "amazon-eventbridge"
+      }
     },
     {
       "id": 68,
@@ -1088,7 +1360,11 @@
         "Bedrock (KI-Schritte)"
       ],
       "note": "Merke: Step Functions = orchestrierter Workflow mit Fehlerbehandlung. Express Workflows = kurz, hochvolumig. Standard Workflows = lang laufend, bis zu 1 Jahr.",
-      "distractor": "Ein Service der ausgehenden Internet-Traffic von privaten Subnets über einen verschlüsselten Tunnel ins öffentliche Internet leitet."
+      "distractor": "Ein Service der ausgehenden Internet-Traffic von privaten Subnets über einen verschlüsselten Tunnel ins öffentliche Internet leitet.",
+      "skriptRef": {
+        "chapter": 9,
+        "anchor": "aws-step-functions"
+      }
     },
     {
       "id": 69,
@@ -1104,7 +1380,11 @@
         "CloudFront (Caching)"
       ],
       "note": "Merke: API Gateway = REST/WebSocket-APIs ohne Server. Eng mit Lambda für serverlose APIs. VPC Link = private Backends erreichbar machen.",
-      "distractor": "Ein Gateway-Service der IPv6-Traffic ins IPv4-Netz übersetzt und ausgehende Internet-Verbindungen für dual-stack VPCs verwaltet."
+      "distractor": "Ein Gateway-Service der IPv6-Traffic ins IPv4-Netz übersetzt und ausgehende Internet-Verbindungen für dual-stack VPCs verwaltet.",
+      "skriptRef": {
+        "chapter": 9,
+        "anchor": "amazon-api-gateway"
+      }
     },
     {
       "id": 70,
@@ -1119,7 +1399,11 @@
         "SCT (Schema-Konversion für heterogene Migration)"
       ],
       "note": "Merke: DMS = Online-Migration mit minimaler Ausfallzeit. Full Load + CDC = kaum Downtime. SCT = Schema Conversion Tool für unterschiedliche DB-Typen.",
-      "distractor": "Ein Service der alle TCP-Verbindungen in einem VPC loggt und automatisch Alarm schlägt wenn unbekannte IPs Verbindungen aufbauen."
+      "distractor": "Ein Service der alle TCP-Verbindungen in einem VPC loggt und automatisch Alarm schlägt wenn unbekannte IPs Verbindungen aufbauen.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "aws-dms-database-migration-service"
+      }
     },
     {
       "id": 71,
@@ -1134,7 +1418,11 @@
         "DataSync (für Online-Transfer)"
       ],
       "note": "Merke: Snowcone = 8 TB, kleinstes Gerät. Snowball Edge Storage Optimized = 80 TB nutzbarer Speicher. Snowball Edge Compute Optimized = 42 TB + mehr CPU für ML vor Ort. Snowmobile = LKW-Container, sinnvoll ab >10 PB. Faustregel: >100 TB bei 1 Gbps → Snowball günstiger als Internet.",
-      "distractor": "Ein Messaging-Dienst der Emails, SMS und Push-Nachrichten versendet und automatisch Empfänger basierend auf Standort auswählt."
+      "distractor": "Ein Messaging-Dienst der Emails, SMS und Push-Nachrichten versendet und automatisch Empfänger basierend auf Standort auswählt.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "aws-snow-family"
+      }
     },
     {
       "id": 72,
@@ -1149,7 +1437,11 @@
         "Server Migration Service (VMs)"
       ],
       "note": "Merke: Migration Hub = zentrale Übersicht aller Migrations-Projekte. Application Discovery Service = automatisch Server im lokalen Netz erkennen und inventarisieren.",
-      "distractor": "Eine vollständig verwaltete Message-Queue die Nachrichten in exakt der Reihenfolge verarbeitet in der sie ankommen und niemals verliert."
+      "distractor": "Eine vollständig verwaltete Message-Queue die Nachrichten in exakt der Reihenfolge verarbeitet in der sie ankommen und niemals verliert.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "aws-migration-hub"
+      }
     },
     {
       "id": 73,
@@ -1165,7 +1457,10 @@
         "Greengrass (Edge)"
       ],
       "note": "Merke: MQTT = leichtgewichtiges Publish/Subscribe-Protokoll für IoT (Port 8883 TLS). Rules Engine = SQL-ähnliche Regeln leiten Daten weiter (→ Lambda, Kinesis, S3, DynamoDB). Device Shadow = JSON-Dokument das den gewünschten und tatsächlichen Gerätestatus speichert – Gerät offline? Shadow merkt sich was geändert werden soll. IoT Analytics = Zeitreihenanalyse für IoT-Daten. IoT Events = erkennt Muster in IoT-Daten und löst Aktionen aus.",
-      "distractor": "Ein Event-Bus der Events von AWS-Diensten in Echtzeit an externe SaaS-Systeme weiterleitet und Schema-Validierung durchführt."
+      "distractor": "Ein Event-Bus der Events von AWS-Diensten in Echtzeit an externe SaaS-Systeme weiterleitet und Schema-Validierung durchführt.",
+      "skriptRef": {
+        "chapter": 13
+      }
     },
     {
       "id": 74,
@@ -1180,7 +1475,11 @@
         "SageMaker (Modelle am Edge)"
       ],
       "note": "Merke: Greengrass = Lambda/ML auf Edge-Geräten, auch offline. IoT Core = Cloud-Verbindung. FreeRTOS = Betriebssystem für sehr kleine Mikrocontroller.",
-      "distractor": "Eine REST-API-Plattform die automatisch Swagger-Dokumentation aus deinem Code generiert und Rate-Limiting auf IP-Basis durchführt."
+      "distractor": "Eine REST-API-Plattform die automatisch Swagger-Dokumentation aus deinem Code generiert und Rate-Limiting auf IP-Basis durchführt.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "hybrid-edge-local-zones-wavelength-outposts"
+      }
     },
     {
       "id": 75,
@@ -1194,7 +1493,11 @@
         "Greengrass (Edge-Computing für größere Geräte)"
       ],
       "note": "Merke: FreeRTOS = für Mikrocontroller (sehr kleine Geräte). Greengrass = für größere Edge-Geräte (Raspberry Pi usw.). IoT Core = für alle Cloud-Verbindungen.",
-      "distractor": "Ein GraphQL-API-Gateway das ausschließlich mit DynamoDB als Datenquelle arbeitet und automatisch Resolver-Funktionen generiert."
+      "distractor": "Ein GraphQL-API-Gateway das ausschließlich mit DynamoDB als Datenquelle arbeitet und automatisch Resolver-Funktionen generiert.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "hybrid-edge-local-zones-wavelength-outposts"
+      }
     },
     {
       "id": 77,
@@ -1209,7 +1512,11 @@
         "Route Table (Wegweiser)"
       ],
       "note": "Merke: NAT Gateway = ausgehender Internetzugang für private Subnetze. Kein NAT Gateway = private Instanzen kommen nicht ins Internet. Eine pro AZ für Hochverfügbarkeit!",
-      "distractor": "Ein verwaltetes Workflow-System das Lambda-Funktionen in einer bestimmten Reihenfolge ausführt und Ergebnisse automatisch weiterleitet."
+      "distractor": "Ein verwaltetes Workflow-System das Lambda-Funktionen in einer bestimmten Reihenfolge ausführt und Ergebnisse automatisch weiterleitet.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "nat-gateway"
+      }
     },
     {
       "id": 78,
@@ -1224,7 +1531,11 @@
         "KMS / SSM / ECR (Interface Endpoint via PrivateLink)"
       ],
       "note": "Merke: Gateway Endpoint = nur S3 und DynamoDB, kostenlos. Interface Endpoint = alle anderen Dienste via PrivateLink, kostenpflichtig. Beides hält Traffic im AWS-Netz.",
-      "distractor": "Ein Migrations-Service der VMs von VMware-Umgebungen automatisch zu ECS-Containern konvertiert ohne Code-Änderungen zu benötigen."
+      "distractor": "Ein Migrations-Service der VMs von VMware-Umgebungen automatisch zu ECS-Containern konvertiert ohne Code-Änderungen zu benötigen.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "vpc-endpoints"
+      }
     },
     {
       "id": 79,
@@ -1240,7 +1551,11 @@
         "Security Hub (Auswertung)"
       ],
       "note": "Merke: Flow Logs = Netzwerk-Kamera. Sehen was reingeht und rausgeht. Enthält: Quell-IP, Ziel-IP, Port, Protokoll, ACCEPT/REJECT. Gut bei: Sicherheitsproblemen, Debugging.",
-      "distractor": "Ein physisches Gerät das direkt in deinem Rechenzentrum steht, Daten komprimiert und per VPN-Tunnel zu AWS sendet."
+      "distractor": "Ein physisches Gerät das direkt in deinem Rechenzentrum steht, Daten komprimiert und per VPN-Tunnel zu AWS sendet.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "vpc-flow-logs"
+      }
     },
     {
       "id": 80,
@@ -1255,7 +1570,11 @@
         "Site-to-Site VPN (Verschlüsselung darüber)"
       ],
       "note": "Merke: Direct Connect = privat, schnell, stabil, aber NICHT verschlüsselt! Verschlüsselung = IPSec-VPN über Direct Connect. Failover = Site-to-Site VPN als Backup.",
-      "distractor": "Ein Service der Daten von On-Premises-Datenbanken über Direct Connect zu RDS überträgt und dabei automatisch das Schema konvertiert."
+      "distractor": "Ein Service der Daten von On-Premises-Datenbanken über Direct Connect zu RDS überträgt und dabei automatisch das Schema konvertiert.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-direct-connect"
+      }
     },
     {
       "id": 81,
@@ -1270,7 +1589,11 @@
         "Transit Gateway (viele Standorte)"
       ],
       "note": "Merke: Site-to-Site VPN = verschlüsselter Tunnel über Internet. Direct Connect = dedizierte Leitung, keine Verschlüsselung by default. Beide zusammen = Redundanz.",
-      "distractor": "Ein Dienst der AWS-Accounts automatisch auf Einhaltung von ISO-27001 und SOC-2 prüft und Compliance-Berichte generiert."
+      "distractor": "Ein Dienst der AWS-Accounts automatisch auf Einhaltung von ISO-27001 und SOC-2 prüft und Compliance-Berichte generiert.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-site-to-site-vpn"
+      }
     },
     {
       "id": 82,
@@ -1285,7 +1608,11 @@
         "Security Hub (Befunde)"
       ],
       "note": "Merke: Network Firewall = tiefe Paketprüfung im VPC. WAF = schützt HTTP-Anwendungen. Security Group = Instanz-Ebene. Network Firewall = Netzwerk-Ebene, IDS/IPS.",
-      "distractor": "Ein Tool das alle EC2-Instanzen auf bekannte CVEs (Sicherheitslücken) prüft und automatisch Patches einspielt."
+      "distractor": "Ein Tool das alle EC2-Instanzen auf bekannte CVEs (Sicherheitslücken) prüft und automatisch Patches einspielt.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-network-firewall"
+      }
     },
     {
       "id": 83,
@@ -1300,7 +1627,11 @@
         "Managed Microsoft AD"
       ],
       "note": "Merke: IAM Identity Center = zentrales SSO. Nutzer verwalten einmal, Zugriff in alle Konten. Permission Sets = vordefinierte Berechtigungspakete. Ersetzt eigene Föderationsarbeit.",
-      "distractor": "Ein Security-Information-Event-Management-System (SIEM) das alle CloudTrail-Logs analysiert und Security-Incidents automatisch eskaliert."
+      "distractor": "Ein Security-Information-Event-Management-System (SIEM) das alle CloudTrail-Logs analysiert und Security-Incidents automatisch eskaliert.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-iam-identity-center"
+      }
     },
     {
       "id": 84,
@@ -1315,7 +1646,11 @@
         "Oracle TDE (Datenbank-Verschlüsselung)"
       ],
       "note": "Merke: CloudHSM = höchste Sicherheitsstufe, nur du hast Schlüsselkontrolle. KMS = AWS verwaltet Schlüssel mit. CloudHSM = du verwaltest alles selbst. FIPS 140-2 Level 3.",
-      "distractor": "Ein Dienst der PII (personenbezogene Daten) in DynamoDB-Tabellen erkennt und automatisch maskiert bevor sie gespeichert werden."
+      "distractor": "Ein Dienst der PII (personenbezogene Daten) in DynamoDB-Tabellen erkennt und automatisch maskiert bevor sie gespeichert werden.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-cloudhsm"
+      }
     },
     {
       "id": 85,
@@ -1330,7 +1665,11 @@
         "EventBridge (automatische Meldung)"
       ],
       "note": "Merke: Macie = findet PII und sensible Daten in S3. GuardDuty = findet Bedrohungen im Netzwerk. Inspector = findet Schwachstellen auf Servern. Drei verschiedene Schutzebenen!",
-      "distractor": "Ein verwaltetes IAM-System das automatisch zu mächtige Berechtigungen erkennt und auf Minimum-Privilege reduziert."
+      "distractor": "Ein verwaltetes IAM-System das automatisch zu mächtige Berechtigungen erkennt und auf Minimum-Privilege reduziert.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "amazon-macie"
+      }
     },
     {
       "id": 86,
@@ -1346,7 +1685,11 @@
         "Security Hub (Ergebnisse)"
       ],
       "note": "Merke: Inspector = Schwachstellenscanner, CVEs finden. Macie = sensible Daten finden. GuardDuty = Bedrohungen finden. Inspector prüft: Was ist verwundbar? GuardDuty: Was wird angegriffen?",
-      "distractor": "Ein Dienst der Anmeldungen von Benutzern mit bekannten kompromittierten Passwörtern blockiert und Multi-Faktor-Authentifizierung erzwingt."
+      "distractor": "Ein Dienst der Anmeldungen von Benutzern mit bekannten kompromittierten Passwörtern blockiert und Multi-Faktor-Authentifizierung erzwingt.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "amazon-inspector"
+      }
     },
     {
       "id": 87,
@@ -1363,7 +1706,11 @@
         "EventBridge (Reaktionen)"
       ],
       "note": "Merke: Security Hub = Sicherheits-Aggregator. Sammelt Befunde, prüft CIS-Benchmarks und AWS-Best-Practices. Nicht selbst schützend, sondern Übersicht über alle Schutzmaßnahmen.",
-      "distractor": "Ein Service der EC2-Instanzen automatisch auf Basis von CloudWatch-Metriken in andere Regionen verschiebt um Kosten zu sparen."
+      "distractor": "Ein Service der EC2-Instanzen automatisch auf Basis von CloudWatch-Metriken in andere Regionen verschiebt um Kosten zu sparen.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-security-hub"
+      }
     },
     {
       "id": 88,
@@ -1378,7 +1725,11 @@
         "VPC Flow Logs (Netzwerkdaten)"
       ],
       "note": "Merke: GuardDuty = erkennt Bedrohungen. Detective = erklärt WIE es passiert ist. Macie = findet Datenlecks. Inspector = findet Schwachstellen. Detective = forensische Analyse.",
-      "distractor": "Ein Service der Reserved Instances automatisch kauft und verkauft basierend auf aktuellen Spot-Preisen und Workload-Vorhersagen."
+      "distractor": "Ein Service der Reserved Instances automatisch kauft und verkauft basierend auf aktuellen Spot-Preisen und Workload-Vorhersagen.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "amazon-detective"
+      }
     },
     {
       "id": 89,
@@ -1393,7 +1744,11 @@
         "StackSets (mehrere Konten)"
       ],
       "note": "Merke: CloudFormation = AWS-eigenes IaC-Tool. Template → Stack. StackSets = in mehreren Konten / Regionen gleichzeitig. Rollback automatisch bei Fehler. CDK = CloudFormation mit Programmiersprache.",
-      "distractor": "Ein Dashboard das alle AWS-Dienste in allen Regionen überwacht und automatisch Kapazitätsprobleme löst bevor sie auftreten."
+      "distractor": "Ein Dashboard das alle AWS-Dienste in allen Regionen überwacht und automatisch Kapazitätsprobleme löst bevor sie auftreten.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-cloudformation"
+      }
     },
     {
       "id": 90,
@@ -1409,7 +1764,11 @@
         "CloudWatch (Metriken daneben)"
       ],
       "note": "Merke: X-Ray = Service-Map zeigt alle Verbindungen. Segments und Subsegments = Teile einer Anfrage. Gut für: Wo ist meine App langsam? Warum gibt es Fehler?",
-      "distractor": "Ein Service der DynamoDB-Tabellen automatisch auf mehrere Regionen verteilt und Write-Konflikte durch Versionierung auflöst."
+      "distractor": "Ein Service der DynamoDB-Tabellen automatisch auf mehrere Regionen verteilt und Write-Konflikte durch Versionierung auflöst.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-x-ray"
+      }
     },
     {
       "id": 91,
@@ -1424,7 +1783,11 @@
         "Compute Optimizer (Rightsizing)"
       ],
       "note": "Merke: Cost Explorer = Kostenanalyse rückwirkend + Prognose. Budgets = proaktiv warnen bevor Limit überschritten. Trusted Advisor = gibt Spar-Empfehlungen. Alle drei zusammen = Kostenkontrolle.",
-      "distractor": "Ein Dienst der On-Premises-Server automatisch inventarisiert und ihre Abhängigkeiten kartiert um die Migration nach AWS zu planen."
+      "distractor": "Ein Dienst der On-Premises-Server automatisch inventarisiert und ihre Abhängigkeiten kartiert um die Migration nach AWS zu planen.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-cost-explorer"
+      }
     },
     {
       "id": 92,
@@ -1439,7 +1802,11 @@
         "Organizations (kontoübergreifend)"
       ],
       "note": "Merke: Budgets = Alarm wenn Kosten zu hoch. Cost Explorer = Analyse was bereits ausgegeben wurde. Budgets kann auch Aktionen auslösen (z.B. IAM-Richtlinie einschränken).",
-      "distractor": "Ein Service der Datenbanken von SQL Server automatisch zu PostgreSQL konvertiert ohne Schema Conversion Tool zu benötigen."
+      "distractor": "Ein Service der Datenbanken von SQL Server automatisch zu PostgreSQL konvertiert ohne Schema Conversion Tool zu benötigen.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-budgets"
+      }
     },
     {
       "id": 93,
@@ -1454,7 +1821,11 @@
         "EC2 / Lambda / EBS"
       ],
       "note": "Merke: Compute Optimizer = KI-Empfehlung für Rightsizing. Braucht mindestens 14 Tage CloudWatch-Daten. Trusted Advisor gibt ähnliche Tipps, aber weniger detailliert.",
-      "distractor": "Ein Migrations-Service der EC2-AMIs automatisch aus VMware-VMs erstellt und in die Zielregion hochlädt."
+      "distractor": "Ein Migrations-Service der EC2-AMIs automatisch aus VMware-VMs erstellt und in die Zielregion hochlädt.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-compute-optimizer"
+      }
     },
     {
       "id": 94,
@@ -1469,7 +1840,11 @@
         "Subnets (VPC teilen)"
       ],
       "note": "Merke: RAM = Ressource teilen ohne zu kopieren. Häufigste Nutzung: Transit Gateway oder geteilte VPC-Subnetze. Kein RAM = jedes Konto baut alles selbst. RAM = zentrale Verwaltung.",
-      "distractor": "Ein IoT-Service der MQTT-Verbindungen von bis zu 1000 Geräten verwaltet und Daten direkt in DynamoDB schreibt."
+      "distractor": "Ein IoT-Service der MQTT-Verbindungen von bis zu 1000 Geräten verwaltet und Daten direkt in DynamoDB schreibt.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-resource-access-manager-ram"
+      }
     },
     {
       "id": 95,
@@ -1484,7 +1859,11 @@
         "Security Hub (Sicherheit)"
       ],
       "note": "Merke: Six Pillars = OSRPCS (Operational Excellence, Security, Reliability, Performance, Cost, Sustainability). Well-Architected Tool = Selbstbewertung mit Fragebogen. Trusted Advisor = automatische technische Checks. AWS Resilience Hub = bewertet Ausfallsicherheit anhand von RTO/RPO-Zielen und gibt konkrete Verbesserungsvorschläge.",
-      "distractor": "Ein Service der IoT-Gerätezertifikate verwaltet und automatisch erneuert wenn sie ablaufen ohne Gerät-Neustart."
+      "distractor": "Ein Service der IoT-Gerätezertifikate verwaltet und automatisch erneuert wenn sie ablaufen ohne Gerät-Neustart.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-well-architected-tool"
+      }
     },
     {
       "id": 96,
@@ -1500,7 +1879,11 @@
         "CodeCommit (Quellcode)"
       ],
       "note": "Merke: CodeBuild = automatisches Kompilieren und Testen. buildspec.yml definiert die Build-Schritte (Phasen: install, pre_build, build, post_build). CodePipeline verbindet CodeCommit → CodeBuild → CodeDeploy. AWS Cloud9 = cloudbasierte IDE im Browser (läuft auf EC2), ideal für schnelles Entwickeln ohne lokale Installation.",
-      "distractor": "Ein Streaming-Dienst der Videoinhalte von IoT-Kameras analysiert und automatisch Highlights aus langen Aufnahmen extrahiert."
+      "distractor": "Ein Streaming-Dienst der Videoinhalte von IoT-Kameras analysiert und automatisch Highlights aus langen Aufnahmen extrahiert.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-codebuild"
+      }
     },
     {
       "id": 97,
@@ -1515,7 +1898,11 @@
         "S3 / GitHub (Quellcode)"
       ],
       "note": "Merke: AppSpec-Datei = definiert Deployment-Hooks (BeforeInstall, AfterInstall, ApplicationStart). In-Place = bestehende Instanzen werden aktualisiert (alle Deployment-Strategien: All-at-once, Rolling, Canary). Blue/Green = neue Instanzen parallel starten, dann ALB-Flip – alte Instanzen bleiben als Fallback. Rollback automatisch bei CloudWatch-Alarm.",
-      "distractor": "Ein Service der Modelle trainiert um Energieverbrauch von Rechenzentren zu optimieren und automatisch EC2-Instanzen skaliert."
+      "distractor": "Ein Service der Modelle trainiert um Energieverbrauch von Rechenzentren zu optimieren und automatisch EC2-Instanzen skaliert.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-codedeploy"
+      }
     },
     {
       "id": 98,
@@ -1531,7 +1918,11 @@
         "Athena (Abfragen)"
       ],
       "note": "Merke: DataZone = Daten-Marketplace innerhalb des Unternehmens. Wer darf welche Daten sehen? Lake Formation = technische Zugriffskontrolle. DataZone = geschäftliche Daten-Governance.",
-      "distractor": "Ein vollständig verwaltetes Machine-Learning-System für Entwickler ohne Data-Science-Kenntnisse das Modelle aus Textbeschreibungen erstellt."
+      "distractor": "Ein vollständig verwaltetes Machine-Learning-System für Entwickler ohne Data-Science-Kenntnisse das Modelle aus Textbeschreibungen erstellt.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "aws-datazone"
+      }
     },
     {
       "id": 99,
@@ -1546,7 +1937,11 @@
         "Comprehend (NLP danach)"
       ],
       "note": "Merke: Textract = OCR + Formularerkennung. Rekognition = Bilder und Videos. Textract = gedruckte/gescannte Texte und Formulare. Gut für: Rechnungen, Ausweise, medizinische Formulare.",
-      "distractor": "Ein Service der fertige NLP-Modelle für Stimmungsanalyse bereitstellt und automatisch mit deinen eigenen Textdaten fine-tuned."
+      "distractor": "Ein Service der fertige NLP-Modelle für Stimmungsanalyse bereitstellt und automatisch mit deinen eigenen Textdaten fine-tuned.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-textract"
+      }
     },
     {
       "id": 100,
@@ -1561,7 +1956,11 @@
         "Transcribe (Audio → Text → Comprehend)"
       ],
       "note": "Merke: Comprehend = Textverständnis. Transcribe = Sprache → Text. Translate = Text übersetzen. Kombination: Audio (Transcribe) → Text (Comprehend analysieren) → Übersetzen (Translate).",
-      "distractor": "Ein Service der automatisch Anomalien in S3-Bucket-Zugriffsmustern erkennt und Alarm schlägt wenn ungewöhnliche Downloads auftreten."
+      "distractor": "Ein Service der automatisch Anomalien in S3-Bucket-Zugriffsmustern erkennt und Alarm schlägt wenn ungewöhnliche Downloads auftreten.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-comprehend"
+      }
     },
     {
       "id": 101,
@@ -1576,7 +1975,11 @@
         "Q Business (Alternative für generative KI)"
       ],
       "note": "Merke: Kendra = intelligente Dokumentensuche. Q Business = generative KI für Unternehmensdaten (leistungsfähiger). Kendra = semantische Suche. Beide können auf gleichen Quellen arbeiten.",
-      "distractor": "Ein Dienst der Gesichtserkennung in Live-Videostreams durchführt und automatisch bekannte Personen aus einer Datenbank identifiziert."
+      "distractor": "Ein Dienst der Gesichtserkennung in Live-Videostreams durchführt und automatisch bekannte Personen aus einer Datenbank identifiziert.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-kendra"
+      }
     },
     {
       "id": 102,
@@ -1591,7 +1994,11 @@
         "S3 (Medien)"
       ],
       "note": "Merke: AppSync = GraphQL statt REST. Vorteil: Kein Over-Fetching / Under-Fetching. Client bestimmt exakt welche Felder er braucht. Subscriptions = Live-Updates ohne Polling.",
-      "distractor": "Ein Service der medizinische Bilder (Röntgen, MRT) analysiert und automatisch Diagnosen basierend auf Trainingsdaten erstellt."
+      "distractor": "Ein Service der medizinische Bilder (Röntgen, MRT) analysiert und automatisch Diagnosen basierend auf Trainingsdaten erstellt.",
+      "skriptRef": {
+        "chapter": 13,
+        "anchor": "aws-appsync"
+      }
     },
     {
       "id": 103,
@@ -1605,7 +2012,11 @@
         "VPC (Isolation)"
       ],
       "note": "Merke: MQ = für Migration von RabbitMQ/ActiveMQ zu AWS. SQS = AWS-nativ, besser skalierbar, günstiger. MQ = Protokoll-Kompatibilität. SQS = bessere AWS-Integration.",
-      "distractor": "Ein verwalteter Text-to-Speech-Service der beliebige Texte in Echtzeit vorliest und automatisch Hintergrundgeräusche unterdrückt."
+      "distractor": "Ein verwalteter Text-to-Speech-Service der beliebige Texte in Echtzeit vorliest und automatisch Hintergrundgeräusche unterdrückt.",
+      "skriptRef": {
+        "chapter": 9,
+        "anchor": "amazon-mq"
+      }
     },
     {
       "id": 104,
@@ -1620,7 +2031,11 @@
         "SNS (Bounce-Meldungen)"
       ],
       "note": "Merke: SES = E-Mail-Versand in Massen. SNS = kurze Benachrichtigungen (SMS, Push, E-Mail). SES = für vollständige E-Mail-Inhalte mit HTML. Sandbox = erst freischalten bevor echte Mails.",
-      "distractor": "Ein Service der Audio-Aufnahmen automatisch transkribiert und dabei Dialekte, Fachbegriffe und mehrere Sprecher unterscheidet."
+      "distractor": "Ein Service der Audio-Aufnahmen automatisch transkribiert und dabei Dialekte, Fachbegriffe und mehrere Sprecher unterscheidet.",
+      "skriptRef": {
+        "chapter": 13,
+        "anchor": "amazon-ses-simple-email-service"
+      }
     },
     {
       "id": 105,
@@ -1635,7 +2050,11 @@
         "CloudWatch (Monitoring)"
       ],
       "note": "Merke: MGN = moderner Lift-and-Shift-Dienst, ersetzt Server Migration Service. Schritte: Agent installieren → replizieren → testen → Cutover. DMS = für Datenbanken. MGN = für Server.",
-      "distractor": "Ein Dienst der Angebote in beliebige Sprachen übersetzt und dabei automatisch kulturelle Besonderheiten und Redewendungen anpasst."
+      "distractor": "Ein Dienst der Angebote in beliebige Sprachen übersetzt und dabei automatisch kulturelle Besonderheiten und Redewendungen anpasst.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "aws-application-migration-service-mgn"
+      }
     },
     {
       "id": 106,
@@ -1650,7 +2069,10 @@
         "IAM / Cognito (Authentifizierung)"
       ],
       "note": "Merke: Transfer Family = SFTP/FTP-Protokoll → speichert direkt in S3 oder EFS. DataSync = schnelle Datenübertragung mit Agent. Transfer Family = für bestehende SFTP-Workflows.",
-      "distractor": "Ein Service der KI-Modelle auf Basis von ChatGPT-Technologie bereitstellt und Anfragen auf GPU-Clustern mit niedriger Latenz verarbeitet."
+      "distractor": "Ein Service der KI-Modelle auf Basis von ChatGPT-Technologie bereitstellt und Anfragen auf GPU-Clustern mit niedriger Latenz verarbeitet.",
+      "skriptRef": {
+        "chapter": 11
+      }
     },
     {
       "id": 107,
@@ -1665,7 +2087,11 @@
         "Grafana (Visualisierung)"
       ],
       "note": "Merke: SiteWise = für Industrie 4.0 / SCADA. Liest Maschinendaten mit OPC-UA/Modbus. IoT Core = für allgemeine IoT-Geräte. SiteWise = speziell für Fabrikmaschinen und Anlagen.",
-      "distractor": "Ein verwalteter Service für Datenbankmigrationen der automatisch den gesamten Anwendungscode an die neue Datenbankstruktur anpasst."
+      "distractor": "Ein verwalteter Service für Datenbankmigrationen der automatisch den gesamten Anwendungscode an die neue Datenbankstruktur anpasst.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "hybrid-edge-local-zones-wavelength-outposts"
+      }
     },
     {
       "id": 108,
@@ -1680,7 +2106,11 @@
         "VPC (Isolation)"
       ],
       "note": "Merke: WorkSpaces = vollständiger Cloud-Desktop (persistent). AppStream 2.0 = einzelne Anwendung streamen. WorkSpaces = für Homeoffice, Callcenter, sichere Umgebungen.",
-      "distractor": "Ein Service der Echtzeit-Empfehlungen für Anwender generiert basierend auf ihrem Klickverhalten der letzten 30 Tage."
+      "distractor": "Ein Service der Echtzeit-Empfehlungen für Anwender generiert basierend auf ihrem Klickverhalten der letzten 30 Tage.",
+      "skriptRef": {
+        "chapter": 13,
+        "anchor": "amazon-workspaces"
+      }
     },
     {
       "id": 109,
@@ -1696,7 +2126,11 @@
         "IAM Identity Center"
       ],
       "note": "Merke: Managed Microsoft AD = echtes AD in AWS. AD Connector = leitet AD-Anfragen an On-Premises-AD weiter (kein eigenes Verzeichnis). Simple AD = kleine, einfache Umgebungen.",
-      "distractor": "Eine Game-Server-Plattform die automatisch Spielsitzungen auf EC2-Instanzen verwaltet und Spieler mit niedrigster Latenz verbindet."
+      "distractor": "Eine Game-Server-Plattform die automatisch Spielsitzungen auf EC2-Instanzen verwaltet und Spieler mit niedrigster Latenz verbindet.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-managed-microsoft-ad"
+      }
     },
     {
       "id": 110,
@@ -1711,7 +2145,11 @@
         "Kinesis (Anruf-Daten-Streaming)"
       ],
       "note": "Merke: Connect = AWS-Callcenter. Lex gibt Spracherkennung. Lambda verarbeitet Anruf-Logik. Kein Auftrag an Drittanbieter nötig. Pay-per-Minute, keine Mindestabnahme.",
-      "distractor": "Ein Dienst der Analytics-Events von Web- und Mobil-Apps sammelt und automatisch User-Journeys visualisiert."
+      "distractor": "Ein Dienst der Analytics-Events von Web- und Mobil-Apps sammelt und automatisch User-Journeys visualisiert.",
+      "skriptRef": {
+        "chapter": 13,
+        "anchor": "amazon-connect"
+      }
     },
     {
       "id": 111,
@@ -1726,7 +2164,11 @@
         "S3 (Datenbasis)"
       ],
       "note": "Merke: Lake Formation = Zugriffssteuerung auf Tabellen- und Spaltenebene im Data Lake. Glue = ETL und Datenkatalog (technisch). Lake Formation = Governance und Berechtigungen (organisatorisch).",
-      "distractor": "Ein Service der AR-Erlebnisse direkt im Browser ermöglicht ohne App-Installation mit Echtzeit-3D-Rendering auf AWS-Servern."
+      "distractor": "Ein Service der AR-Erlebnisse direkt im Browser ermöglicht ohne App-Installation mit Echtzeit-3D-Rendering auf AWS-Servern.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "aws-lake-formation"
+      }
     },
     {
       "id": 112,
@@ -1741,7 +2183,11 @@
         "Secrets Manager (Credentials)"
       ],
       "note": "Merke: RDS Proxy = Pflichtlektüre wenn Lambda + RDS. Lambda öffnet viele kurzlebige Verbindungen. RDS Proxy puffert das. Einsatz: Lambda → RDS Proxy → Aurora.",
-      "distractor": "Ein verwalteter Service für das Trainieren von Reinforcement-Learning-Modellen mit simulierten 3D-Umgebungen."
+      "distractor": "Ein verwalteter Service für das Trainieren von Reinforcement-Learning-Modellen mit simulierten 3D-Umgebungen.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-rds-proxy"
+      }
     },
     {
       "id": 113,
@@ -1755,7 +2201,11 @@
         "EC2 / Lambda (Clients)"
       ],
       "note": "Merke: DAX = nur für DynamoDB (nicht für RDS!). Read-Through Cache = DAX antwortet statt DynamoDB bei Leseanfragen. Write-Through = Schreiboperationen gehen durch DAX zu DynamoDB (Cache aktuell). Mikrosekunden-Latenz für Lesezugriffe. ElastiCache = für RDS/Aurora/allgemeine Caches. DAX = API-kompatibel, kein Code-Umbau nötig.",
-      "distractor": "Ein Service der Codequalität automatisch bewertet, Sicherheitslücken erkennt und Pull Requests automatisch ablehnt wenn Tests scheitern."
+      "distractor": "Ein Service der Codequalität automatisch bewertet, Sicherheitslücken erkennt und Pull Requests automatisch ablehnt wenn Tests scheitern.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-dax-dynamodb-accelerator"
+      }
     },
     {
       "id": 114,
@@ -1770,7 +2220,11 @@
         "Security Hub (Sicherheitsbeweise)"
       ],
       "note": "Merke: Audit Manager = automatisierte Beweissammlung für Audits. Artifact = fertige AWS-Compliance-Zertifikate herunterladen. Audit Manager = eigene Compliance nachweisen.",
-      "distractor": "Ein Service der Docker-Container in ECR automatisch nach Malware scannt und unsichere Images blockiert bevor sie deployed werden."
+      "distractor": "Ein Service der Docker-Container in ECR automatisch nach Malware scannt und unsichere Images blockiert bevor sie deployed werden.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-audit-manager"
+      }
     },
     {
       "id": 115,
@@ -1785,7 +2239,11 @@
         "ACM (Zertifikate)"
       ],
       "note": "Merke: Client VPN = für einzelne Nutzer (Laptop → AWS). Site-to-Site VPN = Standort zu Standort (Firmennetz → AWS). Direct Connect = dedizierte Leitung (teuer, stabil). Client VPN = einfachste Homeoffice-Lösung.",
-      "distractor": "Ein Service der serverlose REST-APIs automatisch aus OpenAPI-Spezifikationen generiert ohne Code schreiben zu müssen."
+      "distractor": "Ein Service der serverlose REST-APIs automatisch aus OpenAPI-Spezifikationen generiert ohne Code schreiben zu müssen.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-client-vpn"
+      }
     },
     {
       "id": 116,
@@ -1801,7 +2259,11 @@
         "Network Firewall"
       ],
       "note": "Merke: Firewall Manager = zentrale Verwaltung von Sicherheitsregeln über alle Konten. WAF = schützt einzelne Anwendungen. Shield Advanced = DDoS-Schutz. Firewall Manager bringt alle drei zusammen und durchsetzt Regeln organisationsweit.",
-      "distractor": "Ein IoT-Service der Gerätezwillinge verwaltet und Echtzeit-Streaming direkt an S3 sendet ohne Zwischen-Buffer."
+      "distractor": "Ein IoT-Service der Gerätezwillinge verwaltet und Echtzeit-Streaming direkt an S3 sendet ohne Zwischen-Buffer.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-firewall-manager"
+      }
     },
     {
       "id": 117,
@@ -1817,7 +2279,11 @@
         "Glue Schema Registry"
       ],
       "note": "Merke: MSK = Kafka, AWS verwaltet. Kinesis = AWS-eigene Streaming-Lösung, einfacher. MSK = wenn Kafka-Protokoll Pflicht ist (z.B. Migration oder Standardisierung auf Kafka). MSK Serverless = automatische Skalierung ohne Brokeranzahl festlegen.",
-      "distractor": "Ein Service der MQTT-Nachrichten auf Basis von SQL-ähnlichen Regeln filtert und direkt an SQS-Queues weiterleitet."
+      "distractor": "Ein Service der MQTT-Nachrichten auf Basis von SQL-ähnlichen Regeln filtert und direkt an SQS-Queues weiterleitet.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "amazon-msk-managed-streaming-for-apache-kafka"
+      }
     },
     {
       "id": 118,
@@ -1832,7 +2298,11 @@
         "Lambda (Echtzeit-Übersetzung in Apps)"
       ],
       "note": "Merke: Translate = Textübersetzung. Transcribe = Sprache → Text. Polly = Text → Sprache. Kette: Transcribe (Audio→Text) + Translate (übersetzen) + Polly (vorlesen) = vollständiger Sprachübersetzer.",
-      "distractor": "Ein Service der IoT-Geräte-Firmware automatisch auf neue Versionen aktualisiert und Rollbacks durchführt wenn Updates scheitern."
+      "distractor": "Ein Service der IoT-Geräte-Firmware automatisch auf neue Versionen aktualisiert und Rollbacks durchführt wenn Updates scheitern.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-translate"
+      }
     },
     {
       "id": 119,
@@ -1847,7 +2317,11 @@
         "EventBridge (Reaktion bei Betrug)"
       ],
       "note": "Merke: Fraud Detector = fertige ML-Betrugserkennung für Online-Transaktionen, Kontoregistrierungen. Kein eigenes Modell nötig. Rekognition = Bilderkennung. Fraud Detector = Muster in Transaktionsdaten.",
-      "distractor": "Ein Edge-Computing-Service der Lambda-Funktionen auf IoT-Geräten ausführt ohne Internet-Verbindung zu AWS benötigen."
+      "distractor": "Ein Edge-Computing-Service der Lambda-Funktionen auf IoT-Geräten ausführt ohne Internet-Verbindung zu AWS benötigen.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-fraud-detector"
+      }
     },
     {
       "id": 120,
@@ -1862,7 +2336,11 @@
         "CloudWatch (Überwachung)"
       ],
       "note": "Merke: DRS = Disaster Recovery, Ziel: schneller Wiederanlauf bei Ausfall. RTO = wie lange dauert Wiederherstellung. RPO = wie viel Datenverlust ist akzeptabel. MGN = Migration (einmaliger Umzug). DRS = dauerhafter Notfallschutz.",
-      "distractor": "Ein Service der Machine-Learning-Modelle direkt auf Robotern trainiert und diese dann über Fleet-Management verteilt."
+      "distractor": "Ein Service der Machine-Learning-Modelle direkt auf Robotern trainiert und diese dann über Fleet-Management verteilt.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "aws-elastic-disaster-recovery-drs"
+      }
     },
     {
       "id": 121,
@@ -1877,7 +2355,11 @@
         "IAM (Zugangskontrolle)"
       ],
       "note": "Merke: CodeArtifact = privater Paket-Manager für Teams. Verhindert, dass Entwickler unsichere externe Pakete nutzen. Unterstützt: npm (JavaScript), Maven/Gradle (Java), pip (Python), NuGet (.NET). Upstream Repos = öffentliche Pakete werden durchgeleitet.",
-      "distractor": "Ein vollständig verwaltetes Zeitreihen-Datenbanksystem das automatisch zwischen schnellem SSD-Speicher und günstigem Tape-Archiv wechselt."
+      "distractor": "Ein vollständig verwaltetes Zeitreihen-Datenbanksystem das automatisch zwischen schnellem SSD-Speicher und günstigem Tape-Archiv wechselt.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-codecommit"
+      }
     },
     {
       "id": 122,
@@ -1891,7 +2373,11 @@
         "Audit Manager (eigene Compliance nachweisen)"
       ],
       "note": "Merke: Artifact = AWS stellt dir fertige Compliance-Zertifikate zur Verfügung. Audit Manager = du sammelst Beweise für deine eigene Compliance. Artifact = \"Was hat AWS zertifiziert?\". Audit Manager = \"Was können wir als Kunden nachweisen?\".",
-      "distractor": "Ein Data-Lake-Service der Daten aus verschiedenen Quellen automatisch normalisiert und in einem einheitlichen Format speichert."
+      "distractor": "Ein Data-Lake-Service der Daten aus verschiedenen Quellen automatisch normalisiert und in einem einheitlichen Format speichert.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-audit-manager"
+      }
     },
     {
       "id": 123,
@@ -1907,7 +2393,11 @@
         "Auto Scaling"
       ],
       "note": "Merke: Application Load Balancer = Layer 7, HTTP, Pfad-Routing, WAF. Network Load Balancer = Layer 4, TCP/UDP, statische IP, schnell. Gateway Load Balancer = Inline Security Appliance, GENEVE Port 6081. WAF NUR an ALB oder CloudFront!",
-      "distractor": "Ein ETL-Service der Streaming-Daten aus Kinesis verarbeitet und in Parquet-Format in S3 speichert mit automatischer Schema-Erkennung."
+      "distractor": "Ein ETL-Service der Streaming-Daten aus Kinesis verarbeitet und in Parquet-Format in S3 speichert mit automatischer Schema-Erkennung.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "elastic-load-balancing-elb"
+      }
     },
     {
       "id": 124,
@@ -1923,7 +2413,11 @@
         "Health Check → SNS"
       ],
       "note": "Merke: Alias = kostenlos, Apex möglich, nur AWS-Ressourcen. CNAME = Standard-DNS, kein Apex. Failover Routing braucht Health Check. Geolocation = Land. Geoproximity = Entfernung + Bias. CIDR-basiertes Routing = nach IP-Adressbereich des Nutzers möglich.",
-      "distractor": "Ein verwalteter Apache-Spark-Service der automatisch skaliert und Daten direkt aus S3 verarbeitet ohne Cluster-Konfiguration."
+      "distractor": "Ein verwalteter Apache-Spark-Service der automatisch skaliert und Daten direkt aus S3 verarbeitet ohne Cluster-Konfiguration.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "amazon-route-53"
+      }
     },
     {
       "id": 125,
@@ -1939,7 +2433,11 @@
         "Transit Gateway"
       ],
       "note": "Merke: IGW = Internettor für VPC (IPv4+IPv6). Egress-Only IGW = nur ausgehend IPv6 (kein IPv4!). VGW = AWS-Ende des VPN/DX. CGW = Kunden-Ende des VPN. DX Gateway = Direct Connect zu mehreren Regionen. NAT Gateway = privates Subnetz → Internet (IPv4, ausgehend).",
-      "distractor": "Ein Service der Daten von mehreren AWS-Konten in einer zentralen S3-Location zusammenfasst und automatisch verschlüsselt."
+      "distractor": "Ein Service der Daten von mehreren AWS-Konten in einer zentralen S3-Location zusammenfasst und automatisch verschlüsselt.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-netzwerk-gateways-uebersicht"
+      }
     },
     {
       "id": 126,
@@ -1954,7 +2452,11 @@
         "IoT Greengrass (läuft lokal auf Snowball)"
       ],
       "note": "Merke: Snowcone = 8 TB, kleinstes Gerät. Snowball Edge Storage Optimized = 80 TB Speicher. Snowball Edge Compute Optimized = 42 TB + viel CPU für Edge-Computing. Snowmobile = LKW für Exabytes, ab >10 PB. Alle importieren in S3.",
-      "distractor": "Ein Business-Intelligence-Service der Daten automatisch aus allen AWS-Diensten sammelt und interaktive Dashboards erstellt."
+      "distractor": "Ein Business-Intelligence-Service der Daten automatisch aus allen AWS-Diensten sammelt und interaktive Dashboards erstellt.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "snow-family-im-detail"
+      }
     },
     {
       "id": 127,
@@ -1970,7 +2472,11 @@
         "CloudFront (CDN dahinter)"
       ],
       "note": "Merke: Amplify = Heroku-ähnliche Erfahrung auf AWS. Git-Push → automatisches Build + Deploy. Amplify Hosting = CloudFront + S3 dahinter. Amplify Studio = visueller Low-Code-Builder. Amplify Libraries = Frontend-SDK für Cognito, S3, GraphQL.",
-      "distractor": "Ein Service der Machine-Learning-Modelle in SageMaker automatisch nach neuen Trainingsdaten sucht und neu trainiert."
+      "distractor": "Ein Service der Machine-Learning-Modelle in SageMaker automatisch nach neuen Trainingsdaten sucht und neu trainiert.",
+      "skriptRef": {
+        "chapter": 13,
+        "anchor": "aws-amplify"
+      }
     },
     {
       "id": 128,
@@ -1984,7 +2490,11 @@
         "Cost Explorer (Kosten vergleichen)"
       ],
       "note": "Merke: Standard > Standard-IA > One Zone-IA > Intelligent-Tiering > Glacier Instant > Glacier Flexible > Glacier Deep Archive. Lifecycle-Regeln wechseln automatisch. Minimum Storage Duration: Standard-IA = 30 Tage, Glacier = 90 Tage, Deep Archive = 180 Tage. Glacier Deep Archive = 12–48h Abruf.",
-      "distractor": "Ein Service der SQL-Abfragen über mehrere Datenbanken und S3 hinweg verteilt und Ergebnisse automatisch zusammenführt."
+      "distractor": "Ein Service der SQL-Abfragen über mehrere Datenbanken und S3 hinweg verteilt und Ergebnisse automatisch zusammenführt.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "s3-speicherklassen"
+      }
     },
     {
       "id": 129,
@@ -1999,7 +2509,11 @@
         "Transfer Acceleration → CloudFront Edge"
       ],
       "note": "Merke: Versioning = Schutz vor versehentlichem Löschen. MFA Delete = extra Schutz. Object Lock/WORM = rechtliche Unveränderlichkeit. CRR = cross-region, SRR = same-region (Versioning muss aktiviert sein). Transfer Acceleration = schnellere Uploads via Edge-Standorte. Pre-Signed URL = temporärer Zugriff ohne IAM.",
-      "distractor": "Ein Service der ETL-Jobs automatisch aus einer Quelldatenbank-Beschreibung generiert ohne Code schreiben zu müssen."
+      "distractor": "Ein Service der ETL-Jobs automatisch aus einer Quelldatenbank-Beschreibung generiert ohne Code schreiben zu müssen.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "s3-features-datenschutz"
+      }
     },
     {
       "id": 130,
@@ -2014,7 +2528,11 @@
         "S3 Bucket Policy"
       ],
       "note": "Merke: SSE-S3 = AWS hält alles, einfachste Option. SSE-KMS = du kontrollierst Key-Policy + Audit-Trail. SSE-C = du bringst eigenen Schlüssel mit jedem Request. DSSE = doppelte KMS-Verschlüsselung. Client-Side = du verschlüsselst selbst vor Upload. Bucket Policy mit SecureTransport = HTTPS erzwingen.",
-      "distractor": "Ein verwaltetes Data-Warehouse für PB-Daten das automatisch zwischen Row-Store und Columnar-Store wechselt je nach Abfragetyp."
+      "distractor": "Ein verwaltetes Data-Warehouse für PB-Daten das automatisch zwischen Row-Store und Columnar-Store wechselt je nach Abfragetyp.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "datenverschluesselung-sse-arten"
+      }
     },
     {
       "id": 131,
@@ -2029,7 +2547,11 @@
         "Snapshots → S3"
       ],
       "note": "Merke: gp3 = Standard (3.000 IOPS Basis, 125 MB/s, bis 16.000 IOPS / 1.000 MB/s konfigurierbar, günstiger als gp2). gp2 = 3 IOPS/GB, Burst bis 3.000 IOPS. io2 = bis 64.000 IOPS (Nitro-Instanzen). io2 Block Express = bis 256.000 IOPS, 4.000 MB/s. st1 = sequenziell, max 500 MB/s Durchsatz. sc1 = kalt, max 250 MB/s. Größen: 1 GB – 16 TB. Multi-Attach = io1/io2 an mehrere Instanzen gleichzeitig (Linux, Cluster-Anwendungen). Elastic Volumes = Typ/Größe/IOPS online ändern ohne Neustart. EBS Snapshots = inkrementell in S3.",
-      "distractor": "Ein vollständig verwaltetes Apache-Kafka-System das automatisch skaliert und Events dauerhaft für unbegrenzte Zeit aufbewahrt."
+      "distractor": "Ein vollständig verwaltetes Apache-Kafka-System das automatisch skaliert und Events dauerhaft für unbegrenzte Zeit aufbewahrt.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "ebs-volume-typen"
+      }
     },
     {
       "id": 132,
@@ -2045,7 +2567,11 @@
         "Shield (DDoS)"
       ],
       "note": "Merke: OAC = neu, besser als OAI. Lambda@Edge = Node.js/Python, bis 5s, 4 Event-Typen. CloudFront Functions = JS, 1ms, nur Viewer-Events. Signed URL = 1 Objekt. Signed Cookie = viele Objekte. SNI = mehrere Domains auf einer IP. Invalidation = Cache leeren nach Deployment.",
-      "distractor": "Ein vollständig verwalteter Pub/Sub-Messaging-Service der Millionen Events pro Sekunde verteilt mit garantierter Zustellreihenfolge."
+      "distractor": "Ein vollständig verwalteter Pub/Sub-Messaging-Service der Millionen Events pro Sekunde verteilt mit garantierter Zustellreihenfolge.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "cloudfront-oac-oai-lambda-edge-functions-sni"
+      }
     },
     {
       "id": 133,
@@ -2062,7 +2588,11 @@
         "DRS"
       ],
       "note": "Merke: Backup & Restore = billig, langsam (Stunden). Pilot Light = nur Kern läuft (z.B. RDS repliziert). Warm Standby = skaliertes Kernsystem läuft. Multi-Site Active/Active = alles doppelt, sofortiger Failover. Je schneller = desto teurer. RPO = Datenverlust. RTO = Ausfallzeit.",
-      "distractor": "Ein Service der serverlose Workflows mit bis zu 1000 parallelen Schritten ausführt und Zwischenzustände in DynamoDB speichert."
+      "distractor": "Ein Service der serverlose Workflows mit bis zu 1000 parallelen Schritten ausführt und Zwischenzustände in DynamoDB speichert.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "disaster-recovery-strategien"
+      }
     },
     {
       "id": 134,
@@ -2077,7 +2607,11 @@
         "Savings Plans → Lambda, Fargate"
       ],
       "note": "Merke: On-Demand = teuer, flexibel. Reserved = günstig, 1/3 Jahre. Spot = sehr günstig, unterbrechbar. Dedicated Host = exklusiver physischer Server, Lizenz-Compliance. Savings Plans = flexibler als RI, gilt auch für Fargate und Lambda. Convertible RI = Typ wechselbar.",
-      "distractor": "Ein Service der REST-APIs erstellt und automatisch API-Dokumentation in Confluence schreibt wenn Code deployed wird."
+      "distractor": "Ein Service der REST-APIs erstellt und automatisch API-Dokumentation in Confluence schreibt wenn Code deployed wird.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "ec2-kaufoptionen-savings-plans"
+      }
     },
     {
       "id": 135,
@@ -2092,7 +2626,11 @@
         "Hadoop / Kafka (Partition)"
       ],
       "note": "Merke: Cluster Placement Group = nah beieinander, hohe Bandbreite, Single-Point-of-Failure. Spread Placement Group = maximal verteilt, max. 7 Instanzen/AZ. Partition Placement Group = Gruppen mit eigenen Racks für Big-Data. Cluster für Performance. Spread für HA. Partition für verteilte Systeme.",
-      "distractor": "Ein Service der GraphQL-Schemas automatisch aus SQL-Tabellendefinitionen generiert ohne Code schreiben zu müssen."
+      "distractor": "Ein Service der GraphQL-Schemas automatisch aus SQL-Tabellendefinitionen generiert ohne Code schreiben zu müssen.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "placement-groups"
+      }
     },
     {
       "id": 136,
@@ -2108,7 +2646,11 @@
         "Fargate (serverlos)"
       ],
       "note": "Merke: ECR = Image-Registry. Task Definition = was soll Container tun (Image, CPU, RAM). ECS Service = wie viele Tasks laufen (Desired Count). Fargate = kein Node-Management für ECS und EKS. IRSA = IAM Roles for Service Accounts für Kubernetes-Pods. ECR Image Scanning = automatische Schwachstellenprüfung.",
-      "distractor": "Ein Service der Microservices automatisch per Service-Mesh verbindet und Latenz zwischen Diensten auf Millisekunden reduziert."
+      "distractor": "Ein Service der Microservices automatisch per Service-Mesh verbindet und Latenz zwischen Diensten auf Millisekunden reduziert.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "container-ecs-ecr-im-detail"
+      }
     },
     {
       "id": 137,
@@ -2124,7 +2666,11 @@
         "Flink (Data Analytics)"
       ],
       "note": "Merke: Data Streams = Echtzeit, eigener Code, Shards. Firehose = Near-Real-Time (min. 60s), kein Code, direkt in S3/Redshift. Data Analytics = SQL/Flink auf Streams. Video Streams = Videoströme für ML. KDS = Kontrolle und Flexibilität. Firehose = Einfachheit ohne Code.",
-      "distractor": "Ein Service der Cloud-Infrastruktur automatisch auf Basis von geschäftlichen Anforderungen in natürlicher Sprache erstellt."
+      "distractor": "Ein Service der Cloud-Infrastruktur automatisch auf Basis von geschäftlichen Anforderungen in natürlicher Sprache erstellt.",
+      "skriptRef": {
+        "chapter": 7,
+        "anchor": "kinesis-dienste-im-detail"
+      }
     },
     {
       "id": 138,
@@ -2140,7 +2686,11 @@
         "DynamoDB/RDS/EFS/FSx"
       ],
       "note": "Merke: Lifecycle Rules = automatisch in günstigere Klassen wechseln oder nach X Tagen löschen. Vault Lock = Backups einfrieren, auch Root kann nicht löschen (WORM). AWS Backup = ein Plan für alle Dienste. Cross-Account Backup = bester Schutz gegen Ransomware.",
-      "distractor": "Ein Dienst der AWS-Accounts automatisch auf Sicherheitslücken scannt und Empfehlungen zur Härtung gibt."
+      "distractor": "Ein Dienst der AWS-Accounts automatisch auf Sicherheitslücken scannt und Empfehlungen zur Härtung gibt.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "s3-lifecycle-backup-vault-lock"
+      }
     },
     {
       "id": 139,
@@ -2155,7 +2705,11 @@
         "Direct Connect (Outposts)"
       ],
       "note": "Merke: Local Zone = AWS in einer Stadt, VPC-Erweiterung für niedrige Latenz. Wavelength = AWS im 5G-Netz des Telekommunikationsanbieters, <10ms. Outposts = AWS-Rack bei dir im Keller für On-Prem-Anforderungen. Alle drei reduzieren Latenz zum Endnutzer oder zur eigenen Infrastruktur.",
-      "distractor": "Ein Service der EC2-Spot-Instanzen automatisch kauft und verkauft um immer den günstigsten Preis zu erzielen."
+      "distractor": "Ein Service der EC2-Spot-Instanzen automatisch kauft und verkauft um immer den günstigsten Preis zu erzielen.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "hybrid-edge-local-zones-wavelength-outposts"
+      }
     },
     {
       "id": 140,
@@ -2170,7 +2724,11 @@
         "EventBridge (Alternative)"
       ],
       "note": "Merke: Visibility Timeout = Nachricht unsichtbar nach Abholen (Standard 30s). DLQ = Fehler-Sammelpunkt. FIFO = Reihenfolge + Exactly-Once. SNS FIFO Topic = nur mit SQS FIFO. Fan-out = SNS → viele SQS. Long Polling = SQS effizienter abfragen.",
-      "distractor": "Ein Service der Compliance-Anforderungen nach SOC-2 und ISO-27001 automatisch prüft und Zertifikate ausstellt."
+      "distractor": "Ein Service der Compliance-Anforderungen nach SOC-2 und ISO-27001 automatisch prüft und Zertifikate ausstellt.",
+      "skriptRef": {
+        "chapter": 9,
+        "anchor": "sqs-sns-details"
+      }
     },
     {
       "id": 141,
@@ -2186,7 +2744,11 @@
         "X-Ray (Tracing ergänzend)"
       ],
       "note": "Merke: Log Group = Sammlung von Log Streams (z.B. /aws/lambda/meineFunktion). Log Stream = Logs einer Instanz/Ressource. Logs Insights = SQL-ähnliche Abfragen auf Log-Gruppen. Metric Filter = Muster in Logs → Metrik erstellen. Anomaly Detection = ML-basiertes Erkennen ungewöhnlicher Metrik-Werte. Contributor Insights = Wer erzeugt den meisten Traffic? CloudWatch Synthetics = Canary-Scripts testen Endpunkte regelmäßig.",
-      "distractor": "Ein Service der Migrationsprojekte vollständig automatisiert und On-Premises-Server ohne Ausfallzeit zu ECS-Containern konvertiert."
+      "distractor": "Ein Service der Migrationsprojekte vollständig automatisiert und On-Premises-Server ohne Ausfallzeit zu ECS-Containern konvertiert.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "cloudwatch-details"
+      }
     },
     {
       "id": 142,
@@ -2202,7 +2764,11 @@
         "CloudWatch (Alarme)"
       ],
       "note": "Merke: CloudTrail = wer hat was wann von wo gemacht (API-Protokoll). Trail = dauerhaft in S3. Insights = erkennt ungewöhnliche Muster. CloudTrail Lake = SQL direkt auf Events, kein Athena nötig. Organization Trail = ein Trail für alle Konten. Config = WIE ist es konfiguriert.",
-      "distractor": "Ein Service der AWS-Costs automatisch optimiert indem er ungenutzte Reserved Instances auf dem Marketplace verkauft."
+      "distractor": "Ein Service der AWS-Costs automatisch optimiert indem er ungenutzte Reserved Instances auf dem Marketplace verkauft.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "cloudtrail-details"
+      }
     },
     {
       "id": 143,
@@ -2218,7 +2784,11 @@
         "Trusted Advisor"
       ],
       "note": "Merke: Savings Plans = flexibler als RI, gilt für Lambda + Fargate. Convertible RI = Typ wechselbar, weniger Rabatt. Spot Fleet = zuverlässige Spot-Workloads. Cost Allocation Tags = Kosten nach Team aufschlüsseln. Cost Anomaly Detection = automatischer Alarm bei unerwarteten Kosten.",
-      "distractor": "Ein vollständig verwalteter Event-Broker der Events in Echtzeit an bis zu 10.000 externe SaaS-Systeme gleichzeitig verteilt."
+      "distractor": "Ein vollständig verwalteter Event-Broker der Events in Echtzeit an bis zu 10.000 externe SaaS-Systeme gleichzeitig verteilt.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "cost-optimierung-details"
+      }
     },
     {
       "id": 144,
@@ -2234,7 +2804,11 @@
         "Organizations (SCP)"
       ],
       "note": "Merke: Access Analyzer = findet offene Türen zu AWS-Ressourcen. Permission Boundary = maximale Grenze. STS AssumeRole = temporäre Rolle übernehmen. SAML = Unternehmens-Login → AWS. OIDC = Web/Kubernetes. Deny gewinnt IMMER. SCP wirkt auf OU-Ebene, Permission Boundary auf Rollen-Ebene.",
-      "distractor": "Ein visueller Workflow-Editor der Microservices grafisch verbindet und automatisch Step-Functions-Definitionen generiert."
+      "distractor": "Ein visueller Workflow-Editor der Microservices grafisch verbindet und automatisch Step-Functions-Definitionen generiert.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "iam-access-analyzer-erweiterte-iam-konzepte"
+      }
     },
     {
       "id": 145,
@@ -2250,7 +2824,11 @@
         "CloudTrail Organizational Trail"
       ],
       "note": "Merke: OU = Ordner für Konten, SCP wirkt auf gesamte OU. SCP = kein Grant, nur Einschränkung. Management Account Root = NICHT durch SCP einschränkbar. Account Factory = Konten nach Vorlage. Consolidated Billing = gemeinsame Rechnung, Volume Discounts.",
-      "distractor": "Ein Service der IoT-Geräte-Daten lokal auf Hardware verarbeitet und nur aggregierte Ergebnisse an AWS sendet."
+      "distractor": "Ein Service der IoT-Geräte-Daten lokal auf Hardware verarbeitet und nur aggregierte Ergebnisse an AWS sendet.",
+      "skriptRef": {
+        "chapter": 6,
+        "anchor": "aws-organizations-details-account-factory"
+      }
     },
     {
       "id": 146,
@@ -2266,7 +2844,10 @@
         "ECS/EKS/Fargate (CaaS)"
       ],
       "note": "Merke: IaaS = du verwaltest OS aufwärts. PaaS = du verwaltest nur Anwendung + Daten. SaaS = fertige Software nutzen. CaaS = Container-Plattform. DaaS = Cloud-Desktop. Shared Responsibility: AWS = physische Infrastruktur. Kunde = Betriebssystem, Daten, IAM, Netzwerkregeln, Verschlüsselung.",
-      "distractor": "Ein Service der DNS-Anfragen von IoT-Geräten in einem lokalen Netzwerk ohne Internet-Verbindung beantwortet."
+      "distractor": "Ein Service der DNS-Anfragen von IoT-Geräten in einem lokalen Netzwerk ohne Internet-Verbindung beantwortet.",
+      "skriptRef": {
+        "chapter": 1
+      }
     },
     {
       "id": 147,
@@ -2281,7 +2862,11 @@
         "Macie (sensible Daten finden)"
       ],
       "note": "Merke: Event Notifications → SNS/SQS/Lambda bei s3:ObjectCreated / s3:ObjectRemoved. Access Points = Zugangspunkte pro Team. CORS = Browser-Zugriff über Domain-Grenzen. Server Access Logging = Wer hat wann was geladen. Requester Pays = Downloader zahlt Traffic. Bucket Policy = JSON, Vorrang vor ACL. Block Public Access = immer an lassen!",
-      "distractor": "Ein Service der ML-Modelle direkt in IoT-Geräte-Firmware einbettet ohne Cloud-Verbindung für Inferenz zu benötigen."
+      "distractor": "Ein Service der ML-Modelle direkt in IoT-Geräte-Firmware einbettet ohne Cloud-Verbindung für Inferenz zu benötigen.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "s3-erweiterte-features"
+      }
     },
     {
       "id": 148,
@@ -2296,7 +2881,11 @@
         "AWS Backup (Sicherung)"
       ],
       "note": "Merke: EFS Standard = 3 AZs, sicher. EFS One Zone = 1 AZ, 47% günstiger, für Entwicklung. IA = günstiger speichern, Zugriffsgebühr. Bursting = automatisch mit Datengröße. Provisioned = garantierter Durchsatz. Elastic = automatisch skalierend. General Purpose = Latenz-optimiert. Max I/O = Durchsatz für Big Data.",
-      "distractor": "Ein Service der IoT-Gerätezertifikate verwaltet und bei Verlust automatisch neue ausgibt ohne Gerät-Neukonfiguration."
+      "distractor": "Ein Service der IoT-Gerätezertifikate verwaltet und bei Verlust automatisch neue ausgibt ohne Gerät-Neukonfiguration.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "efs-details-klassen-durchsatz-modi"
+      }
     },
     {
       "id": 149,
@@ -2312,7 +2901,11 @@
         "Route 53 (DNS)"
       ],
       "note": "Merke: ARN = eindeutige Ressourcen-ID für IAM Policies. 169.254.169.254 = EC2-Metadaten intern (IMDSv2 empfohlen). /16 = VPC, /24 = Subnetz. RFC 1918 = private IPs. 5 IPs pro Subnetz reserviert. Elastic IP kostet wenn ungenutzt (reserviert aber keine Instanz zugewiesen)! Port 22=SSH, 443=HTTPS, 3306=MySQL, 5432=PostgreSQL, 6379=Redis.",
-      "distractor": "Ein Service der Roboter-Simulationen in der Cloud ausführt und Trainingsdaten für Roboter-ML-Modelle generiert."
+      "distractor": "Ein Service der Roboter-Simulationen in der Cloud ausführt und Trainingsdaten für Roboter-ML-Modelle generiert.",
+      "skriptRef": {
+        "chapter": 5,
+        "anchor": "aws-netzwerk-grundlagen"
+      }
     },
     {
       "id": 150,
@@ -2328,7 +2921,11 @@
         "Kinesis (Echtzeit)"
       ],
       "note": "Merke: Personalize = individuelle Empfehlungen (wie Netflix/Amazon-Shop). Forecast = Zeitreihen-Prognosen (Absatz, Bedarf). Lookout = Anomalien in Metriken oder Maschinen. A2I = Mensch prüft wenn KI unsicher. Comprehend Medical = medizinisches NLP. Alle fertige Dienste – kein eigenes ML-Training nötig.",
-      "distractor": "Ein Service der Digital-Twin-Modelle von Fabriken erstellt und Maschinenausfälle vorhersagt bevor sie auftreten."
+      "distractor": "Ein Service der Digital-Twin-Modelle von Fabriken erstellt und Maschinenausfälle vorhersagt bevor sie auftreten.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-ml-dienste-komplett-die-spezialisierten-fertig-dienste"
+      }
     },
     {
       "id": 151,
@@ -2344,7 +2941,11 @@
         "OpenSearch (Log-Analyse)"
       ],
       "note": "Merke: S3 Server Access Logs = wer hat welches Objekt heruntergeladen. ALB Access Logs = HTTP-Anfragen. CloudFront Logs = CDN-Requests. VPC Flow Logs = Netzwerk-Traffic. CloudTrail = AWS-API-Aufrufe. RDS Enhanced Monitoring = DB-Server Innenleben. WAF Logs = geblockte Anfragen. Alle in S3 oder CloudWatch Logs.",
-      "distractor": "Ein Service der Millionen GPS-Tracking-Punkte speichert und automatisch Routen zwischen Punkten berechnet."
+      "distractor": "Ein Service der Millionen GPS-Tracking-Punkte speichert und automatisch Routen zwischen Punkten berechnet.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "access-logs-protokollierung"
+      }
     },
     {
       "id": 152,
@@ -2360,7 +2961,11 @@
         "Macie (sensible Daten)"
       ],
       "note": "Merke: CORS = Browser-Zugriff über Domain-Grenzen (für Web-Apps nötig). Bucket Policy = JSON. ACL = veraltet. Block Public Access = immer aktiviert lassen! Pre-Signed URL = temporärer Link, 7 Tage Ablaufzeit max (Standard 15 Minuten). Presigned URL 7 Tage = SDK/CLI generiert. OAC = CloudFront darf S3, alle anderen nicht.",
-      "distractor": "Eine Firewall-Policy für S3-Buckets die ausschließlich Traffic von bestimmten IP-Adressen zulässt und alles andere blockiert."
+      "distractor": "Eine Firewall-Policy für S3-Buckets die ausschließlich Traffic von bestimmten IP-Adressen zulässt und alles andere blockiert.",
+      "skriptRef": {
+        "chapter": 3,
+        "anchor": "cors-bucket-policy-s3-sicherheit"
+      }
     },
     {
       "id": 153,
@@ -2376,7 +2981,11 @@
         "Launch Template (Bauplan für neue Instanzen)"
       ],
       "note": "Merke: ASG = Min/Max/Desired. Scale-out = mehr Instanzen. Scale-in = weniger. Cooldown = Wartezeit nach Skalierung (Standard 300s). Target Tracking = einfachste Richtlinie (z.B. CPU bei 50%). Step Scaling = stufenweise. Scheduled = zeitbasiert. Launch Template ersetzt Launch Configuration (veraltet). Health Check: EC2 oder ELB. Instanz-Terminierung: älteste Launch Config zuerst.",
-      "distractor": "Ein manuelles Dashboard zum Starten und Stoppen einzelner Server nach Zeitplan – du legst für jede Stunde fest wie viele Instanzen laufen sollen."
+      "distractor": "Ein manuelles Dashboard zum Starten und Stoppen einzelner Server nach Zeitplan – du legst für jede Stunde fest wie viele Instanzen laufen sollen.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "auto-scaling-group-asg"
+      }
     },
     {
       "id": 154,
@@ -2391,7 +3000,11 @@
         "CloudWatch (Replikations-Latenz überwachen)"
       ],
       "note": "Merke: Global Tables = Active-Active (alle Regionen schreiben). Konfliktlösung = Last-Writer-Wins. Replikation < 1 Sekunde typisch. Unterschied zu Aurora Global DB: Aurora = Active-Passive (nur eine Write-Region). DynamoDB Global Tables = für NoSQL-Workloads. Voraussetzung: DynamoDB Streams muss aktiviert sein.",
-      "distractor": "Eine Active-Passive-Replikation bei der nur eine Region schreiben darf und alle anderen Regionen reine Lesekopien halten, mit manuellem Failover bei Ausfall."
+      "distractor": "Eine Active-Passive-Replikation bei der nur eine Region schreiben darf und alle anderen Regionen reine Lesekopien halten, mit manuellem Failover bei Ausfall.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "dynamodb-global-tables"
+      }
     },
     {
       "id": 155,
@@ -2407,7 +3020,11 @@
         "DynamoDB (Nutzerprofil speichern)"
       ],
       "note": "Merke: Personalize = Empfehlungssystem ohne eigenes ML. Use Cases: E-Commerce-Produktempfehlungen, Video-Streaming (nächstes Video), personalisierter Newsletter. Unterschied zu SageMaker: Personalize = fertige Empfehlungs-Lösung. SageMaker = selbst ein Modell bauen. Echtzeit- und Batch-Empfehlungen möglich.",
-      "distractor": "Ein vollständig verwalteter Dienst für Zeitreihen-Vorhersagen – trainiert auf historischen Daten und liefert Prognosen für künftige Absatzmengen und Lagerbestände."
+      "distractor": "Ein vollständig verwalteter Dienst für Zeitreihen-Vorhersagen – trainiert auf historischen Daten und liefert Prognosen für künftige Absatzmengen und Lagerbestände.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-personalize"
+      }
     },
     {
       "id": 156,
@@ -2422,7 +3039,11 @@
         "QuickSight (Prognosen visualisieren)"
       ],
       "note": "Merke: Forecast = Vorhersagen für die Zukunft (Demand Planning, Ressourcenplanung). Timestream = Zeitreihendaten speichern und abfragen (Vergangenheit). Forecast ist wie Timestream + ML. Use Cases: Lagerbestandsplanung, Energieverbrauch vorhersagen, Server-Kapazitätsplanung. AutoML wählt automatisch das beste Algorithmus-Modell.",
-      "distractor": "Eine Zeitreihen-Datenbank die historische Messwerte speichert und per SQL abfragt – mit automatischem Tiering zwischen schnellem und günstigem Speicher."
+      "distractor": "Eine Zeitreihen-Datenbank die historische Messwerte speichert und per SQL abfragt – mit automatischem Tiering zwischen schnellem und günstigem Speicher.",
+      "skriptRef": {
+        "chapter": 8,
+        "anchor": "amazon-forecast"
+      }
     },
     {
       "id": 157,
@@ -2438,7 +3059,11 @@
         "Config (Compliance der gestarteten Produkte prüfen)"
       ],
       "note": "Merke: Service Catalog = Self-Service für Endnutzer mit Governance. IT-Admin definiert Portfolios und Produkte. Endnutzer startet nur genehmigte CloudFormation-Stacks. Gut für Compliance: kein wildes Ressourcen-Erstellen. Unterschied zu CloudFormation: CF = Infrastruktur deployen. Service Catalog = wer darf welche CF-Templates nutzen.",
-      "distractor": "Ein automatisierter Berater der die gesamte Infrastruktur auf Best Practices in fünf Kategorien prüft: Kosten, Sicherheit, Performance, Zuverlässigkeit und Limits."
+      "distractor": "Ein automatisierter Berater der die gesamte Infrastruktur auf Best Practices in fünf Kategorien prüft: Kosten, Sicherheit, Performance, Zuverlässigkeit und Limits.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-service-catalog"
+      }
     },
     {
       "id": 158,
@@ -2454,7 +3079,11 @@
         "AWS Organizations (Lizenzen über mehrere Konten verwalten)"
       ],
       "note": "Merke: License Manager = BYOL-Compliance. Verhindert dass mehr Lizenzen als gekauft genutzt werden. Lizenzkonfigurationen definieren Limits (z.B. max. 10 Oracle-Lizenzen). Hard Limit = EC2-Start wird blockiert. Soft Limit = nur Warnung. Wichtig für Dedicated Hosts (physisch gebundene Lizenzen wie Windows Server per-core).",
-      "distractor": "Ein Kostenverwaltungs-Tool das Ausgaben nach Projekt und Team aufschlüsselt und automatisch Budgets pro Abteilung erstellt und überwacht."
+      "distractor": "Ein Kostenverwaltungs-Tool das Ausgaben nach Projekt und Team aufschlüsselt und automatisch Budgets pro Abteilung erstellt und überwacht.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-license-manager"
+      }
     },
     {
       "id": 159,
@@ -2470,7 +3099,11 @@
         "Organizations (aggregierte Health-Events über alle Konten)"
       ],
       "note": "Merke: Service Health = globaler Status aller AWS-Dienste (öffentlich). Personal Health = nur DEINE Ressourcen (privat, kontogebunden). Health API = nur mit Business/Enterprise Support. EventBridge-Integration = automatisch auf Health-Events reagieren (z.B. EC2-Instanz bei Hardware-Problem ersetzen). Organizations Health = aggregierte Sicht über alle Member Accounts.",
-      "distractor": "Ein Monitoring-Dashboard das Metriken wie CPU, RAM und Netzwerk von deinen Servern sammelt und bei Überschreitung eines Schwellenwerts automatisch Alarme auslöst."
+      "distractor": "Ein Monitoring-Dashboard das Metriken wie CPU, RAM und Netzwerk von deinen Servern sammelt und bei Überschreitung eines Schwellenwerts automatisch Alarme auslöst.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-health-dashboard"
+      }
     },
     {
       "id": 160,
@@ -2487,7 +3120,11 @@
         "Systems Manager (Verwaltung danach)"
       ],
       "note": "Merke: Launch Wizard = geführtes Deployment für Enterprise-Apps (SAP, SQL Server, AD). Kein eigenes Sizing-Wissen nötig – Wizard berechnet passende Instanztypen. Erstellt CloudFormation-Stacks unter der Haube. Kostenlos, du zahlst nur die Ressourcen. Unterschied zu Elastic Beanstalk: Beanstalk = eigene Web-Apps deployen. Launch Wizard = fertige Enterprise-Software (SAP, SQL Server) nach Best Practices aufsetzen.",
-      "distractor": "Ein vollständig verwalteter Build-Dienst der Quellcode kompiliert, automatisierte Tests ausführt und fertige Artefakte in einem Repository ablegt."
+      "distractor": "Ein vollständig verwalteter Build-Dienst der Quellcode kompiliert, automatisierte Tests ausführt und fertige Artefakte in einem Repository ablegt.",
+      "skriptRef": {
+        "chapter": 2,
+        "anchor": "aws-launch-wizard"
+      }
     },
     {
       "id": 161,
@@ -2503,7 +3140,11 @@
         "CloudWatch (Monitoring)"
       ],
       "note": "Merke: Device Farm = echte Geräte in der Cloud, nicht Simulatoren/Emulatoren. Automatisiert oder manuell. Für Mobile-Apps und Web-Apps. Unterstützt Android und iOS. Gut für CI/CD-Integration: CodePipeline → CodeBuild → Device Farm → Ergebnis. Bezahlung pro Geräteminute oder Unlimited-Flat für Vieltester.",
-      "distractor": "Ein verwalteter Container-Build-Service der Docker-Images aus Quellcode erzeugt, automatisch testet und in einem privaten Image-Repository speichert."
+      "distractor": "Ein verwalteter Container-Build-Service der Docker-Images aus Quellcode erzeugt, automatisch testet und in einem privaten Image-Repository speichert.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-device-farm"
+      }
     },
     {
       "id": 162,
@@ -2519,7 +3160,11 @@
         "IAM Identity Center (SSO)"
       ],
       "note": "Merke: AppStream 2.0 = einzelne Anwendung streamen (App-Streaming). WorkSpaces = vollständiger persistenter Cloud-Desktop (DaaS). AppStream = nicht-persistent, Browser-basiert, ideal für Schulungen und kurzfristigen Zugriff. WorkSpaces = persönlicher Desktop, immer verfügbar. Beide in der Kategorie End-User Computing.",
-      "distractor": "Vollständige Windows- oder Linux-Desktops als Cloud-Service – Mitarbeiter greifen über jeden Browser oder Client auf ihren persönlichen, dauerhaften Desktop zu."
+      "distractor": "Vollständige Windows- oder Linux-Desktops als Cloud-Service – Mitarbeiter greifen über jeden Browser oder Client auf ihren persönlichen, dauerhaften Desktop zu.",
+      "skriptRef": {
+        "chapter": 13,
+        "anchor": "amazon-appstream-2-0"
+      }
     },
     {
       "id": 163,
@@ -2535,7 +3180,11 @@
         "Athena (Daten analysieren)"
       ],
       "note": "Merke: Discovery Service = WAS haben wir (Inventar). Migration Hub = WIE weit sind wir (Fortschritt). MGN = Server umziehen (Aktion). DMS = Datenbanken umziehen. Reihenfolge: Discovery → Planen → Migrieren. Agentless = schnell, weniger Details. Agent-based = langsamer, mehr Details (Netzwerkverbindungen, Prozesse).",
-      "distractor": "Repliziert physische oder virtuelle Server kontinuierlich nach AWS und ermöglicht Testläufe vor dem finalen Cutover mit minimaler Ausfallzeit beim Umzug."
+      "distractor": "Repliziert physische oder virtuelle Server kontinuierlich nach AWS und ermöglicht Testläufe vor dem finalen Cutover mit minimaler Ausfallzeit beim Umzug.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "aws-application-discovery-service"
+      }
     },
     {
       "id": 164,
@@ -2551,7 +3200,11 @@
         "Redshift (als Ziel für Data Warehouse)"
       ],
       "note": "Merke: SCT = Schema konvertieren (Struktur). DMS = Daten migrieren (Inhalt). Heterogen (Oracle → Aurora) = SCT + DMS. Homogen (MySQL → MySQL) = nur DMS. SCT ist kostenlos und läuft lokal auf deinem Rechner. Assessment Report zeigt was automatisch konvertiert wird und was manuell nachgearbeitet werden muss.",
-      "distractor": "Ein serverloser ETL-Dienst der Rohdaten aus verschiedenen Quellen transformiert und in ein Data Warehouse lädt, mit automatischem Schema-Crawling."
+      "distractor": "Ein serverloser ETL-Dienst der Rohdaten aus verschiedenen Quellen transformiert und in ein Data Warehouse lädt, mit automatischem Schema-Crawling.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "aws-schema-conversion-tool-sct"
+      }
     },
     {
       "id": 165,
@@ -2567,7 +3220,11 @@
         "Well-Architected Tool (ergänzend)"
       ],
       "note": "Merke: Resilience Hub = prüft Ausfallsicherheit gegen RTO/RPO-Ziele. Well-Architected Tool = prüft Architektur gegen alle 6 Säulen. Resilience Hub = fokussiert auf Reliability-Säule mit konkreten Szenarien. FIS (Fault Injection Simulator) = führt echte Chaos-Tests durch (Instanzen killen, AZ deaktivieren). Resilience Hub = bewertet theoretisch, FIS = testet praktisch.",
-      "distractor": "Prüft eine Architektur anhand von sechs Säulen (Operational Excellence, Security, Reliability, Performance, Cost, Sustainability) und gibt zu jeder Säule Verbesserungsvorschläge."
+      "distractor": "Prüft eine Architektur anhand von sechs Säulen (Operational Excellence, Security, Reliability, Performance, Cost, Sustainability) und gibt zu jeder Säule Verbesserungsvorschläge.",
+      "skriptRef": {
+        "chapter": 11,
+        "anchor": "aws-resilience-hub"
+      }
     },
     {
       "id": 166,
@@ -2583,7 +3240,11 @@
         "CodeBuild / CodePipeline (CI/CD)"
       ],
       "note": "Merke: Cloud9 = IDE im Browser, EC2 dahinter. Kostenlos bis auf EC2. Auto-Hibernate = EC2 fährt runter wenn idle. Gut für: schnelles Entwickeln ohne lokale Installation, Workshops, Pair Programming. Q Developer / CodeWhisperer-Integration verfügbar. Für die SAA-Prüfung: Cloud9 wird als cloudbasierte IDE für schnelle Entwicklung ohne lokales Setup erwähnt.",
-      "distractor": "Ein verwaltetes Git-Repository vollständig in der Cloud – Code sicher speichern, Versionierung, Branches, Pull Requests. Integriert mit anderen Entwicklerwerkzeugen."
+      "distractor": "Ein verwaltetes Git-Repository vollständig in der Cloud – Code sicher speichern, Versionierung, Branches, Pull Requests. Integriert mit anderen Entwicklerwerkzeugen.",
+      "skriptRef": {
+        "chapter": 10,
+        "anchor": "aws-cloud9"
+      }
     },
     {
       "id": 167,
@@ -2599,7 +3260,11 @@
         "CloudWatch (Monitoring)"
       ],
       "note": "Merke: Keyspaces = Cassandra-kompatibel, serverlos, AWS-verwaltet. DynamoDB = AWS-eigene NoSQL, mehr AWS-Integration. \"Cassandra zu AWS migrieren\" = Keyspaces. \"Neue NoSQL-Anwendung bauen\" = DynamoDB. DocumentDB = MongoDB-kompatibel. Keyspaces = Cassandra-kompatibel. Neptune = Graph-Datenbank. Jede NoSQL hat ihr Gegenstück auf AWS.",
-      "distractor": "Eine verwaltete Datenbank für JSON-Dokumente die MongoDB vollständig ersetzen kann – bestehende Anwendungen können ohne Code-Änderung migriert werden."
+      "distractor": "Eine verwaltete Datenbank für JSON-Dokumente die MongoDB vollständig ersetzen kann – bestehende Anwendungen können ohne Code-Änderung migriert werden.",
+      "skriptRef": {
+        "chapter": 4,
+        "anchor": "amazon-keyspaces"
+      }
     },
     {
       "id": 168,
@@ -2615,7 +3280,11 @@
         "KMS (Verschlüsselung)"
       ],
       "note": "Merke: AppFlow = SaaS-zu-AWS-Integration ohne Code. Glue = ETL innerhalb von AWS (S3 → Redshift, Datenbanken). Lambda = eigener Code, flexibel aber Aufwand. AppFlow = für SaaS-Konnektoren (Salesforce, SAP, Slack). Kein Server, kein Code, Transformationen eingebaut. Prüfungshinweis: \"Daten aus Salesforce automatisch in S3 übertragen\" = AppFlow.",
-      "distractor": "Ein serverloser ETL-Dienst der Rohdaten aus S3 transformiert und in ein Data Warehouse oder eine Datenbank lädt, mit automatischem Schema-Crawling und Data Catalog."
+      "distractor": "Ein serverloser ETL-Dienst der Rohdaten aus S3 transformiert und in ein Data Warehouse oder eine Datenbank lädt, mit automatischem Schema-Crawling und Data Catalog.",
+      "skriptRef": {
+        "chapter": 9,
+        "anchor": "amazon-appflow"
+      }
     },
     {
       "id": 169,
@@ -2631,7 +3300,11 @@
         "CloudWatch (Monitoring)"
       ],
       "note": "Merke: Pinpoint = Marketing-Kommunikation, Kampagnen, Segmentierung, Multi-Channel. SES = reiner E-Mail-Versand (transaktional). SNS = Pub/Sub-Benachrichtigungen (System-zu-System). Pinpoint = Nutzer-Segmentierung + Kampagnen + Analyse. SES = massenhafter E-Mail-Versand ohne Segmentierung. Prüfungshinweis: \"gezielte Marketing-Kampagnen über mehrere Kanäle\" = Pinpoint.",
-      "distractor": "Ein Pub/Sub-Benachrichtigungsdienst der eine Nachricht an ein Thema schickt und alle Abonnenten (Queues, Funktionen, E-Mail, SMS) gleichzeitig benachrichtigt."
+      "distractor": "Ein Pub/Sub-Benachrichtigungsdienst der eine Nachricht an ein Thema schickt und alle Abonnenten (Queues, Funktionen, E-Mail, SMS) gleichzeitig benachrichtigt.",
+      "skriptRef": {
+        "chapter": 13,
+        "anchor": "amazon-pinpoint"
+      }
     },
     {
       "id": 170,
@@ -2648,7 +3321,11 @@
         "GuardDuty (Sicherheitsbefunde)"
       ],
       "note": "Merke: Chatbot = AWS-Alarme und Befunde in Slack/Teams. SNS = E-Mail/SMS. Chatbot = Slack/Teams-Integration. Interaktiv: AWS-Befehle direkt im Chat ausführen. IAM-Rollen steuern Berechtigungen. Kostenlos (du zahlst nur für die genutzten AWS-Dienste). Prüfungshinweis: \"Entwicklerteam soll CloudWatch-Alarme in Slack erhalten\" = Chatbot.",
-      "distractor": "Ein KI-gestützter Chatbot-Baukasten der Sprache und Text versteht, Absichten erkennt und automatisierte Konversationen mit Endkunden in Web- und Mobil-Apps führt."
+      "distractor": "Ein KI-gestützter Chatbot-Baukasten der Sprache und Text versteht, Absichten erkennt und automatisierte Konversationen mit Endkunden in Web- und Mobil-Apps führt.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "aws-chatbot"
+      }
     },
     {
       "id": 171,
@@ -2665,7 +3342,11 @@
         "IAM Identity Center (SSO)"
       ],
       "note": "Merke: Managed Grafana = offenes Dashboard, viele Datenquellen. CloudWatch Dashboard = nur CloudWatch-Metriken. Grafana + Prometheus = Standard-Monitoring-Stack für Container/Kubernetes. QuickSight = BI und Geschäftsdaten. Grafana = operatives Monitoring und Infrastruktur. Prüfungshinweis: \"einheitliches Dashboard über mehrere Monitoring-Quellen\" = Managed Grafana.",
-      "distractor": "Ein vollständig verwalteter BI-Dienst der interaktive Dashboards und Visualisierungen aus Datenquellen erstellt, mit ML-basierten Prognosen und Anomalie-Erkennung."
+      "distractor": "Ein vollständig verwalteter BI-Dienst der interaktive Dashboards und Visualisierungen aus Datenquellen erstellt, mit ML-basierten Prognosen und Anomalie-Erkennung.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "amazon-managed-grafana"
+      }
     },
     {
       "id": 172,
@@ -2681,7 +3362,11 @@
         "SNS (Alarme über Alertmanager)"
       ],
       "note": "Merke: Managed Prometheus = Metriken sammeln (Container-fokussiert). Managed Grafana = Metriken visualisieren. CloudWatch = AWS-natives Monitoring (breiter, aber weniger Container-fokussiert). Prometheus + Grafana = offener Standard für Kubernetes-Monitoring. Prüfungshinweis: \"Prometheus-kompatibles Monitoring für EKS ohne eigene Server\" = Managed Service for Prometheus.",
-      "distractor": "Ein verwalteter Grafana-Dienst der Dashboards aus verschiedenen Datenquellen erstellt – mit Open-Source-Ökosystem, Tausenden Plugins und SSO über Identity Center."
+      "distractor": "Ein verwalteter Grafana-Dienst der Dashboards aus verschiedenen Datenquellen erstellt – mit Open-Source-Ökosystem, Tausenden Plugins und SSO über Identity Center.",
+      "skriptRef": {
+        "chapter": 12,
+        "anchor": "amazon-managed-service-for-prometheus"
+      }
     }
   ]
 }

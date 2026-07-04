@@ -56,4 +56,14 @@ describe("SERVICES (172 enriched AWS service cards)", () => {
       expect(Array.isArray(s.partners)).toBe(true);
     }
   });
+
+  it("every card carries a skriptRef with a valid chapter number", () => {
+    // Anchor existence against the markdown files is covered by
+    // skript-anchors.test.ts; here we only guard the mapped shape.
+    for (const s of SERVICES) {
+      expect(s.skriptRef, s.title).toBeDefined();
+      expect(s.skriptRef.chapter).toBeGreaterThanOrEqual(1);
+      expect(s.skriptRef.chapter).toBeLessThanOrEqual(13);
+    }
+  });
 });
