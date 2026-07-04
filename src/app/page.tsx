@@ -135,8 +135,8 @@ export default async function Home() {
         />
       </section>
 
-      {/* Separated block: standalone services island — no progress tracking */}
-      <section className="mt-10 border-t border-zinc-200 pt-8">
+      {/* Separated block: standalone free-practice islands — no progress tracking */}
+      <section className="mt-10 flex flex-col gap-4 border-t border-zinc-200 pt-8">
         <Link
           href="/services"
           className="flex flex-col gap-4 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 p-5 transition hover:border-zinc-400 hover:bg-zinc-50 sm:flex-row sm:items-center sm:justify-between"
@@ -161,6 +161,33 @@ export default async function Home() {
           </div>
           <span className="shrink-0 rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-medium text-zinc-600">
             freies Üben
+          </span>
+        </Link>
+
+        <Link
+          href="/skript"
+          className="flex flex-col gap-4 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 p-5 transition hover:border-zinc-400 hover:bg-zinc-50 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-4">
+            <span
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[5px]"
+              style={{ backgroundColor: BRAND_ORANGE }}
+              aria-hidden
+            >
+              <BookOpen size={20} className="text-white" />
+            </span>
+            <div>
+              <h2 className="text-base font-semibold text-zinc-900">
+                AWS-Lernskript
+              </h2>
+              <p className="mt-1 text-[12.5px] text-zinc-500">
+                13 Kapitel, 172 Dienste als Lesestoff — mit Sprungzielen aus
+                den Service-Karten.
+              </p>
+            </div>
+          </div>
+          <span className="shrink-0 rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-medium text-zinc-600">
+            freies Lesen
           </span>
         </Link>
       </section>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
+  BookOpen,
   Lightbulb,
   MousePointerClick,
   RefreshCw,
@@ -11,6 +13,7 @@ import {
 } from "lucide-react";
 import { SERVICES, SERVICE_DOMAINS, type ServiceCard } from "@/lib/services-data";
 import { categoryStyle, tint } from "@/lib/category-style";
+import { skriptUrl } from "@/lib/skript";
 
 function shuffleInPlace<T>(arr: T[]): T[] {
   const out = arr.slice();
@@ -174,11 +177,22 @@ export function ServiceCardGrid() {
             const eselEmoji = c.eselsbruecke.split(" ")[0];
             const eselText = c.eselsbruecke.split(" ").slice(1).join(" ");
             return (
-              <button
+              // div[role=button] instead of <button>: the back carries a real
+              // <Link> (Skript deep link) and interactive elements must not
+              // nest. Enter/Space keep the keyboard flip working.
+              <div
                 key={c.num}
-                type="button"
+                role="button"
+                tabIndex={0}
+                aria-pressed={isFlipped}
                 onClick={() => toggleCard(c.num)}
-                className="flex h-[24rem] overflow-hidden rounded-[18px] border border-zinc-200 bg-white text-left shadow-[0_18px_40px_-12px_rgba(24,24,27,0.22),0_6px_14px_-6px_rgba(24,24,27,0.12)] transition hover:shadow-[0_24px_50px_-12px_rgba(24,24,27,0.28),0_8px_18px_-6px_rgba(24,24,27,0.16)]"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleCard(c.num);
+                  }
+                }}
+                className="flex h-[24rem] cursor-pointer overflow-hidden rounded-[18px] border border-zinc-200 bg-white text-left shadow-[0_18px_40px_-12px_rgba(24,24,27,0.22),0_6px_14px_-6px_rgba(24,24,27,0.12)] transition hover:shadow-[0_24px_50px_-12px_rgba(24,24,27,0.28),0_8px_18px_-6px_rgba(24,24,27,0.16)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500"
               >
                 {/* Left category stripe — clipped into the card rounding */}
                 <div
@@ -241,8 +255,23 @@ export function ServiceCardGrid() {
                         </div>
                       </div>
 
+                      {/* Deep link into the Lernskript chapter/section */}
+                      <Link
+                        href={skriptUrl(c.skriptRef)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-3 inline-flex shrink-0 items-center gap-1.5 self-start rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition hover:opacity-75"
+                        style={{
+                          backgroundColor: tint(color, "14"),
+                          color,
+                          borderColor: tint(color, "33"),
+                        }}
+                      >
+                        <BookOpen className="h-3.5 w-3.5" aria-hidden />
+                        Im Skript lesen
+                      </Link>
+
                       {/* Flip hint */}
-                      <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-zinc-400">
+                      <div className="mt-2 flex shrink-0 items-center justify-center gap-1 text-[11px] text-zinc-400">
                         <RefreshCw className="h-3.5 w-3.5" aria-hidden />
                         Klicken zum Umdrehen
                       </div>
@@ -271,7 +300,7 @@ export function ServiceCardGrid() {
                     </div>
                   )}
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
