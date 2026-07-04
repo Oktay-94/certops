@@ -10,19 +10,19 @@ import type { CSSProperties } from "react";
 export type ChapterColor = { accent: string; accentSoft: string; tint: string };
 
 export const CHAPTER_COLORS: Record<number, ChapterColor> = {
-  1: { accent: "#475569", accentSoft: "#eef1f5", tint: "#f8fafc" },
-  2: { accent: "#6d28d9", accentSoft: "#f1ecfb", tint: "#faf8fe" },
-  3: { accent: "#047857", accentSoft: "#e8f5f0", tint: "#f5fbf9" },
-  4: { accent: "#4338ca", accentSoft: "#ecedfb", tint: "#f7f8fe" },
-  5: { accent: "#0369a1", accentSoft: "#e6f2fa", tint: "#f4fafd" },
-  6: { accent: "#be123c", accentSoft: "#fceef1", tint: "#fdf6f8" },
-  7: { accent: "#0e7490", accentSoft: "#ecf7f8", tint: "#f6fbfb" },
-  8: { accent: "#a21caf", accentSoft: "#fbedfa", tint: "#fdf7fd" },
-  9: { accent: "#1d4ed8", accentSoft: "#e9eefc", tint: "#f5f8fe" },
-  10: { accent: "#4d7c0f", accentSoft: "#f0f6e6", tint: "#f9fbf4" },
-  11: { accent: "#7e22ce", accentSoft: "#f3e9fb", tint: "#faf6fe" },
-  12: { accent: "#57534e", accentSoft: "#f1efee", tint: "#faf9f8" },
-  13: { accent: "#be185d", accentSoft: "#fceef4", tint: "#fdf6fa" },
+  1: { accent: "#0891b2", accentSoft: "#cdeff5", tint: "#e0f4f8" },
+  2: { accent: "#7c3aed", accentSoft: "#e7d9fb", tint: "#f1e9fd" },
+  3: { accent: "#059669", accentSoft: "#c9eddf", tint: "#e0f4ec" },
+  4: { accent: "#4f46e5", accentSoft: "#dcd9fb", tint: "#ebe9fd" },
+  5: { accent: "#0284c7", accentSoft: "#c9e6f9", tint: "#e0f0fc" },
+  6: { accent: "#e11d48", accentSoft: "#f9d3dc", tint: "#fce8ee" },
+  7: { accent: "#0d9488", accentSoft: "#cbeee8", tint: "#dff4f0" },
+  8: { accent: "#c026d3", accentSoft: "#f3d2f8", tint: "#fae8fb" },
+  9: { accent: "#2563eb", accentSoft: "#d2e0fc", tint: "#e6effe" },
+  10: { accent: "#65a30d", accentSoft: "#deeebc", tint: "#eff7db" },
+  11: { accent: "#9333ea", accentSoft: "#ebd7fb", tint: "#f4ecfd" },
+  12: { accent: "#475569", accentSoft: "#dbe1e9", tint: "#edf1f5" },
+  13: { accent: "#db2777", accentSoft: "#fad2e4", tint: "#fce7f1" },
 };
 
 // Neutral tone for the Deckblatt (no single chapter) and any unknown num.

@@ -89,7 +89,7 @@ export default async function SkriptChapterPage({
         {sections.length > 0 && (
           <nav
             aria-label="Dienste in diesem Kapitel"
-            className="mt-8 flex flex-wrap gap-2"
+            className="mt-8 flex flex-wrap gap-2 rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5"
           >
             {sections.map((s) => {
               const emoji = emojiForHeadingText(s.raw);
