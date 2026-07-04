@@ -10,7 +10,7 @@
 // Run: pnpm tsx scripts/generate-skript-refs.ts
 import fs from "node:fs";
 import path from "node:path";
-import { SKRIPT_CHAPTERS, type SkriptRef } from "../src/lib/skript";
+import { SKRIPT_CHAPTERS, normalizeName, type SkriptRef } from "../src/lib/skript";
 import { parseHeadings, readChapterMarkdown } from "../src/lib/skript-content";
 
 const JSON_PATH = path.join(process.cwd(), "src", "lib", "aws-services-172.json");
@@ -50,19 +50,8 @@ const OVERRIDES: Record<number, SkriptRef> = {
   146: { chapter: 1 },
 };
 
-// Normalise for name matching only (slugs stay untouched): lowercase, strip
-// the Amazon/AWS prefix, drop parentheticals ("(Elastic Compute Cloud)",
-// "(Die „Schnellstraße")") and collapse whitespace.
-function normalizeName(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/\(.*?\)/g, " ")
-    .replace(/„|“|"/g, " ")
-    .replace(/^\s*(amazon|aws)\s+/, "")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
+// normalizeName lives in src/lib/skript.ts — single source, shared with the
+// h2 emoji resolver so service→anchor and heading→metaphor agree exactly.
 const source = JSON.parse(fs.readFileSync(JSON_PATH, "utf8")) as RawSource;
 
 // Index: normalised heading name → ref. First occurrence wins, so main cards

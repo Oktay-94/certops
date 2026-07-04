@@ -39,14 +39,12 @@ export type SkriptChapter = {
   file: string;
   /** One-line topic summary for the chapter grid (from the Deckblatt TOC). */
   topics: string;
-  color: string;
   Icon: LucideIcon;
 };
 
 // Chapter manifest — single source for routing (generateStaticParams), the
-// /skript grid and skriptUrl(). Colours reuse CATEGORY_STYLE tones where the
-// chapter maps 1:1 onto a card category; chapters without a category
-// counterpart (1, 13) get their own.
+// /skript grid and skriptUrl(). Per-chapter accent colours live separately in
+// skript-chapter-colors.ts (the reading area's only colour source).
 export const SKRIPT_CHAPTERS: SkriptChapter[] = [
   {
     num: 1,
@@ -54,7 +52,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Grundlagen & Cloud-Konzepte",
     file: "01-grundlagen-cloud-konzepte.md",
     topics: "Cloud-Modelle, Regionen/AZs, Shared Responsibility, Well-Architected",
-    color: "#64748b",
     Icon: Cloud,
   },
   {
@@ -63,7 +60,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Compute, Container & Edge",
     file: "02-compute-container-edge.md",
     topics: "EC2, Lambda, ECS/EKS/Fargate, Auto Scaling, Edge-Compute",
-    color: "#2563eb",
     Icon: Cpu,
   },
   {
@@ -72,7 +68,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Storage",
     file: "03-storage.md",
     topics: "S3 (+ Storage-Klassen), EBS, EFS, FSx, Storage Gateway",
-    color: "#0d9488",
     Icon: HardDrive,
   },
   {
@@ -81,7 +76,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Datenbanken",
     file: "04-datenbanken.md",
     topics: "RDS, Aurora, DynamoDB, ElastiCache, Redshift, Spezialdatenbanken",
-    color: "#4f46e5",
     Icon: Database,
   },
   {
@@ -90,7 +84,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Netzwerk & Content Delivery",
     file: "05-netzwerk-content-delivery.md",
     topics: "VPC, Route 53, CloudFront, Direct Connect, Global Accelerator",
-    color: "#0891b2",
     Icon: Network,
   },
   {
@@ -99,7 +92,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Sicherheit, Identität & Compliance",
     file: "06-sicherheit-identitaet-compliance.md",
     topics: "IAM, KMS, Cognito, GuardDuty, Shield, WAF, Inspector, Macie",
-    color: "#e11d48",
     Icon: ShieldCheck,
   },
   {
@@ -108,7 +100,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Analytik",
     file: "07-analytik.md",
     topics: "Athena, Glue, EMR, Kinesis, OpenSearch, QuickSight, MSK",
-    color: "#7c3aed",
     Icon: BarChart3,
   },
   {
@@ -117,7 +108,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Machine Learning & KI",
     file: "08-machine-learning-ki.md",
     topics: "Bedrock, SageMaker, Rekognition, Comprehend, Kendra …",
-    color: "#c026d3",
     Icon: Brain,
   },
   {
@@ -126,7 +116,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Anwendungsintegration",
     file: "09-anwendungsintegration.md",
     topics: "SQS, SNS, EventBridge, Step Functions, API Gateway, MQ",
-    color: "#059669",
     Icon: Workflow,
   },
   {
@@ -135,7 +124,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Entwickler-Tools & DevOps",
     file: "10-entwickler-tools-devops.md",
     topics: "CloudFormation, CDK, Code-Familie (CI/CD), X-Ray",
-    color: "#65a30d",
     Icon: GitBranch,
   },
   {
@@ -144,7 +132,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Migration & Disaster Recovery",
     file: "11-migration-disaster-recovery.md",
     topics: "DMS, MGN, Snow Family, DRS, DR-Strategien (RTO/RPO)",
-    color: "#ea580c",
     Icon: ArrowRightLeft,
   },
   {
@@ -153,7 +140,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Management, Governance & Kosten",
     file: "12-management-governance-kosten.md",
     topics: "CloudWatch, CloudTrail, Config, Systems Manager, Kosten-Tools",
-    color: "#d97706",
     Icon: Gauge,
   },
   {
@@ -162,7 +148,6 @@ export const SKRIPT_CHAPTERS: SkriptChapter[] = [
     title: "Front-End, End-User & Business Apps",
     file: "13-front-end-end-user-business-apps.md",
     topics: "Amplify, AppSync, SES, Connect, WorkSpaces, AppStream",
-    color: "#0ea5e9",
     Icon: MonitorSmartphone,
   },
 ];
@@ -199,6 +184,25 @@ export function slugifyHeading(heading: string): string {
   return s
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Normalise a service name / heading for NAME matching (not slugging): cut at
+ * the first 🛑 annotation, lowercase, drop parentheticals ("(Elastic Compute
+ * Cloud)", "(Die „Schnellstraße")"), strip a leading Amazon/AWS prefix and
+ * collapse to single-spaced tokens. Shared by the skriptRef generator (service
+ * → anchor) and the h2 emoji resolver (heading → metaphor) so both sides agree.
+ */
+export function normalizeName(s: string): string {
+  const stop = s.indexOf("🛑");
+  const base = stop === -1 ? s : s.slice(0, stop);
+  return base
+    .toLowerCase()
+    .replace(/\(.*?\)/g, " ")
+    .replace(/„|“|"/g, " ")
+    .replace(/^\s*(amazon|aws)\s+/, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
 /** URL for a skriptRef — chapter page, plus anchor when the ref has one. */
