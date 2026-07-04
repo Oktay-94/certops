@@ -35,9 +35,15 @@ function flattenText(children: ReactNode): string {
 // Bold-paragraph section labels ("**Metapher / Konzept**", "**Das Problem &
 // Die Lösung**", "**⚠️ …Prüfungs-Knackpunkte…**") — rendered as small caps
 // labels instead of bold prose. ⚠️ labels (inside the .exam box) read stronger.
+//
+// The exam styling is a flex row (icon + uppercase heading), which shreds a
+// long prose paragraph into one narrow column per inline node. So the ⚠️ branch
+// only fires for SHORT headings: real labels top out around ~70 chars, while a
+// ⚠️-prefixed body sentence runs 250+. The 120-char cut sits in that wide gap.
+const EXAM_LABEL_MAX_LEN = 120;
 function labelKind(text: string): "exam" | "plain" | null {
   const t = text.trim();
-  if (t.startsWith("⚠️")) return "exam";
+  if (t.startsWith("⚠️") && t.length <= EXAM_LABEL_MAX_LEN) return "exam";
   if (t.startsWith("Metapher / Konzept") || t === "Das Problem & Die Lösung") {
     return "plain";
   }
@@ -156,9 +162,14 @@ const COMPONENTS = {
     />
   ),
   // GFM tables can be wide (e.g. Shield-Tabelle) — scroll inside their own box.
+  // min-width forces a horizontal scroll on narrow viewports instead of
+  // squeezing columns to unreadable slivers; w-full still fills wider screens.
   table: (props: ComponentProps<"table">) => (
     <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-200">
-      <table className="w-full border-collapse text-sm" {...props} />
+      <table
+        className="w-full min-w-[520px] border-collapse text-sm"
+        {...props}
+      />
     </div>
   ),
   thead: (props: ComponentProps<"thead">) => (
