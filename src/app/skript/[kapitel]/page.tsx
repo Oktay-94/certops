@@ -8,7 +8,13 @@ import {
   toRenderBlocks,
 } from "@/lib/skript-content";
 import { emojiForHeadingText } from "@/lib/skript-emoji";
+import { INTRO_SLUG, ttsPlainText } from "@/lib/tts-text";
 import { SkriptMarkdown } from "@/components/skript/SkriptMarkdown";
+import {
+  TtsChapterButton,
+  TtsProvider,
+  TtsSectionButton,
+} from "@/components/skript/TtsPlayer";
 
 export function generateStaticParams() {
   return SKRIPT_CHAPTERS.map((c) => ({ kapitel: c.slug }));
@@ -46,6 +52,12 @@ export default async function SkriptChapterPage({
   const prev = SKRIPT_CHAPTERS.find((c) => c.num === chapter.num - 1);
   const next = SKRIPT_CHAPTERS.find((c) => c.num === chapter.num + 1);
 
+  // TTS playlist in reading order — intro only when it actually speaks.
+  const playlist = [
+    ...(ttsPlainText(intro) ? [INTRO_SLUG] : []),
+    ...sections.map((s) => s.slug),
+  ];
+
   return (
     <div
       lang="de"
@@ -69,13 +81,17 @@ export default async function SkriptChapterPage({
         </div>
       </div>
 
+      <TtsProvider kapitel={chapter.slug} playlist={playlist}>
       <main className="mx-auto max-w-[760px] px-6 pb-24">
         {/* Chapter header */}
         <header className="pt-14">
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-[color:var(--accent-soft)] px-3 py-[5px] text-[12.5px] font-semibold uppercase tracking-[0.06em] text-[color:var(--accent)]">
-            <chapter.Icon className="h-3.5 w-3.5" aria-hidden />
-            Kapitel {chapter.num}
-          </span>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--accent-soft)] px-3 py-[5px] text-[12.5px] font-semibold uppercase tracking-[0.06em] text-[color:var(--accent)]">
+              <chapter.Icon className="h-3.5 w-3.5" aria-hidden />
+              Kapitel {chapter.num}
+            </span>
+            {playlist.length > 0 && <TtsChapterButton />}
+          </div>
           <h1 className="text-[40px] font-bold leading-[1.1] tracking-[-0.021em] text-zinc-900 [overflow-wrap:anywhere] hyphens-auto sm:text-[40px]">
             {chapter.title}
           </h1>
@@ -112,8 +128,14 @@ export default async function SkriptChapterPage({
         {sections.map((s) => (
           <article
             key={s.slug}
-            className="mt-6 rounded-[20px] border border-zinc-200 bg-white px-6 py-7 shadow-[0_1px_2px_rgba(24,24,27,0.04),0_8px_24px_-16px_rgba(24,24,27,0.12)] sm:px-9 sm:py-8"
+            className="relative mt-6 rounded-[20px] border border-zinc-200 bg-white px-6 py-7 shadow-[0_1px_2px_rgba(24,24,27,0.04),0_8px_24px_-16px_rgba(24,24,27,0.12)] sm:px-9 sm:py-8 [&_.svc-head]:pr-10"
           >
+            {/* Section play button — top-right of the card, outside the
+                markdown renderer (h2 id/emoji logic stays untouched). The
+                .svc-head padding above reserves its corner. */}
+            <div className="absolute right-4 top-6 sm:right-6 sm:top-7">
+              <TtsSectionButton slug={s.slug} />
+            </div>
             {toRenderBlocks(s.markdown).map((block, i) =>
               block.kind === "exam" ? (
                 <div
@@ -163,6 +185,7 @@ export default async function SkriptChapterPage({
           )}
         </div>
       </main>
+      </TtsProvider>
     </div>
   );
 }
