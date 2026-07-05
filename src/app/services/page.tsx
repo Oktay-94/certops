@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, BookOpen, type LucideIcon } from "lucide-react";
+import { ArrowLeft, BookOpen, Layers, type LucideIcon } from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
 import { MODE_STYLE } from "@/lib/mode-style";
 import { ServiceCardGrid } from "@/components/services/ServiceCardGrid";
@@ -26,6 +26,13 @@ export default function ServicesPage() {
           >
             <BookOpen className="h-4 w-4" aria-hidden />
             Lernskript
+          </Link>
+          <Link
+            href="/uebersicht"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
+          >
+            <Layers className="h-4 w-4" aria-hidden />
+            Übersicht
           </Link>
           <Link
             href="/"

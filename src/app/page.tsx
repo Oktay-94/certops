@@ -190,6 +190,33 @@ export default async function Home() {
             freies Lesen
           </span>
         </Link>
+
+        <Link
+          href="/uebersicht"
+          className="flex flex-col gap-4 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 p-5 transition hover:border-zinc-400 hover:bg-zinc-50 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-4">
+            <span
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[5px]"
+              style={{ backgroundColor: BRAND_ORANGE }}
+              aria-hidden
+            >
+              <Layers size={20} className="text-white" />
+            </span>
+            <div>
+              <h2 className="text-base font-semibold text-zinc-900">
+                Dienste-Schnellübersicht
+              </h2>
+              <p className="mt-1 text-[12.5px] text-zinc-500">
+                145 Dienste als Ein-Zeiler (Metapher &amp; Signalwort),
+                alphabetisch — Deep-Link ins Skript.
+              </p>
+            </div>
+          </div>
+          <span className="shrink-0 rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-medium text-zinc-600">
+            nachschlagen
+          </span>
+        </Link>
       </section>
     </main>
   );

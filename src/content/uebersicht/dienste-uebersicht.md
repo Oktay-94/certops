@@ -1,0 +1,151 @@
+# AWS-Dienste — Schnellübersicht (Metapher · Signalwort)
+
+> Ein Einzeiler pro Dienst zum schnellen Nachschlagen. **Metapher** = Merk-Anker · *Signalwort* = Prüfungs-Trigger.
+> 145 Primär-Dienste, alphabetisch (Sortierschlüssel = Name ohne Amazon/AWS-Präfix). 🛑 = abgekündigt.
+> Kanonische Quelle des Übersichts-Bereichs (`/uebersicht`). Detail-/Sammelkarten der Karteikarten sind bewusst in die Signalwörter gefaltet.
+
+- **AWS Amplify** — die Heroku-artige Plattform für Full-Stack-Web-/Mobile-Apps · *Git-Push → Build + Deploy; Hosting = CloudFront + S3, Studio = Low-Code*
+- **Amazon API Gateway** — das Eingangstor, das APIs bereitstellt, drosselt und schützt · *REST/HTTP/WebSocket ohne Server, eng mit Lambda; VPC Link = private Backends*
+- **AWS App Runner** — Container-Web-App ohne jede Infrastruktur veröffentlichen · *einfachste Web-App-/API-Veröffentlichung*
+- **Amazon AppFlow** — die No-Code-Brücke zwischen SaaS-Apps und AWS · *SaaS ↔ AWS ohne Code (Salesforce, SAP, Slack); Glue = ETL innerhalb AWS*
+- **AWS Application Discovery Service** — der Scanner, der das eigene Rechenzentrum inventarisiert · *„WAS haben wir" (Inventar + Abhängigkeiten); Reihenfolge: Discovery → Plan → MGN*
+- **AWS Application Migration Service (MGN)** — der moderne Lift-and-Shift für ganze Server · *Rehosting: Agent → replizieren → testen → Cutover (ersetzt SMS); DMS = für Datenbanken*
+- **Amazon AppStream 2.0** — das Streaming einzelner Anwendungen aus der Cloud · *nicht-persistent, Browser-basiert, für Schulungen/kurzfristig; WorkSpaces = ganzer Desktop*
+- **AWS AppSync** — die verwaltete GraphQL-Schnittstelle für Apps · *GraphQL statt REST (kein Over-/Under-Fetching), Subscriptions = Live-Updates*
+- **AWS Artifact** — das Selbstbedienungs-Archiv für AWS-Compliance-Zertifikate · *fertige AWS-Berichte laden (SOC, ISO, PCI); Audit Manager = eigene Compliance nachweisen*
+- **Amazon Athena** — die serverlose SQL-Abfrage direkt auf Dateien in S3 · *serverless, SQL auf S3, pay-per-scan; Parquet/ORC günstiger; Redshift = häufige/komplexe Analysen*
+- **AWS Audit Manager** — der automatische Sammler von Nachweisen für Audits · *Beweise für DEINE Compliance sammeln; Artifact = fertige AWS-Zertifikate laden*
+- **Amazon Aurora** — AWS' hochgezüchteter relationaler Motor · *5× MySQL / 3× PostgreSQL, cloud-native relational*
+- **Auto Scaling (ASG)** — die Server-Herde, die sich selbst reguliert · *automatisch mehr/weniger Instanzen bei Last*
+- **AWS Backup** — die zentrale Kommandozentrale für alle Backups · *zentrale, dienstübergreifende Backup-Verwaltung*
+- **AWS Batch** — Stapelverarbeitung großer Job-Mengen · *Batch-Jobs, Job Queue*
+- **Amazon Bedrock** — der Baukasten für generative KI mit fertigen Foundation Models · *GenAI per API (Claude, Titan, Llama), kein eigenes Training; SageMaker = eigene Modelle bauen*
+- **AWS Budgets** — der Kostenwächter, der warnt, bevor das Limit reißt · *proaktiver Alarm bei Kosten/Nutzung, kann Aktionen auslösen; Cost Explorer = Rückblick*
+- **AWS CDK** — Infrastruktur als Code mit echten Programmiersprachen · *Code (TS/Python) → CloudFormation; höhere Abstraktion, wiederverwendbar*
+- **AWS Certificate Manager (ACM)** — die Ausgabestelle für kostenlose HTTPS-Zertifikate · *gratis TLS + auto-Erneuerung, DNS-Validierung; für CloudFront IMMER in us-east-1*
+- **AWS Chatbot** — der Bote, der AWS-Alarme und Befunde in Slack/Teams bringt · *ChatOps, interaktive AWS-Befehle im Chat; „CloudWatch-Alarme in Slack" = Chatbot*
+- **AWS Client VPN** — das persönliche VPN vom einzelnen Laptop ins AWS-Netz · *einzelne Nutzer, einfachste Homeoffice-Lösung; Site-to-Site = Standort ↔ Standort*
+- **AWS Cloud9** 🛑 — die IDE im Browser mit EC2 dahinter · *Browser-IDE, Auto-Hibernate; für Neukunden geschlossen (2024) → IDE Toolkits/CloudShell*
+- **AWS CloudFormation** — der Bauplan, der ganze Infrastruktur per Template aufbaut (IaC) · *Template → Stack, StackSets (mehrere Konten/Regionen), Auto-Rollback; CDK = mit Code*
+- **Amazon CloudFront** — das weltweite CDN, das Inhalte nah am Nutzer am Edge zwischenspeichert · *CDN, Edge-Caching, statisch + dynamisch; OAC schützt S3 (löst OAI ab)*
+- **AWS CloudHSM** — die eigene Hardware-Box für Schlüssel, die nur du kontrollierst · *alleinige Kontrolle, FIPS 140-2 Level 3; KMS = AWS verwaltet mit*
+- **AWS CloudTrail** — das lückenlose Protokoll: wer hat welchen API-Aufruf gemacht · *API-Audit (wer/was/wann/woher), Trail → S3; CloudWatch = Metriken, CloudTrail = Aktionen*
+- **Amazon CloudWatch** — der Wachhund, der Metriken, Logs und Alarme für alle Dienste sammelt · *Metrics + Logs + Alarms; Namespace, Custom Metrics, Dashboards*
+- **AWS CodeArtifact** — das private Paket-Repository für Teams · *privater Package Manager (npm, Maven, pip, NuGet); blockt unsichere externe Pakete*
+- **AWS CodeBuild** — die Build-Fabrik, die Code kompiliert und testet · *managed Build/Test, „buildspec.yml" (install → build → post_build)*
+- **AWS CodeCommit** 🛑 — das verwaltete Git-Repository in AWS · *Git-Hosting in AWS; für Neukunden geschlossen (2024) → GitHub/GitLab o.Ä.*
+- **AWS CodeDeploy** — der Auslieferer, der Deployments automatisiert · *„appspec.yml" + Hooks; In-Place vs Blue-Green, Rolling/Canary/All-at-once*
+- **AWS CodePipeline** — das CI/CD-Fließband: Source → Build → Test → Deploy · *CI/CD-Orchestrierung, auch mit GitHub/Bitbucket/Jenkins*
+- **Amazon Cognito** — die Login- und Nutzerverwaltung für deine eigenen Apps · *User Pool = Nutzerverzeichnis/JWT, Identity Pool = Token → temporäre IAM-Credentials*
+- **Amazon Comprehend** — die NLP-KI, die Texte inhaltlich versteht · *Sentiment, Entitäten, Sprache, Themen; Transcribe = Sprache→Text davor*
+- **AWS Compute Optimizer** — der KI-Berater fürs richtige Instanz-Sizing · *Rightsizing-Empfehlungen (≥14 Tage CloudWatch-Daten); detaillierter als Trusted Advisor*
+- **AWS Config** — die Inventar- und Compliance-Kontrolle für Ressourcen-Konfigurationen · *Konfig-Historie + Compliance-Regeln, Managed Rules, Auto-Remediation*
+- **Amazon Connect** — das Callcenter aus der Cloud, pro Minute abgerechnet · *Cloud-Contact-Center; Lex = Spracherkennung, Lambda = Anruf-Logik; keine Mindestabnahme*
+- **AWS Control Tower** — der Auto-Aufsetzer für eine sichere Multi-Account-Landing-Zone · *Organizations + Best Practices, Guardrails (Preventive = SCP, Detective = Config), Account Factory*
+- **AWS Cost Explorer** — die Lupe für vergangene Kosten, mit Prognose · *Kostenanalyse rückwirkend + Forecast; Budgets = proaktiv warnen*
+- **AWS DataSync** — das Hochgeschwindigkeits-Umzugsunternehmen für Daten · *große Datenmengen online übertragen/migrieren*
+- **AWS DataZone** — der interne Daten-Marktplatz mit Governance für Teams · *geschäftliche Daten-Governance; Lake Formation = technische Zugriffskontrolle*
+- **Amazon DAX** — der Turbo-Cache nur für DynamoDB · *Mikrosekunden, In-Memory-Cache für DynamoDB*
+- **Amazon Detective** — die Forensik, die nach dem Alarm erklärt, WIE es passiert ist · *Root-Cause-Analyse; GuardDuty erkennt, Detective erklärt*
+- **AWS Device Farm** — das Test-Labor mit echten Handys und Browsern in der Cloud · *echte Geräte (keine Emulatoren), Android/iOS + Web, CI/CD-fähig*
+- **AWS Direct Connect** — die eigene, physische Standleitung ins AWS-Rechenzentrum · *dediziert, stabil, aber NICHT verschlüsselt (IPSec-VPN drüberlegen)*
+- **AWS DMS (Database Migration Service)** — der Umzugsdienst für Datenbanken mit minimaler Downtime · *Full Load + CDC (kaum Ausfall); SCT = Schema konvertieren (heterogen)*
+- **Amazon DocumentDB** — das MongoDB von AWS · *JSON-Dokumente, MongoDB-kompatibel*
+- **Amazon DynamoDB** — die serverlose NoSQL-Datenbank ohne Tabellenregeln · *NoSQL, Key-Value/JSON, ms-Latenz, serverless*
+- **Amazon EBS** — die ansteckbare Festplatte für eine EC2 · *Block Storage, persistent, an eine Instanz gebunden*
+- **Amazon EC2** — der leere virtuelle Server zum kompletten Selbst-Einrichten · *IaaS, volle Kontrolle, „eigener Server"*
+- **Amazon ECR** — privates Register für Container-Images · *Docker-Images speichern*
+- **Amazon ECS** — AWS-eigener Container-Orchestrator · *Container ohne Kubernetes*
+- **Amazon EFS** — das gemeinsame Netzlaufwerk für viele Linux-Server · *NFS, von vielen EC2 gleichzeitig, Linux*
+- **Amazon EKS** — verwaltetes Kubernetes · *„Kubernetes / K8s" gefordert*
+- **AWS Elastic Beanstalk** — Code hochladen, AWS baut die Infrastruktur · *PaaS, „nur Code, keine Infra"*
+- **AWS Elastic Disaster Recovery (DRS)** — die kontinuierliche Notfall-Wiederherstellung · *schneller Wiederanlauf bei Ausfall (RTO/RPO); MGN = einmaliger Umzug, DRS = dauerhaft*
+- **Elastic Load Balancing (ELB)** — der Verkehrsverteiler, der Anfragen auf viele Ziele aufteilt · *ALB = Layer 7/HTTP, NLB = Layer 4/TCP + statische IP, GWLB = Security-Appliances (Firewall/IDS)*
+- **Amazon ElastiCache** — der schnelle Notizzettel vor der Datenbank · *Caching, Redis/Memcached, RAM, flüchtig*
+- **Amazon EMR** — die Big-Data-Fabrik für Hadoop und Spark · *Hadoop/Spark, Spot günstiger, EMRFS = S3 statt HDFS; Glue = serverless für Standard-ETL*
+- **Amazon EventBridge** — der Ereignis-Bus, der Events regelbasiert weiterleitet · *event-driven, Regeln filtern Events, SaaS- + AWS-Integrationen; Nachfolger von CloudWatch Events*
+- **AWS Fargate** — serverloses Compute für Container · *Container ohne Server zu verwalten*
+- **AWS Firewall Manager** — die zentrale Verteilung von Firewall-Regeln über alle Konten · *organisationsweit WAF + Shield Advanced + Network Firewall durchsetzen*
+- **Amazon Forecast** 🛑 — die ML-Vorhersage für Zeitreihen (Bedarf, Absatz) · *Demand Planning; Timestream = speichern, Forecast = vorhersagen; für Neukunden geschlossen → SageMaker Canvas*
+- **Amazon Fraud Detector** — die fertige ML-Betrugserkennung für Online-Transaktionen · *Betrugsmuster in Transaktionen/Registrierungen, kein eigenes Modell nötig*
+- **Amazon FreeRTOS** — das schlanke Betriebssystem für Mikrocontroller · *OS für winzige Geräte; Greengrass = größere Edge-Geräte, IoT Core = Cloud*
+- **Amazon FSx** — das Spezial-Dateisystem (v.a. Windows) · *Windows File Server / Lustre / NetApp*
+- **AWS Global Accelerator** — die Schnellstraße übers AWS-Backbone mit festen Eingangs-IPs · *statische Anycast-IPs, TCP/UDP, für Gaming/IoT; CloudFront = HTTP-Caching*
+- **AWS Glue** — der serverlose ETL-Kleber, der Daten aufbereitet und katalogisiert · *ETL + Data Catalog, Crawler erkennt Schema automatisch*
+- **Amazon GuardDuty** — der KI-Wächter, der laufend nach verdächtigen Aktivitäten sucht · *Bedrohungs-Erkennung (reaktiv), kein Agent; IAM Access Analyzer = offene Zugriffe (proaktiv)*
+- **AWS Health Dashboard** — der Gesundheitsmonitor für AWS-Dienste und deine Ressourcen · *Service Health = global/öffentlich, Personal Health = nur deine Ressourcen; früher „Personal/Service Health Dashboard"*
+- **AWS IAM** — die zentrale Schließanlage: wer darf was in AWS · *Wer-darf-was, Least Privilege; Rolle = temporär, User/Gruppe = dauerhaft*
+- **AWS IAM Identity Center** — ein zentrales Login (SSO) für alle Konten und Apps · *zentrales SSO, Permission Sets; früher „AWS SSO"*
+- **Amazon Inspector** — der automatische Schwachstellen-Scan für Server & Container · *CVEs / „Was ist verwundbar?"; GuardDuty = „Was wird angegriffen?"*
+- **AWS IoT Core** — die zentrale Anbindung von IoT-Geräten an die Cloud · *MQTT (Port 8883/TLS), Rules Engine (→ Lambda/Kinesis/S3/DynamoDB), Device Shadow*
+- **AWS IoT Greengrass** — der Edge-Agent, der Lambda/ML auf Geräten auch offline ausführt · *Edge-Compute offline; IoT Core = Cloud-Verbindung, FreeRTOS = Mikrocontroller-OS*
+- **AWS IoT SiteWise** — der Datensammler für Industrie- und Fabrikmaschinen · *Industrie 4.0/SCADA, OPC-UA/Modbus; IoT Core = allgemeine IoT-Geräte*
+- **Amazon Kendra** — die intelligente, semantische Suche über Unternehmens-Dokumente · *ML-Dokumentensuche in natürlicher Sprache; Q Business = generativ, leistungsfähiger*
+- **Amazon Keyspaces** — Apache Cassandra als verwalteter Dienst · *Cassandra / CQL*
+- **Amazon Kinesis** — die Echtzeit-Pipeline für kontinuierliche Datenströme · *Data Streams = Echtzeit/Code/Shards · Firehose = ≥60s ohne Code → S3/Redshift (heute „Amazon Data Firehose") · Analytics = SQL/Flink*
+- **AWS KMS** — der Tresor, der Verschlüsselungs-Schlüssel erzeugt und verwaltet · *AWS-managed Key (gratis) vs Customer-managed CMK (eigene Policy + Rotation)*
+- **AWS Lake Formation** — der Baumeister und Türsteher des Data Lake · *Zugriff auf Tabellen-/Spaltenebene im Data Lake; Glue = ETL/Katalog, Lake Formation = Berechtigungen*
+- **AWS Lambda** — Funktion auf Abruf, die bei einem Event kurz aufwacht · *serverless, event-getrieben, max. 15 Min*
+- **AWS Launch Wizard** — geführtes Setup für Enterprise-Software · *SAP/SQL Server korrekt dimensioniert aufsetzen*
+- **Amazon Lex & Polly & Transcribe** — das Sprach-Trio: Chatbot, Vorlesen, Mitschreiben · *Lex = Chatbot, Polly = Text→Sprache (TTS), Transcribe = Sprache→Text (STT)*
+- **AWS License Manager** — der Lizenz-Polizist, der BYOL-Software-Nutzung überwacht · *BYOL-Compliance, Lizenz-Limits; Hard Limit blockiert EC2-Start, Soft Limit = nur Warnung*
+- **Amazon Lightsail** — fertiger VPS zum monatlichen Festpreis · *feste Kosten, Einsteiger, WordPress*
+- **AWS Local Zones** — AWS-Rechenleistung näher an der Großstadt · *einstellige ms-Latenz in Metro-Region*
+- **Amazon Macie** — der Detektiv, der sensible Daten (PII) in S3 aufspürt · *PII-Erkennung in S3; GuardDuty = Bedrohungen, Inspector = Schwachstellen*
+- **Amazon Managed Grafana** — das verwaltete Grafana für Dashboards aus vielen Quellen · *offene Dashboards, Dutzende Datenquellen; CloudWatch Dashboard = nur CloudWatch*
+- **AWS Managed Microsoft AD** — ein echtes Microsoft Active Directory als verwalteter Dienst · *echtes AD in AWS; AD Connector = an On-Prem-AD weiterleiten, Simple AD = klein*
+- **Amazon Managed Service for Prometheus** — das verwaltete Prometheus für Container-Metriken · *Prometheus-kompatibel für EKS/ECS, PromQL, keine eigene Infra; + Grafana = Standard-Stack*
+- **Amazon MemoryDB** — die In-Memory-DB, die nichts vergisst · *Redis-kompatibel, In-Memory + durable*
+- **AWS Migration Hub** — die zentrale Übersicht über alle Migrations-Projekte · *Fortschritts-Tracking; Application Discovery = Server erkennen, MGN/DMS = umziehen*
+- **Amazon MQ** — der Message Broker für klassische Protokolle (RabbitMQ/ActiveMQ) · *für Migration bestehender Broker (Protokoll-Kompatibilität); SQS = AWS-nativ, günstiger*
+- **Amazon MSK** — das verwaltete Apache Kafka · *Kafka managed; Kinesis = AWS-eigen/einfacher, MSK = wenn Kafka-Protokoll Pflicht*
+- **NAT Gateway** — die Einwegtür: private Server kommen nur nach draußen ins Internet · *ausgehender Zugang für private Subnetze, eine pro AZ für Hochverfügbarkeit*
+- **Amazon Neptune** — die Graphendatenbank für Beziehungen · *Graph, „Beziehungen / Freunde von Freunden"*
+- **AWS Network Firewall** — die programmierbare Firewall mit tiefer Paketprüfung fürs ganze VPC · *Netzwerk-Ebene, IDS/IPS; WAF = HTTP-Apps, Security Group = Instanz*
+- **Amazon OpenSearch Service** — die Volltext-Suchmaschine für Logs und Texte, mit Dashboards · *Volltextsuche + Log-Analyse + Dashboards (ELK auf AWS); früher „Elasticsearch Service"*
+- **AWS Organizations** — die Verwaltung vieler AWS-Konten unter einem Dach · *OUs + SCP (nur Einschränkung, kein Grant), Consolidated Billing, Volume Discounts*
+- **AWS Outposts** — AWS-Hardware im eigenen Rechenzentrum · *AWS on-premises, Hybrid*
+- **Amazon Personalize** — der einbaubare Empfehlungsmotor à la Netflix/Amazon-Shop · *Empfehlungen ohne eigenes ML (Produkte, nächstes Video, personalisierter Newsletter)*
+- **Amazon Pinpoint** 🛑 — die Marketing-Kommunikation über Push, SMS und E-Mail · *Kampagnen, Segmentierung, Multi-Channel; abgekündigt (EoS 30.10.2026) → Connect / End User Messaging / SES*
+- **AWS PrivateLink** — der private Direktzugang zu einem Dienst, ganz ohne Internet · *privater Endpunkt, NLB als Backend Pflicht, kein Peering nötig, IP-Overlap ok*
+- **Amazon Q Business** — der generative KI-Assistent auf deinen Unternehmensdaten · *GenAI über eigene Firmendaten; Q Developer = für Code; Backend = Bedrock*
+- **Amazon Q Developer** 🛑 — der KI-Assistent fürs Programmieren · *Code-Vorschläge für Entwickler (CodeWhisperer ging darin auf); IDE-Plugins EoS 2027, neue Signups blockiert → Kiro*
+- **Amazon QLDB** 🛑 — das fälschungssichere Kassenbuch mit kryptografisch verketteter Historie · *unveränderliches Ledger, verifizierbare Change-History; abgekündigt (EoS 31.07.2025) → Aurora PostgreSQL*
+- **Amazon QuickSight** — der BI-Baukasten für Business-Dashboards und Reports · *BI-Dashboards, SPICE = In-Memory-Engine, ML Insights = Anomalie-Erkennung*
+- **Amazon RDS** — der Autopilot für relationale Datenbanken · *SQL/OLTP, managed relational, Multi-AZ*
+- **Amazon RDS Proxy** — der Verbindungs-Verteiler vor der DB · *Connection Pooling, viele kurze Verbindungen (Lambda!)*
+- **Amazon Redshift** — das Petabyte-Data-Warehouse · *Data Warehouse, OLAP, Analytik, Petabyte*
+- **Amazon Rekognition** — die fertige KI für Bild- und Videoanalyse · *Objekte, Gesichter, Text (OCR), Moderation; kein Training nötig; Textract = Dokumente/Formulare*
+- **AWS Resilience Hub** — der Belastungstest der Architektur gegen Ausfall-Ziele · *prüft gegen RTO/RPO (Reliability-Fokus); Well-Architected Tool = alle 6 Säulen*
+- **AWS Resource Access Manager (RAM)** — Ressourcen über Konten teilen, ohne sie zu kopieren · *z.B. Transit Gateway, geteilte VPC-Subnetze; zentral statt pro Konto neu bauen*
+- **Amazon Route 53** — der DNS-Dienst, der Domainnamen in IP-Adressen übersetzt · *DNS + Routing-Policies (Weighted, Latency, Failover, Geolocation), Health Checks, Alias-Record*
+- **Amazon S3** — der unendliche Internet-Tresor für Objekte · *Object Storage, Zugriff über URL, 11×9 Haltbarkeit*
+- **Amazon SageMaker** — die Werkstatt zum Bauen, Trainieren und Deployen eigener ML-Modelle · *end-to-end ML (Build/Train/Deploy), Ground Truth = Labeling; heute „SageMaker AI" (Plattform-Umbau 2024)*
+- **AWS Schema Conversion Tool (SCT)** — der Übersetzer, der DB-Schemas zwischen Engines konvertiert · *Struktur konvertieren; heterogen (Oracle → Aurora) = SCT + DMS; lokal + kostenlos*
+- **AWS Secrets Manager** — der Passwort-Safe der Cloud, mit automatischer Rotation · *Secrets + auto-Rotation (teurer); Parameter Store = günstig, keine Rotation*
+- **AWS Security Hub** — die zentrale Leitstelle, die alle Sicherheits-Befunde bündelt · *Aggregator + CIS-Benchmarks, selbst kein Schutz; heute „Security Hub CSPM"*
+- **AWS Service Catalog** — der genehmigte Selbstbedienungs-Katalog für AWS-Ressourcen · *Self-Service mit Governance; Nutzer starten nur freigegebene CloudFormation-Stacks*
+- **Amazon SES** — der Dienst für Massen- und transaktionalen E-Mail-Versand · *vollständige E-Mails (HTML), Sandbox erst freischalten; SNS = kurze Benachrichtigungen*
+- **AWS Shield** — der DDoS-Schutzschild von AWS · *Standard = gratis + automatisch, Advanced = teuer + SLA + Support; kombiniert mit WAF*
+- **AWS Site-to-Site VPN** — der verschlüsselte Tunnel vom Firmennetz zu AWS übers Internet · *Standort ↔ AWS, verschlüsselt; Direct Connect = dediziert, unverschlüsselt; beide = Redundanz*
+- **AWS Snow Family** — die physischen Geräte für Offline-Datentransport · *Snowcone (8 TB) · Snowball Edge Storage/Compute Optimized; Snowmobile (LKW) eingestellt*
+- **Amazon SNS** — der Lautsprecher: ein Sender, viele Empfänger (Pub/Sub) · *Pub/Sub push, Fan-out → mehrere SQS; SNS = push, SQS = pull*
+- **Amazon SQS** — die Warteschlange, die Nachrichten zwischen Diensten puffert und entkoppelt · *Standard = ≥1×/keine Reihenfolge, FIFO = genau 1×/Reihenfolge; Visibility Timeout, DLQ*
+- **AWS Step Functions** — der Regisseur, der mehrere Schritte zu einem Workflow orchestriert · *State Machine mit Fehlerbehandlung; Express = kurz/hochvolumig, Standard = bis 1 Jahr*
+- **AWS Storage Gateway** — das Verlängerungskabel zwischen eigenem Keller und Cloud · *Hybrid-Storage, on-premises an Cloud anbinden*
+- **AWS Systems Manager (SSM)** — die Werkzeugkiste zum Verwalten und Steuern der ganzen Flotte · *Session Manager = Shell ohne SSH/Port 22, Parameter Store, Run Command, Patch Manager*
+- **Amazon Textract** — der Extraktor, der Text und Formulare aus Dokumenten liest · *OCR + Formular-/Tabellen-Erkennung (Rechnungen, Ausweise); Rekognition = Bilder/Videos*
+- **Amazon Timestream** — die serverlose Zeitreihendatenbank · *Zeitreihen, IoT-Sensoren, Telemetrie*
+- **AWS Transfer Family** — der verwaltete SFTP-/FTP-Server, der direkt in S3/EFS ablegt · *für bestehende SFTP-Workflows; DataSync = schneller Bulk-Transfer*
+- **AWS Transit Gateway** — der zentrale Knoten, der viele VPCs sternförmig verbindet · *Hub-and-Spoke bei vielen VPCs; VPC Peering = nur 1:1, kein Durchgangsverkehr*
+- **Amazon Translate** — die automatische Textübersetzung zwischen Sprachen · *neuronale Übersetzung; Kette: Transcribe → Translate → Polly = Sprachübersetzer*
+- **AWS Trusted Advisor** — der automatische Berater für Best Practices · *Checks: Kosten, Security, Fault Tolerance, Performance, Limits; volle Checks nur mit Business/Enterprise Support*
+- **AWS Verified Access** — der Zero-Trust-Zugang zu internen Apps ohne VPN · *VPN-los, pro Anfrage geprüft, für Homeoffice*
+- **Amazon VPC** — das eigene, abgeschottete Netzwerk in der AWS-Cloud · *privates Netz + Subnetze; Security Group = stateful, NACL = stateless*
+- **VPC Endpoints** — der direkte Draht zu AWS-Diensten, ohne Umweg übers Internet · *Gateway Endpoint = nur S3 + DynamoDB (kostenlos), Interface Endpoint = Rest (PrivateLink)*
+- **VPC Flow Logs** — die Kamera, die allen Netzwerkverkehr im VPC mitschreibt · *Traffic-Log (Quell-/Ziel-IP, Port, ACCEPT/REJECT), für Security & Debugging*
+- **AWS WAF** — die Firewall speziell für Web-Anwendungen · *Layer 7/HTTP (SQLi, XSS), Web ACL; nur an ALB, CloudFront, API Gateway — NICHT NLB*
+- **AWS Wavelength** — AWS im 5G-Mobilfunknetz · *ultraniedrige Latenz für mobile/5G-Apps*
+- **AWS Well-Architected Tool** — die Selbstbewertung der Architektur gegen die sechs Säulen · *6 Pillars (Ops, Security, Reliability, Performance, Cost, Sustainability); Trusted Advisor = automatisch*
+- **Amazon WorkSpaces** — der vollständige, dauerhafte Cloud-Desktop (DaaS) · *persistenter Desktop für Homeoffice/Callcenter; AppStream 2.0 = einzelne App streamen*
+- **AWS X-Ray** — das Röntgengerät, das Anfragen durch verteilte Services verfolgt · *Distributed Tracing, Service-Map; „wo ist die App langsam / warum Fehler?"*

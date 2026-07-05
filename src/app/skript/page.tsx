@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Layers } from "lucide-react";
 import { SKRIPT_CHAPTERS } from "@/lib/skript";
 import { chapterColor, chapterColorVars } from "@/lib/skript-chapter-colors";
 import {
@@ -27,13 +27,22 @@ export default function SkriptIndexPage() {
             13 Kapitel · 172 Dienste · freies Lesen, kein Fortschritt
           </p>
         </div>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Zum Dashboard
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/uebersicht"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
+          >
+            <Layers className="h-4 w-4" aria-hidden />
+            Übersicht
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Zum Dashboard
+          </Link>
+        </div>
       </div>
 
       {/* Chapter grid — accent-stripe cards, same visual family as the reader. */}
