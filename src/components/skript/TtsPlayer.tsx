@@ -37,6 +37,13 @@ type TtsContextValue = {
 
 const TtsContext = createContext<TtsContextValue | null>(null);
 
+// 1ms of 16-bit mono silence. iOS Safari only allows audio.play() that starts
+// inside a user gesture; on a cache miss the real play() runs after an async
+// fetch, outside the gesture. Playing this silence synchronously in the
+// gesture unlocks the element so the later play() is permitted.
+const SILENT_WAV =
+  "data:audio/wav;base64,UklGRjQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
 function useTts(): TtsContextValue {
   const ctx = useContext(TtsContext);
   if (!ctx) throw new Error("TtsPlayer components need <TtsProvider>");
@@ -76,7 +83,11 @@ export function TtsProvider({
   // Create the singleton <audio> once; all element mutation lives here.
   useEffect(() => {
     const audio = new Audio();
-    audio.onended = () => onEndedRef.current();
+    // The unlock silence (data: URI) also fires `ended` — that must not
+    // advance the playlist or reset state; only real segments count.
+    audio.onended = () => {
+      if (!audio.src.startsWith("data:")) onEndedRef.current();
+    };
     audioRef.current = audio;
     return () => {
       audio.pause();
@@ -94,6 +105,13 @@ export function TtsProvider({
       try {
         let url = urlCache.current.get(slug);
         if (!url) {
+          // Unlock for iOS BEFORE the async gap (see SILENT_WAV). Errors are
+          // irrelevant here — the real play() below reports its own failure.
+          const unlockAudio = audioRef.current;
+          if (unlockAudio && unlockAudio.paused) {
+            unlockAudio.src = SILENT_WAV;
+            void unlockAudio.play().catch(() => {});
+          }
           url = await fetchSegmentUrl(kapitel, slug);
           urlCache.current.set(slug, url);
         }
@@ -184,12 +202,18 @@ export function TtsSectionButton({ slug }: { slug: string }) {
   return (
     <button
       type="button"
-      onClick={() => toggle(slug)}
+      onClick={(e) => {
+        // Never bubble into a clickable ancestor (e.g. a flip card).
+        e.stopPropagation();
+        toggle(slug);
+      }}
       aria-label={
         active && status === "playing" ? "Vorlesen pausieren" : "Abschnitt vorlesen"
       }
       title={status === "error" && active ? "Vorlesen fehlgeschlagen" : undefined}
-      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-[color:var(--accent,#475569)] shadow-sm transition hover:border-[color:var(--accent,#475569)]"
+      // before:-inset-2 grows the 32px button to a 48px hit area (Apple
+      // minimum 44pt) without changing the visual size.
+      className="relative inline-flex h-8 w-8 shrink-0 touch-manipulation items-center justify-center rounded-full border border-zinc-200 bg-white text-[color:var(--accent,#475569)] shadow-sm transition before:absolute before:-inset-2 before:content-[''] hover:border-[color:var(--accent,#475569)]"
     >
       <StatusIcon active={active} status={status} />
     </button>
@@ -209,8 +233,13 @@ export function TtsChapterButton() {
   return (
     <button
       type="button"
-      onClick={toggleChapter}
-      className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-[7px] text-[13.5px] font-medium text-[color:var(--accent,#475569)] shadow-sm transition hover:border-[color:var(--accent,#475569)]"
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleChapter();
+      }}
+      // Visual height is ~34px; before:-inset-y-1.5 lifts the hit area to
+      // ~46px (Apple minimum 44pt) without changing the layout.
+      className="relative inline-flex touch-manipulation items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-[7px] text-[13.5px] font-medium text-[color:var(--accent,#475569)] shadow-sm transition before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:border-[color:var(--accent,#475569)]"
     >
       {active ? (
         <StatusIcon active status={status} />
