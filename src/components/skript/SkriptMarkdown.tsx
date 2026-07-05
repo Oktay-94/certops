@@ -80,7 +80,7 @@ const COMPONENTS = {
             {emoji}
           </span>
         )}
-        <span className="text-[26px] font-[680] leading-tight tracking-[-0.017em] text-zinc-900">
+        <span className="text-[26px] font-[680] leading-tight tracking-[-0.017em] text-zinc-900 [overflow-wrap:anywhere]">
           {title}
           {flag && (
             <span className="ml-2.5 inline-block rounded-md bg-amber-100 px-2 py-[3px] align-middle text-[12.5px] font-semibold tracking-normal text-amber-700">
@@ -92,7 +92,10 @@ const COMPONENTS = {
     );
   },
   h3: (props: ComponentProps<"h3">) => (
-    <h3 className="mt-6 text-lg font-semibold text-zinc-900" {...props} />
+    <h3
+      className="mt-6 text-lg font-semibold text-zinc-900 [overflow-wrap:anywhere]"
+      {...props}
+    />
   ),
   p: ({ children, ...rest }: ComponentProps<"p">) => {
     const kind = labelKind(flattenText(children));
@@ -111,7 +114,10 @@ const COMPONENTS = {
       );
     }
     return (
-      <p className="mt-3 leading-relaxed text-zinc-800" {...rest}>
+      <p
+        className="mt-3 leading-relaxed text-zinc-800 [overflow-wrap:anywhere]"
+        {...rest}
+      >
         {children}
       </p>
     );
@@ -129,18 +135,18 @@ const COMPONENTS = {
     />
   ),
   li: (props: ComponentProps<"li">) => (
-    <li className="leading-relaxed" {...props} />
+    <li className="leading-relaxed [overflow-wrap:anywhere]" {...props} />
   ),
   blockquote: ({ children }: ComponentProps<"blockquote">) => {
     const merk = isMerksatzText(flattenText(children));
     return merk ? (
       // Merksatz (💡 / 🧠) — the one AWS-orange accent.
-      <blockquote className="mt-5 rounded-2xl border border-[#fde3ca] bg-[#fff8f2] px-[18px] py-4 text-[15.5px] leading-relaxed text-[#7c3a06] [&_strong]:text-[#9a4d0a] [&>p]:mt-2 [&>p:first-child]:mt-0">
+      <blockquote className="mt-5 rounded-2xl border border-[#fde3ca] bg-[#fff8f2] px-[18px] py-4 text-[15.5px] leading-relaxed text-[#7c3a06] [overflow-wrap:anywhere] [&_strong]:text-[#9a4d0a] [&>p]:mt-2 [&>p:first-child]:mt-0">
         {children}
       </blockquote>
     ) : (
       // Metaphor / note — chapter accent.
-      <blockquote className="my-5 rounded-r-xl border-l-[3px] border-[color:var(--accent,#475569)] bg-[color:var(--accent-soft,#eef1f5)] px-[18px] py-3.5 text-[17px] italic leading-relaxed text-zinc-900 [&>p]:mt-2 [&>p:first-child]:mt-0">
+      <blockquote className="my-5 rounded-r-xl border-l-[3px] border-[color:var(--accent,#475569)] bg-[color:var(--accent-soft,#eef1f5)] px-[18px] py-3.5 text-[17px] italic leading-relaxed text-zinc-900 [overflow-wrap:anywhere] [&>p]:mt-2 [&>p:first-child]:mt-0">
         {children}
       </blockquote>
     );
@@ -165,7 +171,7 @@ const COMPONENTS = {
   // min-width forces a horizontal scroll on narrow viewports instead of
   // squeezing columns to unreadable slivers; w-full still fills wider screens.
   table: (props: ComponentProps<"table">) => (
-    <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-200">
+    <div className="mt-4 max-w-full overflow-x-auto rounded-xl border border-zinc-200">
       <table
         className="w-full min-w-[520px] border-collapse text-sm"
         {...props}

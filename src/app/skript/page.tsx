@@ -72,7 +72,7 @@ export default function SkriptIndexPage() {
                   >
                     Kapitel {chapter.num}
                   </p>
-                  <h2 className="mt-0.5 text-base font-semibold leading-snug text-zinc-900">
+                  <h2 className="mt-0.5 text-base font-semibold leading-snug text-zinc-900 [overflow-wrap:anywhere]">
                     {chapter.title}
                   </h2>
                   <p className="mt-1 text-[12.5px] leading-snug text-zinc-500">
