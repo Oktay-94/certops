@@ -48,6 +48,7 @@ export default async function SkriptChapterPage({
 
   return (
     <div
+      lang="de"
       style={chapterColorVars(chapter.num)}
       className="min-h-screen bg-[color:var(--tint)]"
     >
@@ -75,7 +76,7 @@ export default async function SkriptChapterPage({
             <chapter.Icon className="h-3.5 w-3.5" aria-hidden />
             Kapitel {chapter.num}
           </span>
-          <h1 className="text-[40px] font-bold leading-[1.1] tracking-[-0.021em] text-zinc-900 sm:text-[40px]">
+          <h1 className="text-[40px] font-bold leading-[1.1] tracking-[-0.021em] text-zinc-900 [overflow-wrap:anywhere] hyphens-auto sm:text-[40px]">
             {chapter.title}
           </h1>
           {intro && (
