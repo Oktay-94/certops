@@ -9,6 +9,7 @@
 // this module stays import-safe from client and test contexts.
 import services from "./aws-services-172.json";
 import { normalizeName, type SkriptRef } from "./skript";
+import { emojiForHeadingText } from "./skript-emoji";
 
 type RawService = { service: string; skriptRef?: SkriptRef };
 const SERVICES = (services as { services: RawService[] }).services;
@@ -37,13 +38,16 @@ export function resolveServiceRef(name: string): SkriptRef | null {
   return null;
 }
 
-// Sort/index key: drop a leading Amazon/AWS prefix, lowercase — a learner looks
-// up "Athena", not "Amazon Athena". Display always keeps the full name.
-export function sortKey(name: string): string {
-  return name.replace(/^(Amazon|AWS)\s+/i, "").toLowerCase();
-}
-
-/** Uppercase first letter of the sort key (A–Z bucket for the jump nav). */
-export function letterOf(name: string): string {
-  return sortKey(name).charAt(0).toUpperCase();
+/**
+ * Leading metaphor emoji for a service, or null. Reuses the skript resolver
+ * (emojiForHeadingText → normalizeName lookup against the JSON metaphor fields)
+ * so the overview and the reader show the SAME emoji per service. For the four
+ * aliased entries the JSON folds into detail cards, we look up the emoji of the
+ * owning card instead (same REF_ALIASES table as the deep link).
+ */
+export function serviceEmoji(name: string): string | null {
+  const direct = emojiForHeadingText(name);
+  if (direct) return direct;
+  const aliased = REF_ALIASES[normalizeName(name)];
+  return aliased ? emojiForHeadingText(aliased) : null;
 }

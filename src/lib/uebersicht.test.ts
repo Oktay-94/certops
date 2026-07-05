@@ -11,7 +11,8 @@ import {
   readUebersichtMarkdown,
   readUebersichtServices,
 } from "./uebersicht-content";
-import { letterOf, resolveServiceRef, sortKey } from "./uebersicht";
+import { resolveServiceRef, serviceEmoji } from "./uebersicht";
+import { matchesQuery, sortKey } from "./uebersicht-search";
 
 const markdown = readUebersichtMarkdown();
 const services = readUebersichtServices();
@@ -93,10 +94,63 @@ describe("uebersicht deprecation", () => {
   });
 });
 
-describe("uebersicht letter bucketing", () => {
-  it("buckets by the stripped-prefix first letter", () => {
-    expect(letterOf("Amazon Athena")).toBe("A");
-    expect(letterOf("AWS Lambda")).toBe("L");
-    expect(letterOf("Elastic Load Balancing (ELB)")).toBe("E");
+describe("uebersicht emojis", () => {
+  it("every service resolves to a real pictographic emoji", () => {
+    const broken: string[] = [];
+    for (const s of services) {
+      const e = serviceEmoji(s.name);
+      // A real emoji (not a stray metaphor word) — pictographic, no ASCII letter.
+      if (!e || !/\p{Extended_Pictographic}/u.test(e) || /[a-z]/i.test(e)) {
+        broken.push(`${s.name} → ${JSON.stringify(e)}`);
+      }
+    }
+    expect(broken).toEqual([]);
+  });
+
+  it("resolves emojis for the aliased and chapter-level edge cases", () => {
+    // The four detail-card aliases + the two chapter-level services must still
+    // get an emoji via the alias table / their own JSON entry.
+    for (const n of [
+      "Auto Scaling (ASG)",
+      "Amazon ECR",
+      "AWS Local Zones",
+      "AWS Wavelength",
+      "AWS Transfer Family",
+      "AWS IoT Core",
+      "Amazon Bedrock",
+      "Amazon QLDB",
+    ]) {
+      expect(serviceEmoji(n), n).not.toBeNull();
+    }
+  });
+});
+
+describe("uebersicht prefix search", () => {
+  it("empty query matches everything", () => {
+    expect(matchesQuery("glue", "")).toBe(true);
+    expect(matchesQuery("glue", "   ")).toBe(true);
+  });
+
+  it("matches by prefix of the sort key, case-insensitive", () => {
+    expect(matchesQuery("glue", "g")).toBe(true);
+    expect(matchesQuery("glue", "glue")).toBe(true);
+    expect(matchesQuery("glue", "GLU")).toBe(true);
+    expect(matchesQuery("athena", "a")).toBe(true);
+  });
+
+  it("does not match a non-prefix substring", () => {
+    expect(matchesQuery("glue", "lue")).toBe(false);
+    expect(matchesQuery("athena", "b")).toBe(false);
+  });
+
+  it("filters the real dataset consistently (single letter vs full name)", () => {
+    const keys = services.map((s) => sortKey(s.name));
+    const gServices = keys.filter((k) => matchesQuery(k, "g"));
+    expect(gServices.length).toBeGreaterThan(0);
+    expect(keys.filter((k) => matchesQuery(k, "glue"))).toEqual(["glue"]);
+    // "a" bucket equals every sort key starting with "a"
+    expect(keys.filter((k) => matchesQuery(k, "a"))).toEqual(
+      keys.filter((k) => k.startsWith("a")),
+    );
   });
 });
