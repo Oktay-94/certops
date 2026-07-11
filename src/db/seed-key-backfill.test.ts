@@ -15,6 +15,7 @@ import { clfC02Flashcards } from "./seed/cards/index";
 import {
   backfillSeedKeys,
   checkSeedKeyCompleteness,
+  reportSeedKeyState,
 } from "./seed-key-backfill";
 
 const allQuestions: NewQuestion[] = [
@@ -142,5 +143,92 @@ describe("backfillSeedKeys", () => {
     expect(gate.ok).toBe(false);
     expect(gate.unmatchedQuestions).toHaveLength(1);
     expect(gate.unmatchedQuestions[0]!.id).toBe(target!.id);
+  });
+});
+
+// ── Dry-run report: read-only preview of what a backfill run would do. ────────
+describe("reportSeedKeyState", () => {
+  let db: DB;
+  beforeEach(async () => {
+    db = await createTestDb();
+  });
+
+  const sources = { questions: allQuestions, cards: allCards };
+
+  it("pre-backfill live state: everything matchable, nothing keyed", async () => {
+    await seedWithoutKeys(db);
+    const report = await reportSeedKeyState(db, sources);
+
+    expect(report.questions).toEqual({
+      total: 264,
+      alreadyKeyed: 0,
+      matchable: 264,
+      drift: [],
+      missingLive: [],
+      dupLive: [],
+    });
+    expect(report.cards).toEqual({
+      total: 150,
+      alreadyKeyed: 0,
+      matchable: 150,
+      drift: [],
+      missingLive: [],
+      dupLive: [],
+    });
+  });
+
+  it("is read-only — reporting leaves every seed_key NULL", async () => {
+    await seedWithoutKeys(db);
+    await reportSeedKeyState(db, sources);
+
+    const nulls = await db
+      .select({ n: sql<number>`sum(${questions.seedKey} is null)` })
+      .from(questions)
+      .get();
+    expect(nulls!.n).toBe(264);
+  });
+
+  it("post-backfill state: all keyed, nothing left to match", async () => {
+    await seedWithoutKeys(db);
+    await backfillSeedKeys(db, sources);
+    const report = await reportSeedKeyState(db, sources);
+
+    expect(report.questions.alreadyKeyed).toBe(264);
+    expect(report.questions.matchable).toBe(0);
+    expect(report.cards.alreadyKeyed).toBe(150);
+    expect(report.cards.matchable).toBe(0);
+  });
+
+  it("flags a drifted row as drift AND its seed entry as missingLive", async () => {
+    await seedWithoutKeys(db);
+    const target = await db
+      .select({ id: questions.id, prompt: questions.prompt })
+      .from(questions)
+      .limit(1)
+      .get();
+    await db
+      .update(questions)
+      .set({ prompt: "DRIFTED — no seed entry matches this prompt anymore" })
+      .where(eq(questions.id, target!.id))
+      .run();
+
+    const report = await reportSeedKeyState(db, sources);
+    expect(report.questions.matchable).toBe(263);
+    expect(report.questions.drift).toHaveLength(1);
+    expect(report.questions.drift[0]!.id).toBe(target!.id);
+
+    const driftedSource = allQuestions.find((q) => q.prompt === target!.prompt);
+    expect(report.questions.missingLive).toEqual([driftedSource!.seedKey]);
+  });
+
+  it("flags duplicate live rows (same prompt) as dupLive collision risk", async () => {
+    await seedWithoutKeys(db);
+    // Simulate a leftover duplicate from the destructive-seed era.
+    await db.insert(questions).values(stripKey(allQuestions[0]!)).run();
+
+    const report = await reportSeedKeyState(db, sources);
+    expect(report.questions.total).toBe(265);
+    expect(report.questions.dupLive).toHaveLength(1);
+    expect(report.questions.dupLive[0]!.ids).toHaveLength(2);
   });
 });

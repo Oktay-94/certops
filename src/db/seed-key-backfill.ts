@@ -57,6 +57,96 @@ export async function backfillSeedKeys(
 
 export type UnmatchedRow = { id: number; text: string };
 
+export type DuplicateLiveRows = { ids: number[]; text: string };
+
+export type TableSeedKeyReport = {
+  /** live row count */
+  total: number;
+  /** live rows that already carry a seed_key (skipped by backfill) */
+  alreadyKeyed: number;
+  /** NULL rows whose text matches a seed entry — would be updated */
+  matchable: number;
+  /** NULL rows with no matching seed entry — would fail the completeness gate */
+  drift: UnmatchedRow[];
+  /** seed entries (by seedKey) with no live row — become INSERTs on reseed */
+  missingLive: string[];
+  /** live rows sharing the same bridge text — backfill would hit the unique index */
+  dupLive: DuplicateLiveRows[];
+};
+
+export type SeedKeyStateReport = {
+  questions: TableSeedKeyReport;
+  cards: TableSeedKeyReport;
+};
+
+type LiveRow = { id: number; text: string; seedKey: string | null };
+type SourceEntry = { text: string; seedKey: string };
+
+function buildTableReport(
+  rows: LiveRow[],
+  sources: SourceEntry[],
+): TableSeedKeyReport {
+  const sourceTexts = new Set(sources.map((s) => s.text));
+  const liveTexts = new Set(rows.map((r) => r.text));
+
+  const idsByText = new Map<string, number[]>();
+  for (const r of rows) {
+    const ids = idsByText.get(r.text) ?? [];
+    ids.push(r.id);
+    idsByText.set(r.text, ids);
+  }
+
+  const nullRows = rows.filter((r) => r.seedKey === null);
+  return {
+    total: rows.length,
+    alreadyKeyed: rows.length - nullRows.length,
+    matchable: nullRows.filter((r) => sourceTexts.has(r.text)).length,
+    drift: nullRows
+      .filter((r) => !sourceTexts.has(r.text))
+      .map((r) => ({ id: r.id, text: clip(r.text) })),
+    missingLive: sources
+      .filter((s) => !liveTexts.has(s.text))
+      .map((s) => s.seedKey),
+    dupLive: [...idsByText.entries()]
+      .filter(([, ids]) => ids.length > 1)
+      .map(([text, ids]) => ({ ids, text: clip(text) })),
+  };
+}
+
+/**
+ * Read-only dry-run report: compares live rows against the seed sources
+ * WITHOUT writing anything. drift > 0 or dupLive > 0 are stop criteria —
+ * running the real backfill would then either fail the completeness gate
+ * (drift) or abort on the unique seed_key index (dupLive).
+ */
+export async function reportSeedKeyState(
+  db: DB,
+  sources: SeedKeySources,
+): Promise<SeedKeyStateReport> {
+  const toEntry = (o: { seedKey?: string | null }, text: string) =>
+    o.seedKey ? [{ text, seedKey: o.seedKey }] : [];
+
+  const qRows = await db
+    .select({ id: questions.id, text: questions.prompt, seedKey: questions.seedKey })
+    .from(questions)
+    .all();
+  const cRows = await db
+    .select({ id: flashcards.id, text: flashcards.front, seedKey: flashcards.seedKey })
+    .from(flashcards)
+    .all();
+
+  return {
+    questions: buildTableReport(
+      qRows,
+      sources.questions.flatMap((q) => toEntry(q, q.prompt)),
+    ),
+    cards: buildTableReport(
+      cRows,
+      sources.cards.flatMap((c) => toEntry(c, c.front)),
+    ),
+  };
+}
+
 export type CompletenessReport = {
   ok: boolean;
   unmatchedQuestions: UnmatchedRow[];
