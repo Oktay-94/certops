@@ -396,3 +396,39 @@ body {
     transform: none;
   }
 }
+
+/* ============================================================
+   Flashcard 3D flip (/cards) — both faces mounted, 600ms rotateY.
+   Behavior stays click-to-flip (React toggles .flipped); this only
+   adds the animation. GPU layer per face → no text flicker mid-flip.
+   ============================================================ */
+.flip-scene {
+  position: relative;
+  perspective: 1400px;
+}
+.flip-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.22, 0.9, 0.3, 1);
+  will-change: transform;
+}
+.flip-inner.flipped {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+.flip-face.flip-back {
+  transform: rotateY(180deg) translateZ(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner {
+    transition: none;
+  }
+}

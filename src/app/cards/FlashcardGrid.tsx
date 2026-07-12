@@ -28,11 +28,12 @@ const MARKDOWN_COMPONENTS = {
     <ol className="list-decimal pl-4" {...props} />
   ),
   code: (props: React.HTMLAttributes<HTMLElement>) => (
-    <code className="rounded bg-zinc-100 px-1 text-[13px]" {...props} />
+    <code className="rounded bg-surface-2 px-1 text-[13px]" {...props} />
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p className="text-zinc-800" {...props} />
+    <p className="text-ink-soft" {...props} />
   ),
+  // mark stays bg-orange-100 (== highlight signal, test-locked).
   mark: ({
     className: _ignored,
     ...rest
@@ -152,12 +153,9 @@ export function FlashcardGrid({ cards, domains }: Props) {
     }
   }
 
-  const btnBase =
-    "inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition disabled:cursor-not-allowed disabled:opacity-50";
-  const btnZinc = `${btnBase} border-zinc-200 bg-white text-zinc-900 hover:border-zinc-400`;
-  const btnShuffle = `${btnBase} border-blue-200 bg-blue-100 text-blue-800 hover:bg-blue-200`;
-  const btnFlipAll = `${btnBase} border-violet-200 bg-violet-100 text-violet-800 hover:bg-violet-200`;
-  const btnReset = `${btnBase} border-amber-200 bg-amber-100 text-amber-800 hover:bg-amber-200`;
+  // Uniform token buttons (dark-safe); icon + label distinguish the actions.
+  const btn =
+    "inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
     <div className="mt-6">
@@ -165,7 +163,7 @@ export function FlashcardGrid({ cards, domains }: Props) {
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-[16rem] flex-1 sm:flex-none">
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint"
             aria-hidden
           />
           <input
@@ -173,14 +171,14 @@ export function FlashcardGrid({ cards, domains }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Karten durchsuchen …"
-            className="w-full rounded-xl border border-zinc-200 bg-white py-2 pl-9 pr-3 text-sm text-zinc-900 placeholder:text-zinc-400 transition hover:border-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full rounded-lg border border-line bg-surface py-2 pl-9 pr-3 text-sm text-ink placeholder:text-ink-faint transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
         <select
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
-          className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong focus:outline-none focus:ring-2 focus:ring-accent"
         >
           <option value="all">Alle Bereiche</option>
           {domains.map((d) => (
@@ -190,49 +188,50 @@ export function FlashcardGrid({ cards, domains }: Props) {
           ))}
         </select>
 
-        <button type="button" onClick={onShuffle} className={btnShuffle}>
-          <Shuffle className="h-4 w-4" aria-hidden />
+        <button type="button" onClick={onShuffle} className={btn}>
+          <Shuffle className="h-4 w-4 text-ink-faint" aria-hidden />
           Mischen
         </button>
-        <button type="button" onClick={onFlipAll} className={btnFlipAll}>
-          <RefreshCw className="h-4 w-4" aria-hidden />
+        <button type="button" onClick={onFlipAll} className={btn}>
+          <RefreshCw className="h-4 w-4 text-ink-faint" aria-hidden />
           Alle umdrehen
         </button>
-        <button type="button" onClick={onReset} className={btnReset}>
-          <RotateCcw className="h-4 w-4" aria-hidden />
+        <button type="button" onClick={onReset} className={btn}>
+          <RotateCcw className="h-4 w-4 text-ink-faint" aria-hidden />
           Reset
         </button>
-        <Link href="/" className={btnZinc}>
-          <ArrowLeft className="h-4 w-4" aria-hidden />
+        <Link href="/" className={btn}>
+          <ArrowLeft className="h-4 w-4 text-ink-faint" aria-hidden />
           Zum Dashboard
         </Link>
       </div>
 
       {/* Stats */}
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold">
-        <div className="flex flex-wrap gap-x-6 gap-y-1">
-          <span className="text-zinc-900">
-            Karten gesamt:{" "}
-            <span className="text-zinc-900">{cards.length}</span>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm font-semibold">
+        <div className="flex flex-wrap gap-x-6 gap-y-1 text-ink">
+          <span>
+            Karten gesamt: <span>{cards.length}</span>
           </span>
-          <span className="text-zinc-900">
+          <span>
             Angezeigt:{" "}
-            <span className="text-blue-600">{visible.length}</span>
+            <span className="text-accent">{visible.length}</span>
           </span>
-          <span className="text-zinc-900">
+          <span>
             Umgedreht:{" "}
-            <span className="text-emerald-600">{flippedVisibleCount}</span>
+            <span style={{ color: "var(--success)" }}>
+              {flippedVisibleCount}
+            </span>
           </span>
         </div>
-        <span className="flex items-center gap-1.5 text-xs text-zinc-500">
-          <Lightbulb className="h-3.5 w-3.5 text-amber-600" aria-hidden />
+        <span className="flex items-center gap-1.5 text-xs text-ink-faint">
+          <Lightbulb className="h-3.5 w-3.5" aria-hidden />
           Vorderseite = Frage · Rückseite = Antwort
         </span>
       </div>
 
       {/* Grid */}
       {visible.length === 0 ? (
-        <p className="mt-8 rounded-xl border border-zinc-200 bg-white px-4 py-8 text-center text-sm text-zinc-500">
+        <p className="mt-8 rounded-xl border border-line bg-surface px-4 py-8 text-center text-sm text-ink-faint">
           Keine Karten gefunden.
         </p>
       ) : (
@@ -245,17 +244,26 @@ export function FlashcardGrid({ cards, domains }: Props) {
                 key={c.id}
                 type="button"
                 onClick={() => toggleCard(c.id)}
-                className="flex h-80 overflow-hidden rounded-[18px] bg-white text-left shadow-[0_18px_40px_-12px_rgba(24,24,27,0.22),0_6px_14px_-6px_rgba(24,24,27,0.12)] transition hover:shadow-[0_24px_50px_-12px_rgba(24,24,27,0.28),0_8px_18px_-6px_rgba(24,24,27,0.16)]"
+                className="flex h-80 overflow-hidden rounded-xl border border-line bg-surface text-left shadow-[0_18px_40px_-16px_rgba(24,24,27,0.18),0_6px_14px_-8px_rgba(24,24,27,0.10)] transition-shadow hover:shadow-[0_24px_50px_-16px_rgba(24,24,27,0.24)] dark:shadow-none"
               >
-                {/* Left domain stripe — clipped into the card rounding via overflow-hidden */}
-                <div className={`w-[5px] shrink-0 ${color.iconBg}`} aria-hidden />
+                {/* Left domain stripe (solid hex — dark-safe) */}
+                <div
+                  className="w-[5px] shrink-0"
+                  style={{ background: color.solid }}
+                  aria-hidden
+                />
 
                 {/* Content column */}
                 <div className="flex min-h-0 flex-1 flex-col">
                   {/* Header: domain pill with the card number prefixed */}
                   <div className="flex shrink-0 items-center px-5 pb-3.5 pt-5">
                     <span
-                      className={`min-w-0 truncate rounded-full border px-3.5 py-1.5 text-sm font-medium ${color.tag}`}
+                      className="min-w-0 truncate rounded-full border px-3.5 py-1.5 text-sm font-medium"
+                      style={{
+                        color: color.solid,
+                        borderColor: `color-mix(in srgb, ${color.solid} 35%, transparent)`,
+                        background: `color-mix(in srgb, ${color.solid} 12%, transparent)`,
+                      }}
                     >
                       <span className="font-bold">
                         {displayNumberById.get(c.id)}.
@@ -265,19 +273,31 @@ export function FlashcardGrid({ cards, domains }: Props) {
                   </div>
 
                   {/* Neutral divider, inset from edges (not touching stripe) */}
-                  <div className="mx-5 shrink-0 border-t border-zinc-200" />
+                  <div className="mx-5 shrink-0 border-t border-line" />
 
-                  {/* Body */}
+                  {/* Body — 3D flip scene (both faces mounted, 600ms rotateY) */}
                   <div className="flex min-h-0 flex-1 flex-col p-5">
-                    <div className="flex min-h-0 flex-1 flex-col">
-                      {isFlipped ? (
-                        <div className="flex h-full min-h-0 flex-col">
-                          <div className="mb-2.5 shrink-0 rounded-md border-l-2 border-amber-500 bg-amber-100 px-2.5 py-1.5">
-                            <p className="text-[11.5px] leading-snug text-amber-900">
+                    <div className="flip-scene min-h-0 flex-1">
+                      <div className={`flip-inner ${isFlipped ? "flipped" : ""}`}>
+                        {/* FRONT */}
+                        <div className="flip-face flex flex-col items-center justify-center gap-3.5">
+                          <FlashcardIcon
+                            iconSlugs={c.iconSlugs}
+                            domain={c.domain}
+                            variant="hero"
+                          />
+                          <p className="whitespace-pre-wrap text-center text-[15px] font-semibold leading-relaxed text-ink">
+                            {c.front}
+                          </p>
+                        </div>
+                        {/* BACK */}
+                        <div className="flip-face flip-back flex flex-col">
+                          <div className="mb-2.5 shrink-0 rounded-md border-l-2 border-line-strong bg-surface-2 px-2.5 py-1.5">
+                            <p className="text-[11.5px] leading-snug text-ink-soft">
                               {c.front}
                             </p>
                           </div>
-                          <div className="min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-relaxed text-zinc-800">
+                          <div className="min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-relaxed text-ink-soft">
                             <ReactMarkdown
                               remarkPlugins={REMARK_PLUGINS}
                               allowedElements={MARKDOWN_ALLOWED}
@@ -288,22 +308,11 @@ export function FlashcardGrid({ cards, domains }: Props) {
                             </ReactMarkdown>
                           </div>
                         </div>
-                      ) : (
-                        <div className="flex h-full flex-col items-center justify-center gap-3.5">
-                          <FlashcardIcon
-                            iconSlugs={c.iconSlugs}
-                            domain={c.domain}
-                            variant="hero"
-                          />
-                          <p className="whitespace-pre-wrap text-center text-[15px] font-semibold leading-relaxed text-zinc-900">
-                            {c.front}
-                          </p>
-                        </div>
-                      )}
+                      </div>
                     </div>
 
                     {/* Flip hint */}
-                    <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-zinc-400">
+                    <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-ink-faint">
                       {isFlipped ? (
                         <>
                           <RefreshCw className="h-3.5 w-3.5" aria-hidden />

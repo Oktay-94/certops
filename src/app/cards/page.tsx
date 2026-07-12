@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "@/db";
 import { getFlashcards } from "@/db/repository";
+import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { FlashcardGrid } from "./FlashcardGrid";
 
 export default async function CardsPage() {
@@ -11,11 +12,16 @@ export default async function CardsPage() {
   const domains = Array.from(new Set(cards.map((c) => c.domain))).sort();
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10 sm:py-12">
-      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
+    <main className="relative mx-auto w-full max-w-[1120px] px-6 py-10 sm:py-12">
+      <ScrollBackground />
+      <div className="mb-3.5 flex items-center gap-2.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+        <span className="h-px w-8 bg-line-strong" aria-hidden />
+        🗂️ Karteikarten
+      </div>
+      <h1 className="text-[clamp(26px,4vw,40px)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">
         AWS Karteikarten
       </h1>
-      <p className="mt-3 text-zinc-600">
+      <p className="mt-2.5 text-[14.5px] leading-relaxed text-ink-soft">
         Vorderseite = Frage · Rückseite = Antwort · Klick zum Umdrehen
       </p>
 
@@ -36,17 +42,16 @@ export default async function CardsPage() {
 
 function EmptyState() {
   return (
-    <main className="max-w-2xl mx-auto px-6 py-12 sm:py-16">
-      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
+    <main className="relative mx-auto max-w-2xl px-6 py-12 sm:py-16">
+      <ScrollBackground />
+      <h1 className="text-[clamp(26px,4vw,40px)] font-bold tracking-[-0.03em] text-ink">
         Karteikarten in Vorbereitung
       </h1>
-      <p className="mt-3 text-zinc-600">
-        Noch keine Karten in der Datenbank.
-      </p>
+      <p className="mt-3 text-ink-soft">Noch keine Karten in der Datenbank.</p>
 
       <Link
         href="/"
-        className="mt-10 inline-block rounded-xl border border-zinc-300 px-6 py-3 text-center text-zinc-900 transition hover:bg-zinc-100"
+        className="mt-10 inline-block rounded-lg border border-line-strong px-6 py-3 text-center text-[13px] font-semibold text-ink transition-colors hover:border-ink-faint"
       >
         Zurück zum Dashboard
       </Link>
