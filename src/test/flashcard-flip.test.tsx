@@ -25,9 +25,7 @@ const cards: FlashcardItem[] = [
 ];
 
 function cardButton(): HTMLElement {
-  return screen
-    .getAllByRole("button")
-    .find((b) => b.className.includes("h-80"))!;
+  return screen.getByTestId("flashcard");
 }
 
 describe("FlashcardGrid flip (behaviour preserved through re-skin)", () => {

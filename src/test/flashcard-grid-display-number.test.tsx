@@ -65,8 +65,8 @@ describe("FlashcardGrid markdown answer", () => {
     const { container } = render(
       <FlashcardGrid cards={md} domains={["Cloud Concepts"]} />,
     );
-    const cardBtn = Array.from(container.querySelectorAll("button")).find((b) =>
-      b.className.includes("h-80"),
+    const cardBtn = container.querySelector<HTMLButtonElement>(
+      '[data-testid="flashcard"]',
     );
     expect(cardBtn).toBeDefined();
     await act(async () => {
@@ -93,8 +93,8 @@ describe("FlashcardGrid markdown answer", () => {
     const { container } = render(
       <FlashcardGrid cards={md} domains={["Cloud Concepts"]} />,
     );
-    const cardBtn = Array.from(container.querySelectorAll("button")).find((b) =>
-      b.className.includes("h-80"),
+    const cardBtn = container.querySelector<HTMLButtonElement>(
+      '[data-testid="flashcard"]',
     );
     await act(async () => {
       cardBtn!.click();

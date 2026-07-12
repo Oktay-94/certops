@@ -398,20 +398,21 @@ body {
 }
 
 /* ============================================================
-   Flashcard 3D flip (/cards) — both faces mounted, 600ms rotateY.
+   Flashcard 3D flip (/cards) — both faces mounted, 500ms rotateY.
    Behavior stays click-to-flip (React toggles .flipped); this only
    adds the animation. GPU layer per face → no text flicker mid-flip.
+   A card flip is a "hero" motion, so 500ms/1200px perspective (not
+   the 120–200ms UI-motion) per the flashcard-ui-guide.
    ============================================================ */
 .flip-scene {
   position: relative;
-  perspective: 1100px;
+  perspective: 1200px;
 }
 .flip-inner {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  /* Shadow rides along in 3D → depth cue that moves with the flip. */
-  transition: transform 0.6s cubic-bezier(0.22, 0.9, 0.3, 1);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: transform;
 }
 .flip-inner.flipped {

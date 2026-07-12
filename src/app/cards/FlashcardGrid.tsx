@@ -16,15 +16,49 @@ import remarkFlexibleMarkers from "remark-flexible-markers";
 import { getDomainColor } from "@/lib/domain-colors";
 import { markFlashcardSeen, resetFlashcardViews } from "./actions";
 
-// Domain emoji for the card front (replaces the generic lucide fallback —
-// same emoji language as the dashboard). Keyed by CLF domain.
+// Domain emoji = fallback when no topic keyword matches. 80/150 cards live in
+// "Cloud Technology and Services", so the domain emoji alone made almost every
+// card the same 🧰 — the topic map below differentiates by card content first.
 const DOMAIN_EMOJI: Record<string, string> = {
   "Cloud Concepts": "☁️",
   "Security and Compliance": "🔒",
   "Cloud Technology and Services": "🧰",
   "Billing, Pricing, and Support": "💵",
 };
-function domainEmoji(domain: string): string {
+
+// Topic → emoji, matched against the card front (first hit wins, so order =
+// specificity). Keeps the emoji tied to what the card is actually about.
+const TOPIC_EMOJI: Array<[RegExp, string]> = [
+  [/\b(ec2|instanz|instance|compute|virtuelle server)\b/i, "🖥️"],
+  [/\b(lambda|serverless)\b/i, "⚡"],
+  [/\b(container|ecs|eks|fargate|docker|kubernetes)\b/i, "📦"],
+  [/\b(s3|bucket|objektspeicher|object storage)\b/i, "🪣"],
+  [/\b(ebs|efs|fsx|storage gateway|volume|block storage)\b/i, "🗄️"],
+  [/\b(rds|aurora|dynamodb|datenbank|database|redshift|sql)\b/i, "🗃️"],
+  [/\b(vpc|subnet|netzwerk|network|peering|transit gateway)\b/i, "🌐"],
+  [/\b(route ?53|dns)\b/i, "🧭"],
+  [/\b(cloudfront|cdn|edge)\b/i, "📡"],
+  [/\b(load balancer|elb|alb|nlb|auto ?scaling|skalier)\b/i, "⚖️"],
+  [/\b(sns|sqs|eventbridge|queue|messaging|nachricht)\b/i, "📨"],
+  [/\b(api gateway|rest api)\b/i, "🔌"],
+  [/\b(cloudwatch|monitoring|logs|metrik|metric|x-ray)\b/i, "📊"],
+  [/\b(athena|kinesis|glue|quicksight|emr|analytics|analyse)\b/i, "📈"],
+  [/\b(sagemaker|rekognition|comprehend|machine learning|\bki\b|\bml\b|\bai\b)\b/i, "🤖"],
+  [/\b(migration|snowball|snowcone|dms|transfer)\b/i, "🚚"],
+  [/\b(backup|disaster recovery|\bdr\b|wiederherstellung)\b/i, "💾"],
+  [/\b(iam|kms|encryption|verschlüssel|cognito|secrets|waf|shield|guardduty)\b/i, "🔒"],
+  [/\b(compliance|audit|governance|artifact|config|control tower|organizations)\b/i, "📋"],
+  [/\b(shared responsibility|geteilte verantwortung)\b/i, "🤝"],
+  [/\b(billing|cost|kosten|pricing|preis|budget|savings plan|reserved)\b/i, "💵"],
+  [/\b(support|basic|developer|business|enterprise)\b.*\bplan\b/i, "🛟"],
+  [/\b(well[- ]architected|architektur|architecture|design principle)\b/i, "🏛️"],
+  [/\b(region|availability zone|verfügbarkeitszone|\baz\b|global)\b/i, "🗺️"],
+];
+
+function cardEmoji(front: string, domain: string): string {
+  for (const [re, emoji] of TOPIC_EMOJI) {
+    if (re.test(front)) return emoji;
+  }
   return DOMAIN_EMOJI[domain] ?? "📇";
 }
 
@@ -246,14 +280,11 @@ export function FlashcardGrid({ cards, domains }: Props) {
           Keine Karten gefunden.
         </p>
       ) : (
-        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((c) => {
             const isFlipped = flipped.has(c.id);
             const color = getDomainColor(c.domain);
-            const emoji = domainEmoji(c.domain);
-            // Back is tinted in the domain hue over the surface → clearly the
-            // "answer" side; works on light and dark (surface follows theme).
-            const backTint = `color-mix(in srgb, ${color.solid} 12%, var(--surface))`;
+            const emoji = cardEmoji(c.front, c.domain);
             const stripe = (
               <div
                 className="w-[5px] shrink-0"
@@ -266,8 +297,9 @@ export function FlashcardGrid({ cards, domains }: Props) {
               <button
                 key={c.id}
                 type="button"
+                data-testid="flashcard"
                 onClick={() => toggleCard(c.id)}
-                className="flip-scene relative h-80 text-left"
+                className="flip-scene relative h-[27rem] text-left"
               >
                 <div
                   className={`flip-inner rounded-xl shadow-[0_22px_46px_-18px_rgba(24,24,27,0.24)] dark:shadow-none ${
@@ -296,7 +328,7 @@ export function FlashcardGrid({ cards, domains }: Props) {
                       <div className="mx-5 shrink-0 border-t border-line" />
                       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-5">
                         <span
-                          className="text-[46px] leading-none [filter:drop-shadow(0_2px_3px_rgba(0,0,0,0.14))]"
+                          className="text-[30px] leading-none [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.12))]"
                           aria-hidden
                         >
                           {emoji}
@@ -312,11 +344,9 @@ export function FlashcardGrid({ cards, domains }: Props) {
                     </div>
                   </div>
 
-                  {/* BACK — tinted in the domain hue (the "answer" side) */}
-                  <div
-                    className="flip-face flip-back flex overflow-hidden rounded-xl border border-line"
-                    style={{ background: backTint }}
-                  >
+                  {/* BACK — neutral surface like the front; the stripe + "Antwort"
+                      label mark the answer side (no tinted background) */}
+                  <div className="flip-face flip-back flex overflow-hidden rounded-xl border border-line bg-surface">
                     {stripe}
                     <div className="flex min-w-0 flex-1 flex-col">
                       <div className="flex min-w-0 shrink-0 items-center gap-2 px-5 pb-3 pt-4">
