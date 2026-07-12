@@ -39,7 +39,9 @@
   --ink-faint: #a4a7ad;
   --success: #16a34a;
   --success-soft: #e8f7ee;
-  --grid-line: transparent;
+  /* Blueprint grid — theme-scoped since 2b polish (diagramm-quiz reference:
+     visible in BOTH themes; the old saa×dark-only gating undersold the mockups). */
+  --grid-line: rgba(35, 47, 62, 0.06);
   --heat-0: #f0f0f1;
   --heat-1: #d5eee3;
   --heat-2: #9fdcc0;
@@ -77,7 +79,17 @@
   --heat-4: rgba(255, 255, 255, 0.8);
   --glow-a: rgba(125, 147, 201, 0.14);
   --glow-b: rgba(1, 168, 141, 0.12);
+  --grid-line: rgba(255, 255, 255, 0.045);
+
+  /* Legacy pair flips in dark → consistent dark canvas app-wide (dark is only
+     reachable via the manual toggle until the full re-skin lands). Light mode
+     stays byte-identical. */
+  --background: var(--canvas);
+  --foreground: var(--ink);
 }
+
+/* Tailwind `dark:` variant driven by the data-theme axis (not media query). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* Exam axis: accent identity only. Domain colors stay in domain-colors.ts. */
 :root[data-exam="clf"] {
@@ -91,11 +103,6 @@
   --accent: #7d93c9;
   --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
 }
-/* Blueprint grid is an SAA signature and only visible in dark. */
-:root[data-exam="saa"][data-theme="dark"] {
-  --grid-line: rgba(255, 255, 255, 0.045);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -164,16 +171,23 @@ body {
 }
 
 /* ============================================================
-   Dashboard v2 (Phase 2) — scroll background + area previews.
-   Grid uses --grid-line (transparent in clf×light by design: the
-   canonical CLF look is "Apple-clean"; the grid appears in dark).
-   Glows are always on, subtle, theme-tinted via --glow-a/-b.
+   Dashboard v2 — scroll background + area previews.
+   References: certops-diagramm-quiz.html (grid + glows, both themes),
+   certops-statistik-v3.html (.area hover, .pv-cards 600ms flip).
+   The .scroll-bg element itself paints the token canvas full-bleed
+   (dashboard-only — body keeps the legacy pair for other pages).
    ============================================================ */
+.scroll-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--canvas);
+}
 .scroll-bg::before,
 .scroll-bg::after {
   content: "";
   position: fixed;
-  z-index: -1;
   pointer-events: none;
 }
 .scroll-bg::before {
@@ -205,17 +219,23 @@ body {
       transparent 70%
     );
   opacity: calc(0.7 + var(--scrollp, 0) * 0.3);
+  transition: opacity 0.3s linear;
 }
 
-/* --- Bereiche mini previews (CSS-only, hover on the .area group) --- */
+/* --- Area tiles: hover 1:1 from certops-statistik-v3.html .area --- */
 .area-tile {
   transition:
     border-color var(--t-fast) linear,
-    transform var(--t-fast) cubic-bezier(0.22, 0.9, 0.3, 1);
+    transform 220ms cubic-bezier(0.22, 0.9, 0.3, 1),
+    box-shadow 220ms linear;
 }
 .area-tile:hover {
   border-color: var(--border-strong);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+}
+/* Shadow is LIGHT-ONLY by mockup design — dark uses border+lift only. */
+:root:not([data-theme="dark"]) .area-tile:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
 }
 
 /* Quiz preview: the correct option fills on hover */
@@ -231,14 +251,14 @@ body {
   border-color: var(--success);
 }
 
-/* Card preview: mini flashcard flips on hover */
+/* Card/Dienste previews: 3D flip on hover (statistik-v3 .pv-cards, 600ms) */
 .pv-card-scene {
   perspective: 600px;
 }
 .pv-card {
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.55s cubic-bezier(0.22, 0.9, 0.3, 1);
+  transition: transform 0.6s cubic-bezier(0.22, 0.9, 0.3, 1);
 }
 .area-tile:hover .pv-card {
   transform: rotateY(180deg);
@@ -252,13 +272,55 @@ body {
   transform: rotateY(180deg);
   background: var(--accent-soft);
 }
+.pv-card-back-surface {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  background: var(--surface-2);
+}
 
-/* Skript preview: text column drifts upward on hover */
+/* Skript preview: text column scrolls upward on hover (3s, long drift) */
 .pv-scroll {
-  transition: transform 1.4s cubic-bezier(0.22, 0.9, 0.3, 1);
+  transition: transform 3s cubic-bezier(0.22, 0.9, 0.3, 1);
 }
 .area-tile:hover .pv-scroll {
-  transform: translateY(-34px);
+  transform: translateY(-60px);
+}
+
+/* Statistik preview: sparkline draws itself on hover (statistik-v3 pattern:
+   stroke-dasharray/offset → 0). Idle shows the empty axis + target line. */
+.pv-spark-path {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+}
+.area-tile:hover .pv-spark-path {
+  animation: pv-draw 1.4s cubic-bezier(0.22, 0.9, 0.3, 1) forwards;
+}
+@keyframes pv-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Übersicht preview: chips light up staggered (diagramm-quiz .chipd.selected) */
+.pv-chip {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-pill);
+  transition:
+    border-color var(--t-fast) linear,
+    color var(--t-fast) linear,
+    box-shadow var(--t-fast) linear;
+}
+.area-tile:hover .pv-chip {
+  border-color: var(--orange-bright);
+  color: var(--orange-bright);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--orange-bright) 18%, transparent);
+}
+.area-tile:hover .pv-chip:nth-child(2) {
+  transition-delay: 70ms;
+}
+.area-tile:hover .pv-chip:nth-child(3) {
+  transition-delay: 140ms;
 }
 
 /* --- Reduced motion: kill dashboard motion, previews settle instantly --- */
@@ -272,8 +334,14 @@ body {
   .pv-opt,
   .pv-card,
   .pv-scroll,
+  .pv-chip,
   .ring-arc {
     transition: none !important;
+    animation: none !important;
+  }
+  .pv-spark-path {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
     animation: none !important;
   }
 }

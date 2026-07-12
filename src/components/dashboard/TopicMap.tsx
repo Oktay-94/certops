@@ -3,6 +3,10 @@ import { CLF_C02_DOMAINS } from "@/lib/domains";
 import { PERF_THRESHOLDS } from "@/lib/scoreColor";
 import type { DomainOverview } from "@/db/repository";
 
+// CURRENTLY NOT RENDERED (2b polish): the topic map is an SAA architecture
+// signature — four CLF domain boxes in a row are not an architecture. Returns
+// with Phase 6 (exam switcher) fed by SAA data. Tests keep covering nodeState.
+//
 // Passive topic map (mockup Topic-Map tile): node boxes with 2pt strokes,
 // right-angle connectors with mid-x elbow, OPEN arrowheads (chevron), dashed
 // group container. ChartSvg convention: ONE draw function, two configs,

@@ -7,16 +7,19 @@ function clearThemeState(): void {
   document.cookie = "certops_theme=; path=/; max-age=0";
 }
 
-describe("ThemeToggle", () => {
+describe("ThemeToggle (pill switch)", () => {
   beforeEach(clearThemeState);
   afterEach(() => {
     cleanup();
     clearThemeState();
   });
 
-  it("toggles to dark: sets data-theme and persists the cookie", () => {
+  it("toggles to dark: sets data-theme, cookie and aria-checked", () => {
     render(<ThemeToggle />);
-    fireEvent.click(screen.getByRole("button"));
+    const toggle = screen.getByRole("switch");
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+
+    fireEvent.click(toggle);
 
     expect(document.documentElement.dataset.theme).toBe("dark");
     expect(document.cookie).toContain("certops_theme=dark");
@@ -24,14 +27,15 @@ describe("ThemeToggle", () => {
 
   it("toggles back to light: removes data-theme, cookie says light", async () => {
     render(<ThemeToggle />);
-    fireEvent.click(screen.getByRole("button")); // → dark
+    fireEvent.click(screen.getByRole("switch")); // → dark
 
     // MutationObserver notifies as a microtask — wait for the re-render
     // before the second click, otherwise it still targets the dark toggle.
-    const backButton = await screen.findByRole("button", {
+    const backToggle = await screen.findByRole("switch", {
       name: /light mode aktivieren/i,
     });
-    fireEvent.click(backButton); // → light
+    expect(backToggle).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(backToggle); // → light
 
     expect(document.documentElement.dataset.theme).toBeUndefined();
     expect(document.cookie).toContain("certops_theme=light");
@@ -41,9 +45,8 @@ describe("ThemeToggle", () => {
     document.documentElement.dataset.theme = "dark";
     render(<ThemeToggle />);
 
-    // Button now offers switching to light.
     expect(
-      screen.getByRole("button", { name: /light mode aktivieren/i }),
+      screen.getByRole("switch", { name: /light mode aktivieren/i }),
     ).toBeInTheDocument();
   });
 });

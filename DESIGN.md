@@ -10,7 +10,7 @@ Zwei orthogonale Attribute auf `<html>`:
 | Achse | Werte | steuert |
 |---|---|---|
 | `data-theme` | *(leer = light)* / `dark` | Flächen-/Text-/Heat-**Leitern**, `color-scheme` |
-| `data-exam` | `clf` / `saa` | **Akzent**-Identität (`--accent`, `--accent-soft`), Blueprint-Grid |
+| `data-exam` | `clf` / `saa` | **Akzent**-Identität (`--accent`, `--accent-soft`) |
 
 Das Mockup koppelt beide Achsen (CLF = hell, SAA = Squid-Ink). Die App entkoppelt sie:
 **kanonisch (mockup-treu 1:1)** sind `clf×light` und `saa×dark`; die übrigen zwei Kombis
@@ -41,7 +41,7 @@ statischen Routen dynamic machen. Theme-Init läuft als statisches Inline-Script
 | `--ink-faint` | `#a4a7ad` | `#5c6a7e` |
 | `--success` / `-soft` | `#16a34a` / `#e8f7ee` | `#2bbf9e` / `rgba(1,168,141,.14)` |
 | `--heat-0…4` | `#f0f0f1 → #16a34a` | weiße Alpha-Stufen `.05 → .8` |
-| `--grid-line` | `transparent` | nur `saa×dark`: `rgba(255,255,255,.045)` |
+| `--grid-line` | `rgba(35,47,62,.06)` | `rgba(255,255,255,.045)` — theme-scoped seit 2b (diagramm-quiz) |
 | `--cta-ink` | `#1a1204` | `#1a1204` |
 
 ### Akzent (`data-exam`)

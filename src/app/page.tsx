@@ -22,7 +22,6 @@ import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { StaggerReveal } from "@/components/dashboard/StaggerReveal";
 import { StreakTile } from "@/components/dashboard/StreakTile";
 import { Tile } from "@/components/dashboard/Tile";
-import { TopicMap } from "@/components/dashboard/TopicMap";
 
 export default async function Home() {
   const userId = await getActiveProfileId();
@@ -52,14 +51,29 @@ export default async function Home() {
       <div className="flex items-start justify-between gap-4">
         <div>
           {branding ? (
-            <Image
-              src={branding.logoSrc}
-              alt="CertOps"
-              width={1200}
-              height={428}
-              priority
-              className="h-auto w-full max-w-[200px] sm:max-w-[260px]"
-            />
+            <>
+              {/* Light: profile logo PNG. Dark: mockup wordmark (the PNGs are
+                  light-baked; the mockups use a text wordmark anyway). */}
+              <Image
+                src={branding.logoSrc}
+                alt="CertOps"
+                width={1200}
+                height={428}
+                priority
+                className="h-auto w-full max-w-[200px] dark:hidden sm:max-w-[260px]"
+              />
+              <div className="hidden items-center gap-2 text-base font-bold tracking-[-0.02em] text-ink dark:flex">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ background: "var(--orange-bright)" }}
+                  aria-hidden
+                />
+                CertOps
+                <span className="ml-1 font-mono text-[9.5px] font-normal uppercase tracking-[0.14em] text-ink-faint">
+                  {branding.profileName}
+                </span>
+              </div>
+            </>
           ) : (
             <h1 className="text-3xl font-semibold tracking-tight text-ink">
               CertOps
@@ -171,11 +185,6 @@ export default async function Home() {
         <StaggerReveal index={4} className="md:col-span-7">
           <Tile label="Lern-Aktivität" value="Letzte 26 Wochen" className="h-full">
             <ActivityHeatmap buckets={buckets} today={now} />
-          </Tile>
-        </StaggerReveal>
-        <StaggerReveal index={5} className="md:col-span-12">
-          <Tile label="Topic-Map" value="Passiv · Live-Zustand" className="h-full">
-            <TopicMap stats={domainStats} />
           </Tile>
         </StaggerReveal>
       </div>

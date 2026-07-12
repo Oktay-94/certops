@@ -33,7 +33,7 @@ export const THEME_LIGHT = {
   inkFaint: "#a4a7ad",
   success: "#16a34a",
   successSoft: "#e8f7ee",
-  gridLine: "transparent",
+  gridLine: "rgba(35,47,62,.06)", // theme-scoped since 2b (diagramm-quiz)
   heat: ["#f0f0f1", "#d5eee3", "#9fdcc0", "#4cbe8b", "#16a34a"],
   ctaInk: "#1a1204",
 } as const;
