@@ -4,6 +4,8 @@ import { db } from "@/db";
 import { getQuestionsByCert } from "@/db/repository";
 import type { Question, QuestionDisplay } from "@/db/schema";
 import { seedFromString, shuffle } from "@/lib/shuffle";
+import { BRAND_ORANGE } from "@/lib/brand";
+import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { QuestionCard } from "../QuestionCard";
 
 const SESSION_COOKIE = "certops_session_id";
@@ -74,18 +76,19 @@ export default async function QuizQuestionPage({ params }: Props) {
   const percent = Math.round((position / total) * 100);
 
   return (
-    <main className="max-w-2xl mx-auto px-6 py-12 sm:py-16">
+    <main className="relative mx-auto max-w-2xl px-6 py-12 sm:py-16">
+      <ScrollBackground />
       <div className="mb-6">
-        <div className="flex items-center justify-between text-xs text-zinc-500">
+        <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
           <span>
             Frage {position} von {total}
           </span>
-          <span className="tabular-nums">{percent}%</span>
+          <span className="tabular-nums text-ink-soft">{percent}%</span>
         </div>
-        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-zinc-100">
+        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-surface-2">
           <div
-            className="h-full bg-zinc-400 transition-all"
-            style={{ width: `${percent}%` }}
+            className="h-full rounded-full transition-[width] duration-500 ease-[cubic-bezier(.22,.9,.3,1)]"
+            style={{ width: `${percent}%`, background: BRAND_ORANGE }}
             aria-hidden
           />
         </div>

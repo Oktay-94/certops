@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import {
   Cloud,
   DollarSign,
-  GraduationCap,
   LayoutGrid,
   Server,
   Shield,
@@ -69,9 +68,10 @@ function previewSentence(
   return `Du startest: ${cText} ${dText}, ${mText}.`;
 }
 
-function selectionBorderAccent(domain: DomainChoice): string {
-  if (domain === "all") return "border-l-emerald-500";
-  return getDomainColor(domain).borderAccent;
+// Solid hex for the preview panel's left accent (dark-safe, single source).
+function selectionAccentHex(domain: DomainChoice): string {
+  if (domain === "all") return "var(--accent)";
+  return getDomainColor(domain).solid;
 }
 
 export function QuizConfigForm({ questionCount }: { questionCount: number }) {
@@ -99,45 +99,42 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
     });
   }
 
+  // Selected = accent (mockup convention); inactive = line + hover strong.
   function chipClass(active: boolean): string {
     const base =
-      "rounded-xl border px-4 py-2 text-sm transition disabled:cursor-not-allowed disabled:opacity-50";
+      "rounded-lg border-[1.5px] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.06em] transition-colors disabled:cursor-not-allowed disabled:opacity-50";
     return active
-      ? `${base} border-zinc-200 bg-zinc-100 text-zinc-900 ring-2 ring-emerald-500`
-      : `${base} border-zinc-200 text-zinc-900 hover:border-zinc-400`;
+      ? `${base} border-accent bg-accent-soft text-accent`
+      : `${base} border-line-strong text-ink-soft hover:border-accent`;
   }
 
   function rowClass(active: boolean): string {
     const base =
-      "flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50";
+      "flex w-full items-center gap-3 rounded-lg border-[1.5px] px-4 py-3 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50";
     return active
-      ? `${base} border-zinc-200 bg-zinc-100 text-zinc-900 ring-2 ring-emerald-500`
-      : `${base} border-zinc-200 text-zinc-900 hover:border-zinc-400`;
+      ? `${base} border-accent bg-accent-soft text-ink`
+      : `${base} border-line text-ink hover:border-line-strong`;
   }
 
   function modeClass(active: boolean): string {
     const base =
-      "flex flex-1 flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50";
+      "flex flex-1 flex-col items-start gap-1 rounded-lg border-[1.5px] px-4 py-3 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50";
     return active
-      ? `${base} border-zinc-200 bg-zinc-100 text-zinc-900 ring-2 ring-emerald-500`
-      : `${base} border-zinc-200 text-zinc-900 hover:border-zinc-400`;
+      ? `${base} border-accent bg-accent-soft text-ink`
+      : `${base} border-line text-ink hover:border-line-strong`;
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <div className="mt-4 rounded-2xl border border-line bg-surface p-6">
       <header className="flex items-center gap-3">
-        <span
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px]"
-          style={{ backgroundColor: BRAND_ORANGE }}
-          aria-hidden
-        >
-          <GraduationCap size={19} className="text-white" />
+        <span className="text-[30px] leading-none" aria-hidden>
+          🎯
         </span>
         <div>
-          <h2 className="text-xl sm:text-2xl font-medium text-zinc-900">
+          <h2 className="text-xl font-semibold text-ink sm:text-2xl">
             Quiz konfigurieren
           </h2>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-ink-soft">
             {questionCount} CLF-C02-Fragen verfügbar — Umfang und Fokus wählen
           </p>
         </div>
@@ -145,7 +142,9 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
 
       <div className="mt-5 flex flex-col gap-5">
         <section>
-          <h3 className="text-sm font-medium text-zinc-900">Anzahl Fragen</h3>
+          <h3 className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
+            Anzahl Fragen
+          </h3>
           <div className="mt-3 flex flex-wrap gap-2">
             {QUIZ_COUNT_OPTIONS.map((c) => (
               <button
@@ -160,11 +159,13 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-zinc-500">{COUNT_LABEL[String(count)]}</p>
+          <p className="mt-2 text-xs text-ink-faint">{COUNT_LABEL[String(count)]}</p>
         </section>
 
         <section>
-          <h3 className="text-sm font-medium text-zinc-900">Bereich</h3>
+          <h3 className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
+            Bereich
+          </h3>
           <div className="mt-3 flex flex-col gap-2">
             <button
               type="button"
@@ -175,7 +176,7 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
             >
               <LayoutGrid
                 className={`h-4 w-4 shrink-0 ${
-                  domain === "all" ? "text-emerald-600" : ""
+                  domain === "all" ? "text-accent" : "text-ink-faint"
                 }`}
                 aria-hidden
               />
@@ -195,7 +196,8 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
                     className={rowClass(domain === value)}
                   >
                     <span
-                      className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] ${color.iconBg}`}
+                      className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px]"
+                      style={{ background: color.solid }}
                       aria-hidden
                     >
                       <Icon size={16} className="text-white" />
@@ -210,7 +212,9 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <section>
-            <h3 className="text-sm font-medium text-zinc-900">Modus</h3>
+            <h3 className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
+              Modus
+            </h3>
             <div className="mt-3 flex gap-2">
               <button
                 type="button"
@@ -219,14 +223,14 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
                 aria-pressed={mode === "random"}
                 className={modeClass(mode === "random")}
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2 font-medium">
                   <Shuffle
-                    className={`h-4 w-4 ${mode === "random" ? "text-emerald-600" : ""}`}
+                    className={`h-4 w-4 ${mode === "random" ? "text-accent" : "text-ink-faint"}`}
                     aria-hidden
                   />
                   Zufällig
                 </span>
-                <span className="text-xs text-zinc-500">
+                <span className="text-xs text-ink-soft">
                   Zufällige Auswahl aus dem Pool
                 </span>
               </button>
@@ -237,11 +241,11 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
                 aria-pressed={mode === "weakest-first"}
                 className={modeClass(mode === "weakest-first")}
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2 font-medium">
                   <TriangleAlert className="h-4 w-4 text-amber-500" aria-hidden />
                   Schwache zuerst
                 </span>
-                <span className="text-xs text-zinc-500">
+                <span className="text-xs text-ink-soft">
                   Priorisiert Karten mit niedriger Trefferquote
                 </span>
               </button>
@@ -249,9 +253,12 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
           </section>
 
           <section>
-            <h3 className="text-sm font-medium text-zinc-900">Auswahl</h3>
+            <h3 className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
+              Auswahl
+            </h3>
             <div
-              className={`mt-3 flex min-h-[5.5rem] items-center rounded-xl border-l-[3px] bg-zinc-50 px-3 py-2 text-sm text-zinc-700 ${selectionBorderAccent(domain)}`}
+              className="mt-3 flex min-h-[5.5rem] items-center rounded-lg border-l-[3px] bg-surface-2 px-3 py-2 text-sm text-ink-soft"
+              style={{ borderLeftColor: selectionAccentHex(domain) }}
             >
               {previewSentence(count, domain, mode)}
             </div>
@@ -262,12 +269,17 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
           type="button"
           onClick={onSubmit}
           disabled={isPending}
-          className="rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+          className="rounded-lg px-6 py-3 text-[13px] font-semibold transition-transform hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-50"
+          style={{ background: BRAND_ORANGE, color: "var(--cta-ink)" }}
         >
           {isPending ? "Starte …" : "Quiz starten"}
         </button>
 
-        {error && <p className="text-sm text-rose-700">Fehler: {error}</p>}
+        {error && (
+          <p className="text-sm" style={{ color: "var(--danger)" }}>
+            Fehler: {error}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import type { QuestionDisplay } from "@/db/schema";
+import { BRAND_ORANGE } from "@/lib/brand";
 import { submitAnswer } from "./[id]/actions";
 
 type Props = {
@@ -117,49 +118,64 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
     onSubmit,
   ]);
 
+  // Option state → token classes (mockup .opt / .sel / .correct / .wrong).
+  // Conditions unchanged; only the color mapping is tokenized.
   function choiceClass(choiceId: string): string {
     const base =
-      "w-full text-left border rounded-xl px-5 py-4 transition flex items-start gap-3";
+      "w-full text-left flex items-start gap-3 rounded-[10px] border-[1.5px] px-[15px] py-[13px] transition-colors";
     const isSelected = selectedSet.has(choiceId);
 
     if (!verdict) {
       return `${base} ${
         isSelected
-          ? "border-zinc-900 bg-zinc-50"
-          : "border-zinc-200 hover:border-zinc-400"
+          ? "border-accent bg-accent-soft"
+          : "border-line bg-surface hover:border-line-strong"
       }`;
     }
 
     const isAnswer = verdict.correctIds.has(choiceId);
     if (isAnswer && isSelected) {
-      return `${base} border-emerald-600 bg-emerald-50`;
+      return `${base} border-success bg-success-soft`;
     }
     if (isAnswer && !isSelected) {
-      return `${base} border-emerald-600`;
+      return `${base} border-success`;
     }
     if (!isAnswer && isSelected) {
-      return `${base} border-rose-600 bg-rose-50`;
+      return `${base} border-danger bg-danger-soft`;
     }
-    return `${base} border-zinc-200 opacity-60`;
+    return `${base} border-line opacity-60`;
+  }
+
+  // Letter badge (mockup .key), recolored per option verdict state.
+  function keyClass(choiceId: string): string {
+    const base =
+      "flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md border font-mono text-[10.5px]";
+    if (verdict) {
+      const isAnswer = verdict.correctIds.has(choiceId);
+      const isSelected = selectedSet.has(choiceId);
+      if (isAnswer) return `${base} border-success text-success`;
+      if (isSelected) return `${base} border-danger text-danger`;
+    }
+    return `${base} border-line-strong text-ink-faint`;
   }
 
   return (
     <article>
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500">
-        <span className="rounded-full bg-zinc-100 px-2.5 py-1 font-medium text-zinc-700">
+      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
+        <span className="rounded-full bg-surface-2 px-2.5 py-1 text-ink-soft">
           {question.domain}
         </span>
         <span>{question.cert}</span>
         {question.type === "multiple" && (
-          <span className="ml-auto text-zinc-400">Mehrfachauswahl</span>
+          <span className="ml-auto text-ink-faint">Mehrfachauswahl</span>
         )}
       </div>
 
-      <h1 className="mt-6 text-xl sm:text-2xl font-medium leading-relaxed text-zinc-900">
+      <h1 className="mt-6 text-xl font-semibold leading-relaxed tracking-[-0.01em] text-ink sm:text-2xl">
         {question.prompt}
       </h1>
 
-      <div className="mt-8 flex flex-col gap-3">
+      <div className="mt-8 flex flex-col gap-[9px]">
         {question.choices.map((choice) => (
           <button
             key={choice.id}
@@ -169,8 +185,10 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
             aria-pressed={selectedSet.has(choice.id)}
             className={choiceClass(choice.id)}
           >
-            <span className="font-medium text-zinc-500">{choice.id}</span>
-            <span className="text-zinc-900">{choice.text}</span>
+            <span className={keyClass(choice.id)}>{choice.id}</span>
+            <span className="pt-0.5 text-[13.5px] leading-relaxed text-ink">
+              {choice.text}
+            </span>
           </button>
         ))}
       </div>
@@ -181,13 +199,14 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
             type="button"
             onClick={onSubmit}
             disabled={selected.length === 0 || isPending}
-            className="rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+            className="rounded-lg px-6 py-3 text-[13px] font-semibold transition-transform hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ background: BRAND_ORANGE, color: "var(--cta-ink)" }}
           >
             {isPending ? "Prüfe …" : "Antwort prüfen"}
           </button>
           <Link
             href="/"
-            className="inline-block rounded-xl border border-zinc-300 px-4 py-2 text-sm text-zinc-900 transition hover:bg-zinc-100"
+            className="inline-block rounded-lg border border-line-strong px-4 py-2 text-sm text-ink transition-colors hover:border-ink-faint"
           >
             Quiz beenden
           </Link>
@@ -195,20 +214,30 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
       )}
 
       {error && (
-        <p className="mt-4 text-sm text-rose-700">Fehler: {error}</p>
+        <p className="mt-4 text-sm" style={{ color: "var(--danger)" }}>
+          Fehler: {error}
+        </p>
       )}
 
       {verdict && (
         <>
-          <section className="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 p-6">
+          <section
+            className="mt-8 rounded-[0_9px_9px_0] border-l-[3px] bg-surface-2 p-5"
+            style={{
+              borderColor: verdict.correct
+                ? "var(--success)"
+                : "var(--danger)",
+            }}
+          >
             <header
-              className={`text-sm font-semibold uppercase tracking-wide ${
-                verdict.correct ? "text-emerald-700" : "text-rose-700"
-              }`}
+              className="text-sm font-semibold uppercase tracking-wide"
+              style={{
+                color: verdict.correct ? "var(--success)" : "var(--danger)",
+              }}
             >
               {verdict.correct ? "Richtig" : "Falsch"}
             </header>
-            <p className="mt-3 leading-relaxed text-zinc-800">
+            <p className="mt-3 leading-relaxed text-ink-soft">
               {verdict.explanation}
             </p>
           </section>
@@ -216,14 +245,15 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
           <div className="mt-6 flex items-center justify-between gap-3">
             <Link
               href={nextHref}
-              className="inline-block rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800"
+              className="inline-block rounded-lg px-6 py-3 text-[13px] font-semibold transition-transform hover:-translate-y-px"
+              style={{ background: BRAND_ORANGE, color: "var(--cta-ink)" }}
             >
-              {isLast ? "Quiz beenden" : "Nächste Frage"}
+              {isLast ? "Quiz beenden" : "Nächste Frage →"}
             </Link>
             {!isLast && (
               <Link
                 href="/"
-                className="inline-block rounded-xl border border-zinc-300 px-4 py-2 text-sm text-zinc-900 transition hover:bg-zinc-100"
+                className="inline-block rounded-lg border border-line-strong px-4 py-2 text-sm text-ink transition-colors hover:border-ink-faint"
               >
                 Quiz beenden
               </Link>
@@ -232,7 +262,7 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
         </>
       )}
 
-      <p className="mt-6 text-xs text-zinc-500">
+      <p className="mt-6 text-xs text-ink-faint">
         {checked
           ? "Tasten: Enter · N · → für nächste Frage"
           : `Tasten: A–${lastChoiceId} wählen · Enter prüfen`}
