@@ -10,6 +10,7 @@ import {
 import { emojiForHeadingText } from "@/lib/skript-emoji";
 import { INTRO_SLUG, ttsPlainText } from "@/lib/tts-text";
 import { SkriptMarkdown } from "@/components/skript/SkriptMarkdown";
+import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import {
   TtsChapterButton,
   TtsProvider,
@@ -62,11 +63,12 @@ export default async function SkriptChapterPage({
     <div
       lang="de"
       style={chapterColorVars(chapter.num)}
-      className="min-h-screen bg-[color:var(--tint)]"
+      className="relative min-h-screen"
     >
+      <ScrollBackground />
       {/* Sticky breadcrumb with blur */}
-      <div className="sticky top-0 z-10 border-b border-zinc-200 bg-white/70 backdrop-blur-xl backdrop-saturate-150">
-        <div className="mx-auto flex max-w-[760px] items-center gap-2.5 px-6 py-3 text-[13.5px] text-zinc-500">
+      <div className="sticky top-0 z-10 border-b border-line bg-surface/70 backdrop-blur-xl backdrop-saturate-150">
+        <div className="mx-auto flex max-w-[760px] items-center gap-2.5 px-6 py-3 text-[13.5px] text-ink-soft">
           <span
             className="h-[7px] w-[7px] shrink-0 rounded-full bg-[color:var(--accent)]"
             aria-hidden
@@ -75,7 +77,7 @@ export default async function SkriptChapterPage({
             Lernskript
           </Link>
           <span aria-hidden>›</span>
-          <span className="truncate text-zinc-900">
+          <span className="truncate text-ink">
             Kapitel {chapter.num} · {chapter.title}
           </span>
         </div>
@@ -92,11 +94,11 @@ export default async function SkriptChapterPage({
             </span>
             {playlist.length > 0 && <TtsChapterButton />}
           </div>
-          <h1 className="text-[40px] font-bold leading-[1.1] tracking-[-0.021em] text-zinc-900 [overflow-wrap:anywhere] hyphens-auto sm:text-[40px]">
+          <h1 className="text-[40px] font-bold leading-[1.1] tracking-[-0.021em] text-ink [overflow-wrap:anywhere] hyphens-auto sm:text-[40px]">
             {chapter.title}
           </h1>
           {intro && (
-            <div className="mt-4 text-[16.5px] text-zinc-600">
+            <div className="mt-4 text-[16.5px] text-ink-soft">
               <SkriptMarkdown markdown={intro} />
             </div>
           )}
@@ -106,7 +108,7 @@ export default async function SkriptChapterPage({
         {sections.length > 0 && (
           <nav
             aria-label="Dienste in diesem Kapitel"
-            className="mt-8 flex flex-wrap gap-2 rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5"
+            className="mt-8 flex flex-wrap gap-2 rounded-2xl border border-line bg-surface p-4 sm:p-5"
           >
             {sections.map((s) => {
               const emoji = emojiForHeadingText(s.raw);
@@ -114,7 +116,7 @@ export default async function SkriptChapterPage({
                 <a
                   key={s.slug}
                   href={`#${s.slug}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white py-[7px] pl-[11px] pr-3.5 text-[14px] font-medium text-zinc-700 transition hover:-translate-y-px hover:border-[color:var(--accent)]"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface py-[7px] pl-[11px] pr-3.5 text-[14px] font-medium text-ink-soft transition hover:-translate-y-px hover:border-[color:var(--accent)]"
                 >
                   {emoji && <span aria-hidden>{emoji}</span>}
                   {shortLabel(s.text)}
@@ -128,7 +130,7 @@ export default async function SkriptChapterPage({
         {sections.map((s) => (
           <article
             key={s.slug}
-            className="relative mt-6 rounded-[20px] border border-zinc-200 bg-white px-6 py-7 shadow-[0_1px_2px_rgba(24,24,27,0.04),0_8px_24px_-16px_rgba(24,24,27,0.12)] sm:px-9 sm:py-8 [&_.svc-head]:pr-10"
+            className="relative mt-6 rounded-2xl border border-line bg-surface px-6 py-7 shadow-[0_1px_2px_rgba(24,24,27,0.04),0_8px_24px_-16px_rgba(24,24,27,0.10)] dark:shadow-none sm:px-9 sm:py-8 [&_.svc-head]:pr-10"
           >
             {/* Section play button — top-right of the card, outside the
                 markdown renderer (h2 id/emoji logic stays untouched). The
@@ -140,7 +142,7 @@ export default async function SkriptChapterPage({
               block.kind === "exam" ? (
                 <div
                   key={i}
-                  className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-[18px] [&_ul]:mt-2.5"
+                  className="mt-6 rounded-2xl border border-line bg-surface-2 px-5 py-[18px] [&_ul]:mt-2.5"
                 >
                   <SkriptMarkdown markdown={block.markdown} />
                 </div>
@@ -156,12 +158,12 @@ export default async function SkriptChapterPage({
           {prev ? (
             <Link
               href={`/skript/${prev.slug}`}
-              className="flex-1 rounded-2xl border border-zinc-200 bg-white px-[18px] py-4 transition hover:border-[color:var(--accent)]"
+              className="flex-1 rounded-2xl border border-line bg-surface px-[18px] py-4 transition hover:border-[color:var(--accent)]"
             >
-              <div className="text-[12px] uppercase tracking-[0.04em] text-zinc-500">
+              <div className="text-[12px] uppercase tracking-[0.04em] text-ink-faint">
                 ‹ Vorher
               </div>
-              <div className="mt-0.5 text-[15.5px] font-semibold text-zinc-900">
+              <div className="mt-0.5 text-[15.5px] font-semibold text-ink">
                 Kapitel {prev.num} · {prev.title}
               </div>
             </Link>
@@ -171,12 +173,12 @@ export default async function SkriptChapterPage({
           {next ? (
             <Link
               href={`/skript/${next.slug}`}
-              className="flex-1 rounded-2xl border border-zinc-200 bg-white px-[18px] py-4 text-right transition hover:border-[color:var(--accent)]"
+              className="flex-1 rounded-2xl border border-line bg-surface px-[18px] py-4 text-right transition hover:border-[color:var(--accent)]"
             >
-              <div className="text-[12px] uppercase tracking-[0.04em] text-zinc-500">
+              <div className="text-[12px] uppercase tracking-[0.04em] text-ink-faint">
                 Weiter ›
               </div>
-              <div className="mt-0.5 text-[15.5px] font-semibold text-zinc-900">
+              <div className="mt-0.5 text-[15.5px] font-semibold text-ink">
                 Kapitel {next.num} · {next.title}
               </div>
             </Link>

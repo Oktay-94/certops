@@ -43,12 +43,16 @@ export function chapterColor(num: number): ChapterColor {
   return CHAPTER_COLORS[num] ?? FALLBACK;
 }
 
-/** CSS custom properties for a chapter accent, spread onto a wrapper's style. */
+/** CSS custom properties for a chapter accent, spread onto a wrapper's style.
+ * Dark-aware since Phase 5: --tint follows the theme canvas token, and
+ * --accent-soft is derived as a translucent mix of the accent so it reads on
+ * both light and dark (the fixed light accentSoft hex above would glare on the
+ * Squid-Ink canvas). The per-chapter accent hue itself works on both themes. */
 export function chapterColorVars(num: number): CSSProperties {
   const c = chapterColor(num);
   return {
     "--accent": c.accent,
-    "--accent-soft": c.accentSoft,
-    "--tint": c.tint,
+    "--accent-soft": `color-mix(in srgb, ${c.accent} 16%, transparent)`,
+    "--tint": "var(--canvas)",
   } as CSSProperties;
 }

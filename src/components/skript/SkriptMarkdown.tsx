@@ -80,7 +80,7 @@ const COMPONENTS = {
             {emoji}
           </span>
         )}
-        <span className="text-[26px] font-[680] leading-tight tracking-[-0.017em] text-zinc-900 [overflow-wrap:anywhere]">
+        <span className="text-[26px] font-[680] leading-tight tracking-[-0.017em] text-ink [overflow-wrap:anywhere]">
           {title}
           {flag && (
             <span className="ml-2.5 inline-block rounded-md bg-amber-100 px-2 py-[3px] align-middle text-[12.5px] font-semibold tracking-normal text-amber-700">
@@ -93,7 +93,7 @@ const COMPONENTS = {
   },
   h3: (props: ComponentProps<"h3">) => (
     <h3
-      className="mt-6 text-lg font-semibold text-zinc-900 [overflow-wrap:anywhere]"
+      className="mt-6 text-lg font-semibold text-ink [overflow-wrap:anywhere]"
       {...props}
     />
   ),
@@ -101,21 +101,21 @@ const COMPONENTS = {
     const kind = labelKind(flattenText(children));
     if (kind === "exam") {
       return (
-        <p className="exam-label flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.03em] text-zinc-900">
+        <p className="exam-label flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.03em] text-ink">
           {children}
         </p>
       );
     }
     if (kind === "plain") {
       return (
-        <p className="mt-6 mb-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-zinc-500">
+        <p className="mt-6 mb-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-ink-faint">
           {children}
         </p>
       );
     }
     return (
       <p
-        className="mt-3 leading-relaxed text-zinc-800 [overflow-wrap:anywhere]"
+        className="mt-3 leading-relaxed text-ink-soft [overflow-wrap:anywhere]"
         {...rest}
       >
         {children}
@@ -124,13 +124,13 @@ const COMPONENTS = {
   },
   ul: (props: ComponentProps<"ul">) => (
     <ul
-      className="mt-3 list-disc space-y-1.5 pl-5 text-zinc-800 marker:text-[color:var(--accent,#475569)]"
+      className="mt-3 list-disc space-y-1.5 pl-5 text-ink-soft marker:text-[color:var(--accent,#475569)]"
       {...props}
     />
   ),
   ol: (props: ComponentProps<"ol">) => (
     <ol
-      className="mt-3 list-decimal space-y-1.5 pl-5 text-zinc-800 marker:text-[color:var(--accent,#475569)]"
+      className="mt-3 list-decimal space-y-1.5 pl-5 text-ink-soft marker:text-[color:var(--accent,#475569)]"
       {...props}
     />
   ),
@@ -146,21 +146,21 @@ const COMPONENTS = {
       </blockquote>
     ) : (
       // Metaphor / note — chapter accent.
-      <blockquote className="my-5 rounded-r-xl border-l-[3px] border-[color:var(--accent,#475569)] bg-[color:var(--accent-soft,#eef1f5)] px-[18px] py-3.5 text-[17px] italic leading-relaxed text-zinc-900 [overflow-wrap:anywhere] [&>p]:mt-2 [&>p:first-child]:mt-0">
+      <blockquote className="my-5 rounded-r-xl border-l-[3px] border-[color:var(--accent,#475569)] bg-[color:var(--accent-soft,#eef1f5)] px-[18px] py-3.5 text-[17px] italic leading-relaxed text-ink [overflow-wrap:anywhere] [&>p]:mt-2 [&>p:first-child]:mt-0">
         {children}
       </blockquote>
     );
   },
   strong: (props: ComponentProps<"strong">) => (
-    <strong className="font-[640] text-zinc-900" {...props} />
+    <strong className="font-[640] text-ink" {...props} />
   ),
   code: (props: ComponentProps<"code">) => (
     <code
-      className="rounded bg-zinc-100 px-1 py-0.5 text-[13px] text-zinc-800"
+      className="rounded bg-surface-2 px-1 py-0.5 text-[13px] text-ink-soft"
       {...props}
     />
   ),
-  hr: () => <hr className="my-8 border-zinc-200" />,
+  hr: () => <hr className="my-8 border-line" />,
   a: (props: ComponentProps<"a">) => (
     <a
       className="text-[color:var(--accent,#475569)] underline underline-offset-2"
@@ -171,7 +171,7 @@ const COMPONENTS = {
   // min-width forces a horizontal scroll on narrow viewports instead of
   // squeezing columns to unreadable slivers; w-full still fills wider screens.
   table: (props: ComponentProps<"table">) => (
-    <div className="mt-4 max-w-full overflow-x-auto rounded-xl border border-zinc-200">
+    <div className="mt-4 max-w-full overflow-x-auto rounded-xl border border-line">
       <table
         className="w-full min-w-[520px] border-collapse text-sm"
         {...props}
@@ -179,17 +179,17 @@ const COMPONENTS = {
     </div>
   ),
   thead: (props: ComponentProps<"thead">) => (
-    <thead className="bg-zinc-50 text-left" {...props} />
+    <thead className="bg-surface-2 text-left" {...props} />
   ),
   th: (props: ComponentProps<"th">) => (
     <th
-      className="border-b border-zinc-200 px-3 py-2 font-semibold text-zinc-900"
+      className="border-b border-line px-3 py-2 font-semibold text-ink"
       {...props}
     />
   ),
   td: (props: ComponentProps<"td">) => (
     <td
-      className="border-b border-zinc-100 px-3 py-2 align-top text-zinc-800"
+      className="border-b border-line px-3 py-2 align-top text-ink-soft"
       {...props}
     />
   ),

@@ -213,7 +213,7 @@ export function TtsSectionButton({ slug }: { slug: string }) {
       title={status === "error" && active ? "Vorlesen fehlgeschlagen" : undefined}
       // before:-inset-2 grows the 32px button to a 48px hit area (Apple
       // minimum 44pt) without changing the visual size.
-      className="relative inline-flex h-8 w-8 shrink-0 touch-manipulation items-center justify-center rounded-full border border-zinc-200 bg-white text-[color:var(--accent,#475569)] shadow-sm transition before:absolute before:-inset-2 before:content-[''] hover:border-[color:var(--accent,#475569)]"
+      className="relative inline-flex h-8 w-8 shrink-0 touch-manipulation items-center justify-center rounded-full border border-line bg-surface text-[color:var(--accent,#475569)] shadow-sm transition before:absolute before:-inset-2 before:content-[''] hover:border-[color:var(--accent,#475569)] dark:shadow-none"
     >
       <StatusIcon active={active} status={status} />
     </button>
@@ -239,7 +239,7 @@ export function TtsChapterButton() {
       }}
       // Visual height is ~34px; before:-inset-y-1.5 lifts the hit area to
       // ~46px (Apple minimum 44pt) without changing the layout.
-      className="relative inline-flex touch-manipulation items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-[7px] text-[13.5px] font-medium text-[color:var(--accent,#475569)] shadow-sm transition before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:border-[color:var(--accent,#475569)]"
+      className="relative inline-flex touch-manipulation items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-[7px] text-[13.5px] font-medium text-[color:var(--accent,#475569)] shadow-sm transition before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:border-[color:var(--accent,#475569)] dark:shadow-none"
     >
       {active ? (
         <StatusIcon active status={status} />
