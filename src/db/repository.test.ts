@@ -23,6 +23,7 @@ import {
   getQuestionStats,
   getQuestionsByCert,
   getRoundTrend,
+  getPersistentWeakest,
   getWeakestQuestions,
   insertAttempt,
   insertQuestion,
@@ -1193,6 +1194,48 @@ describe("getWeakestQuestions", () => {
     }
     const weakest = await getWeakestQuestions(db, "s1", "CLF-C02", 3);
     expect(weakest).toHaveLength(3);
+  });
+});
+
+describe("getPersistentWeakest", () => {
+  let db: DB;
+  beforeEach(async () => {
+    db = await createTestDb();
+  });
+
+  it("ranks by wrong RATE and applies the minAttempts floor", async () => {
+    const hi = await insertQuestion(db, { ...sampleClf, prompt: "hi-rate" });
+    const lo = await insertQuestion(db, { ...sampleClf, prompt: "lo-rate" });
+    const single = await insertQuestion(db, { ...sampleClf, prompt: "single" });
+
+    // hi: 2/2 wrong = 100%
+    await ins(db, { questionId: hi.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: hi.id, selected: ["B"], correct: false, sessionId: "s1" });
+    // lo: 1/4 wrong = 25%
+    await ins(db, { questionId: lo.id, selected: ["B"], correct: false, sessionId: "s1" });
+    await ins(db, { questionId: lo.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: lo.id, selected: ["A"], correct: true, sessionId: "s1" });
+    await ins(db, { questionId: lo.id, selected: ["A"], correct: true, sessionId: "s1" });
+    // single: 1/1 wrong — excluded by minAttempts=2 (a single miss isn't 100%)
+    await ins(db, { questionId: single.id, selected: ["B"], correct: false, sessionId: "s1" });
+
+    const weak = await getPersistentWeakest(db, "s1", "CLF-C02", 4, 2);
+    expect(weak.map((w) => w.id)).toEqual([hi.id, lo.id]);
+    expect(weak[0].wrongRate).toBe(1);
+    expect(weak[0].attempts).toBe(2);
+    expect(weak[1].wrongRate).toBeCloseTo(0.25);
+  });
+
+  it("filters by user_id alone (identity guard)", async () => {
+    const q = await insertQuestion(db, sampleClf);
+    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "shared", userId: "oktay" });
+    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "shared", userId: "oktay" });
+    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "shared", userId: "merve" });
+    await insertAttempt(db, { questionId: q.id, selected: ["B"], correct: false, sessionId: "shared", userId: "merve" });
+
+    expect(await getPersistentWeakest(db, "oktay", "CLF-C02")).toHaveLength(1);
+    expect(await getPersistentWeakest(db, "merve", "CLF-C02")).toHaveLength(1);
+    expect(await getPersistentWeakest(db, "nobody", "CLF-C02")).toHaveLength(0);
   });
 });
 

@@ -559,6 +559,56 @@ export async function getWeakestQuestions(
   }));
 }
 
+export type PersistentWeakness = {
+  id: number;
+  prompt: string;
+  domain: string;
+  wrongRate: number; // 0..1
+  attempts: number;
+};
+
+type PersistentWeaknessRow = {
+  id: number;
+  prompt: string;
+  domain: string;
+  attempts: number;
+  wrong_count: number;
+};
+
+// "Hartnäckigste Schwachstellen" — ranked by wrong RATE, not absolute count
+// (distinct from getWeakestQuestions). minAttempts guards against a single miss
+// reading as 100%. Reads filter by user_id alone.
+export async function getPersistentWeakest(
+  db: DB,
+  userId: string,
+  cert: Question["cert"],
+  limit = 4,
+  minAttempts = 2,
+): Promise<PersistentWeakness[]> {
+  const rows = (await db.all(sql`
+    SELECT q.id, q.prompt, q.domain,
+           COUNT(*) AS attempts,
+           SUM(CASE WHEN qa.correct THEN 0 ELSE 1 END) AS wrong_count
+    FROM question_attempts qa
+    JOIN questions q ON q.id = qa.question_id
+    WHERE qa.user_id = ${userId}
+      AND q.cert = ${cert}
+    GROUP BY q.id
+    HAVING attempts >= ${minAttempts}
+       AND wrong_count >= 1
+    ORDER BY (wrong_count * 1.0 / attempts) DESC, attempts DESC
+    LIMIT ${limit}
+  `)) as PersistentWeaknessRow[];
+
+  return rows.map((r) => ({
+    id: Number(r.id),
+    prompt: r.prompt,
+    domain: r.domain,
+    attempts: Number(r.attempts),
+    wrongRate: Number(r.wrong_count) / Number(r.attempts),
+  }));
+}
+
 export type LastRoundQuestion = {
   questionId: number;
   questionText: string;

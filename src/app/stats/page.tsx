@@ -10,15 +10,18 @@ import {
 import { db } from "@/db";
 import {
   countAnsweredQuestions,
+  getAttemptTimestamps,
   getDomainPerformance,
   getLastRoundReview,
   getOverallAvgLast3,
+  getPersistentWeakest,
   getQuestionsByCert,
   getRoundTrend,
   getWeakestQuestions,
   type DomainPerformance,
   type RoundTrendPoint,
 } from "@/db/repository";
+import { bucketByDay } from "@/lib/activity";
 import { getDomainColor, type FallbackIconName } from "@/lib/domain-colors";
 import {
   LEARNING_TARGET,
@@ -26,9 +29,12 @@ import {
   scoreColorHex,
 } from "@/lib/scoreColor";
 import { getActiveProfileId } from "@/lib/profile-cookie";
+import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
+import { AreaTiles } from "@/components/dashboard/AreaTiles";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { Tile } from "@/components/dashboard/Tile";
 import { LastRoundBox } from "./LastRoundBox";
+import { PersistentWeaknesses } from "./PersistentWeaknesses";
 import { TrendCompactBars } from "./TrendCompactBars";
 import { TrendLineChart } from "./TrendLineChart";
 import { WeakestBox } from "./WeakestBox";
@@ -58,21 +64,34 @@ export default async function StatsPage() {
 
   if (!userId) return <EmptyState />;
 
-  const [overall, allQuestions, answered, perf, weakest, trend, lastRound] =
-    await Promise.all([
-      getOverallAvgLast3(db, userId, CERT),
-      getQuestionsByCert(db, CERT),
-      countAnsweredQuestions(db, userId, CERT),
-      getDomainPerformance(db, userId, CERT),
-      getWeakestQuestions(db, userId, CERT, 10),
-      getRoundTrend(db, userId, CERT, 10),
-      getLastRoundReview(db, userId, CERT),
-    ]);
+  const now = new Date();
+  const [
+    overall,
+    allQuestions,
+    answered,
+    perf,
+    weakest,
+    trend,
+    lastRound,
+    persistent,
+    timestamps,
+  ] = await Promise.all([
+    getOverallAvgLast3(db, userId, CERT),
+    getQuestionsByCert(db, CERT),
+    countAnsweredQuestions(db, userId, CERT),
+    getDomainPerformance(db, userId, CERT),
+    getWeakestQuestions(db, userId, CERT, 10),
+    getRoundTrend(db, userId, CERT, 10),
+    getLastRoundReview(db, userId, CERT),
+    getPersistentWeakest(db, userId, CERT, 4),
+    getAttemptTimestamps(db, userId, CERT),
+  ]);
   const totalQuestions = allQuestions.length;
 
   if (answered === 0) return <EmptyState />;
 
   const perfByDomain = new Map(perf.map((p) => [p.domain, p]));
+  const buckets = bucketByDay(timestamps);
   const lastRoundRate =
     lastRound.correctCount + lastRound.incorrectCount > 0
       ? lastRound.correctCount /
@@ -199,7 +218,34 @@ export default async function StatsPage() {
             <LastRoundBox review={lastRound} />
           </div>
         </Tile>
+
+        <Tile
+          label="Hartnäckigste Schwachstellen"
+          glyph="🔁"
+          value="Falsch-Quote"
+          className="md:col-span-5"
+        >
+          <PersistentWeaknesses items={persistent} />
+        </Tile>
+
+        <Tile
+          label="Lern-Aktivität"
+          glyph="🔥"
+          value="Letzte 26 Wochen"
+          className="md:col-span-7"
+        >
+          <ActivityHeatmap buckets={buckets} today={now} />
+        </Tile>
       </div>
+
+      {/* Bereiche — identical to the dashboard */}
+      <div className="mb-4 mt-11 flex items-baseline gap-3">
+        <h2 className="text-[17px] font-bold text-ink">Bereiche</h2>
+        <span className="font-mono text-[10px] tracking-[0.1em] text-ink-faint">
+          QUIZ · KARTEN · DIENSTE · STATISTIK · SKRIPT · ÜBERSICHT
+        </span>
+      </div>
+      <AreaTiles />
     </main>
   );
 }
