@@ -1,16 +1,108 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Design tokens — render source (TS mirror: src/lib/design-tokens.ts).
+   Values 1:1 from design/mockups/certops-redesign-v2.html.
+   Two orthogonal axes on <html>:
+     data-theme (light default / dark) → surface/ink/heat ladders
+     data-exam  (clf / saa)            → accent identity
+   Canonical mockup combos: clf×light, saa×dark. The remaining two
+   combos derive --accent-soft via color-mix until they get a design.
+   Theme default is LIGHT with no prefers-color-scheme fallback until
+   the re-skin (Phases 2–5) lands — see DESIGN.md.
+   ============================================================ */
 :root {
-  /* Light-only app — pin color-scheme so UA elements (scrollbars, inputs,
-     form controls) stay light even when the OS is in dark mode. */
+  /* Shared ladders (both themes) */
+  --r-card: 12px;
+  --r-btn: 8px;
+  --r-pill: 999px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 48px;
+  --t-fast: 140ms;
+  --t-med: 200ms;
+  --orange-bright: #ff9900;
+  --teal: #01a88d;
+
+  /* Light ladder (default) */
   color-scheme: light;
+  --canvas: #fafafa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --border: #e7e7e9;
+  --border-strong: #d9d9dc;
+  --ink: #17181a;
+  --ink-soft: #55585f;
+  --ink-faint: #a4a7ad;
+  --success: #16a34a;
+  --success-soft: #e8f7ee;
+  --grid-line: transparent;
+  --heat-0: #f0f0f1;
+  --heat-1: #d5eee3;
+  --heat-2: #9fdcc0;
+  --heat-3: #4cbe8b;
+  --heat-4: #16a34a;
+  --cta-ink: #1a1204;
+
+  /* Legacy pair — kept so existing pages render EXACTLY as before.
+     New (Phase 2+) code uses --canvas/--surface instead. */
   --background: #ffffff;
   --foreground: #171717;
+}
+
+:root[data-theme="dark"] {
+  /* Squid-Ink, luminance stacking */
+  color-scheme: dark;
+  --canvas: #141a24;
+  --surface: #1b2330;
+  --surface-2: #222c3b;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --ink: #eef2f7;
+  --ink-soft: #9fadc0;
+  --ink-faint: #5c6a7e;
+  --success: #2bbf9e;
+  --success-soft: rgba(1, 168, 141, 0.14);
+  --heat-0: rgba(255, 255, 255, 0.05);
+  --heat-1: rgba(255, 255, 255, 0.13);
+  --heat-2: rgba(255, 255, 255, 0.26);
+  --heat-3: rgba(255, 255, 255, 0.48);
+  --heat-4: rgba(255, 255, 255, 0.8);
+}
+
+/* Exam axis: accent identity only. Domain colors stay in domain-colors.ts. */
+:root[data-exam="clf"] {
+  --accent: #0891b2;
+  --accent-soft: #e0f5fa; /* canonical clf×light */
+}
+:root[data-exam="clf"][data-theme="dark"] {
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+:root[data-exam="saa"] {
+  --accent: #7d93c9;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+/* Blueprint grid is an SAA signature and only visible in dark. */
+:root[data-exam="saa"][data-theme="dark"] {
+  --grid-line: rgba(255, 255, 255, 0.045);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -18,7 +110,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
 }
 
 /* /services practice-mode "start" buttons — Variant B: gradient base→hover with

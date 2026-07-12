@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CertOps — Redesign v2 (Research-Umsetzung)</title>
+<style>
+/* ================================================================
+   CertOps Redesign v2 — Umsetzung des Research-Reports
+   Ein Token-System, zwei Modi:
+   CLF-C02  = hell, Apple-clean, Archiv/Passed-State
+   SAA-C03  = Squid-Ink Blueprint, luminance stacking, mono labels
+   Im echten Repo: Geist Sans/Mono via next/font. Hier: System-Näherung.
+   ================================================================ */
+:root{
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  /* Geteilte Leitern (beide Modi identisch) */
+  --r-card: 12px; --r-btn: 8px; --r-pill: 999px;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 48px;
+  --t-fast: 140ms; --t-med: 200ms;
+  --orange: #ED7100;        /* AWS "Smile" — nur als Signal */
+  --orange-bright: #FF9900; /* Brand-Anker, sparsam */
+  --teal: #01A88D;          /* AWS "Orbit" — mastered/success dunkel */
+}
+
+/* ---------- CLF: hell, Apple-clean, aufgewertet ---------- */
+body[data-exam="clf"]{
+  --canvas:#fafafa; --surface:#ffffff; --surface-2:#f4f4f5;
+  --border:#e7e7e9; --border-strong:#d9d9dc;
+  --ink:#17181a; --ink-soft:#55585f; --ink-faint:#a4a7ad;
+  --accent:#0891b2; --accent-soft:#e0f5fa;
+  --success:#16a34a; --success-soft:#e8f7ee;
+  --grid-line: transparent;
+  --heat-0:#f0f0f1; --heat-1:#d5eee3; --heat-2:#9fdcc0; --heat-3:#4cbe8b; --heat-4:#16a34a;
+  --cta-ink:#1a1204;
+  color-scheme: light;
+}
+/* ---------- SAA: Squid-Ink Blueprint, luminance stacking ---------- */
+body[data-exam="saa"]{
+  --canvas:#141a24; --surface:#1b2330; --surface-2:#222c3b;
+  --border:rgba(255,255,255,.07); --border-strong:rgba(255,255,255,.14);
+  --ink:#eef2f7; --ink-soft:#9fadc0; --ink-faint:#5c6a7e;
+  --accent:#7d93c9; --accent-soft:rgba(125,147,201,.14);
+  --success:#2bbf9e; --success-soft:rgba(1,168,141,.14);
+  --grid-line: rgba(255,255,255,.045);
+  --heat-0:rgba(255,255,255,.05); --heat-1:rgba(255,255,255,.13);
+  --heat-2:rgba(255,255,255,.26); --heat-3:rgba(255,255,255,.48); --heat-4:rgba(255,255,255,.8);
+  --cta-ink:#1a1204;
+  color-scheme: dark;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-sans); background:var(--canvas); color:var(--ink);
+  min-height:100vh; -webkit-font-smoothing:antialiased;
+}
+/* Blueprint-Raster nur im SAA-Modus, fixiert hinter allem */
+body[data-exam="saa"]::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:24px 24px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 30%, transparent 75%);
+}
+
+/* ================= HEADER ================= */
+header{
+  position:sticky; top:0; z-index:40;
+  background:color-mix(in srgb, var(--canvas) 85%, transparent);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.header-inner{
+  max-width:1120px; margin:0 auto; padding:12px 24px;
+  display:flex; align-items:center; gap:16px;
+}
+.wordmark{font-weight:700; font-size:16px; letter-spacing:-.02em; display:flex; align-items:center; gap:8px}
+.wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--orange-bright)}
+.wordmark .mode{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-faint);margin-left:4px;text-transform:uppercase}
+
+.kbd-hint{
+  margin-left:auto; display:flex; align-items:center; gap:8px;
+  font-size:12.5px; color:var(--ink-soft); background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--r-btn);
+  padding:6px 10px; cursor:pointer;
+  transition:border-color var(--t-fast) linear;
+}
+.kbd-hint:hover{border-color:var(--border-strong)}
+kbd{
+  font-family:var(--font-mono); font-size:10px; color:var(--ink-soft);
+  border:1px solid var(--border-strong); border-bottom-width:2px;
+  border-radius:5px; padding:1px 5px; background:var(--surface-2);
+}
+
+.exam-switch{
+  display:flex; align-items:stretch; gap:2px;
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--r-pill); padding:3px;
+}
+.exam-switch button{
+  font-family:var(--font-sans); font-size:12.5px; font-weight:600;
+  border:none; background:transparent; color:var(--ink-soft);
+  padding:6px 14px; border-radius:var(--r-pill); cursor:pointer;
+  display:flex; align-items:center; gap:6px;
+  transition:background var(--t-fast) linear, color var(--t-fast) linear;
+}
+.exam-switch button:hover{color:var(--ink)}
+.exam-switch button.active{background:var(--ink); color:var(--canvas)}
+.exam-switch .check{
+  width:14px;height:14px;border-radius:50%;background:var(--success);color:#fff;
+  font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;
+}
+
+/* ================= LAYOUT ================= */
+main{max-width:1120px; margin:0 auto; padding:36px 24px 90px; position:relative; z-index:1}
+.view{display:none}
+.view.visible{display:block}
+
+/* Stagger-Reveal beim Laden/Umschalten */
+.rise{opacity:0; transform:translateY(12px); animation:rise .55s cubic-bezier(.22,.9,.3,1) forwards}
+@keyframes rise{to{opacity:1; transform:none}}
+.rise:nth-child(1){animation-delay:.03s}.rise:nth-child(2){animation-delay:.08s}
+.rise:nth-child(3){animation-delay:.13s}.rise:nth-child(4){animation-delay:.18s}
+.rise:nth-child(5){animation-delay:.23s}.rise:nth-child(6){animation-delay:.28s}
+
+/* ================= HERO ================= */
+.eyebrow{
+  font-family:var(--font-mono); font-size:10.5px; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint);
+  display:flex; align-items:center; gap:10px; margin-bottom:14px;
+}
+.eyebrow .rule{height:1px; width:32px; background:var(--border-strong)}
+.eyebrow .tag{
+  color:var(--orange); border:1px solid color-mix(in srgb, var(--orange) 35%, transparent);
+  border-radius:var(--r-pill); padding:2px 9px; letter-spacing:.12em;
+}
+h1{font-size:clamp(26px,4vw,40px); font-weight:700; letter-spacing:-.03em; line-height:1.06; margin-bottom:10px}
+.sub{font-size:14.5px; color:var(--ink-soft); max-width:56ch; line-height:1.65}
+
+/* ================= BENTO ================= */
+.bento{
+  display:grid; gap:14px; margin-top:32px;
+  grid-template-columns:repeat(12,1fr);
+}
+.tile{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-card); padding:20px; position:relative; overflow:hidden;
+  transition:border-color var(--t-fast) linear, transform var(--t-fast) cubic-bezier(.22,.9,.3,1);
+}
+.tile:hover{border-color:var(--border-strong)}
+.tile .t-label{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px;
+  display:flex; justify-content:space-between; align-items:baseline;
+}
+.tile .t-label .val{color:var(--ink-soft); letter-spacing:.06em}
+.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-5{grid-column:span 5}
+.col-6{grid-column:span 6}.col-7{grid-column:span 7}.col-8{grid-column:span 8}.col-12{grid-column:span 12}
+
+/* --- Readiness-Ring --- */
+.ring-wrap{display:flex; align-items:center; gap:22px}
+.ring-svg{flex-shrink:0}
+.ring-num{font-size:38px; font-weight:700; letter-spacing:-.03em; line-height:1}
+.ring-num small{font-size:15px; color:var(--ink-faint); font-weight:500}
+.ring-desc{font-size:12.5px; color:var(--ink-soft); line-height:1.55; margin-top:6px}
+
+/* --- Domain-Mastery --- */
+.dom-row{display:grid; grid-template-columns:64px 1fr 34px; gap:10px; align-items:center; padding:8px 0}
+.dom-row + .dom-row{border-top:1px solid var(--border)}
+.dom-code{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); letter-spacing:.06em}
+.dom-name{font-size:12.5px; font-weight:550; color:var(--ink); line-height:1.3}
+.dom-weight{font-family:var(--font-mono); font-size:10px; color:var(--ink-faint)}
+.dom-bar{height:4px; border-radius:2px; background:var(--surface-2); position:relative; margin-top:5px; overflow:visible}
+.dom-bar i{position:absolute; inset:0 auto 0 0; border-radius:2px; background:var(--accent)}
+.dom-bar i.hot{background:var(--orange)}
+.dom-val{font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); text-align:right}
+
+/* --- Activity-Heatmap --- */
+.heat{display:grid; grid-auto-flow:column; grid-template-rows:repeat(7,10px); gap:3px; overflow:hidden}
+.heat i{width:10px; height:10px; border-radius:2.5px; background:var(--heat-0)}
+.heat .h1{background:var(--heat-1)}.heat .h2{background:var(--heat-2)}
+.heat .h3{background:var(--heat-3)}.heat .h4{background:var(--heat-4)}
+.heat-legend{display:flex; align-items:center; gap:5px; margin-top:12px; font-family:var(--font-mono); font-size:9.5px; color:var(--ink-faint)}
+.heat-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+/* --- Streak --- */
+.streak-num{font-size:38px; font-weight:700; letter-spacing:-.03em}
+.streak-num small{font-size:14px; color:var(--ink-faint); font-weight:500}
+.streak-days{display:flex; gap:5px; margin-top:14px}
+.streak-days i{flex:1; height:22px; border-radius:5px; background:var(--surface-2); border:1px solid var(--border)}
+.streak-days i.on{background:var(--success-soft); border-color:color-mix(in srgb,var(--success) 40%,transparent)}
+.streak-days i.today{background:var(--orange); border-color:var(--orange)}
+.freeze{font-size:11.5px; color:var(--ink-faint); margin-top:10px; font-family:var(--font-mono); letter-spacing:.04em}
+
+/* --- Next up / CTA --- */
+.next-title{font-size:16px; font-weight:650; letter-spacing:-.01em; margin-bottom:6px}
+.next-desc{font-size:12.5px; color:var(--ink-soft); line-height:1.55; margin-bottom:16px}
+.btn{
+  font-family:var(--font-sans); font-size:13px; font-weight:600;
+  padding:9px 16px; border-radius:var(--r-btn); cursor:pointer;
+  border:1px solid transparent;
+  transition:transform var(--t-fast) cubic-bezier(.22,.9,.3,1), border-color var(--t-fast) linear;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-cta{background:var(--orange); color:var(--cta-ink)}
+.btn-quiet{background:transparent; color:var(--ink); border-color:var(--border-strong)}
+.btn + .btn{margin-left:8px}
+
+/* --- Topic-Map (Architektur-Schema, SAA-Signature) --- */
+.map-tile{padding:20px 20px 12px}
+.map-svg{width:100%; height:auto; display:block}
+.map-legend{display:flex; gap:18px; margin-top:6px; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.08em; color:var(--ink-faint); text-transform:uppercase; flex-wrap:wrap}
+.map-legend span{display:flex; align-items:center; gap:6px}
+.map-legend i{width:10px; height:10px; border-radius:3px; display:inline-block; border:1.5px solid var(--ink-faint)}
+.map-legend i.m{background:var(--success-soft); border-color:var(--success)}
+.map-legend i.c{border-color:var(--orange)}
+
+/* --- CLF Passed-Zertifikat --- */
+.cert{
+  display:flex; align-items:center; gap:20px;
+}
+.cert .seal{
+  width:64px; height:64px; border-radius:50%; flex-shrink:0;
+  background:var(--success-soft); color:var(--success);
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; font-weight:800;
+  border:1.5px solid color-mix(in srgb, var(--success) 45%, transparent);
+  cursor:pointer; transition:transform var(--t-fast) cubic-bezier(.22,.9,.3,1);
+}
+.cert .seal:hover{transform:scale(1.06)}
+.cert h2{font-size:20px; font-weight:700; letter-spacing:-.02em; margin-bottom:4px}
+.cert p{font-size:13px; color:var(--ink-soft); line-height:1.5}
+.cert .date{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; color:var(--ink-faint); text-transform:uppercase; margin-top:8px}
+
+/* --- Bereiche --- */
+.section-h{margin:44px 0 16px; display:flex; align-items:baseline; gap:12px}
+.section-h h2{font-size:17px; font-weight:700; letter-spacing:-.02em}
+.section-h span{font-family:var(--font-mono); font-size:10px; color:var(--ink-faint); letter-spacing:.1em}
+.areas{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px}
+.area{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card);
+  padding:20px; cursor:pointer; position:relative;
+  transition:border-color var(--t-fast) linear, transform var(--t-fast) cubic-bezier(.22,.9,.3,1);
+}
+.area:hover{border-color:var(--border-strong); transform:translateY(-2px)}
+.area h3{font-size:14.5px; font-weight:650; margin-bottom:6px; display:flex; align-items:center; gap:8px}
+.area p{font-size:12px; color:var(--ink-soft); line-height:1.55}
+.area .glyph{font-family:var(--font-mono); color:var(--accent); font-size:13px}
+.shared{
+  position:absolute; top:14px; right:14px;
+  font-family:var(--font-mono); font-size:8.5px; letter-spacing:.12em;
+  color:var(--ink-faint); border:1px solid var(--border); border-radius:var(--r-pill); padding:2px 7px;
+}
+
+/* ================= COMMAND PALETTE ================= */
+.palette-backdrop{
+  position:fixed; inset:0; z-index:80; display:none;
+  background:color-mix(in srgb, var(--canvas) 55%, transparent);
+  backdrop-filter:blur(4px);
+}
+.palette-backdrop.open{display:flex; align-items:flex-start; justify-content:center; padding-top:14vh}
+.palette{
+  width:min(560px, calc(100vw - 32px));
+  background:var(--surface); border:1px solid var(--border-strong);
+  border-radius:14px; overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.35);
+  animation:pal .18s cubic-bezier(.22,.9,.3,1);
+}
+@keyframes pal{from{opacity:0; transform:scale(.97) translateY(-6px)}to{opacity:1; transform:none}}
+.palette input{
+  width:100%; border:none; outline:none; background:transparent; color:var(--ink);
+  font-family:var(--font-sans); font-size:15px; padding:16px 18px;
+  border-bottom:1px solid var(--border);
+}
+.palette input::placeholder{color:var(--ink-faint)}
+.palette ul{list-style:none; max-height:300px; overflow-y:auto; padding:6px}
+.palette li{
+  display:flex; align-items:center; gap:12px;
+  padding:10px 12px; border-radius:8px; cursor:pointer;
+  font-size:13.5px; color:var(--ink);
+}
+.palette li .g{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); width:20px}
+.palette li .k{margin-left:auto}
+.palette li.sel{background:var(--surface-2)}
+.palette .empty{padding:22px; text-align:center; color:var(--ink-faint); font-size:13px}
+
+/* Toast */
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+  z-index:90; opacity:0; pointer-events:none;
+  background:var(--ink); color:var(--canvas);
+  font-size:12.5px; font-weight:550; padding:9px 16px; border-radius:var(--r-pill);
+  transition:opacity var(--t-med) linear, transform var(--t-med) cubic-bezier(.22,.9,.3,1);
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+footer{
+  max-width:1120px; margin:0 auto; padding:0 24px 40px; position:relative; z-index:1;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.08em;
+  color:var(--ink-faint); display:flex; gap:18px; flex-wrap:wrap; text-transform:uppercase;
+}
+
+#confetti-canvas{position:fixed; inset:0; z-index:100; pointer-events:none}
+
+/* View-Transition-Feintuning */
+::view-transition-old(root), ::view-transition-new(root){animation-duration:.45s}
+
+@media (max-width:860px){
+  .col-3,.col-4,.col-5,.col-6,.col-7,.col-8{grid-column:span 12}
+  .ring-wrap{gap:16px}
+  main{padding:24px 16px 70px}
+  .header-inner{padding:10px 14px; gap:10px}
+  .kbd-hint span.txt{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{animation:none !important; transition:none !important}
+  .rise{opacity:1; transform:none}
+}
+</style>
+</head>
+<body data-exam="saa">
+
+<header>
+  <div class="header-inner">
+    <div class="wordmark"><span class="dot"></span>CertOps<span class="mode" id="mode-label">SAA-C03</span></div>
+    <button class="kbd-hint" onclick="openPalette()"><span class="txt">Befehle</span> <kbd>⌘</kbd><kbd>K</kbd></button>
+    <div class="exam-switch" role="tablist" aria-label="Prüfung wählen">
+      <button id="btn-clf" role="tab" onclick="setExam('clf')"><span class="check">✓</span> CLF-C02</button>
+      <button id="btn-saa" role="tab" class="active" onclick="setExam('saa')">SAA-C03</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ==================== SAA: Blueprint-Modus ==================== -->
+<section class="view visible" id="view-saa">
+  <div class="rise">
+    <div class="eyebrow">
+      <span class="rule"></span> Solutions Architect · Associate
+      <span class="tag">SAA-C03</span>
+    </div>
+    <h1>Vom Fundament zur Architektur.</h1>
+    <p class="sub">Vier Domains, szenario-basierte Fragen, ein Readiness-Score. Aufgebaut auf allem, was für die CLF schon sitzt.</p>
+  </div>
+
+  <div class="bento">
+    <!-- Readiness-Ring -->
+    <div class="tile col-5 rise">
+      <div class="t-label">Readiness <span class="val">ZIEL ≥ 85</span></div>
+      <div class="ring-wrap">
+        <svg class="ring-svg" width="132" height="132" viewBox="0 0 132 132" id="ring"></svg>
+        <div>
+          <div class="ring-num">12<small> / 100</small></div>
+          <div class="ring-desc">Gewichteter Score über alle vier Domains. Steigt mit Mastery, fällt mit Vergessen — ehrlich, nicht schmeichelnd.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak -->
+    <div class="tile col-3 rise">
+      <div class="t-label">Streak</div>
+      <div class="streak-num">6<small> Tage</small></div>
+      <div class="streak-days">
+        <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="today"></i>
+      </div>
+      <div class="freeze">❄ 1 FREEZE VERFÜGBAR</div>
+    </div>
+
+    <!-- Next up -->
+    <div class="tile col-4 rise">
+      <div class="t-label">Next up <span class="val">DOM-02 · SCHWÄCHSTE</span></div>
+      <div class="next-title">Resilient: Multi-AZ vs. Multi-Region</div>
+      <div class="next-desc">8 Szenario-Fragen · RDS-Failover, Route-53-Routing-Policies, Backup-Strategien.</div>
+      <button class="btn btn-cta">Szenario-Quiz starten</button>
+    </div>
+
+    <!-- Domain-Mastery -->
+    <div class="tile col-5 rise">
+      <div class="t-label">Domain-Mastery <span class="val">GEWICHTUNG LT. EXAM GUIDE</span></div>
+      <div class="dom-row">
+        <div><div class="dom-code">DOM-01</div><div class="dom-weight">30%</div></div>
+        <div><div class="dom-name">Design Secure Architectures</div><div class="dom-bar"><i style="width:18%"></i></div></div>
+        <div class="dom-val">18</div>
+      </div>
+      <div class="dom-row">
+        <div><div class="dom-code">DOM-02</div><div class="dom-weight">26%</div></div>
+        <div><div class="dom-name">Design Resilient Architectures</div><div class="dom-bar"><i class="hot" style="width:9%"></i></div></div>
+        <div class="dom-val">9</div>
+      </div>
+      <div class="dom-row">
+        <div><div class="dom-code">DOM-03</div><div class="dom-weight">24%</div></div>
+        <div><div class="dom-name">Design High-Performing Architectures</div><div class="dom-bar"><i style="width:11%"></i></div></div>
+        <div class="dom-val">11</div>
+      </div>
+      <div class="dom-row">
+        <div><div class="dom-code">DOM-04</div><div class="dom-weight">20%</div></div>
+        <div><div class="dom-name">Design Cost-Optimized Architectures</div><div class="dom-bar"><i style="width:8%"></i></div></div>
+        <div class="dom-val">8</div>
+      </div>
+    </div>
+
+    <!-- Activity-Heatmap -->
+    <div class="tile col-7 rise">
+      <div class="t-label">Lern-Aktivität <span class="val">LETZTE 26 WOCHEN</span></div>
+      <div class="heat" id="heat"></div>
+      <div class="heat-legend">
+        WENIGER <i style="background:var(--heat-0)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-4)"></i> MEHR
+      </div>
+    </div>
+
+    <!-- Topic-Map: das Signature-Stück -->
+    <div class="tile col-12 map-tile rise">
+      <div class="t-label">Topic-Map · DOM-02 Resilient <span class="val">2PT · RECHTE WINKEL · OPEN ARROW</span></div>
+      <svg class="map-svg" viewBox="0 0 1040 240" xmlns="http://www.w3.org/2000/svg" id="topicmap" aria-label="Architektur-Schema der Lernthemen"></svg>
+      <div class="map-legend">
+        <span><i class="m"></i> Mastered</span>
+        <span><i class="c"></i> In Arbeit</span>
+        <span><i></i> Offen</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-h"><h2>Bereiche</h2></div>
+  <div class="areas">
+    <div class="area"><h3><span class="glyph">◈</span> Szenario-Quiz</h3><p>Mehrstufige Architektur-Szenarien im Prüfungsformat, domainweise wählbar.</p></div>
+    <div class="area"><h3><span class="glyph">▤</span> Flashcards</h3><p>Associate-Level: Limits, Patterns, Service-Abgrenzungen mit Confidence-Rating.</p></div>
+    <div class="area"><span class="shared">GETEILT</span><h3><span class="glyph">☰</span> Skript</h3><p>Dasselbe Master-Skript — deckt die SAA-Tiefe bereits ab.</p></div>
+    <div class="area"><span class="shared">GETEILT</span><h3><span class="glyph">⌕</span> Übersicht</h3><p>145 Dienste als Nachschlagewerk mit Deep-Links ins Skript.</p></div>
+  </div>
+</section>
+
+<!-- ==================== CLF: heller Archiv-Modus ==================== -->
+<section class="view" id="view-clf">
+  <div class="rise">
+    <div class="eyebrow"><span class="rule"></span> Cloud Practitioner · Foundational <span class="tag" style="color:var(--success); border-color:color-mix(in srgb,var(--success) 40%,transparent)">BESTANDEN</span></div>
+    <h1>Geschafft. Das Fundament steht.</h1>
+    <p class="sub">Dein CLF-Wissen bleibt vollständig erhalten — der Refresh-Modus zeigt dir nur, was zu verblassen droht.</p>
+  </div>
+
+  <div class="bento">
+    <!-- Zertifikat -->
+    <div class="tile col-7 rise">
+      <div class="t-label">Zertifikat</div>
+      <div class="cert">
+        <div class="seal" onclick="fireConfetti()" title="Klick mich">✓</div>
+        <div>
+          <h2>AWS Certified Cloud Practitioner</h2>
+          <p>CLF-C02 bestanden. Quiz, Karten und Statistik laufen im Archiv-Modus weiter — nichts geht verloren.</p>
+          <div class="date">Bestanden · Juli 2026 · Klick aufs Siegel 🎉</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trefferquote -->
+    <div class="tile col-5 rise">
+      <div class="t-label">Ø Trefferquote <span class="val">LETZTE 3 RUNDEN</span></div>
+      <div class="ring-wrap">
+        <svg class="ring-svg" width="108" height="108" viewBox="0 0 132 132" id="ring-clf"></svg>
+        <div>
+          <div class="ring-num">83<small> %</small></div>
+          <div class="ring-desc">Stark über der Bestehensgrenze — der Stoff sitzt.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Refresh-Queue -->
+    <div class="tile col-7 rise">
+      <div class="t-label">Refresh-Queue <span class="val">SPACED REPETITION</span></div>
+      <div class="next-title">14 Karten drohen zu verblassen</div>
+      <div class="next-desc">Ältestes Review vor 21 Tagen · Schwerpunkt: Billing &amp; Support-Pläne, Well-Architected.</div>
+      <button class="btn btn-cta">Auffrischen (10 min)</button>
+      <button class="btn btn-quiet">Statistik ansehen</button>
+    </div>
+
+    <!-- Karten-Stand -->
+    <div class="tile col-5 rise">
+      <div class="t-label">Bestand</div>
+      <div class="dom-row">
+        <div><div class="dom-code">QUIZ</div></div>
+        <div><div class="dom-name">264 Fragen · 4 Domains</div><div class="dom-bar"><i style="width:100%; background:var(--success)"></i></div></div>
+        <div class="dom-val">✓</div>
+      </div>
+      <div class="dom-row">
+        <div><div class="dom-code">KARTEN</div></div>
+        <div><div class="dom-name">150 Flashcards</div><div class="dom-bar"><i style="width:100%; background:var(--success)"></i></div></div>
+        <div class="dom-val">✓</div>
+      </div>
+      <div class="dom-row">
+        <div><div class="dom-code">SKRIPT</div></div>
+        <div><div class="dom-name">13 Kapitel · 172 Dienste</div><div class="dom-bar"><i style="width:100%; background:var(--success)"></i></div></div>
+        <div class="dom-val">✓</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-h"><h2>Bereiche</h2></div>
+  <div class="areas">
+    <div class="area"><h3><span class="glyph">◈</span> Quiz</h3><p>264 CLF-Fragen im Auffrisch-Modus — Fokus auf die schwächsten Domains.</p></div>
+    <div class="area"><h3><span class="glyph">▤</span> Flashcards</h3><p>150 Karten mit Spaced-Repetition gegen das Vergessen.</p></div>
+    <div class="area"><span class="shared">GETEILT</span><h3><span class="glyph">☰</span> Skript</h3><p>13 Kapitel, 172 Dienste — gilt für beide Prüfungen.</p></div>
+    <div class="area"><span class="shared">GETEILT</span><h3><span class="glyph">⌕</span> Übersicht</h3><p>145 Dienste als Nachschlagewerk mit Deep-Links.</p></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>Mockup · Redesign v2</span>
+  <span>⌘K Command Palette</span>
+  <span>Switcher = View Transition</span>
+  <span>Siegel = Confetti</span>
+</footer>
+
+<!-- Command Palette -->
+<div class="palette-backdrop" id="pal-back" onclick="if(event.target===this)closePalette()">
+  <div class="palette" role="dialog" aria-label="Befehle">
+    <input id="pal-input" placeholder="Befehl suchen …" autocomplete="off">
+    <ul id="pal-list"></ul>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+/* ============ Reduced Motion ============ */
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============ Exam-Switch mit View Transitions API ============ */
+function applyExam(exam){
+  document.body.dataset.exam = exam;
+  document.getElementById('btn-clf').classList.toggle('active', exam==='clf');
+  document.getElementById('btn-saa').classList.toggle('active', exam==='saa');
+  document.getElementById('view-clf').classList.toggle('visible', exam==='clf');
+  document.getElementById('view-saa').classList.toggle('visible', exam==='saa');
+  document.getElementById('mode-label').textContent = exam==='clf' ? 'CLF-C02 · Bestanden' : 'SAA-C03';
+  restagger(exam==='clf' ? 'view-clf' : 'view-saa');
+}
+function setExam(exam){
+  if(document.body.dataset.exam === exam) return;
+  if(document.startViewTransition && !reduced){
+    document.startViewTransition(()=>applyExam(exam));
+  } else {
+    applyExam(exam);
+  }
+}
+function restagger(viewId){
+  if(reduced) return;
+  document.querySelectorAll('#'+viewId+' .rise').forEach(el=>{
+    el.style.animation='none'; el.offsetHeight; el.style.animation='';
+  });
+}
+
+/* ============ Readiness-Ring (custom SVG, Maß-Ticks) ============ */
+function buildRing(svgId, value, accentVar){
+  const svg = document.getElementById(svgId);
+  const NS='http://www.w3.org/2000/svg', C=66, R=52, TICKS=48;
+  let s='';
+  for(let i=0;i<TICKS;i++){
+    const a=(i/TICKS)*Math.PI*2 - Math.PI/2;
+    const long = i%6===0;
+    const r1=R+6, r2=R+(long?12:9);
+    s+=`<line x1="${C+r1*Math.cos(a)}" y1="${C+r1*Math.sin(a)}" x2="${C+r2*Math.cos(a)}" y2="${C+r2*Math.sin(a)}" stroke="var(--ink-faint)" stroke-width="${long?1.4:0.8}" opacity="${long?0.7:0.35}"/>`;
+  }
+  const circ=2*Math.PI*R, off=circ*(1-value/100);
+  s+=`<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="7"/>`;
+  s+=`<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${accentVar}" stroke-width="7" stroke-linecap="round"
+       stroke-dasharray="${circ}" stroke-dashoffset="${reduced?off:circ}" transform="rotate(-90 ${C} ${C})"
+       style="transition:stroke-dashoffset 1.1s cubic-bezier(.22,.9,.3,1) .25s"/>`;
+  svg.innerHTML=s;
+  if(!reduced) requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    svg.querySelectorAll('circle')[1].style.strokeDashoffset=off;
+  }));
+}
+buildRing('ring', 12, 'var(--orange)');
+buildRing('ring-clf', 83, 'var(--success)');
+
+/* ============ Activity-Heatmap (deterministisch) ============ */
+(function(){
+  const heat=document.getElementById('heat');
+  let seed=42; const rnd=()=> (seed=(seed*9301+49297)%233280)/233280;
+  let html='';
+  for(let w=0; w<26; w++){
+    for(let d=0; d<7; d++){
+      const r=rnd();
+      const lvl = r>0.86?4 : r>0.7?3 : r>0.5?2 : r>0.32?1 : 0;
+      html+=`<i class="h${lvl}"></i>`;
+    }
+  }
+  heat.innerHTML=html;
+})();
+
+/* ============ Topic-Map: rechte Winkel, 2pt, Open-Arrow ============ */
+(function(){
+  const svg=document.getElementById('topicmap');
+  const nodes=[
+    {id:'r53',  x:40,  y:95,  w:120, label:'ROUTE 53',        state:'m'},
+    {id:'elb',  x:240, y:95,  w:120, label:'ELB / ALB',       state:'m'},
+    {id:'asg',  x:440, y:40,  w:150, label:'AUTO SCALING',    state:'c'},
+    {id:'rds',  x:440, y:150, w:150, label:'RDS MULTI-AZ',    state:'c'},
+    {id:'s3',   x:680, y:40,  w:130, label:'S3 / CRR',        state:'o'},
+    {id:'dr',   x:680, y:150, w:130, label:'BACKUP & DR',     state:'o'},
+    {id:'cf',   x:890, y:95,  w:120, label:'CLOUDFRONT',      state:'o'},
+  ];
+  const edges=[['r53','elb'],['elb','asg'],['elb','rds'],['asg','s3'],['rds','dr'],['s3','cf'],['dr','cf']];
+  const H=44;
+  const fill=s=> s==='m' ? 'var(--success-soft)' : 'var(--surface-2)';
+  const stroke=s=> s==='m' ? 'var(--success)' : s==='c' ? 'var(--orange)' : 'var(--border-strong)';
+  const byId=Object.fromEntries(nodes.map(n=>[n.id,n]));
+  let s='';
+  /* Gruppen-Container à la AWS-Diagramm: gestrichelt + Eck-Label */
+  s+=`<rect x="8" y="8" width="1024" height="224" rx="10" fill="none" stroke="var(--border-strong)" stroke-width="1.5" stroke-dasharray="6 5"/>`;
+  s+=`<text x="24" y="28" font-family="var(--font-mono)" font-size="10" letter-spacing="2" fill="var(--ink-faint)">DOM-02 · RESILIENT ARCHITECTURES</text>`;
+  /* Kanten: rechtwinklig, 2pt, offene Pfeilspitze */
+  edges.forEach(([a,b])=>{
+    const A=byId[a], B=byId[b];
+    const x1=A.x+A.w, y1=A.y+H/2, x2=B.x, y2=B.y+H/2;
+    const mx=(x1+x2)/2;
+    s+=`<path d="M ${x1} ${y1} H ${mx} V ${y2} H ${x2-9}" fill="none" stroke="var(--ink-faint)" stroke-width="2"/>`;
+    s+=`<path d="M ${x2-10} ${y2-5} L ${x2-1} ${y2} L ${x2-10} ${y2+5}" fill="none" stroke="var(--ink-faint)" stroke-width="2" stroke-linecap="round"/>`;
+  });
+  /* Nodes */
+  nodes.forEach(n=>{
+    s+=`<rect x="${n.x}" y="${n.y}" width="${n.w}" height="${H}" rx="8" fill="${fill(n.state)}" stroke="${stroke(n.state)}" stroke-width="2"/>`;
+    s+=`<text x="${n.x+n.w/2}" y="${n.y+H/2+4}" text-anchor="middle" font-family="var(--font-mono)" font-size="11" letter-spacing="1.5" fill="var(--ink)">${n.label}</text>`;
+  });
+  svg.innerHTML=s;
+})();
+
+/* ============ Command Palette (cmdk-Muster) ============ */
+const commands=[
+  {g:'⇄', label:'Zu SAA-C03 wechseln', kbd:'S', run:()=>setExam('saa')},
+  {g:'⇄', label:'Zu CLF-C02 wechseln (bestanden)', kbd:'C', run:()=>setExam('clf')},
+  {g:'◈', label:'Szenario-Quiz starten · DOM-02', run:()=>toast('Mockup: würde das Szenario-Quiz öffnen')},
+  {g:'▤', label:'Flashcards · Refresh-Queue', run:()=>toast('Mockup: würde die Refresh-Queue öffnen')},
+  {g:'☰', label:'Skript öffnen', run:()=>toast('Mockup: würde /skript öffnen')},
+  {g:'⌕', label:'Dienste-Übersicht öffnen', run:()=>toast('Mockup: würde /uebersicht öffnen')},
+  {g:'📊', label:'Statistik anzeigen', run:()=>toast('Mockup: würde die Statistik öffnen')},
+];
+let palSel=0, palFiltered=commands;
+const back=document.getElementById('pal-back'), input=document.getElementById('pal-input'), list=document.getElementById('pal-list');
+
+function renderPal(){
+  if(!palFiltered.length){ list.innerHTML='<div class="empty">Kein Befehl gefunden</div>'; return; }
+  list.innerHTML = palFiltered.map((c,i)=>
+    `<li class="${i===palSel?'sel':''}" onclick="runCmd(${i})"><span class="g">${c.g}</span>${c.label}${c.kbd?`<span class="k"><kbd>${c.kbd}</kbd></span>`:''}</li>`
+  ).join('');
+}
+function openPalette(){ back.classList.add('open'); input.value=''; palFiltered=commands; palSel=0; renderPal(); setTimeout(()=>input.focus(),30); }
+function closePalette(){ back.classList.remove('open'); }
+function runCmd(i){ const c=palFiltered[i]; closePalette(); if(c) c.run(); }
+input.addEventListener('input', ()=>{
+  const q=input.value.trim().toLowerCase();
+  palFiltered=commands.filter(c=>c.label.toLowerCase().includes(q));
+  palSel=0; renderPal();
+});
+document.addEventListener('keydown', e=>{
+  if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); back.classList.contains('open')?closePalette():openPalette(); return; }
+  if(!back.classList.contains('open')) return;
+  if(e.key==='Escape') closePalette();
+  if(e.key==='ArrowDown'){ e.preventDefault(); palSel=Math.min(palSel+1, palFiltered.length-1); renderPal(); }
+  if(e.key==='ArrowUp'){ e.preventDefault(); palSel=Math.max(palSel-1, 0); renderPal(); }
+  if(e.key==='Enter'){ e.preventDefault(); runCmd(palSel); }
+});
+
+/* ============ Toast ============ */
+let toastT;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ============ Confetti (canvas-confetti-Muster, inline mini) ============ */
+function fireConfetti(){
+  if(reduced){ toast('🎉 Bestanden! (Confetti bei reduced motion aus)'); return; }
+  const cv=document.getElementById('confetti-canvas'), ctx=cv.getContext('2d');
+  cv.width=innerWidth; cv.height=innerHeight;
+  const colors=['#ED7100','#FF9900','#16a34a','#0891b2','#232F3E'];
+  const parts=Array.from({length:110},()=>({
+    x:innerWidth/2+(Math.random()-.5)*140, y:innerHeight*0.42,
+    vx:(Math.random()-.5)*11, vy:-(Math.random()*11+5),
+    w:5+Math.random()*5, h:8+Math.random()*6,
+    rot:Math.random()*Math.PI, vr:(Math.random()-.5)*.28,
+    c:colors[Math.floor(Math.random()*colors.length)], life:1
+  }));
+  let frame=0;
+  (function step(){
+    ctx.clearRect(0,0,cv.width,cv.height); frame++;
+    let alive=false;
+    parts.forEach(p=>{
+      p.vy+=0.32; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life-=0.006;
+      if(p.life>0 && p.y<cv.height+30){ alive=true;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+        ctx.globalAlpha=Math.max(p.life,0); ctx.fillStyle=p.c;
+        ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+      }
+    });
+    if(alive && frame<300) requestAnimationFrame(step); else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+</script>
+</body>
+</html>

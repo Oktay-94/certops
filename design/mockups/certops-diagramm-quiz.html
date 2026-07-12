@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CertOps — Diagramm-Quiz (Mockup)</title>
+<style>
+:root{
+  --font-sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --font-mono:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --r-card:12px;--r-btn:8px;--r-pill:999px;
+  --t-fast:140ms;--t-med:220ms;
+  --orange:#ED7100;--orange-bright:#FF9900;
+  --scrollp:0; /* 0..1, von JS gesetzt */
+}
+/* ---------- SAA dunkel (Default) ---------- */
+body[data-theme="dark"]{
+  --canvas:#141a24;--surface:#1b2330;--surface-2:#222c3b;
+  --border:rgba(255,255,255,.07);--border-strong:rgba(255,255,255,.14);
+  --ink:#eef2f7;--ink-soft:#9fadc0;--ink-faint:#5c6a7e;
+  --accent:#7d93c9;--accent-soft:rgba(125,147,201,.14);
+  --success:#2bbf9e;--success-soft:rgba(1,168,141,.14);
+  --danger:#f0776b;--danger-soft:rgba(240,119,107,.13);
+  --grid-line:rgba(255,255,255,.045);
+  --glow-a:rgba(125,147,201,.14);--glow-b:rgba(1,168,141,.12);
+  --cta-ink:#1a1204;color-scheme:dark;
+}
+/* ---------- SAA hell ("Paper-Blueprint") ---------- */
+body[data-theme="light"]{
+  --canvas:#f6f8fc;--surface:#ffffff;--surface-2:#eef1f7;
+  --border:#e2e6ef;--border-strong:#cfd5e3;
+  --ink:#151a26;--ink-soft:#4d5872;--ink-faint:#9aa4bd;
+  --accent:#3b4f9e;--accent-soft:#e4e9f8;
+  --success:#0d9478;--success-soft:#e2f4ef;
+  --danger:#d64545;--danger-soft:#fbe9e9;
+  --grid-line:rgba(35,47,62,.06);
+  --glow-a:rgba(59,79,158,.10);--glow-b:rgba(13,148,120,.08);
+  --cta-ink:#1a1204;color-scheme:light;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-sans);background:var(--canvas);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* Blueprint-Raster mit sanfter Scroll-Parallaxe */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:24px 24px;
+  background-position:0 calc(var(--scrollp) * -40px);
+  mask-image:radial-gradient(ellipse 95% 80% at 50% 10%,black 25%,transparent 80%);
+}
+/* Scroll-reaktiver Glow: wandert + Farbwechsel indigo→teal, sehr dezent */
+body::after{
+  content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(38% 30% at calc(22% + var(--scrollp)*40%) calc(12% + var(--scrollp)*30%), var(--glow-a), transparent 70%),
+    radial-gradient(32% 26% at calc(80% - var(--scrollp)*30%) calc(70% - var(--scrollp)*25%), var(--glow-b), transparent 70%);
+  opacity:calc(.7 + var(--scrollp)*.3);
+  transition:opacity .3s linear;
+}
+
+header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--canvas) 82%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.header-inner{max-width:1120px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:14px}
+.wordmark{font-weight:700;font-size:16px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--orange-bright)}
+.crumb{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase}
+.crumb b{color:var(--ink-soft);font-weight:500}
+.right-controls{margin-left:auto;display:flex;align-items:center;gap:10px}
+/* Hell/Dunkel-Toggle */
+.theme-toggle{
+  width:60px;height:30px;border-radius:var(--r-pill);cursor:pointer;position:relative;
+  background:var(--surface-2);border:1px solid var(--border);
+  transition:border-color var(--t-fast) linear;
+}
+.theme-toggle:hover{border-color:var(--border-strong)}
+.theme-toggle .knob{
+  position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border-strong);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  transition:transform .28s cubic-bezier(.22,.9,.3,1);
+}
+body[data-theme="light"] .theme-toggle .knob{transform:translateX(30px)}
+.exam-pill{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--ink-soft);border:1px solid var(--border);border-radius:var(--r-pill);padding:6px 12px}
+
+main{max-width:1120px;margin:0 auto;padding:32px 24px 90px;position:relative;z-index:1}
+.rise{opacity:0;transform:translateY(12px);animation:rise .55s cubic-bezier(.22,.9,.3,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.rise:nth-child(1){animation-delay:.03s}.rise:nth-child(2){animation-delay:.08s}
+.rise:nth-child(3){animation-delay:.13s}.rise:nth-child(4){animation-delay:.18s}
+
+.eyebrow{font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.eyebrow .rule{height:1px;width:32px;background:var(--border-strong)}
+.eyebrow .tag{color:var(--orange);border:1px solid color-mix(in srgb,var(--orange) 35%,transparent);border-radius:var(--r-pill);padding:2px 9px}
+h1{font-size:clamp(24px,3.4vw,36px);font-weight:700;letter-spacing:-.03em;line-height:1.08;margin-bottom:8px}
+.sub{font-size:14px;color:var(--ink-soft);max-width:62ch;line-height:1.6}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:22px;margin-top:20px;position:relative;transition:border-color var(--t-fast) linear}
+.t-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px;display:flex;justify-content:space-between;gap:8px}
+.t-label .val{color:var(--ink-soft)}
+
+.scenario{font-size:14px;line-height:1.7}
+.scenario b{font-weight:650}
+
+/* ===== Diagramm mit Slots ===== */
+.diagram{padding:26px 22px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);margin-top:16px;overflow-x:auto}
+.flow{display:flex;flex-direction:column;gap:26px;min-width:640px}
+.row{display:flex;align-items:center;gap:0}
+.node,.slot{
+  min-width:128px;height:52px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;padding:6px 12px;
+}
+.node{background:var(--surface);border:2px solid var(--border-strong);color:var(--ink)}
+.node.given{border-color:var(--success);}
+.slot{
+  background:transparent;border:2px dashed var(--border-strong);color:var(--ink-faint);
+  cursor:pointer;position:relative;
+  transition:border-color var(--t-fast) linear,background var(--t-fast) linear,transform var(--t-fast) linear;
+}
+.slot .hint{position:absolute;top:-9px;left:10px;background:var(--surface-2);padding:0 6px;font-size:8.5px;letter-spacing:.12em;color:var(--ink-faint)}
+.slot.armed{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.slot.filled{border-style:solid;border-color:var(--accent);color:var(--ink);background:var(--surface)}
+.slot.correct{border-color:var(--success);background:var(--success-soft);color:var(--ink)}
+.slot.wrong{border-color:var(--danger);background:var(--danger-soft);color:var(--ink);animation:shake .35s linear}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.conn{flex-shrink:0;width:56px;height:52px;display:flex;align-items:center}
+.conn svg{width:100%;height:12px;display:block}
+.branch-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.12em;color:var(--ink-faint);margin:-14px 0 -8px 4px;text-transform:uppercase}
+
+/* ===== Tray ===== */
+.tray{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.chipd{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;
+  border:1.5px solid var(--border-strong);border-radius:var(--r-pill);
+  background:var(--surface);color:var(--ink);padding:9px 16px;cursor:grab;user-select:none;
+  transition:border-color var(--t-fast) linear,transform var(--t-fast) cubic-bezier(.22,.9,.3,1),opacity var(--t-fast) linear;
+}
+.chipd:hover{transform:translateY(-2px);border-color:var(--accent)}
+.chipd.selected{border-color:var(--orange);color:var(--orange);box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 18%,transparent)}
+.chipd.used{opacity:.28;pointer-events:none}
+.tray-hint{font-size:11.5px;color:var(--ink-faint);margin-top:10px}
+
+/* ===== Actions ===== */
+.actions{display:flex;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{font-family:var(--font-sans);font-size:13px;font-weight:600;padding:10px 18px;border-radius:var(--r-btn);cursor:pointer;border:1px solid transparent;transition:transform var(--t-fast) cubic-bezier(.22,.9,.3,1)}
+.btn:hover{transform:translateY(-1px)}
+.btn-cta{background:var(--orange);color:var(--cta-ink)}
+.btn-quiet{background:transparent;color:var(--ink);border-color:var(--border-strong)}
+.result{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.06em;padding:8px 14px;border-radius:var(--r-pill);display:none}
+.result.ok{display:inline-block;color:var(--success);background:var(--success-soft)}
+.result.partial{display:inline-block;color:var(--orange);background:color-mix(in srgb,var(--orange) 14%,transparent)}
+
+/* ===== Erklärung nach dem Prüfen ===== */
+.explain{display:none;margin-top:18px;border-left:3px solid var(--success);padding:12px 16px;background:var(--success-soft);border-radius:0 9px 9px 0;font-size:13px;line-height:1.65;color:var(--ink)}
+.explain.show{display:block}
+.explain b{font-weight:650}
+
+/* ===== Scroll-Sektionen ===== */
+.section-h{margin:52px 0 16px;display:flex;align-items:baseline;gap:12px}
+.section-h h2{font-size:17px;font-weight:700;letter-spacing:-.02em}
+.section-h span{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);letter-spacing:.1em}
+.up-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.up{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:16px;font-size:12.5px}
+.up .k{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:6px;text-transform:uppercase}
+.up b{font-weight:650}
+.up .lock{float:right;color:var(--ink-faint);font-size:11px}
+.how{font-size:13.5px;line-height:1.75;color:var(--ink-soft);max-width:70ch}
+.how b{color:var(--ink);font-weight:650}
+
+footer{max-width:1120px;margin:0 auto;padding:0 24px 40px;position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--ink-faint);display:flex;gap:18px;flex-wrap:wrap;text-transform:uppercase}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.4s}
+
+@media (max-width:860px){
+  main{padding:22px 16px 70px}.header-inner{padding:10px 14px}.crumb{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rise{opacity:1;transform:none}
+  body::before{background-position:0 0}
+  body::after{opacity:.7}
+}
+</style>
+</head>
+<body data-theme="dark" data-exam="saa">
+
+<header>
+  <div class="header-inner">
+    <div class="wordmark"><span class="dot"></span>CertOps</div>
+    <span class="crumb">SAA-C03 / <b>Diagramm-Quiz</b></span>
+    <div class="right-controls">
+      <span class="exam-pill">SZENARIO 1/8 · DOM-02</span>
+      <div class="theme-toggle" onclick="toggleTheme()" role="switch" aria-label="Hell/Dunkel umschalten" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTheme()}">
+        <div class="knob" id="knob">🌙</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="rise">
+    <div class="eyebrow"><span class="rule"></span> Diagramm-Quiz <span class="tag">NEU</span></div>
+    <h1>Vervollständige die Architektur.</h1>
+    <p class="sub">Wähle einen Dienst aus der Ablage und setze ihn in den passenden Slot — per Klick/Tap oder Drag. Zwei Dienste sind Ablenker.</p>
+  </div>
+
+  <div class="card rise">
+    <div class="t-label">Szenario <span class="val">HOCHVERFÜGBARE WEB-APP</span></div>
+    <p class="scenario">Ein Startup betreibt eine Web-Anwendung mit <b>statischem Frontend</b> und <b>dynamischem API-Backend</b>. Die Architektur soll <b>global schnell ausliefern</b>, <b>Lastspitzen automatisch abfangen</b> und einen <b>AZ-Ausfall der Datenbank ohne manuellen Eingriff</b> überstehen. Vervollständige das Schema.</p>
+
+    <div class="diagram">
+      <div class="flow">
+        <div class="branch-label">Statischer Pfad</div>
+        <div class="row">
+          <div class="node given">ROUTE 53</div>
+          <div class="conn"><svg viewBox="0 0 56 12"><path d="M0 6 H44" stroke="var(--ink-faint)" stroke-width="2"/><path d="M44 1.5 L52 6 L44 10.5" fill="none" stroke="var(--ink-faint)" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="slot" data-slot="a"><span class="hint">CDN / EDGE</span><span class="fill">?</span></div>
+          <div class="conn"><svg viewBox="0 0 56 12"><path d="M0 6 H44" stroke="var(--ink-faint)" stroke-width="2"/><path d="M44 1.5 L52 6 L44 10.5" fill="none" stroke="var(--ink-faint)" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="node given">S3 STATIC</div>
+        </div>
+        <div class="branch-label">Dynamischer Pfad</div>
+        <div class="row">
+          <div class="node given">ALB</div>
+          <div class="conn"><svg viewBox="0 0 56 12"><path d="M0 6 H44" stroke="var(--ink-faint)" stroke-width="2"/><path d="M44 1.5 L52 6 L44 10.5" fill="none" stroke="var(--ink-faint)" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="slot" data-slot="b"><span class="hint">COMPUTE · ELASTISCH</span><span class="fill">?</span></div>
+          <div class="conn"><svg viewBox="0 0 56 12"><path d="M0 6 H44" stroke="var(--ink-faint)" stroke-width="2"/><path d="M44 1.5 L52 6 L44 10.5" fill="none" stroke="var(--ink-faint)" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="slot" data-slot="c"><span class="hint">DB · AZ-AUSFALLSICHER</span><span class="fill">?</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tray" id="tray">
+      <div class="chipd" draggable="true" data-id="cloudfront">CLOUDFRONT</div>
+      <div class="chipd" draggable="true" data-id="asg">EC2 AUTO SCALING</div>
+      <div class="chipd" draggable="true" data-id="rds-maz">RDS MULTI-AZ</div>
+      <div class="chipd" draggable="true" data-id="elasticache">ELASTICACHE</div>
+      <div class="chipd" draggable="true" data-id="rds-rr">RDS READ-REPLICA</div>
+    </div>
+    <div class="tray-hint">Tipp: Klick auf einen gesetzten Slot legt den Dienst zurück in die Ablage.</div>
+
+    <div class="actions">
+      <button class="btn btn-cta" onclick="checkAnswers()">Prüfen</button>
+      <button class="btn btn-quiet" onclick="resetQuiz()">Zurücksetzen</button>
+      <span class="result" id="result"></span>
+    </div>
+
+    <div class="explain" id="explain">
+      <b>Warum:</b> CloudFront cached global am Edge (statischer Pfad). EC2 Auto Scaling fängt Lastspitzen elastisch ab. <b>RDS Multi-AZ</b> repliziert synchron in eine Standby-AZ und failovert automatisch — die <b>Read-Replica</b> ist asynchron und braucht manuelle Promotion, <b>ElastiCache</b> ist ein Cache, keine ausfallsichere Primär-DB. Klassische SAA-Falle.
+    </div>
+  </div>
+
+  <div class="section-h"><h2>Kommende Szenarien</h2><span>DOM-02 · RESILIENT</span></div>
+  <div class="up-list">
+    <div class="up"><div class="k">Szenario 2</div><b>Entkoppelte Bildverarbeitung</b> — Queue oder Stream?<span class="lock"></span></div>
+    <div class="up"><div class="k">Szenario 3</div><b>Multi-Region-Failover</b> mit Route-53-Policies<span class="lock">🔒</span></div>
+    <div class="up"><div class="k">Szenario 4</div><b>Backup &amp; Restore vs. Pilot Light</b> — DR-Strategien<span class="lock">🔒</span></div>
+  </div>
+
+  <div class="section-h"><h2>So funktioniert die Wertung</h2></div>
+  <p class="how">Jeder Slot zählt einzeln — <b>Teilpunkte statt Alles-oder-Nichts</b>. Falsch gesetzte Dienste bleiben nach dem Prüfen rot markiert, damit du siehst, <b>wo</b> dein Denkfehler lag, nicht nur <b>dass</b> einer da war. Ablenker sind bewusst plausibel gewählt (Read-Replica statt Multi-AZ ist die häufigste SAA-Verwechslung). Jedes Szenario speist dieselbe Statistik wie das Szenario-Quiz: Falsch-Antworten landen in den Schwächsten Fragen, die Domain-Mastery aktualisiert sich.</p>
+
+</main>
+
+<footer>
+  <span>Mockup · Diagramm-Quiz</span>
+  <span>Klick/Tap oder Drag</span>
+  <span>Toggle = Hell/Dunkel</span>
+  <span>Scroll = Hintergrund reagiert</span>
+</footer>
+
+<script>
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ===== Theme-Toggle (unabhängig vom Exam-Switcher) ===== */
+function applyTheme(t){
+  document.body.dataset.theme=t;
+  document.getElementById('knob').textContent = t==='dark' ? '🌙' : '☀️';
+}
+function toggleTheme(){
+  const next=document.body.dataset.theme==='dark'?'light':'dark';
+  if(document.startViewTransition&&!reduced) document.startViewTransition(()=>applyTheme(next));
+  else applyTheme(next);
+}
+
+/* ===== Scroll-reaktiver Hintergrund ===== */
+let ticking=false;
+function onScroll(){
+  if(ticking||reduced)return;ticking=true;
+  requestAnimationFrame(()=>{
+    const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+    document.body.style.setProperty('--scrollp',(scrollY/max).toFixed(3));
+    ticking=false;
+  });
+}
+addEventListener('scroll',onScroll,{passive:true});
+
+/* ===== Quiz-Logik: Klick-zu-Setzen + Drag&Drop ===== */
+const SOLUTION={a:'cloudfront', b:'asg', c:'rds-maz'};
+const LABELS={cloudfront:'CLOUDFRONT', asg:'EC2 AUTO SCALING', 'rds-maz':'RDS MULTI-AZ', elasticache:'ELASTICACHE', 'rds-rr':'RDS READ-REPLICA'};
+let selected=null;           /* aktuell gewählter Chip (id) */
+const placed={};             /* slot -> chip-id */
+
+const chips=[...document.querySelectorAll('.chipd')];
+const slots=[...document.querySelectorAll('.slot')];
+
+function chipEl(id){return chips.find(c=>c.dataset.id===id)}
+function refreshChips(){
+  chips.forEach(c=>{
+    c.classList.toggle('used',Object.values(placed).includes(c.dataset.id));
+    c.classList.toggle('selected',selected===c.dataset.id);
+  });
+}
+function armSlots(on){slots.forEach(s=>{if(!s.classList.contains('filled'))s.classList.toggle('armed',on)})}
+
+chips.forEach(c=>{
+  c.addEventListener('click',()=>{
+    selected = selected===c.dataset.id ? null : c.dataset.id;
+    refreshChips(); armSlots(!!selected);
+  });
+  c.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',c.dataset.id)});
+});
+
+function placeChip(slot,id){
+  /* falls Slot belegt: alten Chip freigeben */
+  const key=slot.dataset.slot;
+  if(placed[key]) delete placed[key];
+  placed[key]=id;
+  slot.classList.add('filled');
+  slot.classList.remove('armed','correct','wrong');
+  slot.querySelector('.fill').textContent=LABELS[id];
+  selected=null; refreshChips(); armSlots(false);
+  hideResult();
+}
+function clearSlot(slot){
+  const key=slot.dataset.slot;
+  if(!placed[key])return;
+  delete placed[key];
+  slot.classList.remove('filled','correct','wrong');
+  slot.querySelector('.fill').textContent='?';
+  refreshChips(); hideResult();
+}
+
+slots.forEach(s=>{
+  s.addEventListener('click',()=>{
+    if(selected){ placeChip(s,selected); }
+    else if(s.classList.contains('filled')){ clearSlot(s); }
+  });
+  s.addEventListener('dragover',e=>{e.preventDefault();s.classList.add('armed')});
+  s.addEventListener('dragleave',()=>{if(!s.classList.contains('filled'))s.classList.remove('armed')});
+  s.addEventListener('drop',e=>{
+    e.preventDefault();
+    const id=e.dataTransfer.getData('text/plain');
+    if(id && !Object.values(placed).includes(id)) placeChip(s,id);
+    else s.classList.remove('armed');
+  });
+});
+
+function checkAnswers(){
+  let correct=0, total=Object.keys(SOLUTION).length, filledCount=0;
+  slots.forEach(s=>{
+    const key=s.dataset.slot;
+    if(!placed[key]){ s.classList.add('wrong'); setTimeout(()=>s.classList.remove('wrong'),400); return; }
+    filledCount++;
+    if(placed[key]===SOLUTION[key]){ s.classList.remove('wrong'); s.classList.add('correct'); correct++; }
+    else { s.classList.remove('correct'); s.classList.add('wrong'); }
+  });
+  const r=document.getElementById('result');
+  r.className='result '+(correct===total?'ok':'partial');
+  r.textContent = correct===total ? '✓ 3/3 — SAUBER ARCHITEKTIERT' : `${correct}/${total} PUNKTE — ROT = DENKFEHLER`;
+  document.getElementById('explain').classList.toggle('show', correct===total || filledCount===total);
+}
+function hideResult(){
+  const r=document.getElementById('result'); r.className='result'; r.textContent='';
+  document.getElementById('explain').classList.remove('show');
+}
+function resetQuiz(){
+  slots.forEach(s=>{s.classList.remove('filled','correct','wrong','armed');s.querySelector('.fill').textContent='?'});
+  Object.keys(placed).forEach(k=>delete placed[k]);
+  selected=null; refreshChips(); hideResult();
+}
+</script>
+</body>
+</html>

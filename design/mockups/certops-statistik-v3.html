@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CertOps — Statistik v3 (alte Funktionen · neues Design)</title>
+<style>
+:root{
+  --font-sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --font-mono:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --r-card:12px;--r-btn:8px;--r-pill:999px;
+  --t-fast:140ms;--t-med:220ms;
+  --orange:#ED7100;--orange-bright:#FF9900;
+  /* CLF-Domain-Farben (aus domain-colors, alte App) */
+  --dom-cc:#2563eb;   /* Cloud Concepts */
+  --dom-sec:#dc2626;  /* Security and Compliance */
+  --dom-tech:#7c3aed; /* Cloud Technology and Services */
+  --dom-bill:#d97706; /* Billing, Pricing, and Support */
+}
+body[data-exam="clf"]{
+  --canvas:#fafafa;--surface:#fff;--surface-2:#f4f4f5;
+  --border:#e7e7e9;--border-strong:#d9d9dc;
+  --ink:#17181a;--ink-soft:#55585f;--ink-faint:#a4a7ad;
+  --accent:#0891b2;--accent-soft:#e0f5fa;
+  --success:#16a34a;--success-soft:#e8f7ee;--danger:#dc2626;--danger-soft:#fdecec;
+  --grid-line:transparent;
+  --heat-0:#f0f0f1;--heat-1:#d5eee3;--heat-2:#9fdcc0;--heat-3:#4cbe8b;--heat-4:#16a34a;
+  --cta-ink:#1a1204;color-scheme:light;
+}
+body[data-exam="saa"]{
+  --canvas:#141a24;--surface:#1b2330;--surface-2:#222c3b;
+  --border:rgba(255,255,255,.07);--border-strong:rgba(255,255,255,.14);
+  --ink:#eef2f7;--ink-soft:#9fadc0;--ink-faint:#5c6a7e;
+  --accent:#7d93c9;--accent-soft:rgba(125,147,201,.14);
+  --success:#2bbf9e;--success-soft:rgba(1,168,141,.14);--danger:#f0776b;--danger-soft:rgba(240,119,107,.13);
+  --grid-line:rgba(255,255,255,.045);
+  --heat-0:rgba(255,255,255,.05);--heat-1:rgba(255,255,255,.13);--heat-2:rgba(255,255,255,.26);--heat-3:rgba(255,255,255,.48);--heat-4:rgba(255,255,255,.8);
+  --cta-ink:#1a1204;color-scheme:dark;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-sans);background:var(--canvas);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+body[data-exam="saa"]::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:24px 24px;mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,black 30%,transparent 75%)}
+
+header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--canvas) 85%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.header-inner{max-width:1120px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:16px}
+.wordmark{font-weight:700;font-size:16px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--orange-bright)}
+.crumb{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase}
+.crumb b{color:var(--ink-soft);font-weight:500}
+.exam-switch{margin-left:auto;display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-pill);padding:3px}
+.exam-switch button{font-family:var(--font-sans);font-size:12.5px;font-weight:600;border:none;background:transparent;color:var(--ink-soft);padding:6px 14px;border-radius:var(--r-pill);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background var(--t-fast) linear,color var(--t-fast) linear}
+.exam-switch button.active{background:var(--ink);color:var(--canvas)}
+.exam-switch .check{width:14px;height:14px;border-radius:50%;background:var(--success);color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+
+main{max-width:1120px;margin:0 auto;padding:32px 24px 90px;position:relative;z-index:1}
+.rise{opacity:0;transform:translateY(12px);animation:rise .55s cubic-bezier(.22,.9,.3,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.rise:nth-child(1){animation-delay:.03s}.rise:nth-child(2){animation-delay:.07s}.rise:nth-child(3){animation-delay:.11s}
+.rise:nth-child(4){animation-delay:.15s}.rise:nth-child(5){animation-delay:.19s}.rise:nth-child(6){animation-delay:.23s}
+.rise:nth-child(7){animation-delay:.27s}.rise:nth-child(8){animation-delay:.31s}
+
+.eyebrow{font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.eyebrow .rule{height:1px;width:32px;background:var(--border-strong)}
+h1{font-size:clamp(24px,3.4vw,34px);font-weight:700;letter-spacing:-.03em;line-height:1.08;margin-bottom:8px}
+.sub{font-size:14px;color:var(--ink-soft);max-width:60ch;line-height:1.6}
+
+.bento{display:grid;gap:14px;margin-top:30px;grid-template-columns:repeat(12,1fr)}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:20px;position:relative;overflow:hidden;transition:border-color var(--t-fast) linear}
+.tile:hover{border-color:var(--border-strong)}
+.t-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:16px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.t-label .val{color:var(--ink-soft);letter-spacing:.06em;text-align:right}
+.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-5{grid-column:span 5}.col-6{grid-column:span 6}.col-7{grid-column:span 7}.col-8{grid-column:span 8}.col-12{grid-column:span 12}
+
+/* KPI */
+.kpi .n{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.kpi .n small{font-size:15px;color:var(--ink-faint);font-weight:500}
+.kpi .d{font-size:12px;color:var(--ink-soft);margin-top:8px;line-height:1.5}
+.kpi-spark{margin-top:10px}
+
+/* ===== NACH BEREICH: alte Funktion, neue kompakte Größe ===== */
+.dom-row{display:grid;grid-template-columns:34px 1fr 56px;gap:12px;align-items:center;padding:10px 0}
+.dom-row+.dom-row{border-top:1px solid var(--border)}
+.dom-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
+.dom-name{font-size:12.5px;font-weight:600;line-height:1.3}
+.dom-meta{font-family:var(--font-mono);font-size:9.5px;color:var(--ink-faint);letter-spacing:.05em;margin-top:1px}
+.dom-bar{height:5px;border-radius:3px;background:var(--surface-2);position:relative;margin-top:7px}
+.dom-bar i{position:absolute;inset:0 auto 0 0;border-radius:3px;width:0;transition:width 1s cubic-bezier(.22,.9,.3,1) .3s}
+/* Lernziel-70%-Marker auf jeder Bar (alte Funktion) */
+.dom-bar::after{content:"";position:absolute;left:70%;top:-3px;bottom:-3px;width:1.5px;background:var(--ink-faint);opacity:.7}
+.dom-val{font-family:var(--font-mono);font-size:13px;font-weight:600;text-align:right}
+.dom-val em{font-style:normal;color:var(--ink-faint);font-size:9.5px;display:block;font-weight:400}
+
+/* ===== Schwächste Fragen: echte Fragentexte (alte Funktion) ===== */
+.q-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;cursor:pointer;transition:opacity var(--t-fast) linear}
+.q-item+.q-item{border-top:1px solid var(--border)}
+.q-item:hover{opacity:.8}
+.q-text{font-size:12.5px;line-height:1.55;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.q-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.chip{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;border-radius:var(--r-pill);padding:3px 9px;white-space:nowrap;border:1px solid transparent}
+.chip.wrong{color:var(--danger);background:var(--danger-soft)}
+.q-arrow{color:var(--ink-faint);font-size:14px;align-self:center;flex-shrink:0}
+
+/* ===== Verlauf: R1–R5 mit Schnitt + Lernziel (alte Funktion) ===== */
+.chart-svg{width:100%;height:auto;display:block;overflow:visible}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--ink-soft)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:16px;height:0}
+.legend .l-line{border-top:2.5px solid var(--orange)}
+.legend .l-dot{width:7px;height:7px;border-radius:50%;background:var(--orange)}
+.legend .l-avg{border-top:2px dotted var(--ink-faint)}
+.legend .l-goal{border-top:2px dashed var(--ink-soft)}
+.chart-note{font-size:11px;color:var(--ink-faint);margin-top:8px;line-height:1.5}
+
+/* ===== Letzte Runde / Dein Schnitt (alte Funktion) ===== */
+.round-row{display:grid;grid-template-columns:92px 1fr 52px;gap:12px;align-items:center;padding:10px 0}
+.round-row+.round-row{border-top:1px solid var(--border)}
+.round-name{font-size:12.5px;font-weight:550;color:var(--ink-soft)}
+.round-bar{height:6px;border-radius:3px;background:var(--surface-2);position:relative}
+.round-bar i{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--ink);width:0;transition:width 1s cubic-bezier(.22,.9,.3,1) .35s}
+.round-bar::after{content:"";position:absolute;left:70%;top:-3px;bottom:-3px;width:1.5px;background:var(--ink-faint);opacity:.7}
+.round-val{font-family:var(--font-mono);font-size:13px;font-weight:600;text-align:right}
+.goal-note{font-size:11px;color:var(--ink-faint);margin-top:12px}
+
+/* ===== Fragen der letzten Runde: Falsch/Richtig-Tabs (alte Funktion) ===== */
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-pill);padding:3px;width:max-content;margin-bottom:14px}
+.tabs button{font-family:var(--font-sans);font-size:12px;font-weight:600;border:none;background:transparent;color:var(--ink-soft);padding:5px 14px;border-radius:var(--r-pill);cursor:pointer;transition:background var(--t-fast) linear,color var(--t-fast) linear}
+.tabs button.active{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--border)}
+.tabs .cnt{font-family:var(--font-mono);font-size:10.5px;margin-left:4px}
+.tabs .cnt.bad{color:var(--danger)}
+.tabs .cnt.good{color:var(--success)}
+.empty-state{border-radius:9px;background:var(--danger-soft);color:var(--ink-soft);font-size:13px;display:flex;align-items:center;justify-content:center;min-height:110px;text-align:center;padding:20px}
+.right-list .q-item .chip.ok{color:var(--success);background:var(--success-soft)}
+.hidden{display:none}
+
+/* Heatmap + Schwachstellen (aus v2, bleiben) */
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px;overflow:hidden}
+.heat i{width:11px;height:11px;border-radius:2.5px;background:var(--heat-0)}
+.heat .h1{background:var(--heat-1)}.heat .h2{background:var(--heat-2)}.heat .h3{background:var(--heat-3)}.heat .h4{background:var(--heat-4)}
+.heat-legend{display:flex;align-items:center;gap:5px;margin-top:12px;font-family:var(--font-mono);font-size:9.5px;color:var(--ink-faint)}
+.heat-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.weak{display:flex;flex-direction:column;gap:10px}
+.weak-item{display:flex;align-items:center;gap:12px}
+.weak-item .wbar{flex:1;height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.weak-item .wbar i{display:block;height:100%;background:var(--danger);border-radius:3px;width:0;transition:width .9s cubic-bezier(.22,.9,.3,1) .3s}
+.weak-item .wname{font-size:12.5px;font-weight:550;width:40%}
+.weak-item .wpct{font-family:var(--font-mono);font-size:11px;color:var(--danger);width:34px;text-align:right}
+
+/* ===== Bereiche mit Live-Preview (Dashboard + Statistik identisch) ===== */
+.section-h{margin:46px 0 18px;display:flex;align-items:baseline;gap:12px}
+.section-h h2{font-size:18px;font-weight:700;letter-spacing:-.02em}
+.section-h span{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);letter-spacing:.1em}
+.areas{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.area{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:18px;cursor:pointer;position:relative;overflow:hidden;transition:border-color var(--t-fast) linear,transform var(--t-med) cubic-bezier(.22,.9,.3,1),box-shadow var(--t-med) linear}
+.area:hover{border-color:var(--border-strong);transform:translateY(-3px)}
+body[data-exam="clf"] .area:hover{box-shadow:0 12px 30px rgba(0,0,0,.07)}
+.area-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.area-ico{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-family:var(--font-mono)}
+.area-ico.quiz{background:var(--accent-soft);color:var(--accent)}
+.area-ico.cards{background:var(--orange);color:var(--cta-ink)}
+.area-ico.diagram{background:var(--success-soft);color:var(--success)}
+.area-ico.script{background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--border)}
+.area h3{font-size:15px;font-weight:650;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.area .meta{font-size:11.5px;color:var(--ink-soft);margin-top:3px;line-height:1.4}
+.shared{margin-left:auto;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.12em;color:var(--ink-faint);border:1px solid var(--border);border-radius:var(--r-pill);padding:3px 8px;align-self:center}
+.badge-new{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.1em;color:var(--orange);border:1px solid color-mix(in srgb,var(--orange) 40%,transparent);border-radius:var(--r-pill);padding:2px 7px}
+.preview{border-radius:9px;background:var(--surface-2);border:1px solid var(--border);padding:12px;min-height:96px;overflow:hidden}
+.pv-quiz .opt{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink-soft);padding:5px 8px;border-radius:6px;border:1px solid var(--border);margin-bottom:5px;background:var(--surface);transition:all var(--t-fast) linear}
+.pv-quiz .opt .box{width:12px;height:12px;border-radius:3px;border:1.5px solid var(--ink-faint);flex-shrink:0}
+.area:hover .pv-quiz .opt.correct{border-color:var(--success);color:var(--ink)}
+.area:hover .pv-quiz .opt.correct .box{background:var(--success);border-color:var(--success)}
+.pv-cards{perspective:600px;display:flex;align-items:center;justify-content:center;min-height:72px}
+.pv-cards .card{width:150px;height:66px;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.22,.9,.3,1)}
+.area:hover .pv-cards .card{transform:rotateY(180deg)}
+.pv-cards .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;padding:8px;text-align:center}
+.pv-cards .back{transform:rotateY(180deg);background:var(--accent-soft);color:var(--accent);font-family:var(--font-mono);font-size:10px}
+.pv-diagram svg{width:100%;height:auto;display:block}
+.pv-diagram .fillbox{opacity:.35;transition:opacity var(--t-med) linear}
+.area:hover .pv-diagram .fillbox{opacity:1}
+.pv-script{font-family:var(--font-mono);font-size:9px;line-height:1.9;color:var(--ink-faint);letter-spacing:.02em}
+.pv-script .scroller{transition:transform 3s linear}
+.area:hover .pv-script .scroller{transform:translateY(-38px)}
+.pv-script b{color:var(--accent);font-weight:600}
+.saa-only{display:none}
+body[data-exam="saa"] .saa-only{display:block}
+
+footer{max-width:1120px;margin:0 auto;padding:0 24px 40px;position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--ink-faint);display:flex;gap:18px;flex-wrap:wrap;text-transform:uppercase}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.45s}
+@media (max-width:860px){
+  .col-3,.col-4,.col-5,.col-6,.col-7,.col-8{grid-column:span 12}
+  .areas{grid-template-columns:1fr}
+  main{padding:22px 16px 70px}.header-inner{padding:10px 14px;gap:10px}.crumb{display:none}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rise{opacity:1;transform:none}}
+</style>
+</head>
+<body data-exam="clf">
+
+<header>
+  <div class="header-inner">
+    <div class="wordmark"><span class="dot"></span>CertOps</div>
+    <span class="crumb">Dashboard / <b>Statistik</b></span>
+    <div class="exam-switch">
+      <button id="btn-clf" class="active" onclick="setExam('clf')"><span class="check">✓</span> CLF-C02</button>
+      <button id="btn-saa" onclick="setExam('saa')">SAA-C03</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="rise">
+    <div class="eyebrow"><span class="rule"></span> Statistik · <span id="exam-name">CLF-C02 · Bestanden</span></div>
+    <h1>Dein Lernstand auf einen Blick.</h1>
+    <p class="sub">Trend der letzten Runden, Stärken und Schwächen pro Bereich — ohne Beschönigung.</p>
+  </div>
+
+  <div class="bento">
+    <!-- KPI 1: Trefferquote mit Sparkline (alte Funktion) -->
+    <div class="tile col-4 kpi rise">
+      <div class="t-label">Ø Trefferquote <span class="val">LETZTE 10 RUNDEN</span></div>
+      <div class="n">83<small> %</small></div>
+      <svg class="kpi-spark" width="150" height="34" viewBox="0 0 150 34" id="spark"></svg>
+    </div>
+    <!-- KPI 2 -->
+    <div class="tile col-4 kpi rise">
+      <div class="t-label">Fragen gesamt</div>
+      <div class="n">264</div>
+      <div class="d">Im CLF-Pool · 4 Domains.</div>
+    </div>
+    <!-- KPI 3: Beantwortet (alte Funktion) -->
+    <div class="tile col-4 kpi rise">
+      <div class="t-label">Beantwortet</div>
+      <div class="n">84<small> / 264</small></div>
+      <div class="d">32 % des Pools mindestens einmal gesehen.</div>
+    </div>
+
+    <!-- NACH BEREICH: alte Funktion + Domain-Farben, neue kompakte Größe -->
+    <div class="tile col-5 rise">
+      <div class="t-label">Nach Bereich <span class="val">┊ LERNZIEL 70%</span></div>
+      <div class="dom-row">
+        <div class="dom-ico" style="background:var(--dom-cc)">☁</div>
+        <div><div class="dom-name">Cloud Concepts</div><div class="dom-meta">67 FRAGEN</div>
+          <div class="dom-bar"><i style="background:var(--dom-cc)" data-w="85%"></i></div></div>
+        <div class="dom-val" style="color:var(--dom-cc)">85%</div>
+      </div>
+      <div class="dom-row">
+        <div class="dom-ico" style="background:var(--dom-sec)">◉</div>
+        <div><div class="dom-name">Security and Compliance</div><div class="dom-meta">79 FRAGEN</div>
+          <div class="dom-bar"><i style="background:var(--dom-sec)" data-w="90%"></i></div></div>
+        <div class="dom-val" style="color:var(--dom-sec)">90%</div>
+      </div>
+      <div class="dom-row">
+        <div class="dom-ico" style="background:var(--dom-tech)">▤</div>
+        <div><div class="dom-name">Cloud Technology and Services</div><div class="dom-meta">87 FRAGEN</div>
+          <div class="dom-bar"><i style="background:var(--dom-tech)" data-w="92%"></i></div></div>
+        <div class="dom-val" style="color:var(--dom-tech)">92%</div>
+      </div>
+      <div class="dom-row">
+        <div class="dom-ico" style="background:var(--dom-bill)">$</div>
+        <div><div class="dom-name">Billing, Pricing, and Support</div><div class="dom-meta">31 FRAGEN</div>
+          <div class="dom-bar"><i style="background:var(--dom-bill)" data-w="89%"></i></div></div>
+        <div class="dom-val" style="color:var(--dom-bill)">89%</div>
+      </div>
+    </div>
+
+    <!-- SCHWÄCHSTE FRAGEN: echte Fragentexte (alte Funktion) -->
+    <div class="tile col-7 rise">
+      <div class="t-label">Schwächste Fragen <span class="val">KLICK = ZUR FRAGE</span></div>
+      <div class="q-item">
+        <div class="q-text">Ein Betriebsteam möchte personalisierte Hinweise zu AWS-Ereignissen und geplanten Änderungen sehen, die SPEZIELL die eigenen Konten und Ressourcen betreffen. Welche AWS-Ressource bietet diese personalisierte Sicht?</div>
+        <div class="q-side">
+          <span class="chip" style="color:var(--dom-bill);background:color-mix(in srgb,var(--dom-bill) 12%,transparent)">BILLING &amp; SUPPORT</span>
+          <span class="chip wrong">1× FALSCH</span>
+        </div>
+        <span class="q-arrow">›</span>
+      </div>
+      <div class="q-item">
+        <div class="q-text">Ein Unternehmen will sicherstellen, dass alle S3-Buckets dauerhaft verschlüsselt sind, und bei Abweichungen alarmiert werden. Welcher Service eignet sich?</div>
+        <div class="q-side">
+          <span class="chip" style="color:var(--dom-sec);background:color-mix(in srgb,var(--dom-sec) 12%,transparent)">SECURITY</span>
+          <span class="chip wrong">1× FALSCH</span>
+        </div>
+        <span class="q-arrow">›</span>
+      </div>
+      <div class="q-item">
+        <div class="q-text">Welcher Support-Plan beinhaltet einen dedizierten Technical Account Manager (TAM) und Concierge-Support?</div>
+        <div class="q-side">
+          <span class="chip" style="color:var(--dom-bill);background:color-mix(in srgb,var(--dom-bill) 12%,transparent)">BILLING &amp; SUPPORT</span>
+          <span class="chip wrong">2× FALSCH</span>
+        </div>
+        <span class="q-arrow">›</span>
+      </div>
+    </div>
+
+    <!-- VERLAUF: R1–R5 mit Schnitt + Lernziel (alte Funktion) -->
+    <div class="tile col-7 rise">
+      <div class="t-label">Verlauf <span class="val">R1–R5 · R5 = AKTUELLSTE</span></div>
+      <svg class="chart-svg" viewBox="0 0 520 170" id="verlauf" aria-label="Trefferquote je Runde"></svg>
+      <div class="legend">
+        <span><i class="l-line"></i> Trefferquote je Runde</span>
+        <span><i class="l-dot"></i> letzte Runde</span>
+        <span><i class="l-avg"></i> Schnitt (Ø)</span>
+        <span><i class="l-goal"></i> Lernziel 70%</span>
+      </div>
+      <div class="chart-note">Höhe = Trefferquote in %. Lernziel 70 % ist dein eigenes Ziel, nicht die Bestehensgrenze.</div>
+    </div>
+
+    <!-- LETZTE RUNDE / DEIN SCHNITT (alte Funktion) -->
+    <div class="tile col-5 rise">
+      <div class="t-label">Runden-Bilanz <span class="val">┊ LERNZIEL 70%</span></div>
+      <div class="round-row">
+        <span class="round-name">Letzte Runde</span>
+        <div class="round-bar"><i data-w="100%"></i></div>
+        <span class="round-val">100%</span>
+      </div>
+      <div class="round-row">
+        <span class="round-name">Dein Schnitt</span>
+        <div class="round-bar"><i data-w="83%"></i></div>
+        <span class="round-val">83%</span>
+      </div>
+      <div class="goal-note">Lernziel 70 % (nicht Bestehensgrenze).</div>
+
+      <div class="t-label" style="margin-top:22px">Fragen der letzten Runde</div>
+      <div class="tabs">
+        <button id="tab-wrong" class="active" onclick="setTab('wrong')">Falsch <span class="cnt bad">0</span></button>
+        <button id="tab-right" onclick="setTab('right')">Richtig <span class="cnt good">3</span></button>
+      </div>
+      <div id="pane-wrong">
+        <div class="empty-state">Keine Fehler in dieser Runde. 💪</div>
+      </div>
+      <div id="pane-right" class="hidden right-list">
+        <div class="q-item"><div class="q-text">Welche Säule des Well-Architected Framework adressiert Recovery-Planung?</div><span class="chip ok">✓</span></div>
+        <div class="q-item"><div class="q-text">Welcher Service bietet zentrale Verwaltung mehrerer AWS-Konten?</div><span class="chip ok">✓</span></div>
+        <div class="q-item"><div class="q-text">Was beschreibt das Shared-Responsibility-Modell für S3?</div><span class="chip ok">✓</span></div>
+      </div>
+    </div>
+
+    <!-- Hartnäckigste Schwachstellen (v2, bleibt) -->
+    <div class="tile col-5 rise">
+      <div class="t-label">Hartnäckigste Schwachstellen <span class="val">FALSCH-QUOTE</span></div>
+      <div class="weak">
+        <div class="weak-item"><span class="wname">Support-Pläne &amp; TAM</span><span class="wbar"><i data-w="66%"></i></span><span class="wpct">66%</span></div>
+        <div class="weak-item"><span class="wname">Health Dashboard vs. Trusted Advisor</span><span class="wbar"><i data-w="54%"></i></span><span class="wpct">54%</span></div>
+        <div class="weak-item"><span class="wname">S3-Verschlüsselung &amp; Config</span><span class="wbar"><i data-w="48%"></i></span><span class="wpct">48%</span></div>
+        <div class="weak-item"><span class="wname">EC2-Kaufoptionen</span><span class="wbar"><i data-w="41%"></i></span><span class="wpct">41%</span></div>
+      </div>
+    </div>
+
+    <!-- Aktivität (v2, bleibt) -->
+    <div class="tile col-7 rise">
+      <div class="t-label">Lern-Aktivität <span class="val">LETZTE 26 WOCHEN</span></div>
+      <div class="heat" id="heat"></div>
+      <div class="heat-legend">WENIGER <i style="background:var(--heat-0)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-4)"></i> MEHR</div>
+    </div>
+  </div>
+
+  <!-- ===== BEREICHE: identisches Muster für Dashboard + Statistik ===== -->
+  <div class="section-h"><h2>Bereiche</h2><span>LIVE-PREVIEW BEIM HOVER · IDENTISCH AUF DEM DASHBOARD</span></div>
+  <div class="areas">
+    <div class="area">
+      <div class="area-head">
+        <div class="area-ico quiz">◈</div>
+        <div><h3>Quiz</h3><div class="meta">264 Fragen · Übungsmodus, Umfang &amp; Fokus wählbar</div></div>
+      </div>
+      <div class="preview pv-quiz">
+        <div class="opt correct"><span class="box"></span> AWS Health Dashboard (Account-spezifisch)</div>
+        <div class="opt"><span class="box"></span> Service Health Dashboard (global)</div>
+        <div class="opt"><span class="box"></span> Trusted Advisor</div>
+      </div>
+    </div>
+
+    <div class="area saa-only">
+      <div class="area-head">
+        <div class="area-ico diagram">◫</div>
+        <div><h3>Diagramm-Quiz <span class="badge-new">NEU</span></h3><div class="meta">Dienste ins Architektur-Schema ziehen</div></div>
+      </div>
+      <div class="preview pv-diagram">
+        <svg viewBox="0 0 300 88" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 78 44 H 108" stroke="var(--ink-faint)" stroke-width="2" fill="none"/>
+          <path d="M 100 40 L 108 44 L 100 48" stroke="var(--ink-faint)" stroke-width="2" fill="none"/>
+          <path d="M 192 44 H 222" stroke="var(--ink-faint)" stroke-width="2" fill="none"/>
+          <path d="M 214 40 L 222 44 L 214 48" stroke="var(--ink-faint)" stroke-width="2" fill="none"/>
+          <rect x="14" y="28" width="64" height="32" rx="7" fill="var(--surface)" stroke="var(--success)" stroke-width="2"/>
+          <text x="46" y="48" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--ink)">ELB</text>
+          <rect class="fillbox" x="118" y="28" width="74" height="32" rx="7" fill="var(--success-soft)" stroke="var(--success)" stroke-width="2" stroke-dasharray="4 3"/>
+          <text class="fillbox" x="155" y="48" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--success)">EC2 ASG</text>
+          <rect x="222" y="28" width="64" height="32" rx="7" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="2"/>
+          <text x="254" y="48" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--ink-faint)">?</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="area">
+      <div class="area-head">
+        <div class="area-ico cards">▤</div>
+        <div><h3>Karteikarten</h3><div class="meta">150 Karten · Begriffe trainieren</div></div>
+      </div>
+      <div class="preview pv-cards">
+        <div class="card">
+          <div class="face front">Was macht AWS Config?</div>
+          <div class="face back">→ Ressourcen-Konformität überwachen + Abweichungs-Alarm</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="area">
+      <div class="area-head">
+        <div class="area-ico script">☰</div>
+        <div><h3>Skript</h3><div class="meta">13 Kapitel · 172 Dienste als Lesestoff</div></div>
+        <span class="shared">GETEILT</span>
+      </div>
+      <div class="preview pv-script">
+        <div class="scroller">
+          <div><b>## Kapitel 6 — Security</b></div>
+          <div>AWS Config überwacht Ressourcen-Konformität …</div>
+          <div>S3-Default-Encryption gilt seit 2023 automatisch …</div>
+          <div><b>🛑 Prüfungs-Knackpunkt:</b> Config ≠ CloudTrail</div>
+          <div>Trusted Advisor prüft Kosten, Sicherheit, Limits …</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>Mockup · Statistik v3</span>
+  <span>Alte Funktionen · Neues Design</span>
+  <span>Daten = CLF-Beispieldaten</span>
+</footer>
+
+<script>
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function applyExam(exam){
+  document.body.dataset.exam=exam;
+  document.getElementById('btn-clf').classList.toggle('active',exam==='clf');
+  document.getElementById('btn-saa').classList.toggle('active',exam==='saa');
+  document.getElementById('exam-name').textContent=exam==='clf'?'CLF-C02 · Bestanden':'SAA-C03 Solutions Architect';
+  document.querySelectorAll('.rise').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});
+  animateBars();
+}
+function setExam(exam){
+  if(document.body.dataset.exam===exam)return;
+  if(document.startViewTransition&&!reduced)document.startViewTransition(()=>applyExam(exam));
+  else applyExam(exam);
+}
+function animateBars(){
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll('[data-w]').forEach(i=>{i.style.width=i.dataset.w});
+  }));
+}
+
+/* KPI-Sparkline: letzte 10 Runden */
+(function(){
+  const d=[72,78,75,81,68,84,80,88,79,83];
+  const W=150,H=34,min=60,max=95;
+  const x=i=>2+i*((W-4)/(d.length-1)), y=v=>H-3-((v-min)/(max-min))*(H-8);
+  let p='';d.forEach((v,i)=>{p+=(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)+' '});
+  document.getElementById('spark').innerHTML=
+    `<line x1="0" y1="${y(83)}" x2="${W}" y2="${y(83)}" stroke="var(--border-strong)" stroke-dasharray="3 3"/>`+
+    `<path d="${p}" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`+
+    `<circle cx="${x(9)}" cy="${y(83)}" r="3" fill="var(--success)"/>`;
+})();
+
+/* Verlauf: R1–R5, Schnitt Ø + Lernziel 70% */
+(function(){
+  const svg=document.getElementById('verlauf');
+  const data=[63,68,15,97,100];
+  const avg=data.reduce((a,b)=>a+b,0)/data.length;
+  const W=520,H=170,padL=34,padR=14,padT=12,padB=26;
+  const x=i=>padL+i*((W-padL-padR)/(data.length-1));
+  const y=v=>H-padB-(v/100)*(H-padT-padB);
+  let s='';
+  [0,50,100].forEach(g=>{
+    s+=`<line x1="${padL}" y1="${y(g)}" x2="${W-padR}" y2="${y(g)}" stroke="var(--border)" stroke-width="1"/>`;
+    s+=`<text x="${padL-6}" y="${y(g)+3}" text-anchor="end" font-family="var(--font-mono)" font-size="8.5" fill="var(--ink-faint)">${g}%</text>`;
+  });
+  s+=`<line x1="${padL}" y1="${y(70)}" x2="${W-padR}" y2="${y(70)}" stroke="var(--ink-soft)" stroke-width="1.5" stroke-dasharray="7 5"/>`;
+  s+=`<line x1="${padL}" y1="${y(avg)}" x2="${W-padR}" y2="${y(avg)}" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="2 4"/>`;
+  s+=`<text x="${W-padR}" y="${y(avg)-4}" text-anchor="end" font-family="var(--font-mono)" font-size="8.5" fill="var(--ink-faint)">Ø ${Math.round(avg)}%</text>`;
+  let d='';data.forEach((v,i)=>{d+=(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)+' '});
+  s+=`<path d="${d}" fill="none" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" ${reduced?'':'stroke-dasharray="1000" stroke-dashoffset="1000" style="animation:draw 1.4s cubic-bezier(.22,.9,.3,1) .2s forwards"'}/>`;
+  data.forEach((v,i)=>{
+    s+=`<circle cx="${x(i)}" cy="${y(v)}" r="${i===data.length-1?4:2.5}" fill="var(--orange)"/>`;
+    s+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--ink-faint)">R${i+1}</text>`;
+  });
+  svg.innerHTML=s;
+})();
+const st=document.createElement('style');st.textContent='@keyframes draw{to{stroke-dashoffset:0}}';document.head.appendChild(st);
+
+/* Falsch/Richtig-Tabs */
+function setTab(t){
+  document.getElementById('tab-wrong').classList.toggle('active',t==='wrong');
+  document.getElementById('tab-right').classList.toggle('active',t==='right');
+  document.getElementById('pane-wrong').classList.toggle('hidden',t!=='wrong');
+  document.getElementById('pane-right').classList.toggle('hidden',t!=='right');
+}
+
+/* Heatmap */
+(function(){
+  const heat=document.getElementById('heat');let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;let h='';
+  for(let w=0;w<26;w++)for(let d=0;d<7;d++){const r=rnd();const l=r>0.86?4:r>0.7?3:r>0.5?2:r>0.32?1:0;h+=`<i class="h${l}"></i>`;}
+  heat.innerHTML=h;
+})();
+
+animateBars();
+</script>
+</body>
+</html>

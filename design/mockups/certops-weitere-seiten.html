@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CertOps — Restliche Seiten (Mockup)</title>
+<style>
+:root{
+  --font-sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --font-mono:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --r-card:12px;--r-btn:8px;--r-pill:999px;
+  --t-fast:140ms;--t-med:220ms;
+  --orange:#ED7100;--orange-bright:#FF9900;
+  --scrollp:0;
+}
+body[data-theme="dark"]{
+  --canvas:#141a24;--surface:#1b2330;--surface-2:#222c3b;
+  --border:rgba(255,255,255,.07);--border-strong:rgba(255,255,255,.14);
+  --ink:#eef2f7;--ink-soft:#9fadc0;--ink-faint:#5c6a7e;
+  --accent:#7d93c9;--accent-soft:rgba(125,147,201,.14);
+  --success:#2bbf9e;--success-soft:rgba(1,168,141,.14);
+  --danger:#f0776b;--danger-soft:rgba(240,119,107,.13);
+  --grid-line:rgba(255,255,255,.045);
+  --glow-a:rgba(125,147,201,.14);--glow-b:rgba(1,168,141,.12);
+  --cta-ink:#1a1204;color-scheme:dark;
+}
+body[data-theme="light"]{
+  --canvas:#f6f8fc;--surface:#ffffff;--surface-2:#eef1f7;
+  --border:#e2e6ef;--border-strong:#cfd5e3;
+  --ink:#151a26;--ink-soft:#4d5872;--ink-faint:#9aa4bd;
+  --accent:#3b4f9e;--accent-soft:#e4e9f8;
+  --success:#0d9478;--success-soft:#e2f4ef;
+  --danger:#d64545;--danger-soft:#fbe9e9;
+  --grid-line:rgba(35,47,62,.06);
+  --glow-a:rgba(59,79,158,.10);--glow-b:rgba(13,148,120,.08);
+  --cta-ink:#1a1204;color-scheme:light;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-sans);background:var(--canvas);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:24px 24px;background-position:0 calc(var(--scrollp) * -40px);
+  mask-image:radial-gradient(ellipse 95% 80% at 50% 10%,black 25%,transparent 80%)}
+body::after{content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;
+  background:radial-gradient(38% 30% at calc(22% + var(--scrollp)*40%) calc(12% + var(--scrollp)*30%),var(--glow-a),transparent 70%),
+             radial-gradient(32% 26% at calc(80% - var(--scrollp)*30%) calc(70% - var(--scrollp)*25%),var(--glow-b),transparent 70%);
+  opacity:calc(.7 + var(--scrollp)*.3)}
+
+header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--canvas) 82%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.header-inner{max-width:1120px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.wordmark{font-weight:700;font-size:16px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--orange-bright)}
+.nav{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-pill);padding:3px}
+.nav button{font-family:var(--font-sans);font-size:12px;font-weight:600;border:none;background:transparent;color:var(--ink-soft);padding:6px 12px;border-radius:var(--r-pill);cursor:pointer;transition:background var(--t-fast) linear,color var(--t-fast) linear}
+.nav button.active{background:var(--ink);color:var(--canvas)}
+.right-controls{margin-left:auto;display:flex;align-items:center;gap:10px}
+.exam-pill{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-soft);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 11px}
+.theme-toggle{width:56px;height:28px;border-radius:var(--r-pill);cursor:pointer;position:relative;background:var(--surface-2);border:1px solid var(--border)}
+.theme-toggle .knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:var(--surface);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:11px;transition:transform .28s cubic-bezier(.22,.9,.3,1)}
+body[data-theme="light"] .theme-toggle .knob{transform:translateX(28px)}
+
+main{max-width:1120px;margin:0 auto;padding:30px 24px 90px;position:relative;z-index:1}
+.view{display:none}
+.view.visible{display:block}
+.rise{opacity:0;transform:translateY(12px);animation:rise .5s cubic-bezier(.22,.9,.3,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.rise:nth-child(1){animation-delay:.03s}.rise:nth-child(2){animation-delay:.08s}
+.rise:nth-child(3){animation-delay:.13s}.rise:nth-child(4){animation-delay:.18s}
+
+.eyebrow{font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.eyebrow .rule{height:1px;width:32px;background:var(--border-strong)}
+h1{font-size:clamp(22px,3.2vw,32px);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:8px}
+.sub{font-size:13.5px;color:var(--ink-soft);max-width:60ch;line-height:1.6}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:22px;margin-top:18px;position:relative}
+.t-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px;display:flex;justify-content:space-between;gap:8px}
+.t-label .val{color:var(--ink-soft)}
+.btn{font-family:var(--font-sans);font-size:13px;font-weight:600;padding:10px 18px;border-radius:var(--r-btn);cursor:pointer;border:1px solid transparent;transition:transform var(--t-fast) cubic-bezier(.22,.9,.3,1)}
+.btn:hover{transform:translateY(-1px)}
+.btn-cta{background:var(--orange);color:var(--cta-ink)}
+.btn-quiet{background:transparent;color:var(--ink);border-color:var(--border-strong)}
+.chip-select{display:flex;flex-wrap:wrap;gap:8px}
+.chip-select button{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;border:1.5px solid var(--border-strong);border-radius:var(--r-pill);background:var(--surface);color:var(--ink-soft);padding:7px 14px;cursor:pointer;transition:all var(--t-fast) linear}
+.chip-select button.on{border-color:var(--orange);color:var(--orange);background:color-mix(in srgb,var(--orange) 10%,transparent)}
+
+/* ===== QUIZ ===== */
+.progress{height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden;margin-bottom:18px}
+.progress i{display:block;height:100%;width:20%;background:var(--orange);border-radius:2px;transition:width .5s cubic-bezier(.22,.9,.3,1)}
+.q-text{font-size:15px;line-height:1.65;font-weight:550;margin-bottom:18px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);padding:13px 15px;font-size:13.5px;line-height:1.5;cursor:pointer;transition:border-color var(--t-fast) linear,background var(--t-fast) linear}
+.opt:hover{border-color:var(--border-strong)}
+.opt .key{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);border:1px solid var(--border-strong);border-radius:6px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.correct{border-color:var(--success);background:var(--success-soft)}
+.opt.wrong{border-color:var(--danger);background:var(--danger-soft)}
+.opt.correct .key{border-color:var(--success);color:var(--success)}
+.opt.wrong .key{border-color:var(--danger);color:var(--danger)}
+.explain{display:none;margin-top:16px;border-left:3px solid var(--success);padding:12px 16px;background:var(--success-soft);border-radius:0 9px 9px 0;font-size:13px;line-height:1.65}
+.explain.show{display:block}
+.quiz-actions{display:flex;gap:10px;margin-top:18px;align-items:center}
+
+/* ===== FLASHCARDS ===== */
+.fc-stage{display:flex;flex-direction:column;align-items:center;gap:20px;padding:14px 0 4px}
+.fc-wrap{perspective:1100px;width:min(480px,100%)}
+.fc{position:relative;width:100%;height:230px;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.9,.3,1);cursor:pointer}
+.fc.flipped{transform:rotateY(180deg)}
+.fc .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;border:1px solid var(--border-strong);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:26px;text-align:center}
+.fc .face .fc-tag{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;color:var(--ink-faint);position:absolute;top:14px;left:16px;text-transform:uppercase}
+.fc .face .fc-hint{font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;color:var(--ink-faint);position:absolute;bottom:14px;text-transform:uppercase}
+.fc .front .q{font-size:17px;font-weight:650;line-height:1.5}
+.fc .back{transform:rotateY(180deg);background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.fc .back .a{font-size:14px;line-height:1.65;color:var(--ink)}
+.fc .back .a b{color:var(--accent)}
+.conf{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.conf button{font-family:var(--font-sans);font-size:12.5px;font-weight:600;border:1.5px solid var(--border-strong);border-radius:var(--r-pill);background:var(--surface);color:var(--ink-soft);padding:9px 16px;cursor:pointer;transition:all var(--t-fast) linear}
+.conf button:hover{transform:translateY(-1px)}
+.conf .c1:hover{border-color:var(--danger);color:var(--danger)}
+.conf .c2:hover{border-color:var(--orange);color:var(--orange)}
+.conf .c3:hover{border-color:var(--accent);color:var(--accent)}
+.conf .c4:hover{border-color:var(--success);color:var(--success)}
+.fc-meta{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--ink-faint);text-transform:uppercase}
+
+/* ===== DIENSTE (freies Üben) ===== */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+.svc{perspective:800px;height:150px;cursor:pointer}
+.svc .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.22,.9,.3,1)}
+.svc:hover .inner{transform:rotateY(180deg)}
+.svc .f{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;border:1px solid var(--border);background:var(--surface);padding:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;text-align:center}
+.svc .f .emoji{font-size:26px}
+.svc .f h4{font-size:13.5px;font-weight:650}
+.svc .f .cat{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase}
+.svc .b{transform:rotateY(180deg);background:var(--surface-2);font-size:11.5px;line-height:1.55;color:var(--ink-soft);justify-content:center}
+.mode-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.mode{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:16px;cursor:pointer;transition:border-color var(--t-fast) linear,transform var(--t-fast) linear}
+.mode:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.mode .k{font-family:var(--font-mono);font-size:9px;letter-spacing:.12em;color:var(--orange);text-transform:uppercase;margin-bottom:5px}
+.mode b{font-size:13.5px;font-weight:650}
+.mode p{font-size:11.5px;color:var(--ink-soft);margin-top:4px;line-height:1.5}
+
+/* ===== SKRIPT-LESEBEREICH ===== */
+.skript-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.skript-head .kap-chip{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;border:1px solid var(--border-strong);border-radius:var(--r-pill);padding:5px 12px;color:var(--ink-soft);cursor:pointer}
+.skript-head .kap-chip.on{border-color:var(--danger);color:var(--danger)}
+.svc-section{margin-top:16px}
+.svc-section .svc-head{display:flex;align-items:flex-start;gap:10px;padding-right:44px}
+.svc-section h2{font-size:19px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
+.svc-section h2 .em{margin-right:6px}
+/* TTS-Button (PR #22-Funktion, neues Design) */
+.tts-btn{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border-strong);background:var(--surface);color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all var(--t-fast) linear}
+.tts-btn:hover{border-color:var(--orange);color:var(--orange)}
+.tts-btn.playing{border-color:var(--orange);color:var(--orange);background:color-mix(in srgb,var(--orange) 10%,transparent)}
+.tts-bar{display:none;height:3px;border-radius:2px;background:var(--surface-2);overflow:hidden;margin-top:14px}
+.tts-bar.on{display:block}
+.tts-bar i{display:block;height:100%;width:0;background:var(--orange);animation:ttsplay 14s linear forwards}
+@keyframes ttsplay{to{width:100%}}
+.metapher{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;line-height:1.65;font-style:italic}
+.bodytext{font-size:13.5px;line-height:1.75;color:var(--ink-soft);margin-top:14px}
+.bodytext b{color:var(--ink);font-weight:650}
+.exam-box{border:1px solid var(--border-strong);background:var(--surface-2);border-radius:9px;padding:12px 16px;margin-top:14px;font-size:13px;line-height:1.6}
+.exam-box .k{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;color:var(--ink-faint);text-transform:uppercase;display:block;margin-bottom:5px}
+.merksatz{border-left:3px solid var(--orange);background:color-mix(in srgb,var(--orange) 8%,transparent);border-radius:0 9px 9px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;line-height:1.65;font-weight:550}
+.merksatz .k{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;color:var(--orange);text-transform:uppercase;display:block;margin-bottom:4px}
+.kap-player{display:flex;align-items:center;gap:12px;margin-top:18px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r-card);background:var(--surface)}
+.kap-player .play{width:38px;height:38px;border-radius:50%;background:var(--orange);color:var(--cta-ink);border:none;font-size:14px;cursor:pointer;flex-shrink:0}
+.kap-player .info{font-size:12px;color:var(--ink-soft)}
+.kap-player .info b{color:var(--ink);font-weight:650;display:block;font-size:12.5px}
+
+/* ===== ÜBERSICHT ===== */
+.search{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border-strong);border-radius:var(--r-card);background:var(--surface);padding:12px 16px;margin-top:16px}
+.search input{flex:1;border:none;outline:none;background:transparent;color:var(--ink);font-family:var(--font-sans);font-size:14px}
+.search input::placeholder{color:var(--ink-faint)}
+.search .glyph{color:var(--ink-faint);font-family:var(--font-mono)}
+.u-row{display:flex;align-items:center;gap:14px;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity var(--t-fast) linear}
+.u-row:hover{opacity:.75}
+.u-row .em{font-size:19px;width:26px;text-align:center;flex-shrink:0}
+.u-row .name{font-size:13.5px;font-weight:650;min-width:180px}
+.u-row .name .abbr{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);margin-left:6px}
+.u-row .line{flex:1;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+.u-row .line i{font-style:normal;color:var(--accent);font-weight:600}
+.u-row .dot2{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.u-row .arrow{color:var(--ink-faint);flex-shrink:0}
+.u-count{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--ink-faint);margin-top:12px;text-transform:uppercase}
+
+footer{max-width:1120px;margin:0 auto;padding:0 24px 40px;position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--ink-faint);display:flex;gap:18px;flex-wrap:wrap;text-transform:uppercase}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.4s}
+@media (max-width:860px){
+  main{padding:20px 14px 70px}.header-inner{padding:10px 12px}
+  .nav{order:3;width:100%;justify-content:space-between}
+  .u-row .name{min-width:120px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rise{opacity:1;transform:none}}
+</style>
+</head>
+<body data-theme="dark" data-exam="saa">
+
+<header>
+  <div class="header-inner">
+    <div class="wordmark"><span class="dot"></span>CertOps</div>
+    <div class="nav">
+      <button data-v="quiz" class="active" onclick="setView('quiz')">Quiz</button>
+      <button data-v="cards" onclick="setView('cards')">Karten</button>
+      <button data-v="svc" onclick="setView('svc')">Dienste</button>
+      <button data-v="skript" onclick="setView('skript')">Skript</button>
+      <button data-v="ueb" onclick="setView('ueb')">Übersicht</button>
+    </div>
+    <div class="right-controls">
+      <span class="exam-pill">SAA-C03</span>
+      <div class="theme-toggle" onclick="toggleTheme()" role="switch" aria-label="Hell/Dunkel" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleTheme()}"><div class="knob" id="knob">🌙</div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ==================== QUIZ ==================== -->
+<section class="view visible" id="v-quiz">
+  <div class="rise">
+    <div class="eyebrow"><span class="rule"></span> Szenario-Quiz · DOM-02</div>
+    <h1>Übungsmodus</h1>
+    <p class="sub">Umfang &amp; Fokus wählbar — genau wie du es kennst, nur schöner.</p>
+  </div>
+
+  <div class="card rise">
+    <div class="t-label">Runden-Setup</div>
+    <div class="chip-select" style="margin-bottom:12px">
+      <button class="on">10 FRAGEN</button><button>15 FRAGEN</button><button>25 FRAGEN</button><button>ALLE OFFENEN</button>
+    </div>
+    <div class="chip-select">
+      <button>DOM-01 SECURE</button><button class="on">DOM-02 RESILIENT</button><button>DOM-03 PERFORMANCE</button><button>DOM-04 COST</button><button>NUR SCHWÄCHSTE</button>
+    </div>
+  </div>
+
+  <div class="card rise">
+    <div class="t-label">Frage 3 / 10 <span class="val">TEILPUNKTE AUS</span></div>
+    <div class="progress"><i id="qprog" style="width:30%"></i></div>
+    <p class="q-text">Ein Unternehmen betreibt eine kritische Anwendung auf Amazon RDS. Bei einem Ausfall der primären Availability Zone soll die Datenbank <b>ohne manuellen Eingriff und ohne Datenverlust</b> weiterlaufen. Welche Konfiguration erfüllt die Anforderung?</p>
+    <div class="opts" id="opts">
+      <div class="opt" data-k="a" onclick="selOpt(this)"><span class="key">A</span> Read-Replica in einer zweiten AZ, Promotion per Runbook</div>
+      <div class="opt" data-k="b" data-right onclick="selOpt(this)"><span class="key">B</span> Multi-AZ-Deployment mit synchroner Replikation und automatischem Failover</div>
+      <div class="opt" data-k="c" onclick="selOpt(this)"><span class="key">C</span> Tägliche automatische Snapshots mit Restore in eine zweite AZ</div>
+      <div class="opt" data-k="d" onclick="selOpt(this)"><span class="key">D</span> Aurora Global Database mit Secondary Region</div>
+    </div>
+    <div class="explain" id="q-explain"><b>B ist richtig:</b> Multi-AZ repliziert synchron (kein Datenverlust) und failovert automatisch (kein Eingriff). A ist asynchron + manuell, C bedeutet Downtime + Datenverlust seit dem letzten Snapshot, D adressiert Region-, nicht AZ-Ausfall — und wäre überdimensioniert.</div>
+    <div class="quiz-actions">
+      <button class="btn btn-cta" onclick="checkQ()">Antwort prüfen</button>
+      <button class="btn btn-quiet" onclick="nextQ()">Nächste Frage →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== KARTEN ==================== -->
+<section class="view" id="v-cards">
+  <div class="rise">
+    <div class="eyebrow"><span class="rule"></span> Flashcards · Spaced Repetition</div>
+    <h1>Karteikarten</h1>
+    <p class="sub">Karte tippen zum Umdrehen, dann ehrlich bewerten — dein Rating steuert, wann die Karte wiederkommt.</p>
+  </div>
+
+  <div class="card rise">
+    <div class="t-label">Karte 7 / 24 heute <span class="val">DECK: DOM-02 RESILIENT</span></div>
+    <div class="fc-stage">
+      <div class="fc-wrap">
+        <div class="fc" id="fc" onclick="this.classList.toggle('flipped')">
+          <div class="face front">
+            <span class="fc-tag">RDS</span>
+            <div class="q">Worin unterscheiden sich RDS Multi-AZ und Read-Replica in Replikation und Failover?</div>
+            <span class="fc-hint">TIPPEN ZUM UMDREHEN</span>
+          </div>
+          <div class="face back">
+            <span class="fc-tag">ANTWORT</span>
+            <div class="a"><b>Multi-AZ:</b> synchron, automatisches Failover, gleiche Region, nicht lesbar.<br><b>Read-Replica:</b> asynchron, manuelle Promotion, lesbar, auch cross-region.<br>HA ≠ Skalierung.</div>
+            <span class="fc-hint">JETZT EHRLICH BEWERTEN ↓</span>
+          </div>
+        </div>
+      </div>
+      <div class="conf">
+        <button class="c1" onclick="rate()">Nochmal</button>
+        <button class="c2" onclick="rate()">Schwer</button>
+        <button class="c3" onclick="rate()">Gut</button>
+        <button class="c4" onclick="rate()">Leicht</button>
+      </div>
+      <div class="fc-meta" id="fc-meta">NÄCHSTE WIEDERHOLUNG JE NACH RATING: 10 MIN · 1 TAG · 4 TAGE · 9 TAGE</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DIENSTE (freies Üben) ==================== -->
+<section class="view" id="v-svc">
+  <div class="rise">
+    <div class="eyebrow"><span class="rule"></span> AWS Dienste · Freies Üben</div>
+    <h1>172 Dienste. Kein gespeicherter Fortschritt. Nur du und die Karten.</h1>
+    <p class="sub">Hover/Tap dreht die Karte — Metapher vorne, Klartext hinten. Battle und Puzzle wie gehabt.</p>
+  </div>
+
+  <div class="svc-grid rise">
+    <div class="svc"><div class="inner">
+      <div class="f front2"><span class="emoji">🪨</span><h4>Amazon Bedrock</h4><span class="cat">MACHINE LEARNING</span></div>
+      <div class="f b">Foundation-Models per API — Anthropic, Meta, Mistral &amp; Co. ohne eigene Infrastruktur.</div>
+    </div></div>
+    <div class="svc"><div class="inner">
+      <div class="f front2"><span class="emoji">🚪</span><h4>API Gateway</h4><span class="cat">NETWORKING</span></div>
+      <div class="f b">Der Türsteher für deine APIs — Auth, Throttling, Versionierung an einem Ort.</div>
+    </div></div>
+    <div class="svc"><div class="inner">
+      <div class="f front2"><span class="emoji">📮</span><h4>Amazon SQS</h4><span class="cat">INTEGRATION</span></div>
+      <div class="f b">Der Briefkasten zwischen Services — entkoppelt, puffert Lastspitzen, mindestens-einmal-Zustellung.</div>
+    </div></div>
+    <div class="svc"><div class="inner">
+      <div class="f front2"><span class="emoji">🧊</span><h4>S3 Glacier</h4><span class="cat">STORAGE</span></div>
+      <div class="f b">Das Tiefkühlarchiv — Cent-Preise fürs Aufbewahren, Wartezeit beim Auftauen.</div>
+    </div></div>
+  </div>
+
+  <div class="mode-row rise">
+    <div class="mode"><div class="k">Modus</div><b>Service-Battle</b><p>Zwei Dienste, eine Anforderung — welcher passt? Schnellfeuer.</p></div>
+    <div class="mode"><div class="k">Modus</div><b>Kategorie-Puzzle</b><p>Dienste den richtigen Kategorien zuordnen, gegen die Uhr.</p></div>
+    <div class="mode"><div class="k">Modus</div><b>Generatives Quiz</b><p>Zufallsfragen aus allen 172 Diensten — freies Üben ohne Statistik.</p></div>
+  </div>
+</section>
+
+<!-- ==================== SKRIPT ==================== -->
+<section class="view" id="v-skript">
+  <div class="rise">
+    <div class="eyebrow"><span class="rule"></span> Lernskript · Geteilt CLF + SAA</div>
+    <h1>Kapitel 6 — Security &amp; Compliance</h1>
+    <p class="sub">Lesestoff mit Sprungzielen aus den Service-Karten — jetzt mit Vorlesen pro Sektion und seriellem Kapitel-Player.</p>
+  </div>
+
+  <div class="rise" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+    <span class="kap-chip">K5 DATENBANKEN</span>
+    <span class="kap-chip on">K6 SECURITY</span>
+    <span class="kap-chip">K7 NETZWERK</span>
+  </div>
+
+  <div class="kap-player rise">
+    <button class="play" id="kap-play" onclick="toggleKap()">▶</button>
+    <div class="info"><b>Ganzes Kapitel anhören</b>12 Sektionen · seriell · on-demand generiert, danach aus dem Cache</div>
+  </div>
+
+  <div class="card rise">
+    <button class="tts-btn" id="tts1" onclick="toggleTts(this)" title="Sektion vorlesen">▶</button>
+    <div class="svc-section">
+      <div class="svc-head"><h2><span class="em">🕵️</span>AWS Config</h2></div>
+      <div class="tts-bar" id="ttsbar1"><i></i></div>
+      <div class="metapher">Der Gebäude-Inspektor, der ununterbrochen durch alle Räume geht und jede Abweichung vom Bauplan protokolliert.</div>
+      <p class="bodytext">Config <b>bewertet Ressourcen-Konfigurationen</b> gegen Regeln (Compliance) und zeichnet jede Änderung als Historie auf. Typische Prüfungsfrage: „Alle S3-Buckets müssen verschlüsselt sein, Abweichung soll alarmieren" → <b>Config-Rule + Remediation</b>.</p>
+      <div class="exam-box"><span class="k">⚠ Prüfungs-Knackpunkt</span>Config ≠ CloudTrail: Config = <b>Zustand</b> („WIE ist die Ressource konfiguriert?"), CloudTrail = <b>Aktivität</b> („WER hat WAS aufgerufen?"). Beide zusammen = vollständiges Audit-Bild.</div>
+      <div class="merksatz"><span class="k">🧠 Merksatz</span>Config kontrolliert den Zustand, CloudTrail die Taten.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ÜBERSICHT ==================== -->
+<section class="view" id="v-ueb">
+  <div class="rise">
+    <div class="eyebrow"><span class="rule"></span> Dienste-Schnellübersicht</div>
+    <h1>145 Dienste. Ein Einzeiler pro Dienst.</h1>
+    <p class="sub">Metapher &amp; Signalwort, alphabetisch — mit Deep-Link an die richtige Stelle im Skript.</p>
+  </div>
+
+  <div class="search rise">
+    <span class="glyph">⌕</span>
+    <input id="usearch" placeholder="Dienst suchen … (z. B. „Kin" für Kinesis)" oninput="filterU()">
+  </div>
+
+  <div class="rise" id="ulist">
+    <div class="u-row" data-n="api gateway"><span class="em">🚪</span><span class="name">API Gateway</span><span class="line">Der Türsteher für APIs · <i>Throttling</i></span><span class="dot2" style="background:#7c3aed"></span><span class="arrow">›</span></div>
+    <div class="u-row" data-n="athena"><span class="em">🔍</span><span class="name">Athena</span><span class="line">SQL direkt auf S3-Daten, serverless · <i>Ad-hoc-Analyse</i></span><span class="dot2" style="background:#0891b2"></span><span class="arrow">›</span></div>
+    <div class="u-row" data-n="bedrock"><span class="em">🪨</span><span class="name">Bedrock</span><span class="line">Foundation-Models per API · <i>GenAI</i></span><span class="dot2" style="background:#d97706"></span><span class="arrow">›</span></div>
+    <div class="u-row" data-n="cloudfront"><span class="em">🌍</span><span class="name">CloudFront</span><span class="line">Weltweite Auslieferung vom Edge · <i>CDN, 750+ PoPs</i></span><span class="dot2" style="background:#7c3aed"></span><span class="arrow">›</span></div>
+    <div class="u-row" data-n="config"><span class="em">🕵️</span><span class="name">Config</span><span class="line">Inspektor für Ressourcen-Zustand · <i>Compliance</i></span><span class="dot2" style="background:#dc2626"></span><span class="arrow">›</span></div>
+    <div class="u-row" data-n="kinesis data firehose amazon data firehose"><span class="em">🚒</span><span class="name">Data Firehose<span class="abbr">EX KINESIS</span></span><span class="line">Der Löschschlauch in den Data Lake · <i>Streaming-Ingest</i></span><span class="dot2" style="background:#0891b2"></span><span class="arrow">›</span></div>
+    <div class="u-row" data-n="elb elastic load balancing"><span class="em">⚖️</span><span class="name">Elastic Load Balancing<span class="abbr">ELB</span></span><span class="line">Verkehrspolizist für Requests · <i>ALB/NLB/GWLB</i></span><span class="dot2" style="background:#2563eb"></span><span class="arrow">›</span></div>
+    <div class="u-row" data-n="qldb"><span class="em">📒</span><span class="name">QLDB <span class="abbr">🛑 EOS 2025</span></span><span class="line">Unveränderbares Hauptbuch · <i>→ Aurora PostgreSQL</i></span><span class="dot2" style="background:#64748b"></span><span class="arrow">›</span></div>
+  </div>
+  <div class="u-count" id="ucount">8 VON 145 (AUSSCHNITT)</div>
+</section>
+
+</main>
+
+<footer>
+  <span>Mockup · Restliche Seiten</span>
+  <span>Nav oben = Seitenwechsel</span>
+  <span>Toggle = Hell/Dunkel</span>
+</footer>
+
+<script>
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Theme */
+function applyTheme(t){document.body.dataset.theme=t;document.getElementById('knob').textContent=t==='dark'?'🌙':'☀️'}
+function toggleTheme(){const n=document.body.dataset.theme==='dark'?'light':'dark';
+  if(document.startViewTransition&&!reduced)document.startViewTransition(()=>applyTheme(n));else applyTheme(n)}
+
+/* Scroll-Hintergrund */
+let ticking=false;
+addEventListener('scroll',()=>{if(ticking||reduced)return;ticking=true;
+  requestAnimationFrame(()=>{const m=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+    document.body.style.setProperty('--scrollp',(scrollY/m).toFixed(3));ticking=false})},{passive:true});
+
+/* Seiten-Navigation */
+function setView(v){
+  document.querySelectorAll('.view').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('v-'+v).classList.add('visible');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+  if(!reduced)document.querySelectorAll('#v-'+v+' .rise').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});
+  scrollTo({top:0,behavior:reduced?'auto':'smooth'});
+}
+
+/* Quiz */
+let qSel=null;
+function selOpt(el){
+  if(document.getElementById('q-explain').classList.contains('show'))return;
+  document.querySelectorAll('#opts .opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');qSel=el;
+}
+function checkQ(){
+  if(!qSel)return;
+  document.querySelectorAll('#opts .opt').forEach(o=>{
+    if(o.hasAttribute('data-right'))o.classList.add('correct');
+    else if(o===qSel)o.classList.add('wrong');
+    o.classList.remove('sel');
+  });
+  document.getElementById('q-explain').classList.add('show');
+}
+function nextQ(){
+  document.querySelectorAll('#opts .opt').forEach(o=>o.classList.remove('correct','wrong','sel'));
+  document.getElementById('q-explain').classList.remove('show');qSel=null;
+  const p=document.getElementById('qprog');
+  p.style.width=Math.min(100,parseFloat(p.style.width)+10)+'%';
+}
+
+/* Flashcards */
+let seen=7;
+function rate(){
+  const fc=document.getElementById('fc');
+  fc.classList.remove('flipped');seen++;
+  document.querySelector('#v-cards .t-label').firstChild.textContent='Karte '+Math.min(seen,24)+' / 24 heute ';
+}
+
+/* TTS (Sektion) */
+function toggleTts(btn){
+  const bar=document.getElementById('ttsbar1');
+  const on=btn.classList.toggle('playing');
+  btn.textContent=on?'❚❚':'▶';
+  bar.classList.toggle('on',on);
+  if(on){bar.querySelector('i').style.animation='none';bar.offsetHeight;bar.querySelector('i').style.animation=''}
+}
+/* Kapitel-Player */
+function toggleKap(){
+  const b=document.getElementById('kap-play');
+  b.textContent=b.textContent==='▶'?'❚❚':'▶';
+}
+
+/* Übersicht-Suche (Präfix-Match wie in der App) */
+function filterU(){
+  const q=document.getElementById('usearch').value.trim().toLowerCase();
+  let n=0;
+  document.querySelectorAll('#ulist .u-row').forEach(r=>{
+    const hit=!q||r.dataset.n.split(' ').some(w=>w.startsWith(q))||r.dataset.n.startsWith(q);
+    r.style.display=hit?'':'none';if(hit)n++;
+  });
+  document.getElementById('ucount').textContent=q?`${n} TREFFER`:'8 VON 145 (AUSSCHNITT)';
+}
+</script>
+</body>
+</html>

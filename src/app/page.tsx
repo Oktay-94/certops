@@ -21,6 +21,7 @@ import { EXAM_DATE, daysUntil } from "@/lib/config";
 import { getActiveProfileId } from "@/lib/profile-cookie";
 import { getProfileBranding } from "@/lib/profile-branding";
 import { ProfileSwitcher } from "@/components/profile/ProfileSwitcher";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export default async function Home() {
   const userId = await getActiveProfileId();
@@ -65,7 +66,10 @@ export default async function Home() {
             </>
           )}
         </div>
-        {userId && <ProfileSwitcher activeProfileId={userId} />}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          {userId && <ProfileSwitcher activeProfileId={userId} />}
+        </div>
       </div>
 
       {!userId && (

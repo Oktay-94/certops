@@ -1,17 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { BRAND_ORANGE } from "@/lib/brand";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "CertOps",
@@ -22,10 +13,16 @@ export const metadata: Metadata = {
 };
 
 // themeColor belongs in viewport (metadata.themeColor deprecated since Next 14).
+// No colorScheme pin anymore — globals.css sets color-scheme per data-theme.
 export const viewport: Viewport = {
   themeColor: BRAND_ORANGE,
-  colorScheme: "light", // light-only app; ignore OS dark mode
 };
+
+// No-flash theme init. MUST stay a static inline script (never cookies() from
+// next/headers here): a server-side cookie read in the root layout would flip
+// every SSG route to dynamic rendering. Light is the default; dark only via
+// explicit cookie (no prefers-color-scheme until the re-skin lands — DESIGN.md).
+const THEME_INIT_SCRIPT = `try{if(document.cookie.split("; ").includes("certops_theme=dark"))document.documentElement.dataset.theme="dark"}catch(e){}`;
 
 export default function RootLayout({
   children,
@@ -35,9 +32,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      data-exam="clf"
+      suppressHydrationWarning
+      className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {children}
+      </body>
     </html>
   );
 }
