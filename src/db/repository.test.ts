@@ -11,6 +11,7 @@ import {
   countSeenFlashcards,
   getAttemptStats,
   getAttemptsByUser,
+  getAttemptTimestamps,
   getDomainPerformance,
   getDomainStats,
   getFlashcards,
@@ -245,6 +246,78 @@ describe("question_attempts", () => {
 
     const [reloaded] = await getAttemptsByUser(db, "session-multi");
     expect(reloaded.selected).toEqual(["A", "C"]);
+  });
+});
+
+describe("getAttemptTimestamps", () => {
+  let db: DB;
+
+  beforeEach(async () => {
+    db = await createTestDb();
+  });
+
+  it("returns Dates ascending, filtered by user_id AND cert", async () => {
+    const clf = await insertQuestion(db, sampleClf);
+    const saa = await insertQuestion(db, sampleSaa);
+
+    const early = new Date("2026-07-01T08:00:00Z");
+    const late = new Date("2026-07-02T08:00:00Z");
+    await ins(db, {
+      questionId: clf.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "u1",
+      answeredAt: late,
+    });
+    await ins(db, {
+      questionId: clf.id,
+      selected: ["A"],
+      correct: false,
+      sessionId: "u1",
+      answeredAt: early,
+    });
+    // Other user and other cert must both be excluded.
+    await ins(db, {
+      questionId: clf.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "u2",
+    });
+    await ins(db, {
+      questionId: saa.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "u1",
+    });
+
+    const stamps = await getAttemptTimestamps(db, "u1", "CLF-C02");
+    expect(stamps).toHaveLength(2);
+    expect(stamps[0]).toBeInstanceOf(Date);
+    expect(stamps.map((d) => d.toISOString())).toEqual([
+      early.toISOString(),
+      late.toISOString(),
+    ]);
+  });
+
+  it("ignores session_id — filters by user_id alone (identity guard)", async () => {
+    const q = await insertQuestion(db, sampleClf);
+    await insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "shared-device-session",
+      userId: "oktay",
+    });
+    await insertAttempt(db, {
+      questionId: q.id,
+      selected: ["A"],
+      correct: true,
+      sessionId: "shared-device-session",
+      userId: "merve",
+    });
+
+    expect(await getAttemptTimestamps(db, "oktay", "CLF-C02")).toHaveLength(1);
+    expect(await getAttemptTimestamps(db, "merve", "CLF-C02")).toHaveLength(1);
   });
 });
 

@@ -74,6 +74,23 @@ export async function getAttemptsByUser(
     .all();
 }
 
+// Lean feed for the dashboard heatmap/streak: timestamps only (no row payload).
+// Reads filter by user_id ALONE — never session_id (identity invariant).
+export async function getAttemptTimestamps(
+  db: DB,
+  userId: string,
+  cert: Question["cert"],
+): Promise<Date[]> {
+  const rows = await db
+    .select({ answeredAt: questionAttempts.answeredAt })
+    .from(questionAttempts)
+    .innerJoin(questions, eq(questionAttempts.questionId, questions.id))
+    .where(and(eq(questionAttempts.userId, userId), eq(questions.cert, cert)))
+    .orderBy(asc(questionAttempts.answeredAt))
+    .all();
+  return rows.map((r) => r.answeredAt);
+}
+
 export async function getLastNAttempts(
   db: DB,
   userId: string,

@@ -47,6 +47,10 @@
   --heat-4: #16a34a;
   --cta-ink: #1a1204;
 
+  /* Scroll-reactive background glows (certops-weitere-seiten.html light block) */
+  --glow-a: rgba(59, 79, 158, 0.1);
+  --glow-b: rgba(13, 148, 120, 0.08);
+
   /* Legacy pair — kept so existing pages render EXACTLY as before.
      New (Phase 2+) code uses --canvas/--surface instead. */
   --background: #ffffff;
@@ -71,6 +75,8 @@
   --heat-2: rgba(255, 255, 255, 0.26);
   --heat-3: rgba(255, 255, 255, 0.48);
   --heat-4: rgba(255, 255, 255, 0.8);
+  --glow-a: rgba(125, 147, 201, 0.14);
+  --glow-b: rgba(1, 168, 141, 0.12);
 }
 
 /* Exam axis: accent identity only. Domain colors stay in domain-colors.ts. */
@@ -155,4 +161,119 @@ body {
 }
 .mode-start-btn:active {
   transform: translateY(0);
+}
+
+/* ============================================================
+   Dashboard v2 (Phase 2) — scroll background + area previews.
+   Grid uses --grid-line (transparent in clf×light by design: the
+   canonical CLF look is "Apple-clean"; the grid appears in dark).
+   Glows are always on, subtle, theme-tinted via --glow-a/-b.
+   ============================================================ */
+.scroll-bg::before,
+.scroll-bg::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+}
+.scroll-bg::before {
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 calc(var(--scrollp, 0) * -40px);
+  mask-image: radial-gradient(
+    ellipse 95% 80% at 50% 10%,
+    black 25%,
+    transparent 80%
+  );
+}
+.scroll-bg::after {
+  inset: -20%;
+  background:
+    radial-gradient(
+      38% 30% at calc(22% + var(--scrollp, 0) * 40%)
+        calc(12% + var(--scrollp, 0) * 30%),
+      var(--glow-a),
+      transparent 70%
+    ),
+    radial-gradient(
+      32% 26% at calc(80% - var(--scrollp, 0) * 30%)
+        calc(70% - var(--scrollp, 0) * 25%),
+      var(--glow-b),
+      transparent 70%
+    );
+  opacity: calc(0.7 + var(--scrollp, 0) * 0.3);
+}
+
+/* --- Bereiche mini previews (CSS-only, hover on the .area group) --- */
+.area-tile {
+  transition:
+    border-color var(--t-fast) linear,
+    transform var(--t-fast) cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.area-tile:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+/* Quiz preview: the correct option fills on hover */
+.pv-opt {
+  border: 1px solid var(--border);
+  border-radius: var(--r-btn);
+  transition:
+    background var(--t-med) linear,
+    border-color var(--t-med) linear;
+}
+.area-tile:hover .pv-opt-correct {
+  background: var(--success-soft);
+  border-color: var(--success);
+}
+
+/* Card preview: mini flashcard flips on hover */
+.pv-card-scene {
+  perspective: 600px;
+}
+.pv-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.area-tile:hover .pv-card {
+  transform: rotateY(180deg);
+}
+.pv-card-face {
+  backface-visibility: hidden;
+}
+.pv-card-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  background: var(--accent-soft);
+}
+
+/* Skript preview: text column drifts upward on hover */
+.pv-scroll {
+  transition: transform 1.4s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.area-tile:hover .pv-scroll {
+  transform: translateY(-34px);
+}
+
+/* --- Reduced motion: kill dashboard motion, previews settle instantly --- */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-bg::before,
+  .scroll-bg::after {
+    background-position: 0 0;
+    opacity: 0.7;
+  }
+  .area-tile,
+  .pv-opt,
+  .pv-card,
+  .pv-scroll,
+  .ring-arc {
+    transition: none !important;
+    animation: none !important;
+  }
 }
