@@ -23,6 +23,11 @@ type CountChoice = 10 | 20 | 30 | 50 | "all";
 
 const COUNT_OPTIONS: CountChoice[] = [10, 20, 30, 50, "all"];
 
+// Solid CTA — inverts cleanly in both themes (ink is near-black in light,
+// near-white in dark; canvas text contrasts either way).
+const SOLID_BTN =
+  "rounded-xl bg-ink px-6 py-3 text-canvas transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40";
+
 function trophyLabel(pct: number): string {
   if (pct >= 90) return "Exzellent";
   if (pct >= 75) return "Stark";
@@ -112,7 +117,7 @@ export function ServiceQuiz() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-900/40 p-4 sm:p-8">
-      <div className="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl">
+      <div className="w-full max-w-2xl rounded-2xl border border-line bg-surface p-6 shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -123,12 +128,12 @@ export function ServiceQuiz() {
             >
               <GraduationCap size={19} className="text-white" />
             </span>
-            <h2 className="text-xl font-medium text-zinc-900">Dienste-Quiz</h2>
+            <h2 className="text-xl font-medium text-ink">Dienste-Quiz</h2>
           </div>
           <button
             type="button"
             onClick={close}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:text-zinc-900"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-ink-soft transition hover:border-line-strong hover:text-ink"
             aria-label="Schließen"
           >
             <X className="h-4 w-4" />
@@ -192,14 +197,14 @@ function ConfigView({
     const base =
       "rounded-xl border px-4 py-2 text-sm transition disabled:cursor-not-allowed disabled:opacity-50";
     return active
-      ? `${base} border-zinc-200 bg-zinc-100 text-zinc-900 ring-2 ring-emerald-500`
-      : `${base} border-zinc-200 text-zinc-900 hover:border-zinc-400`;
+      ? `${base} border-line bg-surface-2 text-ink ring-2 ring-[var(--success)]`
+      : `${base} border-line text-ink hover:border-line-strong`;
   }
 
   return (
     <div className="mt-5 flex flex-col gap-5">
       <section>
-        <h3 className="text-sm font-medium text-zinc-900">Anzahl Fragen</h3>
+        <h3 className="text-sm font-medium text-ink">Anzahl Fragen</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {COUNT_OPTIONS.map((c) => (
             <button
@@ -216,11 +221,11 @@ function ConfigView({
       </section>
 
       <section>
-        <h3 className="text-sm font-medium text-zinc-900">Bereich</h3>
+        <h3 className="text-sm font-medium text-ink">Bereich</h3>
         <select
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
-          className="mt-3 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-3 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink transition hover:border-line-strong focus:outline-none focus:ring-2 focus:ring-accent"
         >
           <option value="all">Alle Bereiche</option>
           {SERVICE_DOMAINS.map((d) => (
@@ -229,7 +234,7 @@ function ConfigView({
             </option>
           ))}
         </select>
-        <p className="mt-2 text-xs text-zinc-500">
+        <p className="mt-2 text-xs text-ink-soft">
           {poolSize} Dienste im gewählten Bereich · Modus: Zufällig
         </p>
       </section>
@@ -238,7 +243,7 @@ function ConfigView({
         type="button"
         onClick={onStart}
         disabled={poolSize === 0}
-        className="rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+        className={SOLID_BTN}
       >
         Quiz starten
       </button>
@@ -273,23 +278,23 @@ function RunningView({
     const base =
       "flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition";
     if (!answered) {
-      return `${base} border-zinc-200 text-zinc-900 hover:border-zinc-400`;
+      return `${base} border-line text-ink hover:border-line-strong`;
     }
     const opt = question.options[i];
     if (opt.isCorrect) {
-      return `${base} border-emerald-300 bg-emerald-50 text-emerald-900`;
+      return `${base} border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200`;
     }
     if (i === picked) {
-      return `${base} border-rose-300 bg-rose-50 text-rose-900`;
+      return `${base} border-rose-500/50 bg-rose-500/10 text-rose-700 dark:text-rose-200`;
     }
-    return `${base} border-zinc-200 text-zinc-400`;
+    return `${base} border-line text-ink-faint`;
   }
 
   return (
     <div className="mt-5 flex flex-col gap-5">
       {/* Progress + score */}
       <div>
-        <div className="flex items-center justify-between text-xs text-zinc-500">
+        <div className="flex items-center justify-between text-xs text-ink-soft">
           <span>
             Frage {index + 1} / {total}
           </span>
@@ -298,16 +303,16 @@ function RunningView({
             <span>Score: {score}</span>
           </span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all"
-            style={{ width: `${progress}%` }}
+            className="h-full rounded-full transition-all"
+            style={{ width: `${progress}%`, backgroundColor: "var(--success)" }}
           />
         </div>
       </div>
 
       {/* Prompt: service name + domain hint */}
-      <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+      <div className="rounded-xl border border-line bg-surface-2 p-4">
         <span
           className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
           style={{
@@ -319,10 +324,10 @@ function RunningView({
           <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {question.card.domain}
         </span>
-        <h3 className="mt-3 text-lg font-semibold text-zinc-900">
+        <h3 className="mt-3 text-lg font-semibold text-ink">
           {question.card.title}
         </h3>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-ink-soft">
           Welche Beschreibung passt zu diesem Dienst?
         </p>
       </div>
@@ -338,10 +343,16 @@ function RunningView({
             className={optionClass(i)}
           >
             {answered && opt.isCorrect && (
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+              <Check
+                className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
+                aria-hidden
+              />
             )}
             {answered && !opt.isCorrect && i === picked && (
-              <X className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" aria-hidden />
+              <X
+                className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400"
+                aria-hidden
+              />
             )}
             <span>{opt.text}</span>
           </button>
@@ -350,22 +361,18 @@ function RunningView({
 
       {/* Feedback */}
       {answered && (
-        <div className="rounded-xl border-l-2 border-amber-500 bg-amber-50 px-4 py-3">
-          <p className="text-xs font-semibold text-amber-900">
+        <div className="rounded-xl border-l-2 border-amber-500 bg-amber-500/10 px-4 py-3">
+          <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
             {question.options[picked].isCorrect ? "Richtig!" : "Leider falsch."}
           </p>
-          <p className="mt-1 text-[13px] leading-snug text-amber-900">
+          <p className="mt-1 text-[13px] leading-snug text-amber-700 dark:text-amber-300">
             {hintExcerpt(question.card)}
           </p>
         </div>
       )}
 
       {answered && (
-        <button
-          type="button"
-          onClick={onNext}
-          className="rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800"
-        >
+        <button type="button" onClick={onNext} className={SOLID_BTN}>
           {index + 1 >= total ? "Auswertung" : "Weiter"}
         </button>
       )}
@@ -388,21 +395,23 @@ function ResultView({
 }) {
   return (
     <div className="mt-6 flex flex-col items-center gap-4 py-6 text-center">
-      <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
-        <Trophy className="h-7 w-7 text-amber-600" aria-hidden />
+      <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/15">
+        <Trophy className="h-7 w-7 text-amber-600 dark:text-amber-400" aria-hidden />
       </span>
       <div>
-        <p className="text-3xl font-bold text-zinc-900">
+        <p className="text-3xl font-bold text-ink">
           {score} / {total}
         </p>
-        <p className="mt-1 text-lg font-medium text-emerald-700">{pct}%</p>
-        <p className="mt-1 text-sm text-zinc-500">{trophyLabel(pct)}</p>
+        <p className="mt-1 text-lg font-medium text-emerald-600 dark:text-emerald-400">
+          {pct}%
+        </p>
+        <p className="mt-1 text-sm text-ink-soft">{trophyLabel(pct)}</p>
       </div>
       <div className="mt-2 flex gap-2">
         <button
           type="button"
           onClick={onAgain}
-          className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm text-white transition hover:bg-zinc-800"
+          className="inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm text-canvas transition hover:opacity-90"
         >
           <RotateCcw className="h-4 w-4" aria-hidden />
           Nochmal
@@ -410,7 +419,7 @@ function ResultView({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-xl border border-zinc-200 px-5 py-3 text-sm text-zinc-900 transition hover:border-zinc-400"
+          className="rounded-xl border border-line px-5 py-3 text-sm text-ink transition hover:border-line-strong"
         >
           Schließen
         </button>

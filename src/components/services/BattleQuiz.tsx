@@ -27,6 +27,10 @@ type Phase = "config" | "running" | "result";
 const QUESTION_SECONDS = 60;
 const TIMEOUT_REVEAL_MS = 1500;
 
+// Solid CTA — inverts cleanly in both themes.
+const SOLID_BTN =
+  "rounded-xl bg-ink px-6 py-3 text-canvas transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40";
+
 // Per-level Fluent 3D emoji (local assets under public/emoji, MIT-licensed —
 // see NOTICE). Replaces the old numbered circles; the difficulty signal is now
 // the icon, not the value.
@@ -180,7 +184,7 @@ export function BattleQuiz() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-900/40 p-4 sm:p-8">
-      <div className="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl">
+      <div className="w-full max-w-2xl rounded-2xl border border-line bg-surface p-6 shadow-xl">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span
@@ -190,12 +194,12 @@ export function BattleQuiz() {
             >
               <Swords size={19} className="text-white" />
             </span>
-            <h2 className="text-xl font-medium text-zinc-900">Battle Cards</h2>
+            <h2 className="text-xl font-medium text-ink">Battle Cards</h2>
           </div>
           <button
             type="button"
             onClick={close}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:text-zinc-900"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-ink-soft transition hover:border-line-strong hover:text-ink"
             aria-label="Schließen"
           >
             <X className="h-4 w-4" />
@@ -248,8 +252,8 @@ function ConfigView({
   return (
     <div className="mt-5 flex flex-col gap-5">
       <section>
-        <h3 className="text-sm font-medium text-zinc-900">Schwierigkeit</h3>
-        <p className="mt-1 text-xs text-zinc-500">
+        <h3 className="text-sm font-medium text-ink">Schwierigkeit</h3>
+        <p className="mt-1 text-xs text-ink-soft">
           {QUESTIONS_PER_ROUND} Fragen · 4 Optionen · {QUESTION_SECONDS}s pro Frage · kein Fortschritt
         </p>
         <div className="mt-3 flex flex-col gap-2">
@@ -263,11 +267,11 @@ function ConfigView({
                 aria-pressed={active}
                 className={`rounded-xl border px-4 py-3 text-left transition ${
                   active
-                    ? "border-zinc-200 bg-zinc-100 ring-2 ring-emerald-500"
-                    : "border-zinc-200 hover:border-zinc-400"
+                    ? "border-line bg-surface-2 ring-2 ring-[var(--success)]"
+                    : "border-line hover:border-line-strong"
                 }`}
               >
-                <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
+                <span className="flex items-center gap-2 text-sm font-medium text-ink">
                   <Image
                     src={lvl.emoji}
                     alt=""
@@ -278,18 +282,14 @@ function ConfigView({
                   />
                   {lvl.label}
                 </span>
-                <span className="mt-1 block text-xs text-zinc-500">{lvl.hint}</span>
+                <span className="mt-1 block text-xs text-ink-soft">{lvl.hint}</span>
               </button>
             );
           })}
         </div>
       </section>
 
-      <button
-        type="button"
-        onClick={onStart}
-        className="rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800"
-      >
+      <button type="button" onClick={onStart} className={SOLID_BTN}>
         Battle starten
       </button>
     </div>
@@ -323,18 +323,20 @@ function RunningView({
   function optionClass(i: number): string {
     const base =
       "flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition";
-    if (!answered) return `${base} border-zinc-200 text-zinc-900 hover:border-zinc-400`;
+    if (!answered) return `${base} border-line text-ink hover:border-line-strong`;
     const opt = question.options[i];
-    if (opt.isCorrect) return `${base} border-emerald-300 bg-emerald-50 text-emerald-900`;
-    if (i === picked) return `${base} border-rose-300 bg-rose-50 text-rose-900`;
-    return `${base} border-zinc-200 text-zinc-400`;
+    if (opt.isCorrect)
+      return `${base} border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200`;
+    if (i === picked)
+      return `${base} border-rose-500/50 bg-rose-500/10 text-rose-700 dark:text-rose-200`;
+    return `${base} border-line text-ink-faint`;
   }
 
   return (
     <div className="mt-5 flex flex-col gap-5">
       {/* Progress + timer */}
       <div>
-        <div className="flex items-center justify-between text-xs text-zinc-500">
+        <div className="flex items-center justify-between text-xs text-ink-soft">
           <span>
             Frage {index + 1} / {total}
           </span>
@@ -342,7 +344,7 @@ function RunningView({
             <span>Richtig: {correctSoFar}</span>
             <span
               className={`flex items-center gap-1 tabular-nums ${
-                lowTime ? "font-semibold text-rose-600" : ""
+                lowTime ? "font-semibold text-rose-600 dark:text-rose-400" : ""
               }`}
             >
               <Clock className="h-3.5 w-3.5" aria-hidden />
@@ -350,18 +352,19 @@ function RunningView({
             </span>
           </span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
           <div
-            className={`h-full rounded-full transition-all ${
-              lowTime ? "bg-rose-500" : "bg-emerald-500"
-            }`}
-            style={{ width: `${(secondsLeft / QUESTION_SECONDS) * 100}%` }}
+            className="h-full rounded-full transition-all"
+            style={{
+              width: `${(secondsLeft / QUESTION_SECONDS) * 100}%`,
+              backgroundColor: lowTime ? "#f43f5e" : "var(--success)",
+            }}
           />
         </div>
       </div>
 
       {/* Prompt */}
-      <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+      <div className="rounded-xl border border-line bg-surface-2 p-4">
         <span
           className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
           style={{
@@ -373,10 +376,10 @@ function RunningView({
           <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {question.card.domain}
         </span>
-        <h3 className="mt-3 text-lg font-semibold text-zinc-900">
+        <h3 className="mt-3 text-lg font-semibold text-ink">
           {question.card.front}
         </h3>
-        <p className="mt-1 text-sm text-zinc-500">Welche Beschreibung ist korrekt?</p>
+        <p className="mt-1 text-sm text-ink-soft">Welche Beschreibung ist korrekt?</p>
       </div>
 
       {/* Options */}
@@ -390,10 +393,16 @@ function RunningView({
             className={optionClass(i)}
           >
             {answered && opt.isCorrect && (
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+              <Check
+                className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
+                aria-hidden
+              />
             )}
             {answered && !opt.isCorrect && i === picked && (
-              <X className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" aria-hidden />
+              <X
+                className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400"
+                aria-hidden
+              />
             )}
             <span>{opt.text}</span>
           </button>
@@ -402,15 +411,15 @@ function RunningView({
 
       {/* Feedback + note */}
       {answered && (
-        <div className="rounded-xl border-l-2 border-amber-500 bg-amber-50 px-4 py-3">
-          <p className="text-xs font-semibold text-amber-900">
+        <div className="rounded-xl border-l-2 border-amber-500 bg-amber-500/10 px-4 py-3">
+          <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
             {timedOut
               ? "Zeit abgelaufen."
               : question.options[picked].isCorrect
                 ? "Richtig!"
                 : "Leider falsch."}
           </p>
-          <p className="mt-1 whitespace-pre-wrap text-[13px] leading-snug text-amber-900">
+          <p className="mt-1 whitespace-pre-wrap text-[13px] leading-snug text-amber-700 dark:text-amber-300">
             {question.card.hint}
           </p>
         </div>
@@ -418,16 +427,12 @@ function RunningView({
 
       {/* Manual answer → "Weiter"; a real timeout advances on its own. */}
       {answered && !timedOut && (
-        <button
-          type="button"
-          onClick={onNext}
-          className="rounded-xl bg-zinc-900 px-6 py-3 text-white transition hover:bg-zinc-800"
-        >
+        <button type="button" onClick={onNext} className={SOLID_BTN}>
           {index + 1 >= total ? "Auswertung" : "Weiter →"}
         </button>
       )}
       {timedOut && (
-        <p className="text-center text-xs text-zinc-400">Weiter in Kürze …</p>
+        <p className="text-center text-xs text-ink-faint">Weiter in Kürze …</p>
       )}
     </div>
   );
@@ -451,17 +456,17 @@ function ResultView({
   return (
     <div className="mt-6 flex flex-col gap-5">
       <div className="flex flex-col items-center gap-3 text-center">
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
-          <Trophy className="h-7 w-7 text-amber-600" aria-hidden />
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/15">
+          <Trophy className="h-7 w-7 text-amber-600 dark:text-amber-400" aria-hidden />
         </span>
         <div>
-          <p className="text-3xl font-bold text-zinc-900">
+          <p className="text-3xl font-bold text-ink">
             {s.correct} / {s.total}
           </p>
-          <p className="mt-1 text-lg font-medium text-emerald-700">
+          <p className="mt-1 text-lg font-medium text-emerald-600 dark:text-emerald-400">
             {s.accuracyPct}%
           </p>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-ink-soft">
             {trophyLabel(s.accuracyPct)} ·{" "}
             {difficulty === "extreme" ? "Extrem" : `Stufe ${difficulty} (${levelLabel})`}
           </p>
@@ -471,36 +476,42 @@ function ResultView({
       {/* Stats */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {[
-          { k: "Richtig", v: s.correct, c: "text-emerald-700" },
-          { k: "Falsch", v: s.wrong - timedOut, c: "text-rose-600" },
-          { k: "Zeit", v: timedOut, c: "text-rose-600" },
-          { k: "Ø Zeit", v: `${s.avgTimeSec}s`, c: "text-zinc-900" },
+          { k: "Richtig", v: s.correct, c: "text-emerald-600 dark:text-emerald-400" },
+          { k: "Falsch", v: s.wrong - timedOut, c: "text-rose-600 dark:text-rose-400" },
+          { k: "Zeit", v: timedOut, c: "text-rose-600 dark:text-rose-400" },
+          { k: "Ø Zeit", v: `${s.avgTimeSec}s`, c: "text-ink" },
         ].map((cell) => (
           <div
             key={cell.k}
-            className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-center"
+            className="rounded-xl border border-line bg-surface px-3 py-2 text-center"
           >
             <p className={`text-lg font-bold ${cell.c}`}>{cell.v}</p>
-            <p className="text-[11px] text-zinc-500">{cell.k}</p>
+            <p className="text-[11px] text-ink-soft">{cell.k}</p>
           </div>
         ))}
       </div>
 
       {/* Quizzed services */}
       <div>
-        <h3 className="text-sm font-medium text-zinc-900">Abgefragte Dienste</h3>
-        <div className="mt-2 max-h-56 overflow-y-auto rounded-xl border border-zinc-200">
-          <ul className="divide-y divide-zinc-100">
+        <h3 className="text-sm font-medium text-ink">Abgefragte Dienste</h3>
+        <div className="mt-2 max-h-56 overflow-y-auto rounded-xl border border-line">
+          <ul className="divide-y divide-[color:var(--border)]">
             {results.map((r, i) => (
               <li
                 key={i}
                 className="flex items-center justify-between gap-3 px-3 py-1.5 text-sm"
               >
-                <span className="min-w-0 truncate text-zinc-800">{r.card.title}</span>
+                <span className="min-w-0 truncate text-ink">{r.card.title}</span>
                 {r.correct ? (
-                  <Check className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+                  <Check
+                    className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
+                    aria-hidden
+                  />
                 ) : (
-                  <X className="h-4 w-4 shrink-0 text-rose-500" aria-hidden />
+                  <X
+                    className="h-4 w-4 shrink-0 text-rose-500 dark:text-rose-400"
+                    aria-hidden
+                  />
                 )}
               </li>
             ))}
@@ -512,7 +523,7 @@ function ResultView({
         <button
           type="button"
           onClick={onAgain}
-          className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm text-white transition hover:bg-zinc-800"
+          className="inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm text-canvas transition hover:opacity-90"
         >
           <RotateCcw className="h-4 w-4" aria-hidden />
           Neu starten (50 neue)
@@ -520,7 +531,7 @@ function ResultView({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-xl border border-zinc-200 px-5 py-3 text-sm text-zinc-900 transition hover:border-zinc-400"
+          className="rounded-xl border border-line px-5 py-3 text-sm text-ink transition hover:border-line-strong"
         >
           Schließen
         </button>

@@ -1,55 +1,56 @@
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Layers, type LucideIcon } from "lucide-react";
+import { ArrowLeft, BookOpen, Layers } from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
-import { MODE_STYLE } from "@/lib/mode-style";
+import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { ServiceCardGrid } from "@/components/services/ServiceCardGrid";
 import { ServiceQuiz } from "@/components/services/ServiceQuiz";
 import { BattleQuiz } from "@/components/services/BattleQuiz";
 import { PuzzleGame } from "@/components/services/PuzzleGame";
 
+// Token buttons (dark-safe) — same shell as the /cards toolbar links.
+const navBtn =
+  "inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong";
+
 export default function ServicesPage() {
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10 sm:py-12">
+    <main className="relative mx-auto w-full max-w-7xl px-6 py-10 sm:py-12">
+      <ScrollBackground />
+
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
+          <div className="mb-3.5 flex items-center gap-2.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+            <span className="h-px w-8 bg-line-strong" aria-hidden />
+            🧩 AWS Dienste
+          </div>
+          <h1 className="text-[clamp(26px,4vw,40px)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">
             AWS Dienste
           </h1>
-          <p className="mt-3 text-zinc-600">
+          <p className="mt-2.5 text-[14.5px] leading-relaxed text-ink-soft">
             {SERVICES.length} Service-Karteikarten · freies Üben, kein Fortschritt
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link
-            href="/skript"
-            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
-          >
-            <BookOpen className="h-4 w-4" aria-hidden />
+          <Link href="/skript" className={navBtn}>
+            <BookOpen className="h-4 w-4 text-ink-faint" aria-hidden />
             Lernskript
           </Link>
-          <Link
-            href="/uebersicht"
-            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
-          >
-            <Layers className="h-4 w-4" aria-hidden />
+          <Link href="/uebersicht" className={navBtn}>
+            <Layers className="h-4 w-4 text-ink-faint" aria-hidden />
             Übersicht
           </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden />
+          <Link href="/" className={navBtn}>
+            <ArrowLeft className="h-4 w-4 text-ink-faint" aria-hidden />
             Zum Dashboard
           </Link>
         </div>
       </div>
 
       {/* Quiz/practice entries — pure client islands, each a full-screen overlay.
-          "Accent Bar" style: top colour stripe + filled icon badge per mode. */}
+          Dashboard "Bereiche-Kachel" look: surface card, hairline border, emoji
+          glyph + title + desc; the mode colour lives in the launcher gradient. */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <ModeBox
-          color={MODE_STYLE.quiz.base}
-          Icon={MODE_STYLE.quiz.Icon}
+          glyph="🎓"
           title="Dienste-Quiz"
           desc="Dienst-Name gezeigt — wähle die passende Beschreibung. Zufällige Auswahl, kein gespeicherter Fortschritt."
         >
@@ -57,8 +58,7 @@ export default function ServicesPage() {
         </ModeBox>
 
         <ModeBox
-          color={MODE_STYLE.battle.base}
-          Icon={MODE_STYLE.battle.Icon}
+          glyph="⚔️"
           title="Battle Cards"
           desc="50 Fragen, 4 Optionen, 60s pro Frage — in vier Schwierigkeitsstufen. Freies Üben, kein Fortschritt."
         >
@@ -66,8 +66,7 @@ export default function ServicesPage() {
         </ModeBox>
 
         <ModeBox
-          color={MODE_STYLE.puzzle.base}
-          Icon={MODE_STYLE.puzzle.Icon}
+          glyph="🧩"
           title="Puzzle"
           desc="Begriff auf die passende Beschreibung ziehen oder antippen — gemischt oder nach Kategorie. Freies Üben, kein Fortschritt."
         >
@@ -81,34 +80,26 @@ export default function ServicesPage() {
 }
 
 function ModeBox({
-  color,
-  Icon,
+  glyph,
   title,
   desc,
   children,
 }: {
-  color: string;
-  Icon: LucideIcon;
+  glyph: string;
   title: string;
   desc: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
-      {/* Top accent stripe — clipped into the card rounding via overflow-hidden */}
-      <div className="h-[5px] w-full" style={{ backgroundColor: color }} aria-hidden />
-      <div className="flex flex-1 flex-col p-6">
-        <span
-          className="inline-flex h-[46px] w-[46px] items-center justify-center rounded-xl"
-          style={{ backgroundColor: color }}
-          aria-hidden
-        >
-          <Icon className="h-6 w-6 text-white" />
+    <div className="bento-tile relative flex flex-col overflow-hidden rounded-xl border border-line bg-surface p-[18px]">
+      <h2 className="flex items-center gap-2.5 text-[14.5px] font-semibold text-ink">
+        <span className="area-glyph text-[30px] leading-none" aria-hidden>
+          {glyph}
         </span>
-        <h2 className="mt-4 text-lg font-semibold text-zinc-900">{title}</h2>
-        <p className="mt-1 text-sm text-zinc-500">{desc}</p>
-        {children}
-      </div>
+        {title}
+      </h2>
+      <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">{desc}</p>
+      {children}
     </div>
   );
 }

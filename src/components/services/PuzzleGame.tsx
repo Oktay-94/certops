@@ -83,7 +83,7 @@ export function PuzzleGame() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-900/40 p-4 sm:p-8">
-      <div className="w-full max-w-3xl rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl">
+      <div className="w-full max-w-3xl rounded-2xl border border-line bg-surface p-6 shadow-xl">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span
@@ -93,12 +93,12 @@ export function PuzzleGame() {
             >
               <Puzzle size={19} className="text-white" />
             </span>
-            <h2 className="text-xl font-medium text-zinc-900">Puzzle</h2>
+            <h2 className="text-xl font-medium text-ink">Puzzle</h2>
           </div>
           <button
             type="button"
             onClick={close}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:text-zinc-900"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-ink-soft transition hover:border-line-strong hover:text-ink"
             aria-label="Schließen"
           >
             <X className="h-4 w-4" />
@@ -135,25 +135,25 @@ function ConfigView({ onStart }: { onStart: (v: PuzzleVariant) => void }) {
   return (
     <div className="mt-5 flex flex-col gap-5">
       <section>
-        <h3 className="text-sm font-medium text-zinc-900">Variante</h3>
-        <p className="mt-1 text-xs text-zinc-500">
+        <h3 className="text-sm font-medium text-ink">Variante</h3>
+        <p className="mt-1 text-xs text-ink-soft">
           Begriff auf die passende Beschreibung ziehen oder antippen. Freies Üben,
           kein Fortschritt.
         </p>
         <button
           type="button"
           onClick={() => onStart({ kind: "mixed" })}
-          className="mt-3 w-full rounded-xl border border-zinc-200 px-4 py-3 text-left transition hover:border-zinc-400"
+          className="mt-3 w-full rounded-xl border border-line px-4 py-3 text-left transition hover:border-line-strong"
         >
-          <span className="text-sm font-medium text-zinc-900">Alle gemischt</span>
-          <span className="mt-0.5 block text-xs text-zinc-500">
+          <span className="text-sm font-medium text-ink">Alle gemischt</span>
+          <span className="mt-0.5 block text-xs text-ink-soft">
             10 Runden à 7 zufällige Dienste aus allen 172.
           </span>
         </button>
       </section>
 
       <section>
-        <h3 className="text-sm font-medium text-zinc-900">Kategorie-Puzzles</h3>
+        <h3 className="text-sm font-medium text-ink">Kategorie-Puzzles</h3>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {CATEGORY_GROUPS.map((g) => {
             const { color, Icon } = categoryStyle(g.categories[0]);
@@ -162,7 +162,7 @@ function ConfigView({ onStart }: { onStart: (v: PuzzleVariant) => void }) {
                 key={g.id}
                 type="button"
                 onClick={() => onStart({ kind: "category", groupId: g.id })}
-                className="flex items-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-left text-sm text-zinc-900 transition hover:border-zinc-400"
+                className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-left text-sm text-ink transition hover:border-line-strong"
               >
                 <span
                   className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg"
@@ -273,7 +273,7 @@ function PlayingView({
     <div className="mt-5 flex flex-col gap-4">
       {/* Header */}
       <div>
-        <div className="flex items-center justify-between text-xs text-zinc-500">
+        <div className="flex items-center justify-between text-xs text-ink-soft">
           <span>
             {variantName} · Runde {roundIdx + 1} / {totalRounds}
           </span>
@@ -281,10 +281,13 @@ function PlayingView({
             {matched.size}/{total} · Fehlaktionen: {misactions}
           </span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all"
-            style={{ width: `${(matched.size / total) * 100}%` }}
+            className="h-full rounded-full transition-all"
+            style={{
+              width: `${(matched.size / total) * 100}%`,
+              backgroundColor: "var(--success)",
+            }}
           />
         </div>
       </div>
@@ -315,7 +318,7 @@ function PlayingView({
               }}
               className={`select-none rounded-xl border px-3 py-2 text-sm font-medium transition ${
                 isSelected
-                  ? "border-emerald-400 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-400"
+                  ? "border-emerald-500 bg-emerald-500/15 text-emerald-700 ring-2 ring-emerald-500 dark:text-emerald-200"
                   : "hover:brightness-95"
               }`}
             >
@@ -324,7 +327,7 @@ function PlayingView({
           );
         })}
         {matched.size === total && (
-          <span className="text-sm font-medium text-emerald-700">
+          <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
             Runde gelöst!
           </span>
         )}
@@ -350,21 +353,26 @@ function PlayingView({
               }}
               className={`rounded-xl border px-4 py-3 text-sm transition ${
                 isMatched
-                  ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+                  ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200"
                   : isWrong
-                    ? "border-rose-300 bg-rose-50 text-rose-900"
+                    ? "border-rose-500/50 bg-rose-500/10 text-rose-700 dark:text-rose-200"
                     : selected !== null
-                      ? "cursor-pointer border-zinc-300 bg-white text-zinc-800 hover:border-emerald-400"
-                      : "border-zinc-200 bg-white text-zinc-800"
+                      ? "cursor-pointer border-line-strong bg-surface text-ink-soft hover:border-emerald-500"
+                      : "border-line bg-surface text-ink-soft"
               }`}
             >
               <div className="flex items-start gap-2">
                 {isMatched && (
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+                  <Check
+                    className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
+                    aria-hidden
+                  />
                 )}
                 <div>
                   {isMatched && (
-                    <p className="text-xs font-semibold text-emerald-700">{p.term}</p>
+                    <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      {p.term}
+                    </p>
                   )}
                   <p className="leading-snug">{p.description}</p>
                 </div>
@@ -374,14 +382,14 @@ function PlayingView({
         })}
       </div>
 
-      <p className="text-center text-[11px] text-zinc-400">
+      <p className="text-center text-[11px] text-ink-faint">
         Begriff ziehen — oder antippen, dann Beschreibung antippen.
       </p>
 
       {/* Drag ghost */}
       {drag?.moved && (
         <div
-          className="pointer-events-none fixed z-[60] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-emerald-400 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900 shadow-lg"
+          className="pointer-events-none fixed z-[60] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-emerald-500 bg-surface px-3 py-2 text-sm font-medium text-emerald-700 shadow-lg dark:text-emerald-200"
           style={{ left: drag.x, top: drag.y }}
         >
           {terms.find((t) => t.num === drag.num)?.term}
@@ -406,29 +414,29 @@ function ResultView({
   return (
     <div className="mt-6 flex flex-col gap-5">
       <div className="flex flex-col items-center gap-3 text-center">
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
-          <Trophy className="h-7 w-7 text-amber-600" aria-hidden />
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/15">
+          <Trophy className="h-7 w-7 text-amber-600 dark:text-amber-400" aria-hidden />
         </span>
         <div>
-          <p className="text-3xl font-bold text-zinc-900">
+          <p className="text-3xl font-bold text-ink">
             {s.roundsPlayed} Runden gelöst
           </p>
-          <p className="mt-1 text-sm text-zinc-500">{variantName}</p>
+          <p className="mt-1 text-sm text-ink-soft">{variantName}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
         {[
-          { k: "Sofort richtig", v: s.immediate, c: "text-emerald-700" },
-          { k: "Mit Fehlern", v: s.withErrors, c: "text-amber-600" },
-          { k: "Fehlaktionen", v: s.misactions, c: "text-rose-600" },
+          { k: "Sofort richtig", v: s.immediate, c: "text-emerald-600 dark:text-emerald-400" },
+          { k: "Mit Fehlern", v: s.withErrors, c: "text-amber-600 dark:text-amber-400" },
+          { k: "Fehlaktionen", v: s.misactions, c: "text-rose-600 dark:text-rose-400" },
         ].map((cell) => (
           <div
             key={cell.k}
-            className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-center"
+            className="rounded-xl border border-line bg-surface px-3 py-2 text-center"
           >
             <p className={`text-lg font-bold ${cell.c}`}>{cell.v}</p>
-            <p className="text-[11px] text-zinc-500">{cell.k}</p>
+            <p className="text-[11px] text-ink-soft">{cell.k}</p>
           </div>
         ))}
       </div>
@@ -437,7 +445,7 @@ function ResultView({
         <button
           type="button"
           onClick={onAgain}
-          className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm text-white transition hover:bg-zinc-800"
+          className="inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm text-canvas transition hover:opacity-90"
         >
           <Shuffle className="h-4 w-4" aria-hidden />
           Neu mischen
@@ -445,7 +453,7 @@ function ResultView({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-xl border border-zinc-200 px-5 py-3 text-sm text-zinc-900 transition hover:border-zinc-400"
+          className="rounded-xl border border-line px-5 py-3 text-sm text-ink transition hover:border-line-strong"
         >
           <RotateCcw className="mr-2 inline h-4 w-4" aria-hidden />
           Schließen
