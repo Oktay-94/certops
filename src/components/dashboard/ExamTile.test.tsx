@@ -1,6 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { ExamTile } from "./ExamTile";
+
+// No vitest globals in this file → Testing Library's auto-cleanup isn't
+// registered; unmount between tests so repeated renders don't collide.
+afterEach(cleanup);
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
@@ -28,6 +32,52 @@ describe("ExamTile states", () => {
     expect(screen.getByRole("img")).toBeInTheDocument(); // ring svg
   });
 
+  it("countdown: pencil toggles the inline date editor", () => {
+    render(
+      <ExamTile
+        state={{
+          kind: "countdown",
+          daysLeft: 42,
+          progress: 30,
+          examDate: "2026-09-01",
+        }}
+      />,
+    );
+    const pencil = screen.getByRole("button", {
+      name: /prüfungsdatum bearbeiten/i,
+    });
+    expect(screen.queryByLabelText("Neues Prüfungsdatum")).toBeNull();
+
+    fireEvent.click(pencil);
+    expect(screen.getByLabelText("Neues Prüfungsdatum")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /speichern/i }),
+    ).toBeDisabled(); // no date picked yet
+
+    fireEvent.click(pencil); // toggle closed again
+    expect(screen.queryByLabelText("Neues Prüfungsdatum")).toBeNull();
+  });
+
+  it("countdown: mini calendar shows the current month label", () => {
+    render(
+      <ExamTile
+        state={{
+          kind: "countdown",
+          daysLeft: 42,
+          progress: 30,
+          examDate: "2026-09-01",
+        }}
+      />,
+    );
+    // Current month/year label (German), e.g. "Juli 2026" — assert pattern,
+    // not a fixed month, so the test doesn't rot.
+    expect(
+      screen.getByText(
+        /^(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember) \d{4}$/,
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("decision: offers Bestanden / Nicht bestanden", () => {
     render(<ExamTile state={{ kind: "decision" }} />);
     expect(
@@ -51,5 +101,15 @@ describe("ExamTile states", () => {
     expect(
       screen.getByText("AWS Certified Cloud Practitioner"),
     ).toBeInTheDocument();
+  });
+
+  it("passed: pencil opens the date editor to plan a new exam (SAA)", () => {
+    render(<ExamTile state={{ kind: "passed" }} />);
+    expect(screen.queryByLabelText("Neues Prüfungsdatum")).toBeNull();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /neue prüfung planen/i }),
+    );
+    expect(screen.getByLabelText("Neues Prüfungsdatum")).toBeInTheDocument();
   });
 });
