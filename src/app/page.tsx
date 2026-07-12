@@ -1,11 +1,13 @@
 import Image from "next/image";
 import { db } from "@/db";
 import {
+  countSeenFlashcards,
   getAttemptTimestamps,
   getDomainStats,
+  getFlashcards,
   getOverallAvgLast3,
 } from "@/db/repository";
-import { bucketByDay, computeStreak } from "@/lib/activity";
+import { bucketByDay } from "@/lib/activity";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { CLF_RESULT, EXAM_DATE, daysUntil } from "@/lib/config";
 import { getActiveProfileId } from "@/lib/profile-cookie";
@@ -20,7 +22,7 @@ import { NextUpTile } from "@/components/dashboard/NextUpTile";
 import { ReadinessRing } from "@/components/dashboard/ReadinessRing";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { StaggerReveal } from "@/components/dashboard/StaggerReveal";
-import { StreakTile } from "@/components/dashboard/StreakTile";
+import { CardsSeenTile } from "@/components/dashboard/CardsSeenTile";
 import { Tile } from "@/components/dashboard/Tile";
 
 export default async function Home() {
@@ -28,17 +30,17 @@ export default async function Home() {
   const branding = getProfileBranding(userId);
   const now = new Date();
 
-  const [avgLast3, domainStats, timestamps] = userId
+  const cardsTotal = (await getFlashcards(db, "CLF-C02")).length;
+  const [avgLast3, domainStats, timestamps, cardsSeen] = userId
     ? await Promise.all([
         getOverallAvgLast3(db, userId, "CLF-C02"),
         getDomainStats(db, userId, "CLF-C02"),
         getAttemptTimestamps(db, userId, "CLF-C02"),
+        countSeenFlashcards(db, "CLF-C02", userId),
       ])
-    : [null, [], []];
+    : [null, [], [], 0];
 
   const buckets = bucketByDay(timestamps);
-  const activeDays = new Set(buckets.keys());
-  const streak = computeStreak(activeDays, now);
   const readiness = avgLast3 === null ? null : Math.round(avgLast3 * 100);
   const passed = CLF_RESULT === "passed";
   const daysLeft = daysUntil(EXAM_DATE, now);
@@ -127,7 +129,7 @@ export default async function Home() {
         </p>
       </div>
 
-      {/* Bento (mockup spans: 5/3/4 · 5/7 · 12; below md everything stacks) */}
+      {/* Bento (spans: 5/3/4 · 7/5; below md everything stacks) */}
       <div className="mt-8 grid grid-cols-1 gap-3.5 md:grid-cols-12">
         <StaggerReveal index={0} className="md:col-span-5">
           <Tile
@@ -158,8 +160,8 @@ export default async function Home() {
           </Tile>
         </StaggerReveal>
         <StaggerReveal index={1} className="md:col-span-3">
-          <Tile label="Streak" className="h-full">
-            <StreakTile streak={streak} activeDays={activeDays} today={now} />
+          <Tile label="Karten gesehen" className="h-full">
+            <CardsSeenTile seen={cardsSeen} total={cardsTotal} />
           </Tile>
         </StaggerReveal>
         <StaggerReveal index={2} className="md:col-span-4">
@@ -173,7 +175,7 @@ export default async function Home() {
             </Tile>
           )}
         </StaggerReveal>
-        <StaggerReveal index={3} className="md:col-span-5">
+        <StaggerReveal index={3} className="md:col-span-7">
           <Tile
             label="Domain-Mastery"
             value="Gewichtung lt. Exam Guide"
@@ -182,7 +184,7 @@ export default async function Home() {
             <DomainMasteryTile stats={domainStats} />
           </Tile>
         </StaggerReveal>
-        <StaggerReveal index={4} className="md:col-span-7">
+        <StaggerReveal index={4} className="md:col-span-5">
           <Tile label="Lern-Aktivität" value="Letzte 26 Wochen" className="h-full">
             <ActivityHeatmap buckets={buckets} today={now} />
           </Tile>

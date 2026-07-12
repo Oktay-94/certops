@@ -32,8 +32,10 @@ function AreaTile({
           GETEILT
         </span>
       )}
-      <h3 className="flex items-center gap-2 text-[14.5px] font-semibold text-ink">
-        <span className="font-mono text-accent">{glyph}</span>
+      <h3 className="flex items-center gap-2.5 text-[14.5px] font-semibold text-ink">
+        <span className="area-glyph text-[30px] leading-none" aria-hidden>
+          {glyph}
+        </span>
         {title}
       </h3>
       <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">{desc}</p>
@@ -165,21 +167,21 @@ export function AreaTiles() {
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
       <AreaTile
         href="/quiz"
-        glyph="◈"
+        glyph="🎯"
         title="Szenario-Quiz"
         desc="264 Fragen in Runden, schwächste zuerst."
         preview={<QuizPreview />}
       />
       <AreaTile
         href="/cards"
-        glyph="▤"
+        glyph="🗂️"
         title="Karteikarten"
         desc="150 Karten mit Eselsbrücken und Icons."
         preview={<CardPreview />}
       />
       <AreaTile
         href="/skript"
-        glyph="☰"
+        glyph="📖"
         title="Skript"
         desc="13 Kapitel, vorlesbar, mit Deep-Links."
         shared
@@ -187,21 +189,21 @@ export function AreaTiles() {
       />
       <AreaTile
         href="/services"
-        glyph="⬡"
+        glyph="🧩"
         title="Dienste"
         desc="172 AWS-Dienste frei üben: Flip, Battle, Puzzle."
         preview={<DienstePreview />}
       />
       <AreaTile
         href="/stats"
-        glyph="∿"
+        glyph="📊"
         title="Statistik"
         desc="Trends, Schwachstellen, Verlauf pro Runde."
         preview={<StatistikPreview />}
       />
       <AreaTile
         href="/uebersicht"
-        glyph="⌕"
+        glyph="🔍"
         title="Übersicht"
         desc="Alle Dienste alphabetisch, mit Suche."
         shared
