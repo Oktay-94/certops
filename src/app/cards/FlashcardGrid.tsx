@@ -14,8 +14,19 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkFlexibleMarkers from "remark-flexible-markers";
 import { getDomainColor } from "@/lib/domain-colors";
-import { FlashcardIcon } from "@/components/flashcards/FlashcardIcon";
 import { markFlashcardSeen, resetFlashcardViews } from "./actions";
+
+// Domain emoji for the card front (replaces the generic lucide fallback —
+// same emoji language as the dashboard). Keyed by CLF domain.
+const DOMAIN_EMOJI: Record<string, string> = {
+  "Cloud Concepts": "☁️",
+  "Security and Compliance": "🔒",
+  "Cloud Technology and Services": "🧰",
+  "Billing, Pricing, and Support": "💵",
+};
+function domainEmoji(domain: string): string {
+  return DOMAIN_EMOJI[domain] ?? "📇";
+}
 
 const MARKDOWN_COMPONENTS = {
   strong: (props: React.HTMLAttributes<HTMLElement>) => (
@@ -239,91 +250,104 @@ export function FlashcardGrid({ cards, domains }: Props) {
           {visible.map((c) => {
             const isFlipped = flipped.has(c.id);
             const color = getDomainColor(c.domain);
+            const emoji = domainEmoji(c.domain);
+            // Back is tinted in the domain hue over the surface → clearly the
+            // "answer" side; works on light and dark (surface follows theme).
+            const backTint = `color-mix(in srgb, ${color.solid} 12%, var(--surface))`;
+            const stripe = (
+              <div
+                className="w-[5px] shrink-0"
+                style={{ background: color.solid }}
+                aria-hidden
+              />
+            );
             return (
+              // Whole card flips in 3D (button = perspective scene).
               <button
                 key={c.id}
                 type="button"
                 onClick={() => toggleCard(c.id)}
-                className="flex h-80 overflow-hidden rounded-xl border border-line bg-surface text-left shadow-[0_18px_40px_-16px_rgba(24,24,27,0.18),0_6px_14px_-8px_rgba(24,24,27,0.10)] transition-shadow hover:shadow-[0_24px_50px_-16px_rgba(24,24,27,0.24)] dark:shadow-none"
+                className="flip-scene relative h-80 text-left"
               >
-                {/* Left domain stripe (solid hex — dark-safe) */}
                 <div
-                  className="w-[5px] shrink-0"
-                  style={{ background: color.solid }}
-                  aria-hidden
-                />
-
-                {/* Content column */}
-                <div className="flex min-h-0 flex-1 flex-col">
-                  {/* Header: domain pill with the card number prefixed */}
-                  <div className="flex shrink-0 items-center px-5 pb-3.5 pt-5">
-                    <span
-                      className="min-w-0 truncate rounded-full border px-3.5 py-1.5 text-sm font-medium"
-                      style={{
-                        color: color.solid,
-                        borderColor: `color-mix(in srgb, ${color.solid} 35%, transparent)`,
-                        background: `color-mix(in srgb, ${color.solid} 12%, transparent)`,
-                      }}
-                    >
-                      <span className="font-bold">
-                        {displayNumberById.get(c.id)}.
-                      </span>{" "}
-                      {c.domain}
-                    </span>
-                  </div>
-
-                  {/* Neutral divider, inset from edges (not touching stripe) */}
-                  <div className="mx-5 shrink-0 border-t border-line" />
-
-                  {/* Body — 3D flip scene (both faces mounted, 600ms rotateY) */}
-                  <div className="flex min-h-0 flex-1 flex-col p-5">
-                    <div className="flip-scene min-h-0 flex-1">
-                      <div className={`flip-inner ${isFlipped ? "flipped" : ""}`}>
-                        {/* FRONT */}
-                        <div className="flip-face flex flex-col items-center justify-center gap-3.5">
-                          <FlashcardIcon
-                            iconSlugs={c.iconSlugs}
-                            domain={c.domain}
-                            variant="hero"
-                          />
-                          <p className="whitespace-pre-wrap text-center text-[15px] font-semibold leading-relaxed text-ink">
-                            {c.front}
-                          </p>
-                        </div>
-                        {/* BACK */}
-                        <div className="flip-face flip-back flex flex-col">
-                          <div className="mb-2.5 shrink-0 rounded-md border-l-2 border-line-strong bg-surface-2 px-2.5 py-1.5">
-                            <p className="text-[11.5px] leading-snug text-ink-soft">
-                              {c.front}
-                            </p>
-                          </div>
-                          <div className="min-h-0 flex-1 overflow-y-auto pr-1 text-sm leading-relaxed text-ink-soft">
-                            <ReactMarkdown
-                              remarkPlugins={REMARK_PLUGINS}
-                              allowedElements={MARKDOWN_ALLOWED}
-                              unwrapDisallowed
-                              components={MARKDOWN_COMPONENTS}
-                            >
-                              {c.back}
-                            </ReactMarkdown>
-                          </div>
-                        </div>
+                  className={`flip-inner rounded-xl shadow-[0_22px_46px_-18px_rgba(24,24,27,0.24)] dark:shadow-none ${
+                    isFlipped ? "flipped" : ""
+                  }`}
+                >
+                  {/* FRONT — neutral surface */}
+                  <div className="flip-face flex overflow-hidden rounded-xl border border-line bg-surface">
+                    {stripe}
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <div className="flex min-w-0 shrink-0 items-center px-5 pb-3 pt-4">
+                        <span
+                          className="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-full border px-3 py-1 text-[13px] font-medium"
+                          style={{
+                            color: color.solid,
+                            borderColor: `color-mix(in srgb, ${color.solid} 35%, transparent)`,
+                            background: `color-mix(in srgb, ${color.solid} 12%, transparent)`,
+                          }}
+                        >
+                          <span className="shrink-0 font-bold">
+                            {displayNumberById.get(c.id)}.
+                          </span>
+                          <span className="min-w-0 truncate">{c.domain}</span>
+                        </span>
+                      </div>
+                      <div className="mx-5 shrink-0 border-t border-line" />
+                      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-5">
+                        <span
+                          className="text-[46px] leading-none [filter:drop-shadow(0_2px_3px_rgba(0,0,0,0.14))]"
+                          aria-hidden
+                        >
+                          {emoji}
+                        </span>
+                        <p className="whitespace-pre-wrap text-center text-[15px] font-semibold leading-relaxed text-ink">
+                          {c.front}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center justify-center gap-1 py-4 text-[11px] text-ink-faint">
+                        <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
+                        Klicken für Antwort
                       </div>
                     </div>
+                  </div>
 
-                    {/* Flip hint */}
-                    <div className="mt-4 flex shrink-0 items-center justify-center gap-1 text-[11px] text-ink-faint">
-                      {isFlipped ? (
-                        <>
-                          <RefreshCw className="h-3.5 w-3.5" aria-hidden />
-                          Klicken zum Umdrehen
-                        </>
-                      ) : (
-                        <>
-                          <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
-                          Klicken für Antwort
-                        </>
-                      )}
+                  {/* BACK — tinted in the domain hue (the "answer" side) */}
+                  <div
+                    className="flip-face flip-back flex overflow-hidden rounded-xl border border-line"
+                    style={{ background: backTint }}
+                  >
+                    {stripe}
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <div className="flex min-w-0 shrink-0 items-center gap-2 px-5 pb-3 pt-4">
+                        <span
+                          className="shrink-0 rounded-full px-2 py-[3px] font-mono text-[9px] font-semibold uppercase tracking-[0.1em]"
+                          style={{
+                            color: color.solid,
+                            background: `color-mix(in srgb, ${color.solid} 18%, transparent)`,
+                          }}
+                        >
+                          Antwort
+                        </span>
+                        <span className="min-w-0 truncate text-[12px] font-medium text-ink-soft">
+                          {c.domain}
+                        </span>
+                      </div>
+                      <div className="mx-5 shrink-0 border-t border-line" />
+                      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 pr-4 text-sm leading-relaxed text-ink-soft">
+                        <ReactMarkdown
+                          remarkPlugins={REMARK_PLUGINS}
+                          allowedElements={MARKDOWN_ALLOWED}
+                          unwrapDisallowed
+                          components={MARKDOWN_COMPONENTS}
+                        >
+                          {c.back}
+                        </ReactMarkdown>
+                      </div>
+                      <div className="flex shrink-0 items-center justify-center gap-1 py-4 text-[11px] text-ink-faint">
+                        <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                        Klicken zum Umdrehen
+                      </div>
                     </div>
                   </div>
                 </div>
