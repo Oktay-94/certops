@@ -31,6 +31,7 @@ import {
 import { getActiveProfileId } from "@/lib/profile-cookie";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { AreaTiles } from "@/components/dashboard/AreaTiles";
+import { MiniCalendar } from "@/components/dashboard/MiniCalendar";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { Tile } from "@/components/dashboard/Tile";
 import { LastRoundBox } from "./LastRoundBox";
@@ -234,7 +235,13 @@ export default async function StatsPage() {
           value="Letzte 26 Wochen"
           className="md:col-span-7"
         >
-          <ActivityHeatmap buckets={buckets} today={now} />
+          <div className="flex items-start gap-5">
+            <div className="min-w-0 flex-1">
+              <ActivityHeatmap buckets={buckets} today={now} />
+            </div>
+            {/* Fills the empty right side; today marked, no exam highlight. */}
+            <MiniCalendar className="hidden shrink-0 sm:block" />
+          </div>
         </Tile>
       </div>
 
