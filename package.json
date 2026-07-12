@@ -30,7 +30,6 @@
     "drizzle-orm": "^0.45.2",
     "geist": "^1.7.2",
     "lucide-react": "^1.16.0",
-    "motion": "^12.42.2",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",

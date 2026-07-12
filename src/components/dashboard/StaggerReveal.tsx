@@ -1,39 +1,27 @@
-"use client";
-
-import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 
-// Stagger-reveal for bento tiles — the ONLY use of `motion` in the app
-// (LazyMotion + m keeps the initial bundle at ~4.6 KB). Total stagger stays
-// ≤ ~0.3s (mockup .rise timing); reduced motion renders a plain static div.
-// Always renders a real element so it can carry grid col-span classes.
+// Stagger-reveal for bento tiles — CSS-only (mockup .rise pattern).
+// History: first built with `motion` (LazyMotion + m), but even the async-
+// features split kept ~30 KB gz of animation code in the route while the
+// perf gate is 200 KB total JS (measured 2026-07-12). The implementation
+// plan's own overrun rule ("Motion strikt reduzieren") applies: identical
+// visual via @keyframes rise in globals.css, zero JS, reduced-motion handled
+// by the global media query. Server component; carries grid col-span classes.
 export function StaggerReveal({
   children,
   index = 0,
-  className,
+  className = "",
 }: {
   children: ReactNode;
   index?: number;
   className?: string;
 }) {
-  const reduced = useReducedMotion();
-
-  if (reduced) return <div className={className}>{children}</div>;
-
   return (
-    <LazyMotion features={domAnimation} strict>
-      <m.div
-        className={className}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.55,
-          delay: 0.03 + index * 0.05,
-          ease: [0.22, 0.9, 0.3, 1],
-        }}
-      >
-        {children}
-      </m.div>
-    </LazyMotion>
+    <div
+      className={`rise ${className}`}
+      style={{ animationDelay: `${0.03 + index * 0.05}s` }}
+    >
+      {children}
+    </div>
   );
 }
