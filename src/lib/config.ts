@@ -1,10 +1,8 @@
 export const EXAM_DATE = new Date("2026-07-15T00:00:00Z");
 
-// Real exam outcome — flipped MANUALLY after the exam (no data source exists;
-// deliberate decision 2026-07-12). "passed" switches the dashboard into the
-// certificate/archive view (cert tile + confetti, ring becomes Ø-Trefferquote).
-export type ClfResult = "pending" | "passed";
-export const CLF_RESULT: ClfResult = "passed"; // 🎉 bestanden (Juli 2026)
+// Exam outcome lives PER PROFILE in the exam_status table since 2026-07-12
+// (src/lib/exam-status.ts) — EXAM_DATE remains only as the initial default
+// date for profiles without a row yet.
 
 const MS_PER_DAY = 86_400_000;
 

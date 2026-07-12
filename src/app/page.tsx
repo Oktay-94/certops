@@ -4,21 +4,26 @@ import {
   countSeenFlashcards,
   getAttemptTimestamps,
   getDomainStats,
+  getExamStatus,
   getFlashcards,
   getOverallAvgLast3,
 } from "@/db/repository";
 import { bucketByDay } from "@/lib/activity";
 import { BRAND_ORANGE } from "@/lib/brand";
-import { CLF_RESULT, EXAM_DATE, daysUntil } from "@/lib/config";
+import { daysUntil } from "@/lib/config";
+import {
+  countdownProgress,
+  isExpired,
+  resolveExamStatus,
+} from "@/lib/exam-status";
 import { getActiveProfileId } from "@/lib/profile-cookie";
 import { getProfileBranding } from "@/lib/profile-branding";
 import { ProfileSwitcher } from "@/components/profile/ProfileSwitcher";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { AreaTiles } from "@/components/dashboard/AreaTiles";
-import { CertTile } from "@/components/dashboard/CertTile";
+import { ExamTile, type ExamTileState } from "@/components/dashboard/ExamTile";
 import { DomainMasteryTile } from "@/components/dashboard/DomainMasteryTile";
-import { NextUpTile } from "@/components/dashboard/NextUpTile";
 import { ReadinessRing } from "@/components/dashboard/ReadinessRing";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { StaggerReveal } from "@/components/dashboard/StaggerReveal";
@@ -31,19 +36,35 @@ export default async function Home() {
   const now = new Date();
 
   const cardsTotal = (await getFlashcards(db, "CLF-C02")).length;
-  const [avgLast3, domainStats, timestamps, cardsSeen] = userId
+  const [avgLast3, domainStats, timestamps, cardsSeen, examRow] = userId
     ? await Promise.all([
         getOverallAvgLast3(db, userId, "CLF-C02"),
         getDomainStats(db, userId, "CLF-C02"),
         getAttemptTimestamps(db, userId, "CLF-C02"),
         countSeenFlashcards(db, "CLF-C02", userId),
+        getExamStatus(db, userId, "CLF-C02"),
       ])
-    : [null, [], [], 0];
+    : [null, [], [], 0, null];
 
   const buckets = bucketByDay(timestamps);
   const readiness = avgLast3 === null ? null : Math.round(avgLast3 * 100);
-  const passed = CLF_RESULT === "passed";
-  const daysLeft = daysUntil(EXAM_DATE, now);
+
+  // Per-profile exam state machine (replaces the global CLF_RESULT const).
+  const status = resolveExamStatus(examRow, userId ?? "");
+  const passed = status.result === "passed";
+  const daysLeft = daysUntil(status.examDate, now);
+  const examTileState: ExamTileState = passed
+    ? { kind: "passed" }
+    : status.result === "failed"
+      ? { kind: "reschedule" }
+      : isExpired(status.examDate, now)
+        ? { kind: "decision" }
+        : {
+            kind: "countdown",
+            daysLeft,
+            progress: countdownProgress(status.setAt, status.examDate, now),
+            examDate: status.examDate.toISOString().slice(0, 10),
+          };
 
   return (
     <main className="relative mx-auto w-full max-w-[1120px] px-6 pb-20 pt-10">
@@ -134,6 +155,7 @@ export default async function Home() {
         <StaggerReveal index={0} className="md:col-span-5">
           <Tile
             label={passed ? "Ø Trefferquote" : "Readiness"}
+            glyph="🏅"
             value="ZIEL ≥ 70"
             className="h-full"
           >
@@ -160,24 +182,29 @@ export default async function Home() {
           </Tile>
         </StaggerReveal>
         <StaggerReveal index={1} className="md:col-span-3">
-          <Tile label="Karten gesehen" className="h-full">
+          <Tile label="Karten gesehen" glyph="🃏" className="h-full">
             <CardsSeenTile seen={cardsSeen} total={cardsTotal} />
           </Tile>
         </StaggerReveal>
         <StaggerReveal index={2} className="md:col-span-4">
-          {passed ? (
-            <Tile label="Zertifikat" className="h-full">
-              <CertTile />
-            </Tile>
-          ) : (
-            <Tile label="Next up" value="Schwächste Domain" className="h-full">
-              <NextUpTile stats={domainStats} />
-            </Tile>
-          )}
+          <Tile
+            label={
+              examTileState.kind === "passed"
+                ? "Zertifikat"
+                : examTileState.kind === "countdown"
+                  ? "Countdown"
+                  : "Prüfung"
+            }
+            glyph={examTileState.kind === "passed" ? "🎓" : "⏳"}
+            className="h-full"
+          >
+            <ExamTile state={examTileState} />
+          </Tile>
         </StaggerReveal>
         <StaggerReveal index={3} className="md:col-span-7">
           <Tile
             label="Domain-Mastery"
+            glyph="🧭"
             value="Gewichtung lt. Exam Guide"
             className="h-full"
           >
@@ -185,7 +212,7 @@ export default async function Home() {
           </Tile>
         </StaggerReveal>
         <StaggerReveal index={4} className="md:col-span-5">
-          <Tile label="Lern-Aktivität" value="Letzte 26 Wochen" className="h-full">
+          <Tile label="Lern-Aktivität" glyph="🔥" value="Letzte 26 Wochen" className="h-full">
             <ActivityHeatmap buckets={buckets} today={now} />
           </Tile>
         </StaggerReveal>

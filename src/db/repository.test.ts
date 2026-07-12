@@ -13,6 +13,7 @@ import {
   getAttemptsByUser,
   getAttemptTimestamps,
   getDomainPerformance,
+  getExamStatus,
   getDomainStats,
   getFlashcards,
   getLastNAttempts,
@@ -28,6 +29,7 @@ import {
   markFlashcardSeen,
   resetFlashcardViews,
   selectRoundQuestions,
+  upsertExamStatus,
 } from "./repository";
 import { flashcardViews, flashcards } from "./schema";
 
@@ -246,6 +248,77 @@ describe("question_attempts", () => {
 
     const [reloaded] = await getAttemptsByUser(db, "session-multi");
     expect(reloaded.selected).toEqual(["A", "C"]);
+  });
+});
+
+describe("exam status", () => {
+  let db: DB;
+
+  beforeEach(async () => {
+    db = await createTestDb();
+  });
+
+  it("returns null without a row, row after upsert", async () => {
+    expect(await getExamStatus(db, "merve", "CLF-C02")).toBeNull();
+
+    const examDate = new Date("2026-09-01T00:00:00Z");
+    await upsertExamStatus(db, {
+      userId: "merve",
+      cert: "CLF-C02",
+      examDate,
+      result: "pending",
+    });
+
+    const row = await getExamStatus(db, "merve", "CLF-C02");
+    expect(row?.result).toBe("pending");
+    expect(row?.examDate.toISOString()).toBe(examDate.toISOString());
+    expect(row?.updatedAt).toBeInstanceOf(Date);
+  });
+
+  it("upsert updates in place (no duplicate row per user+cert)", async () => {
+    const first = new Date("2026-09-01T00:00:00Z");
+    const second = new Date("2026-10-01T00:00:00Z");
+    await upsertExamStatus(db, {
+      userId: "merve",
+      cert: "CLF-C02",
+      examDate: first,
+      result: "pending",
+    });
+    await upsertExamStatus(db, {
+      userId: "merve",
+      cert: "CLF-C02",
+      examDate: second,
+      result: "failed",
+    });
+
+    const rows = await db.select().from(schema.examStatus).all();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.result).toBe("failed");
+    expect(rows[0]!.examDate.toISOString()).toBe(second.toISOString());
+  });
+
+  it("isolates by user_id \u2014 oktay and merve never see each other", async () => {
+    await upsertExamStatus(db, {
+      userId: "oktay",
+      cert: "CLF-C02",
+      examDate: new Date("2026-07-01T00:00:00Z"),
+      result: "passed",
+    });
+
+    expect(await getExamStatus(db, "merve", "CLF-C02")).toBeNull();
+    expect((await getExamStatus(db, "oktay", "CLF-C02"))?.result).toBe(
+      "passed",
+    );
+  });
+
+  it("isolates by cert \u2014 CLF row does not answer SAA", async () => {
+    await upsertExamStatus(db, {
+      userId: "oktay",
+      cert: "CLF-C02",
+      examDate: new Date("2026-07-01T00:00:00Z"),
+      result: "passed",
+    });
+    expect(await getExamStatus(db, "oktay", "SAA-C03")).toBeNull();
   });
 });
 

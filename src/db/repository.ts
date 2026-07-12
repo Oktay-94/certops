@@ -3,11 +3,13 @@ import type { DB } from "./index";
 import { shuffle } from "@/lib/shuffle";
 import type { QuizMode } from "@/lib/domains";
 import {
+  examStatus,
   flashcardViews,
   flashcards,
   questionAttempts,
   questions,
   type Choice,
+  type ExamStatus,
   type Flashcard,
   type NewQuestion,
   type NewQuestionAttempt,
@@ -72,6 +74,40 @@ export async function getAttemptsByUser(
     .where(eq(questionAttempts.userId, userId))
     .orderBy(asc(questionAttempts.answeredAt))
     .all();
+}
+
+// Per-profile exam status (dashboard). Reads filter by user_id alone.
+export async function getExamStatus(
+  db: DB,
+  userId: string,
+  cert: Question["cert"],
+): Promise<ExamStatus | null> {
+  const row = await db
+    .select()
+    .from(examStatus)
+    .where(and(eq(examStatus.userId, userId), eq(examStatus.cert, cert)))
+    .get();
+  return row ?? null;
+}
+
+export async function upsertExamStatus(
+  db: DB,
+  input: {
+    userId: string;
+    cert: Question["cert"];
+    examDate: Date;
+    result: ExamStatus["result"];
+  },
+): Promise<void> {
+  const now = new Date();
+  await db
+    .insert(examStatus)
+    .values({ ...input, updatedAt: now })
+    .onConflictDoUpdate({
+      target: [examStatus.userId, examStatus.cert],
+      set: { examDate: input.examDate, result: input.result, updatedAt: now },
+    })
+    .run();
 }
 
 // Lean feed for the dashboard heatmap/streak: timestamps only (no row payload).

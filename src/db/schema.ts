@@ -158,3 +158,32 @@ export const flashcardViews = sqliteTable(
 
 export type FlashcardView = typeof flashcardViews.$inferSelect;
 export type NewFlashcardView = typeof flashcardViews.$inferInsert;
+
+// Per-profile exam status (replaces the global CLF_RESULT config constant,
+// 2026-07-12). Identity = user_id ALONE (device-independent — a cookie would
+// diverge per device). updatedAt doubles as the countdown start anchor:
+// setting a new exam date resets it, so progress = elapsed/total window.
+export const examStatus = sqliteTable(
+  "exam_status",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    userId: text("user_id").notNull(),
+    cert: text("cert", { enum: ["CLF-C02", "SAA-C03"] }).notNull(),
+
+    examDate: integer("exam_date", { mode: "timestamp" }).notNull(),
+    result: text("result", { enum: ["pending", "passed", "failed"] })
+      .notNull()
+      .default("pending"),
+
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date())
+      .$onUpdateFn(() => new Date()),
+  },
+  (t) => [uniqueIndex("idx_exam_status_user_cert").on(t.userId, t.cert)],
+);
+
+export type ExamStatus = typeof examStatus.$inferSelect;
+export type NewExamStatus = typeof examStatus.$inferInsert;
+export type ExamResult = ExamStatus["result"];

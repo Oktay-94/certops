@@ -71,6 +71,13 @@
       "when": 1781975891228,
       "tag": "0009_lucky_amazoness",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1783857159722,
+      "tag": "0010_brown_eddie_brock",
+      "breakpoints": true
     }
   ]
 }
