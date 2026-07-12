@@ -19,7 +19,6 @@ import {
 import { getActiveProfileId } from "@/lib/profile-cookie";
 import { getProfileBranding } from "@/lib/profile-branding";
 import { ProfileSwitcher } from "@/components/profile/ProfileSwitcher";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { AreaTiles } from "@/components/dashboard/AreaTiles";
 import { ExamTile, type ExamTileState } from "@/components/dashboard/ExamTile";
@@ -104,7 +103,6 @@ export default async function Home() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           {userId && <ProfileSwitcher activeProfileId={userId} />}
         </div>
       </div>

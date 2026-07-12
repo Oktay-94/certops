@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { BRAND_ORANGE } from "@/lib/brand";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -38,6 +39,14 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {/* Global theme toggle — one instance for every route, pinned in the
+            top padding strip (top-2 clears each page's pt-10+ header content).
+            z-40 stays below the z-50 practice overlays so a quiz/battle/puzzle
+            modal covers it. Client island → the layout stays statically
+            rendered (no cookies() here; DESIGN.md SSG invariant). */}
+        <div className="fixed right-4 top-2 z-40">
+          <ThemeToggle />
+        </div>
         {children}
       </body>
     </html>
