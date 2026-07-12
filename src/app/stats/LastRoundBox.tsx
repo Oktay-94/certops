@@ -12,7 +12,7 @@ export function LastRoundBox({ review }: { review: LastRoundReview }) {
 
   if (review.roundId === null) {
     return (
-      <div className="h-[200px] flex items-center justify-center rounded-lg bg-zinc-50 border border-zinc-200 px-4 text-center text-sm text-zinc-500">
+      <div className="flex h-[200px] items-center justify-center rounded-lg border border-line bg-surface-2 px-4 text-center text-sm text-ink-faint">
         Spiel eine Runde, dann erscheinen hier deine Fragen.
       </div>
     );
@@ -23,34 +23,34 @@ export function LastRoundBox({ review }: { review: LastRoundReview }) {
 
   return (
     <div>
-      <div className="flex items-center justify-end">
-        <div
-          className="inline-flex rounded-lg bg-zinc-100 p-0.5 text-xs"
-          role="tablist"
-          aria-label="Letzte Runde filtern"
-        >
-          <TabButton
-            active={isWrong}
-            onClick={() => setTab("incorrect")}
-            label={`Falsch · ${review.incorrectCount}`}
-            tone="red"
-          />
-          <TabButton
-            active={!isWrong}
-            onClick={() => setTab("correct")}
-            label={`Richtig · ${review.correctCount}`}
-            tone="emerald"
-          />
-        </div>
+      {/* Tab pill (mockup .tabs): surface-2 track, active = surface + ring */}
+      <div
+        className="inline-flex rounded-full border border-line bg-surface-2 p-[3px] text-xs"
+        role="tablist"
+        aria-label="Letzte Runde filtern"
+      >
+        <TabButton
+          active={isWrong}
+          onClick={() => setTab("incorrect")}
+          label={`Falsch · ${review.incorrectCount}`}
+          tone="danger"
+        />
+        <TabButton
+          active={!isWrong}
+          onClick={() => setTab("correct")}
+          label={`Richtig · ${review.correctCount}`}
+          tone="success"
+        />
       </div>
 
       <div
-        className={`mt-3 h-[200px] overflow-y-auto rounded-lg p-3 ${
-          isWrong ? "bg-red-50" : "bg-emerald-50"
-        }`}
+        className="mt-3 h-[200px] overflow-y-auto rounded-lg p-3"
+        style={{
+          background: isWrong ? "var(--danger-soft)" : "var(--success-soft)",
+        }}
       >
         {list.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-center text-sm text-zinc-600">
+          <div className="flex h-full items-center justify-center text-center text-sm text-ink-soft">
             {isWrong
               ? "Keine Fehler in dieser Runde."
               : "Keine richtigen Antworten in dieser Runde."}
@@ -86,21 +86,24 @@ function TabButton({
   active: boolean;
   onClick: () => void;
   label: string;
-  tone: "red" | "emerald";
+  tone: "danger" | "success";
 }) {
-  const activeClass =
-    tone === "red"
-      ? "bg-white text-red-700 shadow-sm"
-      : "bg-white text-emerald-700 shadow-sm";
   return (
     <button
       type="button"
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`rounded-md px-3 py-1 font-medium transition ${
-        active ? activeClass : "text-zinc-500 hover:text-zinc-700"
-      }`}
+      className="rounded-full px-3.5 py-1 font-semibold transition-colors"
+      style={
+        active
+          ? {
+              background: "var(--surface)",
+              color: tone === "danger" ? "var(--danger)" : "var(--success)",
+              boxShadow: "0 0 0 1px var(--border)",
+            }
+          : { color: "var(--ink-soft)" }
+      }
     >
       {label}
     </button>

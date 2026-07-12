@@ -26,6 +26,8 @@ import {
   scoreColorHex,
 } from "@/lib/scoreColor";
 import { getActiveProfileId } from "@/lib/profile-cookie";
+import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
+import { Tile } from "@/components/dashboard/Tile";
 import { LastRoundBox } from "./LastRoundBox";
 import { TrendCompactBars } from "./TrendCompactBars";
 import { TrendLineChart } from "./TrendLineChart";
@@ -71,156 +73,141 @@ export default async function StatsPage() {
   if (answered === 0) return <EmptyState />;
 
   const perfByDomain = new Map(perf.map((p) => [p.domain, p]));
+  const lastRoundRate =
+    lastRound.correctCount + lastRound.incorrectCount > 0
+      ? lastRound.correctCount /
+        (lastRound.correctCount + lastRound.incorrectCount)
+      : null;
+  const answeredPct = Math.round((answered / totalQuestions) * 100);
 
   return (
-    <main className="max-w-4xl mx-auto px-6 py-12 sm:py-16">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
-          Statistik
-        </h1>
+    <main className="relative mx-auto w-full max-w-[1120px] px-6 pb-20 pt-10">
+      <ScrollBackground />
+
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="mb-3.5 flex items-center gap-2.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+            <span className="h-px w-8 bg-line-strong" aria-hidden />
+            Statistik
+          </div>
+          <h1 className="text-[clamp(26px,4vw,40px)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">
+            Dein Lernstand.
+          </h1>
+          <p className="mt-2.5 max-w-[56ch] text-[14.5px] leading-relaxed text-ink-soft">
+            Trend der letzten Runden, Stärken und Schwächen pro Bereich.
+          </p>
+        </div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition hover:border-zinc-400"
+          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Dashboard
+          <span className="hidden sm:inline">Dashboard</span>
         </Link>
       </div>
-      <p className="mt-3 text-zinc-600">
-        Dein Lernstand auf einen Blick — Trend der letzten Runden, Stärken
-        und Schwächen pro Bereich.
-      </p>
 
-      <section className="mt-8 grid gap-3 sm:grid-cols-[1.4fr_1fr_1fr]">
-        <StatCardAvg overall={overall} trend={trend} />
-        <StatCard label="Fragen gesamt" value={String(totalQuestions)} />
-        <StatCard
-          label="Beantwortet"
-          value={String(answered)}
-          valueClass="text-emerald-700"
-        />
-      </section>
-
-      <section className="mt-10">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700">
-            Nach Bereich
-          </h2>
-          <div className="flex items-center gap-2 text-xs text-zinc-500">
-            <span className="inline-block h-3 w-4 border-l border-dashed border-zinc-600" />
-            Lernziel {Math.round(LEARNING_TARGET * 100)}%
-          </div>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          {DOMAINS.map((domain) => (
-            <DomainBar
-              key={domain}
-              domain={domain}
-              data={perfByDomain.get(domain)}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700">
-          Fragen der letzten Runde
-        </h2>
-        <div className="mt-4">
-          <LastRoundBox review={lastRound} />
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700">
-          Schwächste Fragen
-        </h2>
-        <div className="mt-4">
-          <WeakestBox items={weakest} />
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700">
-          Verlauf
-        </h2>
-        <div className="mt-4 space-y-4">
-          <TrendLineChart trend={trend} />
-          <TrendCompactBars
-            lastRoundRate={
-              lastRound.correctCount + lastRound.incorrectCount > 0
-                ? lastRound.correctCount /
-                  (lastRound.correctCount + lastRound.incorrectCount)
-                : null
-            }
-            overallRate={overall}
-          />
-        </div>
-      </section>
-
-      <Link
-        href="/"
-        className="mt-10 inline-block rounded-xl border border-zinc-300 px-6 py-3 text-center text-zinc-900 transition hover:bg-zinc-100"
-      >
-        Zurück zum Dashboard
-      </Link>
-    </main>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  valueClass = "text-zinc-900",
-}: {
-  label: string;
-  value: string;
-  valueClass?: string;
-}) {
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-      </h3>
-      <p className={`mt-2 text-3xl font-semibold tabular-nums ${valueClass}`}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function StatCardAvg({
-  overall,
-  trend,
-}: {
-  overall: number | null;
-  trend: RoundTrendPoint[];
-}) {
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-        Ø Trefferquote
-      </h3>
-      <div className="mt-2 flex items-center justify-between gap-4">
-        <p
-          className={`text-3xl font-semibold tabular-nums ${
-            overall === null ? "text-zinc-400" : scoreColorClass(overall)
-          }`}
+      {/* Bento */}
+      <div className="mt-8 grid grid-cols-1 gap-3.5 md:grid-cols-12">
+        <Tile
+          label="Ø Trefferquote"
+          glyph="🎯"
+          value="Letzte 10 Runden"
+          className="md:col-span-4"
         >
-          {overall === null ? "—" : pct(overall)}
-        </p>
-        <Sparkline trend={trend} />
+          <div className="flex items-center justify-between gap-4">
+            <div
+              className={`text-[34px] font-bold leading-none tracking-[-0.03em] tabular-nums ${
+                overall === null ? "text-ink-faint" : scoreColorClass(overall)
+              }`}
+            >
+              {overall === null ? "—" : pct(overall)}
+            </div>
+            <Sparkline trend={trend} />
+          </div>
+        </Tile>
+
+        <Tile label="Fragen gesamt" glyph="📚" className="md:col-span-4">
+          <div className="text-[34px] font-bold leading-none tracking-[-0.03em] tabular-nums text-ink">
+            {totalQuestions}
+          </div>
+          <p className="mt-2 text-[12.5px] text-ink-soft">
+            Im CLF-Pool · 4 Domains.
+          </p>
+        </Tile>
+
+        <Tile label="Beantwortet" glyph="✅" className="md:col-span-4">
+          <div className="text-[34px] font-bold leading-none tracking-[-0.03em] tabular-nums text-ink">
+            {answered}
+            <small className="text-[15px] font-medium text-ink-faint">
+              {" "}
+              / {totalQuestions}
+            </small>
+          </div>
+          <p className="mt-2 text-[12.5px] text-ink-soft">
+            {answeredPct} % des Pools mindestens einmal gesehen.
+          </p>
+        </Tile>
+
+        <Tile
+          label="Nach Bereich"
+          glyph="🧭"
+          value={`┊ Lernziel ${Math.round(LEARNING_TARGET * 100)}%`}
+          className="md:col-span-5"
+        >
+          <div>
+            {DOMAINS.map((domain, i) => (
+              <DomainBar
+                key={domain}
+                domain={domain}
+                data={perfByDomain.get(domain)}
+                first={i === 0}
+              />
+            ))}
+          </div>
+        </Tile>
+
+        <Tile
+          label="Schwächste Fragen"
+          glyph="⚠️"
+          value="Klick = Details"
+          className="md:col-span-7"
+        >
+          <WeakestBox items={weakest} />
+        </Tile>
+
+        <Tile
+          label="Verlauf"
+          glyph="📈"
+          value="R1–Rn · Rn = aktuellste"
+          className="md:col-span-7"
+        >
+          <TrendLineChart trend={trend} />
+        </Tile>
+
+        <Tile
+          label="Runden-Bilanz"
+          glyph="🎲"
+          value={`┊ Lernziel ${Math.round(LEARNING_TARGET * 100)}%`}
+          className="md:col-span-5"
+        >
+          <TrendCompactBars lastRoundRate={lastRoundRate} overallRate={overall} />
+          <div className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
+            Fragen der letzten Runde
+          </div>
+          <div className="mt-2">
+            <LastRoundBox review={lastRound} />
+          </div>
+        </Tile>
       </div>
-      <p className="mt-2 text-xs text-zinc-500">letzte 10 Runden</p>
-    </div>
+    </main>
   );
 }
 
 function Sparkline({ trend }: { trend: RoundTrendPoint[] }) {
   if (trend.length < 2) {
     return (
-      <span className="max-w-[140px] text-right text-xs text-zinc-500">
+      <span className="max-w-[140px] text-right text-xs text-ink-faint">
         noch nicht genug Runden — ein paar Quiz-Runden spielen
       </span>
     );
@@ -249,17 +236,17 @@ function Sparkline({ trend }: { trend: RoundTrendPoint[] }) {
         x2={W}
         y1={targetY}
         y2={targetY}
-        stroke="#a1a1aa"
         strokeWidth={1}
         strokeDasharray="2 2"
+        style={{ stroke: "var(--border-strong)" }}
       />
       <polyline
         points={polyline}
         fill="none"
-        stroke="#10b981"
         strokeWidth={1.5}
         strokeLinejoin="round"
         strokeLinecap="round"
+        style={{ stroke: "var(--success)" }}
       />
       {points.map((p, i) => (
         <circle
@@ -277,9 +264,11 @@ function Sparkline({ trend }: { trend: RoundTrendPoint[] }) {
 function DomainBar({
   domain,
   data,
+  first,
 }: {
   domain: string;
   data: DomainPerformance | undefined;
+  first: boolean;
 }) {
   const color = getDomainColor(domain);
   const Icon = DOMAIN_ICONS[color.fallbackIconName];
@@ -288,44 +277,47 @@ function DomainBar({
   const fillWidth = rate === null ? 0 : Math.round(rate * 100);
 
   return (
-    <div className={`rounded-lg ${color.bgSoft} p-4`}>
-      <div className="flex items-center gap-3">
-        <span
-          className={`flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-md ${color.iconBg}`}
-        >
-          <Icon className="h-4 w-4 text-white" aria-hidden />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className={`text-sm font-semibold ${color.textStrong}`}>{domain}</p>
-          <p className={`text-xs ${color.textMuted}`}>
-            {rate === null
-              ? "noch keine Daten"
-              : `${questionsCount} Fragen`}
-          </p>
-        </div>
-        <p
-          className={`text-xl font-bold tabular-nums ${
-            rate === null ? "text-zinc-400" : scoreColorClass(rate)
-          }`}
-        >
-          {rate === null ? "—" : pct(rate)}
-        </p>
-      </div>
-
-      <div
-        className={`relative mt-3 h-3 rounded-full ${color.barTrack} overflow-hidden`}
+    <div
+      className={`grid grid-cols-[32px_1fr_46px] items-center gap-3 py-2.5 ${
+        first ? "" : "border-t border-line"
+      }`}
+    >
+      <span
+        className="flex h-8 w-8 items-center justify-center rounded-[9px]"
+        style={{ background: color.solid }}
       >
-        {rate !== null && (
+        <Icon className="h-4 w-4 text-white" aria-hidden />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[12.5px] font-semibold leading-tight text-ink">
+          {domain}
+        </p>
+        <p className="font-mono text-[9.5px] uppercase tracking-[0.05em] text-ink-faint">
+          {rate === null ? "noch keine Daten" : `${questionsCount} Fragen`}
+        </p>
+        <div className="relative mt-[7px] h-[5px] rounded-[3px] bg-surface-2">
+          {rate !== null && (
+            <span
+              className="absolute inset-y-0 left-0 rounded-[3px]"
+              style={{ width: `${fillWidth}%`, background: color.solid }}
+            />
+          )}
           <span
-            className={`absolute inset-y-0 left-0 ${color.barFill} rounded-full`}
-            style={{ width: `${fillWidth}%` }}
+            className="absolute -top-[3px] -bottom-[3px] w-[1.5px] opacity-70"
+            style={{
+              left: `${LEARNING_TARGET * 100}%`,
+              background: "var(--ink-faint)",
+            }}
+            aria-hidden
           />
-        )}
-        <span
-          className="absolute top-0 bottom-0 border-l border-dashed border-zinc-600"
-          style={{ left: `${LEARNING_TARGET * 100}%` }}
-          aria-hidden
-        />
+        </div>
+      </div>
+      <div
+        className={`text-right font-mono text-[13px] font-semibold tabular-nums ${
+          rate === null ? "text-ink-faint" : scoreColorClass(rate)
+        }`}
+      >
+        {rate === null ? "—" : pct(rate)}
       </div>
     </div>
   );
@@ -333,24 +325,30 @@ function DomainBar({
 
 function EmptyState() {
   return (
-    <main className="max-w-2xl mx-auto px-6 py-12 sm:py-16">
-      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
+    <main className="relative mx-auto w-full max-w-[1120px] px-6 pb-20 pt-10">
+      <ScrollBackground />
+      <div className="mb-3.5 flex items-center gap-2.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+        <span className="h-px w-8 bg-line-strong" aria-hidden />
         Statistik
+      </div>
+      <h1 className="text-[clamp(26px,4vw,40px)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">
+        Noch keine Daten.
       </h1>
-      <p className="mt-3 text-zinc-600">
+      <p className="mt-2.5 text-[14.5px] leading-relaxed text-ink-soft">
         Du hast noch keine Fragen beantwortet.
       </p>
 
-      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
           href="/quiz"
-          className="inline-block rounded-xl bg-zinc-900 px-6 py-3 text-center text-white transition hover:bg-zinc-800"
+          className="inline-block rounded-lg px-5 py-2.5 text-center text-[13px] font-semibold text-white transition-transform hover:-translate-y-px"
+          style={{ background: "var(--ink)", color: "var(--canvas)" }}
         >
           Quiz starten
         </Link>
         <Link
           href="/"
-          className="inline-block rounded-xl border border-zinc-300 px-6 py-3 text-center text-zinc-900 transition hover:bg-zinc-100"
+          className="inline-block rounded-lg border border-line-strong px-5 py-2.5 text-center text-[13px] font-semibold text-ink transition-transform hover:-translate-y-px"
         >
           Zurück zum Dashboard
         </Link>

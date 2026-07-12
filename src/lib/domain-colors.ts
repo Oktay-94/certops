@@ -14,6 +14,10 @@ export type DomainColor = {
   textStrong: string;
   textMuted: string;
   fallbackIconName: FallbackIconName;
+  // Single solid hex (the -600 hue). For inline SVG/style where a class won't
+  // do and for dark mode, where the light bg-*-100 literals read too bright.
+  // Matches the app's domain hues (Security = rose), not the mockup's red.
+  solid: string;
 };
 
 const FALLBACK: DomainColor = {
@@ -27,6 +31,7 @@ const FALLBACK: DomainColor = {
   textStrong: "text-zinc-900",
   textMuted: "text-zinc-700",
   fallbackIconName: "Cloud",
+  solid: "#71717a", // zinc-500
 };
 
 const MAP: Record<string, DomainColor> = {
@@ -41,6 +46,7 @@ const MAP: Record<string, DomainColor> = {
     textStrong: "text-blue-900",
     textMuted: "text-blue-700",
     fallbackIconName: "Cloud",
+    solid: "#2563eb", // blue-600
   },
   "Security and Compliance": {
     tag: "bg-rose-100 text-rose-800 border-rose-200",
@@ -53,6 +59,7 @@ const MAP: Record<string, DomainColor> = {
     textStrong: "text-rose-900",
     textMuted: "text-rose-700",
     fallbackIconName: "Shield",
+    solid: "#e11d48", // rose-600
   },
   "Cloud Technology and Services": {
     tag: "bg-violet-100 text-violet-800 border-violet-200",
@@ -65,6 +72,7 @@ const MAP: Record<string, DomainColor> = {
     textStrong: "text-violet-900",
     textMuted: "text-violet-700",
     fallbackIconName: "Server",
+    solid: "#7c3aed", // violet-600
   },
   "Billing, Pricing, and Support": {
     tag: "bg-amber-100 text-amber-900 border-amber-200",
@@ -77,6 +85,7 @@ const MAP: Record<string, DomainColor> = {
     textStrong: "text-amber-900",
     textMuted: "text-amber-700",
     fallbackIconName: "DollarSign",
+    solid: "#d97706", // amber-600
   },
 };
 

@@ -2,9 +2,15 @@ import type { RoundTrendPoint } from "@/db/repository";
 import { LEARNING_TARGET, scoreColorHex } from "@/lib/scoreColor";
 import { BRAND_ORANGE } from "@/lib/brand";
 
+// Structural colors are CSS vars (via inline style so they resolve reliably in
+// SVG and flip in dark mode). The trend LINE stays BRAND_ORANGE (signal, theme-
+// independent) and the point fills stay scoreColorHex (per-round performance
+// signal — deliberately kept, strictly separate from structural color).
 const LINE_COLOR = BRAND_ORANGE;
-const AVG_COLOR = "#a1a1aa"; // zinc-400
-const TARGET_COLOR = "#52525b"; // zinc-600
+const GRID_COLOR = "var(--border)";
+const AXIS_COLOR = "var(--ink-faint)";
+const AVG_COLOR = "var(--ink-faint)";
+const TARGET_COLOR = "var(--ink-soft)";
 
 type ChartConfig = {
   W: number;
@@ -94,15 +100,15 @@ function ChartSvg({
               x2={cfg.W - cfg.padR}
               y1={y}
               y2={y}
-              stroke="#f4f4f5"
               strokeWidth={1}
+              style={{ stroke: GRID_COLOR }}
             />
             <text
               x={cfg.padL - 6}
               y={y + 3}
               textAnchor="end"
               fontSize={cfg.axisFontSize}
-              fill="#a1a1aa"
+              style={{ fill: AXIS_COLOR }}
             >
               {Math.round(tick * 100)}%
             </text>
@@ -118,46 +124,46 @@ function ChartSvg({
           y={cfg.H - 6}
           textAnchor="middle"
           fontSize={cfg.axisFontSize}
-          fill="#a1a1aa"
+          style={{ fill: AXIS_COLOR }}
         >
           R{i + 1}
         </text>
       ))}
 
-      {/* Average reference line */}
+      {/* Average reference line (mockup dash 2 4) */}
       <line
         x1={cfg.padL}
         x2={cfg.W - cfg.padR}
         y1={avgY}
         y2={avgY}
-        stroke={AVG_COLOR}
-        strokeWidth={1}
-        strokeDasharray="2 2"
+        strokeWidth={1.5}
+        strokeDasharray="2 4"
+        style={{ stroke: AVG_COLOR }}
       />
       <text
         x={cfg.W - cfg.padR + 2}
         y={avgY + (labelsOverlap ? -3 : 3)}
         fontSize={cfg.axisFontSize}
-        fill={AVG_COLOR}
+        style={{ fill: AVG_COLOR }}
       >
         Ø
       </text>
 
-      {/* Learning target line */}
+      {/* Learning target line (mockup dash 7 5) */}
       <line
         x1={cfg.padL}
         x2={cfg.W - cfg.padR}
         y1={targetY}
         y2={targetY}
-        stroke={TARGET_COLOR}
-        strokeWidth={1}
-        strokeDasharray="4 2"
+        strokeWidth={1.5}
+        strokeDasharray="7 5"
+        style={{ stroke: TARGET_COLOR }}
       />
       <text
         x={cfg.W - cfg.padR + 2}
         y={targetY + (labelsOverlap ? 9 : 3)}
         fontSize={cfg.axisFontSize}
-        fill={TARGET_COLOR}
+        style={{ fill: TARGET_COLOR }}
       >
         70%
       </text>
@@ -182,8 +188,8 @@ function ChartSvg({
             cy={p.y}
             r={isLast ? cfg.lastPointRadius : cfg.pointRadius}
             fill={scoreColorHex(p.rate)}
-            stroke={isLast ? "#ffffff" : "none"}
             strokeWidth={isLast ? 1.5 : 0}
+            style={isLast ? { stroke: "var(--surface)" } : undefined}
           />
         );
       })}
@@ -206,7 +212,7 @@ function ChartSvg({
 export function TrendLineChart({ trend }: { trend: RoundTrendPoint[] }) {
   if (trend.length < 2) {
     return (
-      <div className="rounded-lg bg-zinc-50 border border-zinc-200 p-4 text-sm text-zinc-500">
+      <div className="rounded-lg border border-line bg-surface-2 p-4 text-sm text-ink-faint">
         Mindestens 2 abgeschlossene Runden nötig — spiel noch ein paar Runden,
         dann wächst hier eine Linie.
       </div>
@@ -214,7 +220,7 @@ export function TrendLineChart({ trend }: { trend: RoundTrendPoint[] }) {
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4">
+    <div>
       {/* Mobile: höhere Plotfläche, größere Labels/Punkte */}
       <div className="sm:hidden">
         <ChartSvg cfg={MOBILE} trend={trend} />
@@ -224,7 +230,7 @@ export function TrendLineChart({ trend }: { trend: RoundTrendPoint[] }) {
         <ChartSvg cfg={DESKTOP} trend={trend} />
       </div>
 
-      <div className="mt-3 rounded-md bg-zinc-50 p-3 text-xs text-zinc-600">
+      <div className="mt-3 rounded-md bg-surface-2 p-3 text-xs text-ink-soft">
         <p>
           R1–R{trend.length} = deine letzten Runden, R{trend.length} ist die
           aktuellste, Höhe = Trefferquote in %.
@@ -240,7 +246,8 @@ export function TrendLineChart({ trend }: { trend: RoundTrendPoint[] }) {
           </li>
           <li className="inline-flex items-center gap-1.5">
             <span
-              className="inline-block h-2 w-2 rounded-full bg-zinc-700"
+              className="inline-block h-2 w-2 rounded-full"
+              style={{ background: LINE_COLOR }}
               aria-hidden
             />
             letzte Runde
@@ -249,7 +256,8 @@ export function TrendLineChart({ trend }: { trend: RoundTrendPoint[] }) {
             <span
               className="inline-block h-0.5 w-4"
               style={{
-                background: `repeating-linear-gradient(to right, ${AVG_COLOR} 0 2px, transparent 2px 4px)`,
+                background:
+                  "repeating-linear-gradient(to right, var(--ink-faint) 0 2px, transparent 2px 4px)",
               }}
               aria-hidden
             />
@@ -259,7 +267,8 @@ export function TrendLineChart({ trend }: { trend: RoundTrendPoint[] }) {
             <span
               className="inline-block h-0.5 w-4"
               style={{
-                background: `repeating-linear-gradient(to right, ${TARGET_COLOR} 0 4px, transparent 4px 6px)`,
+                background:
+                  "repeating-linear-gradient(to right, var(--ink-soft) 0 4px, transparent 4px 6px)",
               }}
               aria-hidden
             />

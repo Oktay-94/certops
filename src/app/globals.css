@@ -39,6 +39,8 @@
   --ink-faint: #a4a7ad;
   --success: #16a34a;
   --success-soft: #e8f7ee;
+  --danger: #d64545;
+  --danger-soft: #fbe9e9;
   /* Blueprint grid — theme-scoped since 2b polish (diagramm-quiz reference:
      visible in BOTH themes; the old saa×dark-only gating undersold the mockups). */
   --grid-line: rgba(35, 47, 62, 0.06);
@@ -72,6 +74,8 @@
   --ink-faint: #5c6a7e;
   --success: #2bbf9e;
   --success-soft: rgba(1, 168, 141, 0.14);
+  --danger: #f0776b;
+  --danger-soft: rgba(240, 119, 107, 0.13);
   --heat-0: rgba(255, 255, 255, 0.05);
   --heat-1: rgba(255, 255, 255, 0.13);
   --heat-2: rgba(255, 255, 255, 0.26);
