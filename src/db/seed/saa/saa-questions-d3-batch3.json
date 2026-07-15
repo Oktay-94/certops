@@ -1,0 +1,242 @@
+[
+  {
+    "seedKey": "saa-c03-q-200",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "type": "single",
+    "prompt": "Eine CloudFront-Distribution liefert Produktseiten aus. Die Cache-Hit-Ratio liegt unter 15 %, obwohl sich die Seiten selten ändern. Die Analyse zeigt: Die Cache Policy nimmt alle Query-Strings und acht Header in den Cache Key auf — der Origin braucht davon aber nur zwei Header für Logging-Zwecke, keiner beeinflusst den Seiteninhalt.\n\nWelche Änderung hebt die Cache-Hit-Ratio?",
+    "choices": [
+      { "id": "A", "text": "Die TTL-Werte der Cache Policy deutlich anheben, damit einmal gecachte Einträge länger gültig bleiben." },
+      { "id": "B", "text": "Origin Shield für die Distribution aktivieren, das als zusätzliche Cache-Schicht vor dem Origin sitzt." },
+      { "id": "C", "text": "Die Cache Policy auf inhaltsrelevante Werte reduzieren und die zwei Header per Origin Request Policy weitergeben." },
+      { "id": "D", "text": "Eine zweite Distribution nur für statische Inhalte anlegen, deren Cache Key keine Header enthält." }
+    ],
+    "correct": ["C"],
+    "explanation": "Das Problem ist die Cache-Key-Explosion: Jede Kombination aus Query-Strings und Header-Werten erzeugt einen eigenen Cache-Eintrag — bei acht Headern zersplittert derselbe Seiteninhalt in unzählige Varianten, die sich gegenseitig nie treffen. Die Trennung der beiden Policies löst das: Die Cache Policy bestimmt den Cache Key und wird auf inhaltsrelevante Werte reduziert; die Origin Request Policy gibt die zwei Logging-Header an den Origin weiter, ohne dass sie in den Key eingehen. (A) verlängert nur das Leben von Einträgen, die ohnehin kaum wiederverwendet werden — die Zersplitterung bleibt. (B) fügt eine zweite Cache-Schicht mit demselben zersplitterten Key hinzu; die Hit-Ratio am Edge ändert sich nicht. (D) funktioniert für die statischen Teile, umgeht das Problem der Produktseiten aber, statt es zu beheben — und verdoppelt die Infrastruktur.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-the-cache-key.html"
+  },
+  {
+    "seedKey": "saa-c03-q-201",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "type": "single",
+    "prompt": "Eine neue CloudFront-Distribution soll einen privaten S3-Bucket ausliefern. Die Objekte sind mit SSE-KMS verschlüsselt, und die Anwendung soll Uploads per PUT durch die Distribution an den Bucket schicken können. Ein älteres Runbook empfiehlt eine Origin Access Identity.\n\nWas ist die korrekte Konfiguration?",
+    "choices": [
+      { "id": "A", "text": "Origin Access Control einrichten, das SSE-KMS und PUT-Requests unterstützt und für neue Distributionen empfohlen ist." },
+      { "id": "B", "text": "Die Origin Access Identity aus dem Runbook verwenden, da beide Mechanismen denselben Funktionsumfang bieten." },
+      { "id": "C", "text": "Den Bucket als S3-Website-Endpoint konfigurieren, dessen Zugriff über einen geheim gehaltenen Referer-Header abgesichert wird." },
+      { "id": "D", "text": "Eine Bucket-Policy anlegen, die Zugriffe auf die IP-Bereiche der CloudFront-Edge-Standorte einschränkt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Origin Access Control ist der Nachfolger der OAI und für alle neuen Distributionen die AWS-Empfehlung — und in diesem Szenario zwingend: OAC unterstützt SSE-KMS-verschlüsselte Objekte und dynamische Requests wie PUT, signiert mit SigV4 und kurzlebigen Credentials. Der KMS-Key braucht lediglich den CloudFront-Service-Principal in seiner Key Policy. (B) ist genau der Irrtum des alten Runbooks: Die OAI unterstützt weder SSE-KMS nativ noch PUT — beide Kernanforderungen scheitern. (C) macht den Bucket zum öffentlichen Website-Endpoint, mit dem weder OAC noch OAI funktionieren, und ein Referer-Geheimnis ist trivial fälschbar. (D) funktioniert näherungsweise über die Managed Prefix List, lässt aber jeden durch, der über irgendeine CloudFront-Distribution kommt — nicht nur die eigene — und löst weder KMS noch PUT.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+  },
+  {
+    "seedKey": "saa-c03-q-202",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "type": "single",
+    "prompt": "Ein Streaming-Dienst liefert Videosegmente über CloudFront mit signierter Zugriffskontrolle aus. Ein Abonnent erhält Zugriff auf tausende Segment-Dateien einer Serie; die Player-URLs der Segmente dürfen dabei nicht verändert werden, weil sie aus den Manifest-Dateien stammen.\n\nWelcher Mechanismus passt?",
+    "choices": [
+      { "id": "A", "text": "Signed URLs, die der Manifest-Generator für jedes einzelne Videosegment vorab erzeugt und einbettet." },
+      { "id": "B", "text": "Signed Cookies, die nach der Anmeldung gesetzt werden und den Zugriff auf alle Segmente erlauben." },
+      { "id": "C", "text": "Ein Lambda@Edge-Viewer-Request, der die Abonnements gegen eine DynamoDB-Tabelle validiert." },
+      { "id": "D", "text": "Field-Level Encryption, die die Segmente individuell für den jeweiligen Abonnenten verschlüsselt." }
+    ],
+    "correct": ["B"],
+    "explanation": "Das ist der Lehrbuchfall für Signed Cookies: Zugriff auf viele Dateien — ganze Bereiche, ganze Abos — ohne die URLs anzufassen. Nach der Anmeldung setzt die Anwendung die Cookies, der Player fordert die unveränderten Segment-URLs aus dem Manifest an, und CloudFront prüft die Cookie-Signatur bei jedem Request. (A) ist das Gegenstück für einzelne Dateien und scheitert hier an der eigenen Bedingung: Signieren heißt, jede URL zu verändern — genau das ist ausgeschlossen, von tausenden Signaturen pro Manifest abgesehen. (C) funktioniert und wird für komplexe Autorisierung gebaut, ersetzt aber einen eingebauten Mechanismus durch eigenen Code samt Latenz und Kosten pro Request. (D) löst ein anderes Problem: Field-Level Encryption schützt einzelne sensible Formularfelder auf dem Weg zum Origin — mit Zugriffskontrolle auf Videosegmente hat sie nichts zu tun.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-choosing-signed-urls-cookies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-203",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "type": "single",
+    "prompt": "Ein Multiplayer-Spiel kommuniziert über UDP mit Game-Servern hinter Network Load Balancern in zwei Regionen. Die Spieler weltweit klagen über schwankende Latenz durch wechselnde Internet-Routen; zusätzlich sollen Client-Firewalls nur zwei feste IP-Adressen freigeben müssen, und ein Regionsausfall soll in Sekunden abgefangen werden.\n\nWelcher Dienst erfüllt alle drei Anforderungen?",
+    "choices": [
+      { "id": "A", "text": "Amazon CloudFront mit einer Origin Group, deren Failover-Regeln beide Regionen als Origins führen." },
+      { "id": "B", "text": "Route 53 mit Latency-based Routing und Health Checks auf die Load Balancer beider Regionen." },
+      { "id": "C", "text": "Eine dritte Region als Relay, deren Network Load Balancer die Spieler an beide Regionen weiterreicht." },
+      { "id": "D", "text": "AWS Global Accelerator mit zwei statischen Anycast-IPs und Endpoint-Groups in beiden Regionen." }
+    ],
+    "correct": ["D"],
+    "explanation": "Die drei Anforderungen zeichnen exakt das Global-Accelerator-Profil: Es arbeitet auf Layer 4 und trägt UDP, die zwei statischen Anycast-IPs sind genau die Firewall-Freigabe, der Traffic springt am nächsten Edge-Standort auf das AWS-Backbone (stabile Latenz statt wechselnder Internet-Routen), und das Failover passiert auf Netzwerkebene in Sekunden — ohne DNS-Beteiligung. (A) scheitert an der ersten Hürde: CloudFront ist ein HTTP/HTTPS-CDN und transportiert kein UDP. (B) erfüllt keine der drei Anforderungen sauber: keine festen IPs, Latenz-Routing nur bei der DNS-Auflösung statt auf dem Pfad, und das Failover hängt am TTL-Verhalten der Clients. (C) ist ein Eigenbau, der die Latenz durch den zusätzlichen Hop verschlechtert und mit der Relay-Region einen neuen Single Point of Failure erfindet.",
+    "sourceRef": "https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html"
+  },
+  {
+    "seedKey": "saa-c03-q-204",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "type": "multiple",
+    "prompt": "Eine REST API auf API Gateway (Regional) mit Lambda-Backend ächzt unter Last: Identische GET-Anfragen auf einen Katalog-Endpunkt treffen tausendfach pro Minute dasselbe Backend, und ein einzelner Partner mit einem fehlerhaften Skript flutet die API so stark, dass andere Kunden leer ausgehen.\n\nWelche ZWEI Maßnahmen adressieren die beiden Probleme? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Das API-Gateway-Response-Caching der Stage aktivieren, das identische GET-Antworten aus dem Cache bedient." },
+      { "id": "B", "text": "Die Lambda-Concurrency des Backends anheben, damit auch die Partner-Flut vollständig bedient wird." },
+      { "id": "C", "text": "Einen Usage Plan mit API-Keys einführen, dessen Rate- und Burst-Limits je Partner durchgesetzt werden." },
+      { "id": "D", "text": "Die Integration auf eine Edge-optimized Konfiguration umstellen, deren CloudFront-Schicht die Last verteilt." },
+      { "id": "E", "text": "Das Account-Level-Throttling der Region absenken, damit die Gesamtlast der API begrenzt bleibt." }
+    ],
+    "correct": ["A", "C"],
+    "explanation": "(A) löst das erste Problem an der richtigen Stelle: REST APIs bringen Response-Caching auf Stage-Ebene mit (0,5 bis 237 GB, Standard-TTL 300 Sekunden) — identische GET-Anfragen werden aus dem Cache bedient, ohne das Lambda-Backend überhaupt zu erreichen. (C) löst das zweite: Usage Plans binden API-Keys an eigene Rate-, Burst- und Quota-Limits je Kunde — der Partner mit dem fehlerhaften Skript läuft in seine 429-Grenze, alle anderen bleiben unbeeinträchtigt. (B) bekämpft das Symptom mit Geld: Die Flut wird bedient statt begrenzt, und die Kosten skalieren mit dem Fehler des Partners. (D) verlagert den Eintrittspunkt an die Edge, cacht aber nichts und drosselt niemanden. (E) trifft die Falschen: Das Account-Throttling gilt für alle APIs der Region gemeinsam — es würde die legitimen Kunden genauso abschneiden wie den Verursacher.",
+    "sourceRef": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html"
+  },
+  {
+    "seedKey": "saa-c03-q-205",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "type": "single",
+    "prompt": "Eine Report-Generierung hinter einer Edge-optimized REST API auf API Gateway braucht je nach Datenmenge 20 bis 120 Sekunden. Anfragen oberhalb von etwa einer halben Minute brechen mit einem 504-Fehler ab, obwohl das Lambda-Timeout auf 5 Minuten steht.\n\nWas ist die Ursache, und welche Architektur behebt sie?",
+    "choices": [
+      { "id": "A", "text": "Das Integration-Timeout der Stage ist zu niedrig konfiguriert; der Wert wird auf 300 Sekunden angehoben." },
+      { "id": "B", "text": "Der Standardwert der Lambda-Funktion greift vor dem konfigurierten; die Funktion wird neu deployt." },
+      { "id": "C", "text": "Das Integration-Timeout liegt bei 29 Sekunden; die API startet den Report asynchron und der Client pollt das Ergebnis." },
+      { "id": "D", "text": "Die Edge-Standorte kappen langlebige Verbindungen; ein Wechsel der CloudFront-Preisklasse hebt die Grenze auf." }
+    ],
+    "correct": ["C"],
+    "explanation": "Das Integration-Timeout von API Gateway liegt standardmäßig bei 29 Sekunden — das Lambda-Timeout dahinter spielt keine Rolle, wenn das Gateway die Verbindung vorher kappt. Seit 2024 lässt sich der Wert zwar anheben, aber ausschließlich für Regional- und Private REST APIs — für Edge-optimized APIs bleibt die Grenze hart. Der tragfähige Weg ist das asynchrone Muster: Die API nimmt den Auftrag an (etwa über SQS oder eine asynchrone Lambda-Invocation), liefert sofort eine Job-ID zurück, und der Client pollt den Status oder erhält das Ergebnis per Push. (A) beschreibt eine Option, die es für Edge-optimized nicht gibt. (B) erfindet einen Mechanismus — es gibt keinen konkurrierenden Lambda-Standardwert, der ein Deployment bräuchte. (D) rät in die falsche Richtung: Die Preisklasse steuert, welche Edge-Standorte genutzt werden, nicht wie lange Verbindungen leben.",
+    "sourceRef": "https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html"
+  },
+  {
+    "seedKey": "saa-c03-q-206",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "type": "single",
+    "prompt": "Eine mobile App zeigt Dashboards, die Daten aus DynamoDB, einer Aurora-Datenbank und zwei internen HTTP-Services kombinieren. Heute ruft die App fünf REST-Endpunkte nacheinander auf und verwirft den Großteil der Felder; auf langsamen Mobilfunkverbindungen dauert der Aufbau Sekunden. Zusätzlich sollen Änderungen künftig in Echtzeit in die App gepusht werden.\n\nWelche Lösung adressiert beide Punkte?",
+    "choices": [
+      { "id": "A", "text": "AWS AppSync mit einem GraphQL-Schema über alle Datenquellen und Subscriptions für die Echtzeit-Updates." },
+      { "id": "B", "text": "Ein Backend-for-Frontend auf Lambda, das die fünf Aufrufe serverseitig bündelt und die Antwort zuschneidet." },
+      { "id": "C", "text": "HTTP-Langpolling gegen einen neuen Aggregations-Endpunkt, der die Datenquellen zyklisch zusammenführt." },
+      { "id": "D", "text": "API Gateway mit Response-Caching, das die kombinierten Dashboard-Antworten am Gateway vorhält." }
+    ],
+    "correct": ["A"],
+    "explanation": "Die Symptome sind das GraphQL-Kernprofil: Over-Fetching (verworfene Felder) und Under-Fetching (fünf sequentielle Aufrufe) verschwinden, weil der Client in einer Query exakt die benötigten Felder anfordert und AppSync die Resolver gegen DynamoDB, Aurora und die HTTP-Services parallel auflöst. Subscriptions liefern die Echtzeit-Updates über verwaltete WebSockets gleich mit — beide Anforderungen, ein Dienst. (B) funktioniert und ist ein legitimes Muster, löst aber nur die Aggregation: Für Echtzeit-Push müsste zusätzlich eine WebSocket-Infrastruktur gebaut und betrieben werden. (C) ist Echtzeit-Simulation mit Latenz und Dauerlast — zyklisches Nachfragen ist genau das, was Push ersetzen soll. (D) hilft nur, wenn viele Nutzer identische Dashboards sehen; personalisierte Daten machen den Cache wirkungslos, und gepusht wird ohnehin nichts.",
+    "sourceRef": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html"
+  },
+  {
+    "seedKey": "saa-c03-q-207",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "type": "single",
+    "prompt": "Eine CloudFront-Distribution liefert eine Anwendung aus, deren einziger Origin ein ALB in eu-central-1 ist. Bei einem regionalen Ausfall soll CloudFront automatisch auf einen zweiten, identischen ALB in eu-west-1 ausweichen — ohne DNS-Änderungen und ohne manuelles Eingreifen.\n\nWie wird das konfiguriert?",
+    "choices": [
+      { "id": "A", "text": "Beide ALBs als gleichberechtigte Origins der Distribution eintragen, zwischen denen CloudFront rotiert." },
+      { "id": "B", "text": "Eine Origin Group mit dem primären und sekundären ALB anlegen, die bei definierten Fehler-Statuscodes umschaltet." },
+      { "id": "C", "text": "Einen Route-53-Failover-Record als Origin hinterlegen, dessen Health Check die Umschaltung übernimmt." },
+      { "id": "D", "text": "Eine zweite Distribution vor den ALB in eu-west-1 setzen und beide über einen CNAME-Wechsel tauschen." }
+    ],
+    "correct": ["B"],
+    "explanation": "Origin Groups sind der eingebaute Failover-Mechanismus von CloudFront: ein primärer und ein sekundärer Origin, und schlägt der primäre mit einem der konfigurierten Statuscodes fehl (etwa 500, 502, 503, 504, optional auch 403/404) oder per Timeout, wiederholt CloudFront den Request automatisch gegen den sekundären. Kein DNS, kein Mensch — nur zu beachten ist, dass das Failover für GET, HEAD und OPTIONS gilt. (A) beschreibt eine Funktion, die es nicht gibt: Mehrere Origins bedienen unterschiedliche Pfad-Muster über Cache Behaviors; eine Rotation oder Lastverteilung zwischen Origins kennt CloudFront nicht. (C) funktioniert grundsätzlich, hängt aber wieder am DNS: TTLs und Resolver-Caching verzögern die Umschaltung — genau das sollte vermieden werden. (D) ist doppelt manuell: Der CNAME-Wechsel ist eine DNS-Änderung und ein Eingriff — beides ausgeschlossen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/high_availability_origin_failover.html"
+  },
+  {
+    "seedKey": "saa-c03-q-208",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion",
+    "type": "single",
+    "prompt": "Ein Kinesis Data Stream wird von einem Standard-Consumer gelesen. Nun sollen vier weitere unabhängige Consumer-Anwendungen denselben Stream verarbeiten. Im Test bricht die Leseleistung aller Anwendungen ein, und die Latenz steigt auf mehrere Sekunden — die Anwendungen konkurrieren um denselben Lesedurchsatz.\n\nWelche Änderung gibt jedem Consumer volle Leistung?",
+    "choices": [
+      { "id": "A", "text": "Die Anwendungen als Enhanced-Fan-out-Consumer registrieren, die je Shard dedizierten Durchsatz per Push erhalten." },
+      { "id": "B", "text": "Die Shard-Anzahl des Streams verfünffachen, damit der geteilte Lesedurchsatz für alle fünf Anwendungen reicht." },
+      { "id": "C", "text": "Je Consumer-Anwendung einen eigenen Stream anlegen, den ein Verteiler-Prozess aus dem Original speist." },
+      { "id": "D", "text": "Die GetRecords-Aufrufe der Anwendungen zeitlich versetzen, damit sich die Lesefenster nicht überlappen." }
+    ],
+    "correct": ["A"],
+    "explanation": "Standard-Consumer teilen sich die 2 MB/s Lesedurchsatz und 5 GetRecords-Aufrufe pro Sekunde je Shard — fünf Anwendungen auf demselben Stream bedeuten geteilte Bandbreite und Polling-Latenzen im Sekundenbereich. Enhanced Fan-out löst genau das: Jeder registrierte Consumer bekommt dedizierte 2 MB/s pro Shard, und die Daten werden per HTTP/2 SubscribeToShard gepusht (Latenz um 70 ms statt Polling). Bis zu 20 Consumer je Stream sind möglich. (B) rechnet an der falschen Stelle: Mehr Shards erhöhen den Gesamtdurchsatz, aber die Consumer teilen sich weiterhin jeden einzelnen Shard — und die Kosten verfünffachen sich mit. (C) ist Enhanced Fan-out als Eigenbau: fünf Streams, ein Verteiler als neuer Engpass und Single Point of Failure, fünffache Stream-Kosten. (D) verwaltet den Mangel, statt ihn zu beheben — die 5 Aufrufe pro Sekunde und Shard bleiben die gemeinsame Obergrenze.",
+    "sourceRef": "https://docs.aws.amazon.com/streams/latest/dev/enhanced-consumers.html"
+  },
+  {
+    "seedKey": "saa-c03-q-209",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion",
+    "type": "single",
+    "prompt": "Clickstream-Daten sollen kontinuierlich in einen S3-Data-Lake fließen — als Parquet, komprimiert und nach Ereignisdatum partitioniert. Eine Verzögerung von ein bis zwei Minuten ist akzeptabel. Das Team will keinerlei Consumer-Code schreiben oder betreiben.\n\nWelcher Dienst erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "Kinesis Data Streams mit einer Lambda-Funktion, die Batches konvertiert und partitioniert nach S3 schreibt." },
+      { "id": "B", "text": "Amazon Managed Streaming for Apache Kafka mit Kafka Connect und einem S3-Sink-Connector." },
+      { "id": "C", "text": "Amazon Data Firehose mit Format-Konvertierung nach Parquet, Kompression und Dynamic Partitioning." },
+      { "id": "D", "text": "Amazon Managed Service for Apache Flink mit einem Streaming-Job, der die Events nach S3 sinkt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Das ist der Firehose-Kernfall: vollständig verwaltete Near-Real-Time-Zustellung nach S3 — die Format-Konvertierung JSON→Parquet, die Kompression und das Dynamic Partitioning nach Ereignisattributen sind eingebaute Funktionen, konfiguriert statt programmiert. Die Pufferung (nach Größe oder Zeit) passt zur akzeptierten Verzögerung von ein bis zwei Minuten, und es gibt keinerlei Consumer-Code zu betreiben. (A) funktioniert und ist das flexible Muster — aber die Lambda ist genau der Code, den niemand schreiben und betreiben will: Konvertierung, Partitionierung, Fehlerbehandlung, alles Eigenverantwortung. (B) ist die richtige Wahl für bestehende Kafka-Ökosysteme; hier bedeutet sie Cluster, Connect-Worker und Connector-Konfiguration für ein Problem, das ein Haken in der Firehose-Konsole löst. (D) ist ein Stream-Processing-Framework für Transformationen und Analytik in Echtzeit — für reines Zustellen mit Formatwandel deutlich zu schwer.",
+    "sourceRef": "https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html"
+  },
+  {
+    "seedKey": "saa-c03-q-210",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion",
+    "type": "multiple",
+    "prompt": "Ein Analytics-Team fragt 40 TB JSON-Logs in S3 mit Amazon Athena ab. Die Abfragen filtern fast immer auf einen Datumsbereich und lesen nur wenige Spalten — trotzdem scannt jede Abfrage den kompletten Datenbestand, dauert Minuten und kostet entsprechend.\n\nWelche ZWEI Maßnahmen senken Scan-Volumen und Laufzeit am stärksten? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Die Daten nach Datum partitionieren, damit Abfragen mit Datumsfilter nur die betroffenen Partitionen lesen." },
+      { "id": "B", "text": "Die Athena-Workgroup mit einem höheren Query-Limit ausstatten, das mehr parallele Scans erlaubt." },
+      { "id": "C", "text": "Die Ergebnisse jeder Abfrage in einer eigenen Result-Location speichern, die Athena wiederverwendet." },
+      { "id": "D", "text": "Die Logs in ein spaltenorientiertes Format wie Parquet mit Kompression konvertieren." },
+      { "id": "E", "text": "Die S3-Objekte auf mehrere Buckets verteilen, deren parallele Zugriffe die Abfragen beschleunigen." }
+    ],
+    "correct": ["A", "D"],
+    "explanation": "Die beiden Maßnahmen greifen an den zwei Dimensionen des Scans an. (A) schneidet Zeilen weg: Partitionierung nach Datum heißt, dass ein Datumsfilter per Partition Pruning nur die betroffenen Verzeichnisse liest — bei typischen Abfragen auf wenige Tage von 40 TB ein Bruchteil. (D) schneidet Spalten weg: Parquet ist spaltenorientiert, Athena liest nur die angefragten Spalten, und die Kompression verkleinert auch die zusätzlich. AWS beziffert die Kombination auf Einsparungen bis in den hohen zweistelligen Prozentbereich — und da Athena pro gescanntem TB abrechnet, sinken Kosten und Laufzeit gemeinsam. (B) erhöht Parallelität und Limits, nicht Effizienz — gescannt wird gleich viel. (C) hilft nur bei exakt wiederholten Abfragen (Query Result Reuse) und ändert am ersten, teuren Scan nichts. (E) verwechselt die Ebenen: Athena parallelisiert ohnehin über Objekte; die Bucket-Anzahl ist kein Performance-Faktor.",
+    "sourceRef": "https://docs.aws.amazon.com/athena/latest/ug/performance-tuning.html"
+  },
+  {
+    "seedKey": "saa-c03-q-211",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion",
+    "type": "single",
+    "prompt": "Ein Kinesis Data Stream im Provisioned-Modus mit 10 Shards weist Producer-Schreibfehler (ProvisionedThroughputExceededException) aus — aber nur auf zwei Shards; die übrigen acht sind kaum ausgelastet. Als Partition Key dient die Filial-ID, und zwei Großfilialen erzeugen den Löwenanteil der Events.\n\nWelche Maßnahme behebt die Drosselung?",
+    "choices": [
+      { "id": "A", "text": "Den Stream per UpdateShardCount auf 20 Shards verdoppeln, damit deutlich mehr Gesamtkapazität bereitsteht." },
+      { "id": "B", "text": "Auf den On-Demand-Modus wechseln, dessen automatische Skalierung die Drosselung unterbindet." },
+      { "id": "C", "text": "Den Partition Key um ein zufälliges Suffix je Event erweitern, das die Last der Großfilialen verteilt." },
+      { "id": "D", "text": "Die Retry-Logik der Producer mit Exponential Backoff auszustatten, das die Schreibfehler abfängt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Das ist ein Hot-Shard-Problem, kein Kapazitätsproblem: Der Partition Key bestimmt per Hash den Shard, und zwei dominante Filial-IDs landen immer auf denselben zwei Shards — deren 1 MB/s bzw. 1.000 Records/s sind der Deckel, egal wie viele Shards daneben leerlaufen. Die Lösung ist ein feinerer Schlüssel: Ein Suffix (etwa filialId#zufallszahl) verteilt die Events der Großfilialen über viele Shards; die Consumer müssen die Teilströme dann zusammenführen, sofern die Reihenfolge je Filiale relevant ist. (A) und (B) skalieren die Gesamtkapazität — der Hash schickt die heißen Schlüssel aber weiterhin auf einzelne Shards, deren Limit unverändert gilt; On-Demand verschiebt das Problem nur in einen anderen Abrechnungsmodus. (D) macht die Fehler leiser statt seltener: Backoff glättet Spitzen, aber ein dauerhaft überlasteter Shard drosselt weiter — die Events stauen sich beim Producer.",
+    "sourceRef": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html"
+  },
+  {
+    "seedKey": "saa-c03-q-212",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion",
+    "type": "single",
+    "prompt": "Ein Unternehmen betreibt on-premises eine umfangreiche Apache-Kafka-Landschaft: Dutzende Producer und Consumer nutzen die Kafka-APIs, Kafka Streams und bestehende Schema-Registry-Integrationen. Die Plattform soll in die Cloud, der Anwendungscode aber unverändert bleiben. Der Betrieb der Broker soll an AWS übergehen.\n\nWelcher Dienst passt?",
+    "choices": [
+      { "id": "A", "text": "Kinesis Data Streams, dessen Shard-Modell die Kafka-Topics nach einer Client-Migration abbildet." },
+      { "id": "B", "text": "Amazon MSK, das Kafka-kompatible Broker verwaltet und die bestehenden Clients unverändert bedient." },
+      { "id": "C", "text": "Amazon Data Firehose, das die Datenströme der Producer verwaltet in die Zielsysteme zustellt." },
+      { "id": "D", "text": "Apache Kafka auf selbst verwalteten EC2-Instanzen, deren AMIs die bestehende Konfiguration spiegeln." }
+    ],
+    "correct": ["B"],
+    "explanation": "Die Anforderung unveränderter Anwendungscode entscheidet: Amazon MSK betreibt echte Apache-Kafka-Broker als verwalteten Dienst — die Kafka-APIs, Kafka Streams und die Schema-Registry-Integrationen funktionieren weiter, nur die Bootstrap-Adressen ändern sich. Broker-Betrieb, Patching und Zookeeper/KRaft übernimmt AWS. (A) ist ein anderes System mit anderen APIs: Jeder Producer und Consumer müsste umgeschrieben werden — genau das Gegenteil der Vorgabe. (C) ist ein Zustelldienst in Data Stores, keine Streaming-Plattform mit Topics, Consumer Groups und Streams-API — die Anwendungslandschaft hätte keinen Anschlusspunkt. (D) erfüllt die Kompatibilität perfekt, verfehlt aber die zweite Anforderung: Der Broker-Betrieb bliebe vollständig beim eigenen Team — Cloud-Umzug ohne Betriebsübergabe.",
+    "sourceRef": "https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html"
+  },
+  {
+    "seedKey": "saa-c03-q-213",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion",
+    "type": "single",
+    "prompt": "Ein Redshift-Data-Warehouse läuft werktags stabil; nur am Monatsende verzehnfacht sich die Zahl gleichzeitiger BI-Abfragen für wenige Stunden, und die Nutzer warten in der Query-Queue. Der Cluster soll dafür nicht dauerhaft vergrößert werden.\n\nWelche Funktion löst das Problem?",
+    "choices": [
+      { "id": "A", "text": "Redshift Spectrum, das die zusätzlichen Abfragen direkt gegen die Daten in S3 ausführt." },
+      { "id": "B", "text": "Ein zweiter Redshift-Cluster, der per Snapshot-Restore vor jedem Monatsende hochgefahren wird." },
+      { "id": "C", "text": "Eine Distribution-Style-Änderung der großen Tabellen auf ALL, die Joins auf allen Knoten lokal macht." },
+      { "id": "D", "text": "Concurrency Scaling, das für die Spitzen automatisch temporäre Zusatzkapazität bereitstellt." }
+    ],
+    "correct": ["D"],
+    "explanation": "Concurrency Scaling ist genau für dieses Muster gebaut: Läuft die Query-Queue voll, schaltet Redshift automatisch temporäre Cluster-Kapazität dazu, verteilt die wartenden Abfragen dorthin und baut sie nach der Spitze wieder ab — bezahlt wird nur die Nutzung, und je Tag Cluster-Betrieb wird ein Stundenguthaben angesammelt, das solche Monatsend-Spitzen oft komplett abdeckt. (A) beantwortet eine andere Frage: Spectrum erweitert Abfragen auf S3-Daten — die Concurrency-Grenze des Clusters für die vorhandenen Warehouse-Tabellen hebt es nicht. (B) funktioniert als manuelles Muster, bedeutet aber Orchestrierung, Datenstand zum Snapshot-Zeitpunkt und doppelte Kosten während der Laufzeit — Eigenbau dessen, was (D) eingebaut liefert. (C) ist Query-Tuning: ALL-Distribution beschleunigt Joins kleiner Dimensionstabellen, vervielfacht aber den Speicher großer Tabellen und ändert nichts an der Zahl gleichzeitig laufender Abfragen.",
+    "sourceRef": "https://docs.aws.amazon.com/redshift/latest/dg/concurrency-scaling.html"
+  }
+]

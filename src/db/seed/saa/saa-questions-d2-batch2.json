@@ -1,0 +1,787 @@
+[
+  {
+    "seedKey": "saa-c03-q-106",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing",
+    "type": "single",
+    "prompt": "Ein Streaming-Dienst betreibt einen Network Load Balancer über drei Availability Zones. Nach mehreren Scale-Out-Ereignissen sind in AZ-a zwölf Instanzen registriert, in AZ-b und AZ-c jeweils vier. Das Monitoring zeigt: Die Instanzen in AZ-b und AZ-c laufen dauerhaft über 80 % CPU, die in AZ-a unter 30 %. Der Load Balancer wurde mit den Standardeinstellungen angelegt.\n\nWelche Maßnahme verteilt die Last mit dem geringsten Betriebsaufwand gleichmäßig über alle Ziele?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Auto Scaling Group so konfigurieren, dass sie in jeder Availability Zone dieselbe feste Instanzanzahl vorhält."
+      },
+      {
+        "id": "B",
+        "text": "Den Network Load Balancer durch einen Application Load Balancer ersetzen, bei dem Cross-Zone immer aktiv ist."
+      },
+      {
+        "id": "C",
+        "text": "Cross-Zone Load Balancing am Network Load Balancer aktivieren und die Inter-AZ-Transferkosten in Kauf nehmen."
+      },
+      {
+        "id": "D",
+        "text": "Route-53-Weighted-Records auf die zonalen DNS-Namen des Load Balancers legen und nach Zielanzahl gewichten."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Beim NLB ist Cross-Zone Load Balancing standardmäßig deaktiviert. Jeder zonale Knoten erhält über DNS etwa ein Drittel des Traffics und verteilt ihn ausschließlich an die Ziele seiner eigenen AZ — vier Instanzen tragen damit dieselbe Last wie zwölf. (C) hebt genau diese Trennung auf; der Preis sind Inter-AZ-Transferkosten, die beim NLB in beiden Richtungen berechnet werden. (A) funktioniert, opfert aber die Elastizität und muss bei jeder Kapazitätsänderung nachgezogen werden. (B) löst das Problem ebenfalls — beim ALB ist Cross-Zone immer an und kostenfrei —, tauscht dafür aber L4 gegen L7 und gibt die statischen IPs auf. (D) lässt sich bauen, hängt aber am DNS-TTL und muss nach jedem Scaling-Ereignis neu gewichtet werden.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html"
+  },
+  {
+    "seedKey": "saa-c03-q-107",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing",
+    "type": "single",
+    "prompt": "Ein Team hat die Deregistration Delay der ALB-Target-Group von 300 auf 30 Sekunden gesenkt, um Deployments zu beschleunigen. Seitdem melden Nutzer abgebrochene Datei-Uploads, und zwar ausschließlich während eines Rolling-Deployments. Die Upload-Verarbeitung dauert im Extremfall vier Minuten.\n\nWelche Maßnahme behebt die Ursache?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Deregistration Delay der Target Group auf einen Wert oberhalb der längsten Verarbeitungsdauer anheben."
+      },
+      {
+        "id": "B",
+        "text": "Sticky Sessions über ein Duration-based Cookie aktivieren, damit laufende Uploads dieselbe Instanz treffen."
+      },
+      {
+        "id": "C",
+        "text": "Das Health-Check-Intervall der Target Group verkürzen, damit ausfallende Ziele früher erkannt werden."
+      },
+      {
+        "id": "D",
+        "text": "Einen Lifecycle Hook vom Typ Terminating:Wait einrichten, der die Instanz 300 Sekunden am Leben hält."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Bei der Deregistrierung schickt der Load Balancer sofort keine neuen Requests mehr an das Ziel und lässt bestehende Verbindungen nur noch für die Dauer der Deregistration Delay weiterlaufen — danach schließt er sie hart. Bei 30 Sekunden trifft das jeden Upload, der länger dauert. (A) setzt den Wert wieder über die längste Requestdauer; der Default ist 300 Sekunden, das Maximum 3.600. (B) hilft nicht: Die Instanz verschwindet, egal worauf das Cookie zeigt. (C) beschleunigt die Fehlererkennung, rettet aber keinen laufenden Request. (D) hält zwar die EC2-Instanz am Leben, doch der Load Balancer hat die Verbindungen zu dem Zeitpunkt längst gekappt — der Hook setzt an der falschen Schicht an.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-target-group-attributes.html"
+  },
+  {
+    "seedKey": "saa-c03-q-108",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing",
+    "type": "single",
+    "prompt": "Ein Zahlungsdienstleister stellt eine Schnittstelle bereit, die Partnerbanken über ein proprietäres TCP-Protokoll ansprechen — kein HTTP. Die Banken tragen die Ziel-IPs fest in ihre On-Premises-Firewalls ein und ändern sie nur nach einem mehrmonatigen Freigabeprozess. Erwartet werden Millionen gleichzeitiger Verbindungen bei niedrigster Latenz.\n\nWelche Load-Balancing-Lösung erfüllt diese Anforderungen?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein Application Load Balancer, dem über einen Route-53-Alias-Record eine feste Elastic IP zugewiesen wird."
+      },
+      {
+        "id": "B",
+        "text": "Ein Application Load Balancer hinter AWS Global Accelerator, der zwei statische Anycast-IPs bereitstellt."
+      },
+      {
+        "id": "C",
+        "text": "Ein Gateway Load Balancer, der die TCP-Verbindungen transparent an die Zielinstanzen der Anwendung weiterreicht."
+      },
+      {
+        "id": "D",
+        "text": "Ein Network Load Balancer mit je einer Elastic IP pro Availability Zone, in der er bereitgestellt wird."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Der NLB arbeitet auf Layer 4, verkraftet Millionen von Verbindungen bei sehr niedriger Latenz und ist der einzige ELB-Typ, dem sich je AZ eine Elastic IP zuweisen lässt — genau das, was eine Firewall-Freigabe braucht. (A) scheitert daran, dass ein ALB grundsätzlich keine feste IP besitzt; ein Alias-Record ändert daran nichts. (B) liefert zwar statische Anycast-IPs, aber der ALB dahinter versteht nur HTTP/HTTPS und kann ein proprietäres TCP-Protokoll nicht terminieren. (Global Accelerator vor einem NLB wäre möglich, ist hier aber nicht nötig.) (C) ist für die transparente Einbindung von Third-Party-Appliances via GENEVE gedacht, nicht für das Load Balancing einer Anwendung.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html"
+  },
+  {
+    "seedKey": "saa-c03-q-109",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing",
+    "type": "single",
+    "prompt": "Ein Onlineshop hält den Warenkorb im lokalen Arbeitsspeicher der EC2-Instanzen; ein ALB mit Duration-based Stickiness sorgt dafür, dass ein Nutzer immer dieselbe Instanz trifft. Bei jedem Scale-In verlieren die betroffenen Nutzer ihren Warenkorb, und die Last verteilt sich zunehmend ungleich über die Flotte.\n\nWelche Lösung macht die Architektur dauerhaft elastisch?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Scale-In-Protection für alle Instanzen der Auto Scaling Group aktivieren, damit keine Sitzung verloren geht."
+      },
+      {
+        "id": "B",
+        "text": "Den Session-State nach Amazon ElastiCache auslagern und die Instanzen anschließend zustandslos betreiben."
+      },
+      {
+        "id": "C",
+        "text": "Die Gültigkeitsdauer des Stickiness-Cookies auf acht Stunden anheben, damit die Zuordnung länger hält."
+      },
+      {
+        "id": "D",
+        "text": "Die Deregistration Delay der Target Group auf 3.600 Sekunden setzen, damit Sitzungen auslaufen können."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Sticky Sessions sind in elastischen Architekturen ein Anti-Pattern: Sie binden Nutzer an eine Instanz, die jederzeit ersetzt werden kann, und verhindern eine gleichmäßige Verteilung. Der Reliability Pillar empfiehlt ausdrücklich, den State auszulagern — ElastiCache und DynamoDB sind die genannten Ziele. Danach ist jede Instanz austauschbar. (A) funktioniert, kostet aber genau die Elastizität, die die Gruppe haben soll. (C) verlängert nur die Bindung an eine Instanz, die trotzdem terminiert wird. (D) verschiebt die Terminierung um bis zu eine Stunde und lindert damit das Symptom, verhindert den Zustandsverlust aber nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/sticky-sessions.html"
+  },
+  {
+    "seedKey": "saa-c03-q-110",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing",
+    "type": "single",
+    "prompt": "Der ALB-Health-Check einer Anwendung ruft den Pfad /health auf, der eine vollständige Schreib-Lese-Abfrage gegen die RDS-Multi-AZ-Datenbank ausführt. Während eines Datenbank-Failovers fallen alle Instanzen gleichzeitig durch den Health-Check. Die Auto Scaling Group (Health-Check-Typ ELB) ersetzt daraufhin die komplette Flotte, und der Ausfall dauert um ein Vielfaches länger als das Failover selbst.\n\nWelche Änderung verhindert, dass eine vorübergehende Abhängigkeitsstörung die gesamte Flotte reißt?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Health-Check-Grace-Period der Auto Scaling Group von 300 auf 900 Sekunden anheben."
+      },
+      {
+        "id": "B",
+        "text": "Den Unhealthy Threshold der Target Group von zwei auf zehn aufeinanderfolgende Fehlversuche anheben."
+      },
+      {
+        "id": "C",
+        "text": "Den Health-Check-Pfad auf einen Endpunkt umstellen, der nur die lokale Prozessgesundheit prüft."
+      },
+      {
+        "id": "D",
+        "text": "Den Health-Check-Typ der Auto Scaling Group von ELB auf EC2 zurückstellen, damit nichts ersetzt wird."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Ein Health-Check, der eine gemeinsame Abhängigkeit mitprüft, verwandelt jede Störung dieser Abhängigkeit in einen Totalausfall: Alle Ziele fallen gleichzeitig durch, der Load Balancer nimmt sie aus dem Verkehr, und die Auto Scaling Group ersetzt eine Flotte, die eigentlich gesund ist. (C) trennt die Belange — der Load Balancer fragt nur, ob dieser Prozess Requests annehmen kann; die Datenbank wird per CloudWatch-Alarm überwacht. (A) greift nur bei frisch gestarteten Instanzen und hilft laufenden nicht. (B) verschafft Luft, verschiebt die Kaskade aber nur und stumpft die Fehlererkennung dauerhaft ab. (D) stoppt zwar den Austausch, holt aber die alte Lücke zurück: Eine laufende Instanz mit toter Anwendung wird dann nie mehr ersetzt.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html"
+  },
+  {
+    "seedKey": "saa-c03-q-111",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing",
+    "type": "single",
+    "prompt": "Eine IoT-Flotte aus mehreren hunderttausend Geräten hält persistente TCP-Verbindungen zu einem Network Load Balancer in eu-central-1. Für den Regionsausfall soll auf einen identischen NLB in eu-west-1 umgeschaltet werden. Die Geräte-Firmware cacht DNS-Antworten dauerhaft und ignoriert TTLs. Das Umschalten muss innerhalb von Sekunden greifen.\n\nWelche Lösung erfüllt die Anforderung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS Global Accelerator mit zwei statischen Anycast-IPs und je einer Endpoint-Group pro Region."
+      },
+      {
+        "id": "B",
+        "text": "Route-53-Failover-Routing mit einer TTL von zehn Sekunden auf die beiden Network Load Balancer."
+      },
+      {
+        "id": "C",
+        "text": "Ein Network Load Balancer in eu-central-1 mit IP-Zielen in beiden Regionen über VPC-Peering."
+      },
+      {
+        "id": "D",
+        "text": "Eine CloudFront-Distribution mit einer Origin Group und Origin Failover vor beiden Load Balancern."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Global Accelerator gibt der Anwendung zwei statische Anycast-IPs, die sich nie ändern. Das Umschalten passiert im AWS-Backbone hinter diesen IPs — die Geräte müssen nichts neu auflösen, ihr DNS-Cache spielt keine Rolle. (B) ist die klassische Lösung und scheitert hier genau daran: Ein Failover auf DNS-Ebene wirkt erst, wenn der Client neu auflöst, und diese Firmware tut das nicht. (C) scheitert daran, dass Target Groups regional sind — ein NLB kann keine Ziele in einer anderen Region registrieren. (D) beherrscht Origin Failover, verarbeitet aber nur HTTP/HTTPS und ist für persistente TCP-Verbindungen nicht geeignet.",
+    "sourceRef": "https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html"
+  },
+  {
+    "seedKey": "saa-c03-q-112",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Auto Scaling",
+    "type": "multiple",
+    "prompt": "Eine Webanwendung läuft hinter einem Application Load Balancer in einer Auto Scaling Group über drei Availability Zones. Zwei Probleme sind offen: Erstens laufen Instanzen weiter und werden nicht ersetzt, obwohl der Anwendungsprozess abgestürzt ist und der Load Balancer sie als unhealthy führt. Zweitens brechen bei jedem Scale-In laufende Requests hart ab.\n\nWelche ZWEI Maßnahmen beheben genau diese beiden Probleme? (Wähle ZWEI.)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den Health-Check-Typ der Auto Scaling Group von EC2 auf ELB umstellen."
+      },
+      {
+        "id": "B",
+        "text": "Die Deregistration Delay der Target Group über die längste Requestdauer hinaus anheben."
+      },
+      {
+        "id": "C",
+        "text": "Cross-Zone Load Balancing am Application Load Balancer aktivieren."
+      },
+      {
+        "id": "D",
+        "text": "Die Health-Check-Grace-Period der Auto Scaling Group auf 600 Sekunden anheben."
+      },
+      {
+        "id": "E",
+        "text": "Sticky Sessions mit Application-based Cookies an der Target Group aktivieren."
+      }
+    ],
+    "correct": [
+      "A",
+      "B"
+    ],
+    "explanation": "(A) trifft den Kern des ersten Problems: Beim Health-Check-Typ EC2 prüft die Auto Scaling Group nur den Zustand der Instanz selbst — eine laufende Instanz mit toter Anwendung gilt als gesund und wird nicht ersetzt. Erst der Typ ELB übernimmt das Urteil des Load Balancers. (B) löst das zweite Problem: Die Deregistration Delay bestimmt, wie lange bestehende Verbindungen nach dem Abmelden noch weiterlaufen dürfen. (C) ist wirkungslos, weil Cross-Zone beim ALB ohnehin immer aktiv ist. (D) betrifft ausschließlich frisch gestartete Instanzen. (E) bindet Nutzer an Instanzen, die verschwinden — das verschärft die Lage eher, als es sie entschärft.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-health-checks.html"
+  },
+  {
+    "seedKey": "saa-c03-q-113",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing",
+    "type": "single",
+    "prompt": "Ein Unternehmen muss den gesamten ein- und ausgehenden VPC-Traffic durch die lizenzierte Firewall-Appliance eines Drittanbieters leiten. Die Appliance-Flotte soll horizontal skalieren, ausgefallene Appliances sollen automatisch aus dem Pfad genommen werden, und Hin- und Rückweg eines Flows müssen dieselbe Appliance treffen.\n\nWelche Architektur erfüllt diese Anforderungen?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein Network Load Balancer vor der Appliance-Flotte, mit Routen, die den gesamten Traffic über die Appliance-Subnetze führen."
+      },
+      {
+        "id": "B",
+        "text": "Ein Gateway Load Balancer mit einem GWLB-Endpoint je AZ, der den Traffic per GENEVE an die Appliance-Flotte verteilt."
+      },
+      {
+        "id": "C",
+        "text": "AWS Network Firewall mit einem eigenen Firewall-Subnetz je Availability Zone und Suricata-kompatiblen Regeln."
+      },
+      {
+        "id": "D",
+        "text": "Eine Route-Table-Regel, die den gesamten Traffic auf die Elastic Network Interface der Appliance-Instanz zeigt."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Der Gateway Load Balancer ist genau dafür gebaut: Er kapselt den Traffic in GENEVE, verteilt ihn über eine skalierbare, health-gecheckte Appliance-Flotte und hält dabei die Flow-Symmetrie — Hin- und Rückweg landen auf derselben Appliance. Der Einstieg erfolgt über GWLB-Endpoints, die als Routen-Ziel in den Route Tables stehen. (A) war das Muster vor dem GWLB und lässt sich bauen, verlangt aber SNAT oder aufwendiges Routing und garantiert die Symmetrie nicht von selbst. (C) funktioniert und ist hochverfügbar, ist aber der AWS-eigene Dienst — die lizenzierte Appliance des Drittanbieters wird damit gerade nicht eingebunden. (D) kennt keine Redundanz: Die eine ENI ist ein Single Point of Failure ohne jede Skalierung.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/gateway/introduction.html"
+  },
+  {
+    "seedKey": "saa-c03-q-114",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Auto Scaling",
+    "type": "single",
+    "prompt": "Eine Anwendung braucht nach dem Start rund acht Minuten, bis sie Requests bedienen kann — Konfigurationsmanagement und das Füllen eines lokalen Caches dauern so lange. Die Auto Scaling Group nutzt den Health-Check-Typ ELB mit den Standardwerten. Sie terminiert jede neue Instanz nach wenigen Minuten und startet eine neue; die Gruppe erreicht ihre Zielkapazität nie.\n\nWelche Einstellung behebt das Problem?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Deregistration Delay der Target Group vom Standardwert 300 auf 600 Sekunden anheben."
+      },
+      {
+        "id": "B",
+        "text": "Den Unhealthy Threshold der Target Group anheben und das Health-Check-Intervall verlängern."
+      },
+      {
+        "id": "C",
+        "text": "Die Cooldown-Periode der Auto Scaling Group vom Standardwert 300 auf 900 Sekunden anheben."
+      },
+      {
+        "id": "D",
+        "text": "Die Health-Check-Grace-Period der Auto Scaling Group über die Bootstrap-Dauer hinaus anheben."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Die Health-Check-Grace-Period (Default 300 Sekunden) ist genau der Zeitraum nach dem Start, in dem die Auto Scaling Group das Health-Check-Ergebnis noch ignoriert. Ist sie kürzer als der Bootstrap, wird jede Instanz getötet, bevor sie fertig ist — die Startschleife. (D) setzt sie über acht Minuten. (A) betrifft das Abmelden, nicht das Starten. (B) funktioniert als Notbehelf und verzögert das Unhealthy-Urteil, stumpft aber dauerhaft die Fehlererkennung für alle Instanzen ab. (C) ist die häufigste Verwechslung: Die Cooldown-Periode drosselt weitere Scaling-Aktivitäten und gilt zudem nur für Simple Scaling — sie schützt keine startende Instanz vor dem Health-Check.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/health-check-grace-period.html"
+  },
+  {
+    "seedKey": "saa-c03-q-115",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Auto Scaling",
+    "type": "single",
+    "prompt": "Eine Auto Scaling Group nutzt eine Simple-Scaling-Policy: bei über 70 % CPU zwei Instanzen hinzufügen, Standard-Cooldown von 300 Sekunden aktiv. An Aktionstagen verzehnfacht sich der Traffic innerhalb von zehn Minuten. Die Gruppe hängt der Nachfrage hinterher, weil nach jeder Skalierung fünf Minuten Pause folgen; Nutzer sehen Timeouts.\n\nWelche Änderung reagiert am besten auf diesen Lastverlauf?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Cooldown-Periode auf 60 Sekunden verkürzen und die Schrittweite auf sechs Instanzen erhöhen."
+      },
+      {
+        "id": "B",
+        "text": "Predictive Scaling aktivieren, das die Kapazität anhand historischer Lastmuster vorab bereitstellt."
+      },
+      {
+        "id": "C",
+        "text": "Auf eine Target-Tracking-Policy umstellen, die statt des Cooldowns einen Instance Warmup verwendet."
+      },
+      {
+        "id": "D",
+        "text": "Eine Scheduled-Scaling-Aktion einrichten, die die gewünschte Kapazität zu den bekannten Zeiten anhebt."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Der Cooldown ist eine Eigenheit von Simple Scaling: Nach jeder Aktivität blockiert er weitere Skalierungen — auch dann, wenn die Last weiter steigt. Target Tracking kennt diesen Mechanismus nicht; es verwendet stattdessen den Instance Warmup, rechnet startende Instanzen bereits in die Metrik ein und darf währenddessen weiter skalieren. (A) funktioniert und ist ein gängiger Notbehelf, überschießt aber und lässt die Gruppe weiter hinterherlaufen. (B) hilft bei wiederkehrenden Mustern und braucht Historie; ein einzelner Aktionstag ist damit nicht abgedeckt. (D) funktioniert, solange der Zeitpunkt exakt bekannt ist, und bricht, sobald die Last früher oder stärker kommt.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html"
+  },
+  {
+    "seedKey": "saa-c03-q-116",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Auto Scaling",
+    "type": "single",
+    "prompt": "Eine Worker-Flotte in einer Auto Scaling Group liest Aufträge aus einer SQS-Standard-Queue. Die Verarbeitung ist I/O-gebunden: Die CPU-Auslastung bleibt konstant unter 20 %, sodass die CPU-basierte Target-Tracking-Policy nie skaliert. Bei Lastspitzen wächst die Queue auf einen Rückstand von mehreren Stunden.\n\nWelche Skalierungsstrategie passt am besten zu dieser Flotte?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Target-Tracking-Policy auf eine Custom-Metrik aus Queue-Tiefe geteilt durch die Anzahl der InService-Instanzen."
+      },
+      {
+        "id": "B",
+        "text": "Eine Step-Scaling-Policy auf einen CloudWatch-Alarm für ApproximateAgeOfOldestMessage mit festen Schwellen."
+      },
+      {
+        "id": "C",
+        "text": "Eine Scheduled-Scaling-Aktion, die die Worker-Flotte zu den bekannten täglichen Spitzenzeiten auf ein Vielfaches anhebt."
+      },
+      {
+        "id": "D",
+        "text": "Eine Target-Tracking-Policy auf die durchschnittliche Netzwerk-Ein- und -Ausgabe der Instanzen der Gruppe."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "AWS dokumentiert für Queue-basierte Worker genau dieses Muster: ApproximateNumberOfMessagesVisible geteilt durch die Anzahl der InService-Instanzen ergibt den Rückstand pro Instanz. Diese Metrik ist eine Rate und skaliert mit der Flottengröße — das ist die Voraussetzung dafür, dass Target Tracking überhaupt sinnvoll arbeiten kann. (B) funktioniert und wird häufig eingesetzt, arbeitet aber mit absoluten Schwellen, die bei jeder Kapazitätsänderung nachgezogen werden müssen. (C) funktioniert nur, solange die Spitzen im Kalender stehen. (D) ist ein Proxy: Er korreliert vielleicht mit der Last, misst aber nicht den Rückstand, um den es eigentlich geht.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-using-sqs-queue.html"
+  },
+  {
+    "seedKey": "saa-c03-q-117",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Auto Scaling",
+    "type": "single",
+    "prompt": "Worker-Instanzen in einer Auto Scaling Group verarbeiten Aufträge, die bis zu zehn Minuten dauern. Bei jedem Scale-In wird eine Instanz mitten in der Verarbeitung terminiert; der Auftrag bricht ab und wird nach Ablauf des Visibility Timeouts von einem anderen Worker erneut aufgenommen. Der laufende Auftrag soll stattdessen zu Ende gehen dürfen, bevor die Instanz verschwindet.\n\nWelche Lösung erreicht das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Scale-In-Protection für alle Instanzen der Gruppe aktivieren und Scale-In-Ereignisse manuell auslösen."
+      },
+      {
+        "id": "B",
+        "text": "Einen Lifecycle Hook vom Typ Terminating:Wait einrichten, den der Worker nach dem letzten Auftrag abschließt."
+      },
+      {
+        "id": "C",
+        "text": "Die Termination Policy auf OldestInstance setzen, damit vorhersehbar ist, welche Instanz beendet wird."
+      },
+      {
+        "id": "D",
+        "text": "Den Visibility Timeout der Queue auf zwölf Stunden anheben, damit abgebrochene Aufträge nicht sofort zurückkehren."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Ein Lifecycle Hook vom Typ Terminating:Wait pausiert die Terminierung: Die Instanz geht in den Zustand Terminating:Wait, der Worker beendet den laufenden Auftrag und meldet CompleteLifecycleAction — erst dann wird terminiert. Genau dafür ist der Hook da. (A) funktioniert, schaltet Scale-In aber faktisch ab und macht die Gruppe unelastisch. (C) bestimmt nur, welche Instanz es trifft, nicht wann sie sterben darf. (D) kuriert das Symptom in die falsche Richtung: Der Auftrag ist trotzdem abgebrochen, die Nachricht bleibt jetzt aber zwölf Stunden unsichtbar, bevor sie es überhaupt erneut versuchen kann.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html"
+  },
+  {
+    "seedKey": "saa-c03-q-118",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Auto Scaling",
+    "type": "single",
+    "prompt": "Eine bestehende Auto Scaling Group nutzt noch eine Launch Configuration. Das Team möchte künftig eine Mischung aus On-Demand- und Spot-Instanzen über mehrere Instanztypen fahren und neue AMIs kontrolliert per Instance Refresh ausrollen.\n\nWelches Vorgehen erfüllt beide Anforderungen?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Launch Configuration um eine Mixed-Instances-Policy erweitern und Instance Refresh darauf aktivieren."
+      },
+      {
+        "id": "B",
+        "text": "Eine zweite Auto Scaling Group mit Spot-Instanzen anlegen und beide Gruppen an dieselbe Target Group hängen."
+      },
+      {
+        "id": "C",
+        "text": "Die Launch Configuration kopieren und in der Kopie einen Spot-Preis sowie eine Liste von Instanztypen hinterlegen."
+      },
+      {
+        "id": "D",
+        "text": "Die Launch Configuration in ein Launch Template überführen und der Gruppe eine Mixed-Instances-Policy zuweisen."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Launch Configurations sind abgekündigt und erhalten keine neuen Funktionen mehr. Mixed Instances, Instance Refresh und Warm Pools setzen alle ein Launch Template voraus. (D) ist der vorgesehene Weg; die Konsole bietet die Überführung direkt an. (A) ist schlicht nicht möglich: Eine Launch Configuration kennt weder eine Mixed-Instances-Policy noch Instance Refresh. (B) funktioniert und war lange die übliche Umgehung — zwei Gruppen an einer Target Group —, verdoppelt aber den Betriebsaufwand und verteilt die Kapazität nicht dynamisch zwischen On-Demand und Spot. (C) scheitert daran, dass eine Launch Configuration genau einen Instanztyp trägt.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/launch-templates.html"
+  },
+  {
+    "seedKey": "saa-c03-q-119",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Auto Scaling",
+    "type": "single",
+    "prompt": "Eine Anwendung braucht zwölf Minuten bis zur Betriebsbereitschaft; der Großteil entfällt auf das Vorwärmen eines lokalen Caches aus einer externen Datenquelle. Die Lastspitzen sind nicht vorhersehbar und treffen die Gruppe innerhalb von zwei Minuten. Selbst mit Target Tracking kommt die Kapazität zu spät, und dauerhaft auf Spitzenlast zu fahren ist zu teuer.\n\nWelche Lösung verkürzt die Scale-Out-Zeit mit dem geringsten Betriebsaufwand?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Mindestkapazität der Auto Scaling Group dauerhaft auf die erwartete Spitzenlast anheben."
+      },
+      {
+        "id": "B",
+        "text": "Predictive Scaling aktivieren, das die Kapazität anhand historischer Lastmuster vorab bereitstellt."
+      },
+      {
+        "id": "C",
+        "text": "Einen Warm Pool mit vorinitialisierten, gestoppten Instanzen einrichten, aus dem die Gruppe sofort schöpft."
+      },
+      {
+        "id": "D",
+        "text": "Vorgewärmte Instanzen im Zustand Stopped vorhalten und sie per Lambda auf einen CloudWatch-Alarm hin starten."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Ein Warm Pool hält bereits initialisierte Instanzen im Zustand Stopped (oder Hibernated) vor. Bei einem Scale-Out werden sie nur noch gestartet statt neu gebootet — der zwölfminütige Bootstrap entfällt, und im Zustand Stopped fallen keine Instanzstunden an. (A) funktioniert und ist die sicherste, aber teuerste Variante. (B) braucht wiederkehrende Muster; unvorhersehbare Spitzen kann es nicht vorhersagen. (D) funktioniert ebenfalls — es ist im Kern ein selbstgebauter Warm Pool, nur mit eigener Lambda, eigener Zustandshaltung und eigenem Fehlerpfad statt der verwalteten Funktion.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-warm-pools.html"
+  },
+  {
+    "seedKey": "saa-c03-q-120",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Auto Scaling",
+    "type": "single",
+    "prompt": "Ein Team rollt neue AMIs aus, indem es das Launch Template aktualisiert und anschließend die Instanzen der Auto Scaling Group von Hand einzeln terminiert. Während des Rollouts sehen Nutzer sporadisch Fehler, und die Gruppe fällt zeitweise unter die gewünschte Kapazität.\n\nWelches Vorgehen macht den Rollout kontrolliert und managed?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Einen Instance Refresh mit Minimum Healthy Percentage und Checkpoints je Batch auf der Gruppe starten."
+      },
+      {
+        "id": "B",
+        "text": "Die gewünschte Kapazität verdoppeln, die gesunden neuen Instanzen abwarten und danach die alten terminieren."
+      },
+      {
+        "id": "C",
+        "text": "Eine zweite Auto Scaling Group mit dem neuen Launch Template anlegen und den Traffic per Route 53 umschwenken."
+      },
+      {
+        "id": "D",
+        "text": "Die Termination Policy auf OldestLaunchTemplate setzen und die gewünschte Kapazität kurzzeitig anheben."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Instance Refresh ersetzt die Instanzen einer Gruppe batchweise, wartet auf gesunde Ziele und respektiert dabei die Minimum Healthy Percentage — die Kapazität fällt nicht unter die vereinbarte Schwelle. Mit Checkpoints lässt sich der Rollout anhalten und im Fehlerfall zurückrollen. (B) funktioniert als manuelles Blue/Green, verdoppelt aber die Kosten und muss von Hand gesteuert werden. (C) funktioniert ebenfalls und erlaubt sogar einen Canary, hängt aber am DNS-TTL und bringt eine zweite Gruppe zum Pflegen. (D) missbraucht die Termination Policy als Rollout-Werkzeug — das greift, ist aber grob und ohne jede Fehlerkontrolle.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/asg-instance-refresh.html"
+  },
+  {
+    "seedKey": "saa-c03-q-121",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Eine Video-Plattform legt Transkodierungsaufträge in eine SQS-Standard-Queue; die Verarbeitung dauert je nach Datei zwei bis acht Minuten. Der Visibility Timeout der Queue steht unverändert auf dem Standardwert. Das Team stellt fest, dass jedes Video drei- bis viermal transkodiert wird und die Rechenkosten entsprechend explodieren.\n\nWelche Maßnahme behebt die Ursache?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Message Retention Period der Queue vom Standardwert vier Tage auf vierzehn Tage anheben."
+      },
+      {
+        "id": "B",
+        "text": "Den Visibility Timeout über die maximale Verarbeitungsdauer hinaus setzen und bei Bedarf verlängern."
+      },
+      {
+        "id": "C",
+        "text": "Auf eine FIFO-Queue umstellen, deren Content-based Deduplication doppelte Nachrichten unterdrückt."
+      },
+      {
+        "id": "D",
+        "text": "Long Polling mit einer Receive-Wait-Zeit von zwanzig Sekunden auf der Queue aktivieren."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Der Visibility Timeout steht per Default auf 30 Sekunden. Läuft er ab, während der Consumer noch arbeitet, wird die Nachricht wieder sichtbar, und der nächste Worker fängt von vorne an — bei acht Minuten Verarbeitung passiert das mehrfach. (B) setzt ihn über die längste Verarbeitungsdauer (Maximum 12 Stunden); alternativ verlängert der Consumer ihn während der Arbeit per ChangeMessageVisibility als Heartbeat. (A) betrifft nur, wie lange eine unverarbeitete Nachricht in der Queue überlebt. (C) ist die naheliegende Falle: Die FIFO-Deduplizierung unterdrückt doppelte Sende-Vorgänge innerhalb von fünf Minuten — gegen eine erneute Zustellung nach abgelaufenem Visibility Timeout hilft sie nicht. (D) senkt leere Receives und Kosten, berührt das Problem aber nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html"
+  },
+  {
+    "seedKey": "saa-c03-q-122",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Bei jeder Bestellung müssen drei unabhängige Systeme das Ereignis erhalten: Rechnungswesen, Versand und Analytics. Heute ruft der Bestell-Service alle drei synchron auf — fällt eines aus, schlägt die Bestellung fehl. Analytics ist regelmäßig mehrere Tage am Stück in Wartung; in dieser Zeit darf kein Ereignis verloren gehen, und jedes System soll den Rückstand im eigenen Tempo aufholen.\n\nWelche Architektur erfüllt alle Anforderungen?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine gemeinsame SQS-Standard-Queue, aus der alle drei Systeme parallel Nachrichten abholen."
+      },
+      {
+        "id": "B",
+        "text": "Ein EventBridge-Bus mit einer Regel je Zielsystem und den drei Systemen als direkte Targets."
+      },
+      {
+        "id": "C",
+        "text": "Ein SNS-Topic mit den drei Systemen als direkte Subscriber und einer DLQ je Subscription."
+      },
+      {
+        "id": "D",
+        "text": "Ein SNS-Topic mit je einer eigenen SQS-Queue pro Zielsystem, aus der der jeweilige Consumer liest."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Das ist das kanonische Fan-out-Muster: SNS verteilt jedes Ereignis an alle drei Subscriptions, und jede SQS-Queue ist ein eigener, dauerhafter Puffer. Analytics kann tagelang stillstehen — die Nachrichten warten (Retention bis 14 Tage) und werden danach im eigenen Tempo abgearbeitet, ohne die anderen beiden zu bremsen. (A) funktioniert nicht: Eine Queue liefert jede Nachricht an genau einen Consumer; die drei Systeme würden sich die Bestellungen aufteilen, statt sie alle zu bekommen. (B) verteilt zwar korrekt und hat je Target Retries und DLQ, puffert aber nicht — EventBridge gibt nach 24 Stunden auf. (C) verteilt ebenfalls korrekt, kennt aber ebenso keinen Puffer; ein mehrtägiger Ausfall landet bestenfalls in der DLQ.",
+    "sourceRef": "https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html"
+  },
+  {
+    "seedKey": "saa-c03-q-123",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Ein Partner-Event-Bus schiebt in Schüben bis zu 20.000 Ereignisse pro Minute nach EventBridge. Eine Regel ruft direkt eine Lambda-Funktion auf, die die Daten an ein Legacy-System weitergibt, das maximal 50 Anfragen pro Sekunde verkraftet. In den Schüben laufen die Aufrufe in Fehler, und Ereignisse gehen verloren.\n\nWelche Änderung fängt die Schübe ab, ohne dass Ereignisse verloren gehen?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die reservierte Concurrency der Lambda-Funktion anheben, damit alle Ereignisse parallel verarbeitet werden."
+      },
+      {
+        "id": "B",
+        "text": "Ein EventBridge-Archive mit Replay einrichten und fehlgeschlagene Ereignisse später erneut abspielen."
+      },
+      {
+        "id": "C",
+        "text": "Eine SQS-Queue als Target der Regel einsetzen und Lambda mit begrenzter Concurrency daraus lesen lassen."
+      },
+      {
+        "id": "D",
+        "text": "Eine Dead-Letter-Queue je Target konfigurieren, in die fehlgeschlagene Ereignisse geschrieben werden."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "EventBridge ist ein Router, kein Puffer. Es kennt keine Queue-Semantik: Ist das Target zu langsam, wird mit Backoff bis zu 24 Stunden wiederholt — es staut sich aber nichts auf, das der Consumer im eigenen Tempo abholen könnte. Genau dafür schiebt man eine SQS-Queue dazwischen: Sie nimmt den Schub auf, und die Lambda-Funktion leert sie mit reservierter Concurrency in einem Tempo, das das Legacy-System aushält. (A) macht es schlimmer — mehr Parallelität überrollt das Legacy-System erst recht. (B) und (D) funktionieren als Sicherheitsnetz und retten einzelne Ereignisse, glätten die Rate aber nicht und verlangen ein manuelles Nachspielen.",
+    "sourceRef": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+  },
+  {
+    "seedKey": "saa-c03-q-124",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Ein Zahlungsprozess besteht aus drei Schritten: Bestand reservieren, Karte belasten, Bestätigung versenden. Keiner der Schritte ist idempotent — eine doppelte Ausführung belastet die Karte zweimal. Ein Durchlauf dauert etwa 90 Sekunden, das Volumen liegt bei wenigen tausend Vorgängen pro Tag. Gefordert sind Retries, Fehlerbehandlung und eine nachvollziehbare Ausführungshistorie.\n\nWelche Lösung passt?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein Step-Functions-Workflow vom Typ Standard, der eine Exactly-once-Ausführung der Schritte garantiert."
+      },
+      {
+        "id": "B",
+        "text": "Ein Step-Functions-Workflow vom Typ Express, der günstiger abrechnet und unter fünf Minuten Laufzeit bleibt."
+      },
+      {
+        "id": "C",
+        "text": "Eine Kette von Lambda-Funktionen, die einander asynchron aufrufen und den Zustand in DynamoDB ablegen."
+      },
+      {
+        "id": "D",
+        "text": "Eine SQS-FIFO-Queue je Schritt, deren Deduplizierung eine doppelte Verarbeitung zuverlässig verhindert."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Standard-Workflows führen jeden Schritt exactly-once aus — die Voraussetzung, wenn eine Aktion nicht idempotent ist. Sie laufen bis zu einem Jahr, bringen Retry und Catch mit und zeigen jede Ausführung visuell. (B) ist die Falle: Express-Workflows sind günstiger und für 90 Sekunden schnell genug, arbeiten aber at-least-once — bei einem internen Retry wird die Karte zweimal belastet. (C) funktioniert und wird oft so gebaut, verlangt aber Retry-Logik, Fehlerpfade und Zustandshaltung komplett von Hand. (D) verhindert doppelte Sende-Vorgänge innerhalb des Deduplizierungsfensters, nicht die doppelte Verarbeitung einer bereits zugestellten Nachricht.",
+    "sourceRef": "https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html"
+  },
+  {
+    "seedKey": "saa-c03-q-125",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "multiple",
+    "prompt": "Eine SQS-Standard-Queue speist einen Lambda-Consumer. Zwei Anforderungen kommen hinzu: Nachrichten desselben Kunden müssen strikt in der Reihenfolge verarbeitet werden, in der sie gesendet wurden. Und Nachrichten, die fünfmal in Folge fehlschlagen, sollen die Queue nicht länger blockieren, sondern zur Analyse aufbewahrt werden.\n\nWelche ZWEI Maßnahmen setzen das um? (Wähle ZWEI.)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den Visibility Timeout auf zwölf Stunden anheben, damit fehlerhafte Nachrichten seltener zugestellt werden."
+      },
+      {
+        "id": "B",
+        "text": "Auf eine FIFO-Queue umstellen und die Kunden-ID als MessageGroupId der Nachrichten verwenden."
+      },
+      {
+        "id": "C",
+        "text": "Long Polling mit einer Receive-Wait-Zeit von zwanzig Sekunden aktivieren, um leere Receives zu senken."
+      },
+      {
+        "id": "D",
+        "text": "Eine Dead-Letter-Queue vom selben Queue-Typ mit einem maxReceiveCount von fünf an die Queue hängen."
+      },
+      {
+        "id": "E",
+        "text": "Die Message Retention Period der Queue auf vierzehn Tage anheben, damit Nachrichten länger überleben."
+      }
+    ],
+    "correct": [
+      "B",
+      "D"
+    ],
+    "explanation": "(B) liefert die Reihenfolge: Eine FIFO-Queue garantiert sie innerhalb einer MessageGroupId. Die Kunden-ID als Gruppe zu nehmen bedeutet strikte Ordnung je Kunde — und weiterhin Parallelität über verschiedene Kunden hinweg. (D) liefert die Redrive-Policy: Nach dem fünften erfolglosen Empfang (maxReceiveCount) verschiebt SQS die Nachricht in die Dead-Letter-Queue, die denselben Typ haben muss wie die Quell-Queue. (A) verzögert die erneute Zustellung nur und blockiert die Nachricht zusätzlich. (C) betrifft Kosten und Effizienz, nicht die Anforderungen. (E) bewahrt die Nachricht länger auf, nimmt sie aber nicht aus dem Weg — sie wird weiter zugestellt und blockiert weiter.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+  },
+  {
+    "seedKey": "saa-c03-q-126",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Eine Dokumenten-Pipeline schickt Dateien von bis zu 40 MB über eine SQS-Queue an einen Consumer. Die Sende-Aufrufe schlagen fehl. Die bestehende Entkopplung samt Dead-Letter-Queue und der Möglichkeit, den Rückstand zu steuern, soll erhalten bleiben; die Anwendung soll so wenig wie möglich umgebaut werden.\n\nWelche Lösung passt?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Dokumente in Blöcke unterhalb des Nachrichtenlimits zerlegen, einzeln senden und im Consumer wieder zusammensetzen."
+      },
+      {
+        "id": "B",
+        "text": "Die Amazon SQS Extended Client Library nutzen, die die Nutzlast nach S3 legt und eine Referenz sendet."
+      },
+      {
+        "id": "C",
+        "text": "Die Dokumente nach S3 laden und die S3-Event-Notification direkt an die Consumer-Lambda schicken."
+      },
+      {
+        "id": "D",
+        "text": "Die Dokumente vor dem Senden komprimieren, damit sie unter die Größengrenze der Queue passen."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "SQS begrenzt eine Nachricht auf 1 MiB (bis August 2025: 256 KB — ältere Materialien nennen noch den alten Wert). Bei 40-MB-Dokumenten löst die Extended Client Library genau das: Sie legt die Nutzlast in S3 ab und schickt nur eine Referenz durch die Queue; der Consumer holt das Objekt beim Empfang transparent nach. Queue, DLQ und Backlog-Steuerung bleiben unangetastet, der Eingriff in den Code ist minimal. (A) funktioniert, verlangt aber Reihenfolge- und Reassemblierungs-Logik samt Umgang mit fehlenden Blöcken. (C) funktioniert ebenfalls, wirft dabei aber die Queue weg — und mit ihr die DLQ und die Backlog-Steuerung, die ausdrücklich bleiben sollten. (D) ist unzuverlässig: 40 MB große Dokumente lassen sich nicht verlässlich unter 1 MiB drücken.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-s3-messages.html"
+  },
+  {
+    "seedKey": "saa-c03-q-127",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Ein SNS-Topic veröffentlicht sämtliche Bestell-Ereignisse an mehrere Subscriber. Das Fraud-Team interessiert sich nur für Bestellungen über 10.000 EUR, bekommt aber alle Ereignisse in seine SQS-Queue und filtert sie im Consumer-Code aus. Anforderung: Nachrichten, die nicht passen, sollen die Fraud-Queue gar nicht erst erreichen.\n\nWelche Lösung erfüllt das mit dem geringsten Aufwand?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein zweites SNS-Topic nur für hochwertige Bestellungen anlegen, das der Producer zusätzlich beschickt."
+      },
+      {
+        "id": "B",
+        "text": "Eine EventBridge-Regel mit Event-Pattern vor die Fraud-Queue schalten und das Topic dorthin publizieren."
+      },
+      {
+        "id": "C",
+        "text": "Die Nachrichten über einen Filter im Lambda-Event-Source-Mapping der Fraud-Queue aussortieren."
+      },
+      {
+        "id": "D",
+        "text": "Eine Filter Policy an der SNS-Subscription der Fraud-Queue hinterlegen, die nur passende Nachrichten zustellt."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Eine Filter Policy sitzt an der Subscription selbst: SNS wertet die Message Attributes (oder den Message Body) aus und stellt gar nicht erst zu, was nicht passt. Kein Producer-Umbau, kein zusätzlicher Dienst, und die Fraud-Queue bleibt sauber. (A) funktioniert, verlagert die Routing-Entscheidung aber in den Producer und schafft ein zweites Topic zum Pflegen. (B) funktioniert ebenfalls — EventBridge beherrscht Content-based Routing —, bringt aber einen zusätzlichen Hop und einen zweiten Dienst ins Spiel. (C) spart zwar Lambda-Aufrufe, aber die Nachrichten landen weiterhin in der Queue und werden dort abgerechnet; gefordert war ausdrücklich, dass sie die Queue nicht erreichen.",
+    "sourceRef": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html"
+  },
+  {
+    "seedKey": "saa-c03-q-128",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Eine SQS-FIFO-Queue muss 1.500 Nachrichten pro Sekunde aufnehmen; die Reihenfolge je Kunde muss erhalten bleiben. Der Producer sendet heute jede Nachricht mit einem eigenen SendMessage-Aufruf und stößt bei rund 300 Nachrichten pro Sekunde an eine Grenze.\n\nWelche Änderung hebt den Durchsatz mit dem geringsten Eingriff in die Architektur?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Auf eine Standard-Queue umstellen und die Reihenfolge im Consumer über einen Zeitstempel rekonstruieren."
+      },
+      {
+        "id": "B",
+        "text": "Die Anzahl der Consumer-Instanzen erhöhen, damit die Queue schneller abgearbeitet und geleert wird."
+      },
+      {
+        "id": "C",
+        "text": "Nachrichten per SendMessageBatch zu je zehn Stück bündeln, was das FIFO-Limit auf 3.000 pro Sekunde hebt."
+      },
+      {
+        "id": "D",
+        "text": "Mehrere FIFO-Queues anlegen und die Nachrichten anhand der Kunden-ID auf sie verteilen (Sharding)."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Eine FIFO-Queue schafft ohne Batching 300 Nachrichten pro Sekunde. Mit SendMessageBatch — bis zu zehn Nachrichten je Aufruf — sind es 3.000, was die geforderten 1.500 abdeckt; die Reihenfolge innerhalb einer MessageGroupId bleibt beim Batching erhalten. Der Eingriff beschränkt sich auf den Producer-Aufruf. (A) funktioniert und wird gebaut, gibt aber die garantierte Reihenfolge auf und verlagert sie in fehleranfällige Consumer-Logik. (B) hilft nicht: Das Limit sitzt auf der Queue, nicht beim Consumer. (D) funktioniert und skaliert sogar weiter als Batching, verlangt aber eine Routing-Schicht und N Queues samt DLQs im Betrieb.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html"
+  },
+  {
+    "seedKey": "saa-c03-q-129",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Eine SQS-Standard-Queue mit rund 15.000 Nachrichten pro Sekunde speist eine Lambda-Funktion, die Datensätze in DynamoDB schreibt. Der Visibility Timeout ist korrekt gesetzt, kein Consumer stürzt ab — trotzdem tauchen einzelne Datensätze doppelt auf. Die Reihenfolge der Nachrichten spielt fachlich keine Rolle.\n\nWelche Maßnahme ist die richtige Antwort auf dieses Verhalten?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den Consumer idempotent machen, etwa mit einem Conditional Write auf einen eindeutigen Schlüssel."
+      },
+      {
+        "id": "B",
+        "text": "Auf eine FIFO-Queue umstellen, die eine Exactly-once-Verarbeitung der Nachrichten garantiert."
+      },
+      {
+        "id": "C",
+        "text": "Den Visibility Timeout verdoppeln, damit die Nachricht während der Verarbeitung unsichtbar bleibt."
+      },
+      {
+        "id": "D",
+        "text": "Die Nachricht direkt nach dem Empfang löschen und die eigentliche Verarbeitung danach ausführen."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Standard-Queues liefern at-least-once: Eine Nachricht kann in seltenen Fällen mehr als einmal zugestellt werden, auch ohne Fehler auf Consumer-Seite. Das ist kein Bug, sondern die Zusage des Dienstes — die Antwort darauf ist Idempotenz, etwa ein Conditional Write mit attribute_not_exists auf die Message-ID. (B) würde die Duplikate zwar unterbinden, deckelt den Durchsatz aber bei 3.000 Nachrichten pro Sekunde mit Batching; 15.000 sind so nicht zu erreichen, und die Reihenfolge wird gar nicht gebraucht. (C) ist bereits korrekt gesetzt und adressiert eine andere Ursache. (D) verhindert die erneute Zustellung, opfert dafür aber die Zustellgarantie: Stürzt der Consumer nach dem Löschen ab, ist die Nachricht weg.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html"
+  },
+  {
+    "seedKey": "saa-c03-q-130",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung",
+    "type": "single",
+    "prompt": "Eine Anwendung muss je Nutzer eine einmalige Erinnerung zu einem individuell gewählten Zeitpunkt auslösen — bis zu 50.000 offene Erinnerungen, Zeitpunkte teils Wochen in der Zukunft. Heute pollt ein Cron-Job auf einer EC2-Instanz jede Minute eine DynamoDB-Tabelle. Die Lösung soll serverlos sein und ohne selbstgebauten Scheduler auskommen.\n\nWelche Lösung passt?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine EventBridge-Rule mit einem eigenen Cron-Ausdruck je Erinnerung auf dem Default-Event-Bus anlegen."
+      },
+      {
+        "id": "B",
+        "text": "Amazon EventBridge Scheduler mit einem One-Time-Schedule je Erinnerung und der Lambda als Target."
+      },
+      {
+        "id": "C",
+        "text": "Eine SQS-Delay-Queue, in die jede Erinnerung mit der passenden Verzögerung eingestellt wird."
+      },
+      {
+        "id": "D",
+        "text": "Eine Step-Functions-Standard-Ausführung je Erinnerung mit einem Wait-State bis zum Zielzeitpunkt."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "EventBridge Scheduler ist genau dafür gebaut: sehr große Mengen an Schedules, einmalig oder wiederkehrend, mit beliebigem Zeitpunkt, direktem Zielaufruf auf Lambda und automatischer Löschung nach der Ausführung. Kein eigener Scheduler, keine Instanz. (A) skaliert nicht: Regeln je Event Bus sind kontingentiert, 50.000 Cron-Regeln sprengen das. (C) scheitert an einer harten Grenze — SQS-Delay-Queues verzögern maximal 15 Minuten, nicht Wochen. (D) funktioniert tatsächlich: Ein Standard-Workflow läuft bis zu einem Jahr, ein Wait-State bis zum Zielzeitpunkt ist ein dokumentiertes Muster. Es ist hier nur der schwerere Weg — 50.000 offene Ausführungen, abgerechnet je State Transition, gegen einen Dienst, der genau diese Aufgabe verwaltet.",
+    "sourceRef": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+  }
+]

@@ -17,7 +17,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "mkdir -p data && drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "mkdir -p data && tsx src/db/seed.ts",
+    "db:seed": "mkdir -p data && DATABASE_URL=file:./data/certops.db tsx src/db/seed.ts",
     "db:backfill-seed-key": "tsx src/db/backfill-seed-key.ts",
     "db:backfill-seed-key:remote": "tsx src/db/backfill-seed-key-remote.ts",
     "db:migrate:remote": "drizzle-kit migrate --config=drizzle.config.turso.ts",

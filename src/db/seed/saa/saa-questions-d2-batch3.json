@@ -1,0 +1,327 @@
+[
+  {
+    "seedKey": "saa-c03-q-131",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Route 53",
+    "type": "single",
+    "prompt": "Eine Anwendung läuft hinter einem Application Load Balancer und soll unter der nackten Domain example.com erreichbar sein, nicht nur unter www.example.com. Das Team versucht, einen CNAME-Record für example.com auf den DNS-Namen des Load Balancers anzulegen; Route 53 lehnt das ab.\n\nWelche Lösung ist korrekt und verursacht keine zusätzlichen Kosten für die DNS-Abfragen?",
+    "choices": [
+      { "id": "A", "text": "Einen A-Record für example.com anlegen, der auf die aktuellen IP-Adressen des Load Balancers zeigt." },
+      { "id": "B", "text": "Einen Alias-Record vom Typ A für example.com anlegen, der direkt auf den Load Balancer zeigt." },
+      { "id": "C", "text": "Eine EC2-Instanz mit Elastic IP hinter example.com betreiben, die alle Anfragen auf www.example.com umleitet." },
+      { "id": "D", "text": "Eine CloudFront-Distribution vor den Load Balancer setzen und example.com per CNAME darauf zeigen lassen." }
+    ],
+    "correct": ["B"],
+    "explanation": "Ein CNAME darf laut DNS-Spezifikation nicht am Zone Apex stehen — das ist keine AWS-Einschränkung, sondern eine Eigenheit von DNS selbst. Route 53 löst das mit dem Alias-Record: Für den Resolver sieht er aus wie ein A-Record, zeigt intern aber auf eine AWS-Ressource, und Abfragen auf AWS-Ziele sind kostenlos. (A) scheitert daran, dass ein ALB keine festen IP-Adressen hat — sie wechseln, und der Record zeigt irgendwann ins Leere. (C) funktioniert und wird tatsächlich so gebaut, holt sich dafür aber eine Instanz samt Betrieb und Single Point of Failure ins Haus. (D) verschiebt das Problem nur: Auch vor einer CloudFront-Distribution bleibt ein CNAME am Zone Apex unzulässig.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html"
+  },
+  {
+    "seedKey": "saa-c03-q-132",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Route 53",
+    "type": "multiple",
+    "prompt": "Ein Unternehmen betreibt seine Anwendung aktiv in eu-central-1 und hält in eu-west-1 eine identische, laufende Umgebung als Passiv-Standby vor. Fällt die primäre Region aus, soll der Datenverkehr automatisch auf die Standby-Region wechseln — ohne manuellen Eingriff.\n\nWelche ZWEI Route-53-Komponenten sind dafür zwingend erforderlich? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Zwei Records mit der Routing-Policy Failover, einer als Primary und einer als Secondary." },
+      { "id": "B", "text": "Zwei Records mit der Routing-Policy Weighted, gewichtet mit 100 und 0." },
+      { "id": "C", "text": "Zwei Records mit der Routing-Policy Latency-based, je einer pro Region." },
+      { "id": "D", "text": "Ein Health Check auf den primären Endpunkt, der dessen Zustand laufend überwacht." },
+      { "id": "E", "text": "Ein Multivalue-Answer-Record, der beide regionalen Endpunkte gleichzeitig zurückgibt." }
+    ],
+    "correct": ["A", "D"],
+    "explanation": "Failover-Routing ist die einzige Policy, die ein Primary/Secondary-Verhältnis kennt — und sie funktioniert ohne Health Check überhaupt nicht: Der Health Check ist der Motor, der entscheidet, wann Route 53 auf den Secondary umschaltet. (A) und (D) gehören deshalb zwingend zusammen. (B) kennt kein Aktiv/Passiv-Verhältnis; ohne Health Check schaltet gar nichts um, und mit Health Check baut man Failover nur umständlich nach. (C) optimiert Latenz, nicht Verfügbarkeit. (E) verteilt auf bis zu acht gesunde Records, ist aber kein Load Balancer und drückt kein Aktiv/Passiv-Verhältnis aus.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-failover.html"
+  },
+  {
+    "seedKey": "saa-c03-q-133",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Route 53",
+    "type": "single",
+    "prompt": "Ein Unternehmen betreibt identische Anwendungs-Stacks in eu-central-1 und us-east-1. Aus rechtlichen Gründen müssen Anfragen aus der EU zwingend im EU-Stack landen — auch dann, wenn der US-Stack im Einzelfall schneller antworten würde. Alle übrigen Anfragen sollen zum US-Stack gehen.\n\nWelche Routing-Policy erfüllt die Vorgabe?",
+    "choices": [
+      { "id": "A", "text": "Latency-based Routing mit je einem Record pro Region und aktivierten Health Checks." },
+      { "id": "B", "text": "Geoproximity Routing mit einem Bias, der den EU-Stack für europäische Nutzer bevorzugt." },
+      { "id": "C", "text": "Geolocation Routing mit einem Record für den Kontinent Europa und einem Default-Record." },
+      { "id": "D", "text": "Weighted Routing, das den Verkehr im Verhältnis der Nutzerzahlen auf beide Stacks verteilt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Geolocation Routing entscheidet ausschließlich anhand des Standorts des Anfragenden — Kontinent, Land oder US-Bundesstaat — und ist damit das Werkzeug für rechtliche Vorgaben und Data Residency. Der Default-Record fängt alles ab, was keiner Regel entspricht; ohne ihn bekommen unzugeordnete Anfragen gar keine Antwort. (A) optimiert die Latenz und kann eine EU-Anfrage sehr wohl in die USA schicken, wenn die Verbindung dorthin gerade besser ist — genau das, was verboten ist. (B) verschiebt nur die geografische Grenze zwischen den Ressourcen und garantiert keine harte Zuordnung. (D) verteilt nach Quote und ignoriert den Standort vollständig.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-geo.html"
+  },
+  {
+    "seedKey": "saa-c03-q-134",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Route 53",
+    "type": "single",
+    "prompt": "Eine kleine interne Anwendung läuft auf acht EC2-Instanzen mit je einer eigenen öffentlichen IP-Adresse. Das Team möchte die Anfragen über alle gesunden Instanzen streuen und ausgefallene Instanzen automatisch aus der DNS-Antwort nehmen, ohne einen Load Balancer zu bezahlen.\n\nWelche Lösung passt zu dieser Anforderung?",
+    "choices": [
+      { "id": "A", "text": "Multivalue-Answer-Records mit je einem Health Check pro Instanz, die bis zu acht gesunde Adressen zurückgeben." },
+      { "id": "B", "text": "Simple Routing mit allen acht IP-Adressen in einem einzigen Record, die Route 53 in zufälliger Folge zurückgibt." },
+      { "id": "C", "text": "Weighted Routing mit acht gleich gewichteten Records und einem gemeinsamen Health Check für die Instanzen." },
+      { "id": "D", "text": "Latency-based Routing mit acht Records, das dem Client jeweils die nächstgelegene Instanz zurückgibt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Multivalue Answer gibt bis zu acht gesunde Records in zufälliger Reihenfolge zurück und nimmt ungesunde anhand ihrer Health Checks heraus — genau die geforderte Streuung ohne Load Balancer. Wichtig ist die Grenze dieses Werkzeugs: Route 53 sieht keine Last, kennt keine Verbindungen und terminiert nichts. Es ist DNS-Streuung, kein Load Balancing. (B) liefert zwar ebenfalls alle acht Adressen, prüft aber keinen Zustand — eine tote Instanz bleibt in der Antwort. (C) gibt je Antwort nur einen Record zurück, und ein gemeinsamer Health Check kann nicht zwischen den Instanzen unterscheiden. (D) ist für die Wahl zwischen Regionen gedacht, nicht zwischen Instanzen innerhalb einer Region.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-multivalue.html"
+  },
+  {
+    "seedKey": "saa-c03-q-135",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Route 53",
+    "type": "single",
+    "prompt": "Ein Backend läuft in einem privaten Subnetz und ist aus dem Internet nicht erreichbar. Route 53 soll trotzdem ein DNS-Failover auf eine zweite Region auslösen, wenn dieses Backend ausfällt. Ein Endpoint-Health-Check von Route 53 kann die privaten Adressen nicht erreichen.\n\nWie lässt sich der Zustand des Backends dennoch in Route 53 abbilden?",
+    "choices": [
+      { "id": "A", "text": "Einen Endpoint-Health-Check auf die private IP-Adresse des Backends anlegen und die NACL dafür öffnen." },
+      { "id": "B", "text": "Ein NAT Gateway einrichten, über das die Route-53-Health-Checker das private Backend erreichen können." },
+      { "id": "C", "text": "Einen öffentlich erreichbaren Bastion-Host bereitstellen, der den Health Check an das Backend weiterreicht." },
+      { "id": "D", "text": "Einen CloudWatch-Alarm auf eine Metrik des Backends legen und einen darauf basierenden Health Check anlegen." }
+    ],
+    "correct": ["D"],
+    "explanation": "Route 53 kennt drei Arten von Health Checks: Endpoint, Calculated und CloudWatch-Alarm-basiert. Die dritte ist genau für diesen Fall da — die Anwendung meldet eine Metrik nach CloudWatch, ein Alarm bewertet sie, und der Health Check übernimmt dessen Zustand. Die Health-Checker müssen die Ressource dafür nie selbst erreichen. (A) ist nicht möglich: Route-53-Health-Checker sitzen im Internet und erreichen private Adressen grundsätzlich nicht; eine NACL ändert daran nichts. (B) hilft nicht, weil ein NAT Gateway ausgehenden Verkehr ermöglicht, keinen eingehenden. (C) funktioniert und wird gelegentlich gebaut, holt sich dafür aber eine öffentlich erreichbare Komponente samt Angriffsfläche ins Netz — die selbst zum Single Point of Failure wird.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/health-checks-types.html"
+  },
+  {
+    "seedKey": "saa-c03-q-136",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Route 53",
+    "type": "single",
+    "prompt": "Eine Anwendung nutzt Alias-Records auf Application Load Balancer in zwei Regionen, kombiniert mit Latency-based Routing. Als in einer Region alle Ziele hinter dem ALB ausfielen, schickte Route 53 weiterhin Anfragen dorthin. An den Alias-Records waren keine Health Checks konfiguriert.\n\nWelche Einstellung ist hier der von AWS empfohlene Weg?",
+    "choices": [
+      { "id": "A", "text": "Für jeden Load Balancer einen eigenen Endpoint-Health-Check auf dessen DNS-Namen anlegen." },
+      { "id": "B", "text": "Für jede Instanz hinter den Load Balancern einen Health Check anlegen und diese verknüpfen." },
+      { "id": "C", "text": "An den Alias-Records Evaluate Target Health aktivieren, damit Route 53 den Zielzustand übernimmt." },
+      { "id": "D", "text": "Die TTL der Alias-Records auf 30 Sekunden senken, damit Clients schneller neu auflösen." }
+    ],
+    "correct": ["C"],
+    "explanation": "Bei Alias-Records auf AWS-Ziele empfiehlt AWS ausdrücklich Evaluate Target Health statt eines eigenen Health Checks: Route 53 übernimmt den Zustand des Ziels direkt — beim ALB heißt das, ob mindestens ein Ziel in einer Target Group gesund ist. Kein zusätzlicher Health Check, keine Extrakosten, keine zweite Zustandsquelle. (A) funktioniert und wird oft so gebaut, kostet aber je Health Check und schafft eine zweite Wahrheit, die von der des Load Balancers abweichen kann. (B) funktioniert über einen Calculated Health Check, ist aber aufwendig und muss bei jedem Scaling-Ereignis nachgezogen werden. (D) bestimmt nur, wie schnell ein Failover greift — hier gibt es überhaupt keines, weil Route 53 den Zustand gar nicht auswertet.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-values-alias.html"
+  },
+  {
+    "seedKey": "saa-c03-q-137",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Resilienz-Patterns",
+    "type": "multiple",
+    "prompt": "Ein Microservice ruft einen Downstream-Service auf. Sobald dieser kurz überlastet ist, wiederholen alle Clients ihren Aufruf sofort und gleichzeitig — die Last verdoppelt sich, der Downstream-Service bricht vollständig zusammen, und der Ausfall zieht sich über Stunden.\n\nWelche ZWEI Maßnahmen entschärfen dieses Verhalten? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Die Anzahl der Wiederholungsversuche im Client auf unbegrenzt setzen, bis der Aufruf gelingt." },
+      { "id": "B", "text": "Das Timeout der Client-Aufrufe deutlich verlängern, damit weniger Versuche als Fehler zählen." },
+      { "id": "C", "text": "Exponential Backoff verwenden, sodass die Abstände zwischen den Wiederholungen wachsen." },
+      { "id": "D", "text": "Die Downstream-Instanzen dauerhaft auf die dreifache Kapazität skalieren." },
+      { "id": "E", "text": "Jitter auf die Wartezeiten legen, damit die Clients ihre Versuche nicht synchron auslösen." }
+    ],
+    "correct": ["C", "E"],
+    "explanation": "AWS nennt beide Bausteine im Reliability Pillar in einem Atemzug: Exponential Backoff streckt die Abstände zwischen den Versuchen, damit der überlastete Dienst überhaupt Luft bekommt; Jitter würfelt die Wartezeiten auseinander, damit nicht alle Clients gleichzeitig zurückkehren. Ohne Jitter marschiert die ganze Herde nur im größeren Takt gemeinsam los. Beides setzt Idempotenz voraus und braucht eine harte Obergrenze an Versuchen. (A) ist die Ursache des Problems, nicht die Lösung. (B) verzögert die Fehlererkennung und bindet Ressourcen im Client, während der Downstream weiter liegt. (D) funktioniert und kauft Kapazität, kostet aber dauerhaft und verschiebt die Grenze nur — beim nächsten größeren Schub passiert dasselbe.",
+    "sourceRef": "https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html"
+  },
+  {
+    "seedKey": "saa-c03-q-138",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Resilienz-Patterns",
+    "type": "single",
+    "prompt": "Eine Multi-Tenant-SaaS-Plattform bedient 5.000 Kunden aus einem einzigen gemeinsamen Stack. Ein einzelner Kunde kann mit einer fehlerhaften Anfrage die gemeinsame Verarbeitungsschicht in einen Fehlerzustand bringen — dann fallen alle 5.000 Kunden gleichzeitig aus. Der Radius eines solchen Ausfalls soll drastisch kleiner werden.\n\nWelches Architekturmuster erreicht das?",
+    "choices": [
+      { "id": "A", "text": "Die gemeinsame Verarbeitungsschicht horizontal auf mehr Instanzen hinter demselben Load Balancer skalieren." },
+      { "id": "B", "text": "Die Plattform in mehrere unabhängige Zellen aufteilen und jeden Kunden fest genau einer Zelle zuordnen." },
+      { "id": "C", "text": "Ein aggressives Rate Limiting je Kunde einführen, das auffällige Anfragemuster früh drosselt und abweist." },
+      { "id": "D", "text": "Die Verarbeitungsschicht über drei Availability Zones verteilen und Cross-Zone Load Balancing aktivieren." }
+    ],
+    "correct": ["B"],
+    "explanation": "Das ist eine Cell-based Architecture, im Reliability Pillar als Bulkhead-Muster geführt: Jede Zelle ist ein vollständiger, unabhängiger Stack, und ein Kunde lebt in genau einer Zelle. Fällt eine Zelle, trifft es nur deren Kunden — bei zehn Zellen ein Zehntel statt aller. Shuffle Sharding treibt das noch weiter, indem es Kunden auf überlappende Teilmengen verteilt. (A) erhöht die Kapazität, nicht die Isolation: Der fehlerhafte Request trifft weiterhin jede Instanz. (C) funktioniert gegen Lastspitzen und fängt manche Fälle ab, hilft aber nicht gegen eine völlig legitime Anfrage, die schlicht einen Bug auslöst. (D) schützt gegen den Ausfall einer Availability Zone — ein fehlerhafter Request wirkt in allen dreien gleich.",
+    "sourceRef": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_fault_isolation_use_bulkhead.html"
+  },
+  {
+    "seedKey": "saa-c03-q-139",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Resilienz-Patterns",
+    "type": "single",
+    "prompt": "Ein Warm-Standby-Setup hält in der DR-Region eine Auto Scaling Group mit reduzierter Kapazität vor. Der Failover-Plan sieht vor, im Ernstfall über die AWS-APIs zusätzliche Instanzen zu starten, eine Target Group anzulegen und die Route-53-Records zu ändern. In einer Übung schlug der Failover fehl, weil genau diese API-Aufrufe unter der Last des Ereignisses gedrosselt wurden.\n\nWelches Prinzip hätte den Failover gerettet?",
+    "choices": [
+      { "id": "A", "text": "Static Stability — alle nötigen Ressourcen vorab bereitstellen und im Ernstfall nur die Data Plane nutzen." },
+      { "id": "B", "text": "Die API-Aufrufe im Failover-Skript mit Exponential Backoff und deutlich mehr Wiederholungen versehen." },
+      { "id": "C", "text": "Das Failover-Skript aus einer dritten Region heraus ausführen, die vom Ereignis nicht betroffen ist." },
+      { "id": "D", "text": "Ein Service-Quota-Increase für die betroffenen APIs beantragen, damit die Aufrufe nicht gedrosselt werden." }
+    ],
+    "correct": ["A"],
+    "explanation": "AWS nennt das Static Stability: Ein System, das im Failover keine neuen Ressourcen erzeugen muss, hängt nicht von der Control Plane ab — und die Control Plane ist genau der Teil, der unter Stress zuerst nachgibt. Konkret heißt das: Target Groups vorab anlegen, Kapazität bereits laufen lassen, Route-53-Health-Checks statt API-Änderungen nutzen. Der Failover besteht dann nur noch aus Data-plane-Operationen. (B) macht das Skript geduldiger, aber nicht unabhängig — bleibt die API gedrosselt, hilft auch der zwanzigste Versuch nicht. (C) verlagert den Ausführungsort, nicht die Abhängigkeit: Die gedrosselte API sitzt in der Zielregion. (D) hebt Quoten an, ändert aber nichts daran, dass der Failover auf Control-plane-Operationen angewiesen bleibt.",
+    "sourceRef": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_withstand_component_failures_static_stability.html"
+  },
+  {
+    "seedKey": "saa-c03-q-140",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Resilienz-Patterns",
+    "type": "single",
+    "prompt": "Eine Anwendung läuft hinter einem Application Load Balancer über drei Availability Zones. Eine einzelne AZ ist beeinträchtigt: Die Instanzen dort antworten, aber mit stark erhöhter Latenz und sporadischen Fehlern — die Health Checks bestehen sie gerade noch. Der Datenverkehr soll binnen Minuten von dieser AZ weggezogen werden.\n\nWelche Maßnahme erreicht das mit dem geringsten Aufwand?",
+    "choices": [
+      { "id": "A", "text": "Die betroffene Availability Zone aus der Subnetz-Konfiguration des Load Balancers entfernen." },
+      { "id": "B", "text": "Die Instanzen der betroffenen AZ aus der Target Group deregistrieren und die Auto Scaling Group anpassen." },
+      { "id": "C", "text": "Ein regionsweites Failover auf die DR-Region auslösen, bis die Availability Zone wiederhergestellt ist." },
+      { "id": "D", "text": "Einen Zonal Shift im Application Recovery Controller starten, der den Verkehr von der AZ wegleitet." }
+    ],
+    "correct": ["D"],
+    "explanation": "Zonal Shift ist genau für diesen Fall gebaut: eine graue Beeinträchtigung, die die Health Checks nicht sauber auslöst. Ein einziger Aufruf zieht den Verkehr für eine gewählte Dauer von der AZ ab, ohne dass Konfiguration verändert wird — und das Zurückschalten ist ebenso einfach. Zonal Autoshift überlässt diese Entscheidung sogar AWS. (A) funktioniert, ist aber eine Konfigurationsänderung am Load Balancer, die zurückgebaut werden muss und die Kapazitätsverteilung beeinflusst. (B) funktioniert ebenfalls, ist manuell und wird von der Auto Scaling Group unter Umständen wieder rückgängig gemacht. (C) löst das Problem mit dem Vorschlaghammer: Ein Regionsausfall liegt gar nicht vor, und der Failover kostet ungleich mehr.",
+    "sourceRef": "https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-shift.html"
+  },
+  {
+    "seedKey": "saa-c03-q-141",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Resilienz-Patterns",
+    "type": "single",
+    "prompt": "Ein Team hat eine Multi-AZ-Architektur gebaut und will vor dem Go-live belegen, dass sie den Ausfall einer Availability Zone tatsächlich übersteht — mit kontrollierten Experimenten, definierten Abbruchbedingungen und automatischem Stopp, sobald die Anwendung dabei zu weit abrutscht.\n\nWelcher Dienst ist dafür gedacht?",
+    "choices": [
+      { "id": "A", "text": "Amazon CloudWatch Synthetics mit Canaries, die die Anwendung kontinuierlich von außen prüfen." },
+      { "id": "B", "text": "AWS Resilience Hub, das die Architektur gegen definierte RTO- und RPO-Ziele bewertet." },
+      { "id": "C", "text": "AWS Fault Injection Service, der Störungen gezielt einspielt und bei Stop-Bedingungen abbricht." },
+      { "id": "D", "text": "AWS Config mit Regeln, die eine Multi-AZ-Konfiguration der Ressourcen erzwingen." }
+    ],
+    "correct": ["C"],
+    "explanation": "Der Fault Injection Service ist der Chaos-Engineering-Dienst von AWS: Er spielt Störungen kontrolliert ein — Instanzen beenden, eine AZ isolieren, Latenz einfügen — und bricht das Experiment automatisch ab, sobald eine Stop-Condition in Form eines CloudWatch-Alarms auslöst. Genau das geforderte Belegen unter kontrollierten Bedingungen. (A) misst, ob die Anwendung läuft, verursacht aber selbst keine Störung — es beobachtet nur. (B) bewertet die Architektur gegen RTO- und RPO-Ziele und gibt Empfehlungen, löst aber keine echte Störung aus. (D) prüft und erzwingt Konfiguration; dass eine Ressource als Multi-AZ konfiguriert ist, beweist noch lange nicht, dass die Anwendung den AZ-Ausfall überlebt.",
+    "sourceRef": "https://docs.aws.amazon.com/fis/latest/userguide/what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-q-142",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Ein fehlerhaftes Deployment schreibt seit 40 Minuten kaputte Datensätze in eine produktive DynamoDB-Tabelle. Point-in-Time Recovery ist auf der Tabelle aktiviert. Das Team will den Zustand von vor dem Deployment wiederherstellen.\n\nWas passiert bei der Wiederherstellung, und was muss das Team einplanen?",
+    "choices": [
+      { "id": "A", "text": "DynamoDB spult die bestehende Tabelle in-place auf den gewählten Zeitpunkt zurück; die Anwendung bleibt unverändert." },
+      { "id": "B", "text": "DynamoDB legt eine neue Tabelle an; die Anwendung muss darauf umgestellt oder die alte ersetzt werden." },
+      { "id": "C", "text": "DynamoDB stellt nur die Items wieder her, die seit dem gewählten Zeitpunkt verändert wurden, direkt in der Tabelle." },
+      { "id": "D", "text": "DynamoDB spielt die Änderungen aus dem Stream der letzten 40 Minuten rückwärts in die bestehende Tabelle ein." }
+    ],
+    "correct": ["B"],
+    "explanation": "Ein PITR-Restore erzeugt in DynamoDB immer eine NEUE Tabelle — die Quelltabelle bleibt unangetastet. Das ist die zentrale betriebliche Konsequenz: Der Cutover muss geplant werden, und die neue Tabelle braucht ihre eigenen Einstellungen wie Auto Scaling, TTL und Tags. PITR deckt 35 Tage ab, sekundengenau. (A) beschreibt Aurora Backtrack, nicht DynamoDB — und das gibt es ohnehin nur für Aurora MySQL. (C) gibt es nicht: PITR arbeitet nicht selektiv auf Item-Ebene. (D) beschreibt eine Eigenbau-Kompensation über DynamoDB Streams; die leben nur 24 Stunden und sind kein Wiederherstellungswerkzeug.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html"
+  },
+  {
+    "seedKey": "saa-c03-q-143",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Ein Unternehmen sichert heute nur EBS-Volumes über den Data Lifecycle Manager. Neu gefordert sind: eine einheitliche Backup-Strategie über EBS, RDS, DynamoDB und EFS hinweg, zentrale Nachweise über alle Konten der Organisation, sowie Kopien in eine zweite Region und in ein separates Backup-Konto.\n\nWelche Lösung erfüllt das mit dem geringsten Betriebsaufwand?",
+    "choices": [
+      { "id": "A", "text": "AWS Backup mit Backup Plans, organisationsweiten Backup Policies und Cross-Region- wie Cross-Account-Copy." },
+      { "id": "B", "text": "Den Data Lifecycle Manager um Regeln für RDS, DynamoDB und EFS erweitern und Kopien in die zweite Region legen." },
+      { "id": "C", "text": "Je Dienst eine Lambda-Funktion, die per EventBridge-Zeitplan Snapshots erzeugt, kopiert und wieder aufräumt." },
+      { "id": "D", "text": "Je Konto einen eigenen lokalen Backup Plan führen, dessen Ergebnisse regelmäßig ins Sammelkonto kopiert werden." }
+    ],
+    "correct": ["A"],
+    "explanation": "AWS Backup ist der zentrale, dienstübergreifende Backup-Dienst: ein Backup Plan für EBS, RDS, DynamoDB, EFS, FSx und weitere, Cross-Region- und Cross-Account-Copy eingebaut, dazu organisationsweite Backup Policies über AWS Organizations und Audit-Nachweise. (B) ist nicht möglich: Der Data Lifecycle Manager deckt ausschließlich EBS-Snapshots und AMIs ab. (C) funktioniert und war vor AWS Backup die übliche Lösung — bedeutet aber, Snapshot-Erzeugung, Kopie, Retention und Fehlerbehandlung je Dienst selbst zu bauen und zu betreiben. (D) funktioniert ebenfalls, verzichtet aber genau auf die zentrale Steuerung und die organisationsweite Durchsetzung, um die es geht.",
+    "sourceRef": "https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html"
+  },
+  {
+    "seedKey": "saa-c03-q-144",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Ein Finanzdienstleister repliziert einen S3-Bucket in eine zweite Region. Eine interne Vorgabe verlangt eine zugesicherte Replikationszeit: 99,9 % der Objekte müssen binnen 15 Minuten in der Zielregion liegen. Zusätzlich sollen die Objekte, die schon vor Aktivierung der Replikation im Bucket lagen, ebenfalls repliziert werden.\n\nWelche Kombination erfüllt beides?",
+    "choices": [
+      { "id": "A", "text": "Cross-Region Replication mit aktivierter Versionierung und einem CloudWatch-Alarm auf die Replikationslatenz." },
+      { "id": "B", "text": "Same-Region Replication in einen zweiten Bucket, kombiniert mit einer regelmäßigen Kopie per AWS DataSync." },
+      { "id": "C", "text": "Cross-Region Replication und ein Lifecycle-Regelwerk, das ältere Objekte erneut in die Replikation gibt." },
+      { "id": "D", "text": "S3 Replication Time Control für neue Objekte und ein S3-Batch-Replication-Job für den Bestand." }
+    ],
+    "correct": ["D"],
+    "explanation": "Replication Time Control ist die einzige S3-Replikationsvariante mit einem SLA: 99,9 % der Objekte innerhalb von 15 Minuten, samt Metriken und Benachrichtigungen. Die normale Cross-Region Replication ist Best Effort ohne jede Zeitzusage. Und weil Replikation grundsätzlich nur NEUE Objekte erfasst, braucht der Bestand einen S3-Batch-Replication-Job. (A) liefert keine Zusage, sondern nur eine Beobachtung — ein Alarm ist kein SLA. (B) repliziert in dieselbe Region und erfüllt die Anforderung an eine zweite Region nicht. (C) funktioniert nicht: Lifecycle-Regeln verschieben Objekte zwischen Speicherklassen, sie stoßen keine Replikation an.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication-time-control.html"
+  },
+  {
+    "seedKey": "saa-c03-q-145",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Eine Aufsichtsbehörde verlangt, dass der Datenbestand einer RDS-Instanz sieben Jahre lang wiederherstellbar bleibt — monatlich ein Stand, aufbewahrt in einer zweiten Region. Die automatisierten Backups der Instanz stehen bereits auf der maximal möglichen Retention.\n\nWelche Lösung erfüllt die Vorgabe?",
+    "choices": [
+      { "id": "A", "text": "Die Retention der automatisierten Backups von 35 Tagen auf sieben Jahre anheben und Cross-Region aktivieren." },
+      { "id": "B", "text": "Eine Cross-Region Read Replica betreiben und aus dieser monatlich einen Snapshot der Daten ziehen." },
+      { "id": "C", "text": "Monatlich einen manuellen Snapshot erzeugen, in die zweite Region kopieren und dort aufbewahren." },
+      { "id": "D", "text": "Die Datenbank monatlich per Data Lifecycle Manager sichern und die Snapshots dort langfristig ablegen." }
+    ],
+    "correct": ["C"],
+    "explanation": "Automatisierte RDS-Backups sind hart auf 35 Tage gedeckelt — sieben Jahre sind damit ausgeschlossen. Manuelle Snapshots dagegen bleiben bestehen, bis man sie explizit löscht, und lassen sich in eine andere Region kopieren; automatisieren lässt sich das über AWS Backup oder einen EventBridge-Zeitplan. (A) ist schlicht nicht möglich: Der Maximalwert lässt sich nicht überschreiten. (B) funktioniert grundsätzlich, ist aber ein Umweg mit dauerhaft laufender Replica-Instanz und laufenden Kosten für etwas, das ein Snapshot direkt kann. (D) ist nicht möglich: Der Data Lifecycle Manager deckt nur EBS-Snapshots und AMIs ab, keine RDS-Datenbanken.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.html"
+  },
+  {
+    "seedKey": "saa-c03-q-146",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Ein Team argumentiert, ein eigenes Backup für eine DynamoDB-Tabelle sei überflüssig: Ein DynamoDB Stream schreibe ohnehin jede Änderung mit, aus ihm lasse sich jeder frühere Zustand rekonstruieren. Compliance verlangt jedoch einen Stand, der auch nach zwei Jahren noch wiederherstellbar ist.\n\nWarum trägt die Argumentation nicht, und was ist der richtige Weg?",
+    "choices": [
+      { "id": "A", "text": "Streams behalten Änderungen 35 Tage; für zwei Jahre genügt die Kombination aus Stream und Point-in-Time Recovery." },
+      { "id": "B", "text": "Streams behalten Änderungen nur 24 Stunden; für die Langzeit-Aufbewahrung braucht es On-Demand-Backups." },
+      { "id": "C", "text": "Streams erfassen ausschließlich Löschungen; für vollständige Stände braucht es Global Tables in einer zweiten Region." },
+      { "id": "D", "text": "Streams sind auf eine Region beschränkt; für Compliance-Stände braucht es eine Cross-Region-Kopie des Streams." }
+    ],
+    "correct": ["B"],
+    "explanation": "Ein DynamoDB Stream hält seine Einträge genau 24 Stunden vor — danach sind sie weg. Er ist ein Change-Feed für event-getriebene Verarbeitung, kein Backup-Mechanismus. Für Langzeit-Aufbewahrung gibt es On-Demand-Backups: Sie bleiben bestehen, bis man sie explizit löscht, und decken damit auch Zwei-Jahres-Vorgaben ab. Für die jüngsten 35 Tage ist Point-in-Time Recovery das passende Werkzeug. (A) verwechselt die Retention: Die 35 Tage gelten für PITR, nicht für Streams. (C) ist falsch — ein Stream erfasst Inserts, Updates und Deletes; Global Tables sind Replikation, kein Backup. (D) beschreibt eine Eigenschaft, die nicht das Problem ist: Am 24-Stunden-Fenster ändert eine Kopie nichts.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
+  },
+  {
+    "seedKey": "saa-c03-q-147",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Resilienz-Patterns",
+    "type": "single",
+    "prompt": "Die Produktseite eines Shops ruft synchron einen Empfehlungsdienst auf. Ist dieser langsam oder ausgefallen, hängt die gesamte Produktseite und läuft schließlich in ein Timeout — obwohl die Empfehlungen für den Kaufabschluss gar nicht notwendig sind.\n\nWelcher Ansatz macht aus dieser harten Abhängigkeit eine weiche?",
+    "choices": [
+      { "id": "A", "text": "Die Produktseite ohne Empfehlungen ausliefern, sobald der Dienst nicht binnen kurzer Frist antwortet." },
+      { "id": "B", "text": "Den Empfehlungsdienst über drei Availability Zones verteilen und in einer Auto Scaling Group betreiben." },
+      { "id": "C", "text": "Die Aufrufe an den Empfehlungsdienst mit Exponential Backoff und Jitter mehrfach wiederholen." },
+      { "id": "D", "text": "Den Empfehlungsdienst über eine SQS-Queue entkoppeln, aus der die Produktseite die Antwort abholt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Graceful Degradation heißt genau das: eine harte Abhängigkeit in eine weiche verwandeln. Die Seite bekommt ein kurzes Timeout auf den Empfehlungsdienst und liefert bei Fehler oder Verzögerung eine Antwort ohne Empfehlungen aus — gegebenenfalls mit statischen oder zwischengespeicherten Vorschlägen. Der Kern des Geschäfts, der Kauf, bleibt funktionsfähig. (B) macht den Dienst verfügbarer, ändert aber nichts daran, dass die Seite ohne ihn nicht funktioniert; die Abhängigkeit bleibt hart. (C) verlängert im Ausfall sogar die Wartezeit des Nutzers, statt sie zu beenden. (D) entkoppelt technisch, löst ein synchrones Rendering-Problem aber nicht: Die Seite wartet dann eben auf die Queue.",
+    "sourceRef": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_mitigate_interaction_failure_graceful_degradation.html"
+  },
+  {
+    "seedKey": "saa-c03-q-148",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Ein S3-Bucket enthält kritische Audit-Logs. Nach einem Vorfall, bei dem ein kompromittierter IAM-Benutzer Objekte gelöscht hat, soll das dauerhafte Löschen von Objektversionen und das Abschalten der Versionierung eine zusätzliche Hürde bekommen, die ein gestohlener Access Key allein nicht überwindet.\n\nWelche Maßnahme erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "Eine Bucket-Policy, die s3:DeleteObject für alle Principals außer der Administrator-Rolle verweigert." },
+      { "id": "B", "text": "Eine Lifecycle-Regel, die gelöschte Objektversionen 90 Tage aufbewahrt, bevor sie entfernt werden." },
+      { "id": "C", "text": "Server-Side Encryption mit einem Customer Managed Key, dessen Key Policy das Löschen einschränkt." },
+      { "id": "D", "text": "Versionierung aktivieren und MFA Delete einschalten, sodass zusätzlich ein MFA-Code nötig wird." }
+    ],
+    "correct": ["D"],
+    "explanation": "MFA Delete verlangt für das dauerhafte Löschen einer Objektversion und für das Abschalten der Versionierung einen gültigen MFA-Code — ein gestohlener Access Key allein reicht nicht mehr. Es setzt aktivierte Versionierung voraus und kann nur vom Root-User des Bucket-Besitzers eingeschaltet werden. (A) funktioniert gegen unprivilegierte Principals, hilft aber nichts, wenn genau die Administrator-Rolle kompromittiert ist. (B) verzögert die endgültige Entfernung, verhindert das Löschen nicht und lässt sich vom Angreifer selbst wieder ändern. (C) schützt die Vertraulichkeit der Daten, nicht ihre Existenz — verschlüsselte Objekte lassen sich genauso löschen wie unverschlüsselte.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html"
+  },
+  {
+    "seedKey": "saa-c03-q-149",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Resilienz-Patterns",
+    "type": "single",
+    "prompt": "Ein Betreiber löst Multi-Region-Failover heute über Route-53-Health-Checks aus. Zweimal hat ein fehlerhafter Health Check ein unbeabsichtigtes Failover ausgelöst; einmal wären beinahe beide Regionen gleichzeitig abgeschaltet worden. Gefordert ist ein Failover, das ein Mensch bewusst auslöst, das auch während einer regionalen Störung noch bedienbar bleibt und das unmögliche Zustände ausschließt.\n\nWelche Lösung erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "Die Health Checks durch CloudWatch-Alarme mit strengeren Schwellwerten und längeren Auswertungsfenstern ersetzen." },
+      { "id": "B", "text": "Ein Lambda-basiertes Failover-Skript, das die Route-53-Records per API umschreibt und vorab eine Freigabe einholt." },
+      { "id": "C", "text": "Routing Controls im Application Recovery Controller mit Safety Rules, bedienbar über fünf regionale Endpoints." },
+      { "id": "D", "text": "Weighted Routing mit manueller Gewichtsanpassung, die ein Bereitschaftshabender im Ernstfall selbst vornimmt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Routing Controls im Application Recovery Controller sind bewusst manuelle Schalter: Ein Mensch entscheidet, kein Health Check. Sie liegen auf einem Cluster aus fünf redundanten regionalen Endpoints und bleiben deshalb auch dann bedienbar, wenn eine Region gestört ist. Safety Rules verhindern genau die unmöglichen Zustände — etwa, dass beide Regionen gleichzeitig abgeschaltet werden. (A) macht die Health Checks träger und damit weniger fehleranfällig, überlässt die Entscheidung aber weiterhin einer Automatik. (B) funktioniert, hängt im Ernstfall aber an genau den Control-plane-APIs, die unter Last als Erstes nachgeben. (D) funktioniert und wird gebaut, kennt aber keine Absicherung gegen widersprüchliche Zustände und wirkt erst, wenn die Resolver neu auflösen.",
+    "sourceRef": "https://docs.aws.amazon.com/r53recovery/latest/dg/routing-control.html"
+  }
+]

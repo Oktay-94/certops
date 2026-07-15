@@ -1,0 +1,446 @@
+[
+  {
+    "seedKey": "saa-c03-q-240",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Ein Aurora-PostgreSQL-Cluster verarbeitet eine schreibintensive Analytics-Last. Die Kostenaufschlüsselung zeigt: Die I/O-Gebühren machen etwa 45 % der gesamten Aurora-Rechnung aus, der Rest verteilt sich auf Instanzen und Storage. Die Kosten sollen ohne Leistungseinbußen sinken.\n\nWelche Maßnahme ist die richtige?",
+    "choices": [
+      { "id": "A", "text": "Die Cluster-Konfiguration auf Aurora I/O-Optimized umstellen, das keine separaten I/O-Gebühren berechnet." },
+      { "id": "B", "text": "Die Instanzklasse des Writers vergrößern, damit die Anfragen schneller abgearbeitet werden und weniger I/O anfällt." },
+      { "id": "C", "text": "Zusätzliche Aurora Replicas ergänzen, die einen Teil der Leselast vom Writer nehmen und die I/O-Last verteilen." },
+      { "id": "D", "text": "Den Cluster auf RDS for PostgreSQL migrieren, dessen EBS-basierter Storage keine Gebühren pro I/O-Vorgang kennt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Aurora I/O-Optimized ist genau für dieses Profil gebaut: Die Konfiguration berechnet keine separaten I/O-Gebühren mehr, sondern höhere Instanz- und Storage-Sätze. AWS nennt als Faustregel, dass sich der Wechsel lohnt, sobald die I/O-Kosten mehr als 25 % der gesamten Aurora-Rechnung ausmachen — bei 45 % liegt der Fall klar darüber, und die Ersparnis kann bis zu 40 % betragen. Die Umstellung ist eine Konfigurationsänderung ohne Leistungseinbußen. (B) kann die Laufzeit verbessern, senkt aber die Zahl der I/O-Vorgänge nicht — dieselben Daten müssen gelesen und geschrieben werden, und die Instanzkosten steigen zusätzlich. (C) verlagert Leselast, erzeugt dabei aber eigene I/O-Vorgänge auf den Replicas und mehr Instanzstunden — die I/O-Rechnung sinkt dadurch nicht. (D) funktioniert und beseitigt die per-I/O-Abrechnung tatsächlich, ist aber eine vollständige Migration mit Verlust der Aurora-Eigenschaften — ein radikaler Umbau für etwas, das ein Konfigurationsschalter erledigt.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-storage-type.html"
+  },
+  {
+    "seedKey": "saa-c03-q-241",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Ein Team betreibt 15 Aurora-PostgreSQL-Cluster für Feature-Branches. Jeder Cluster wird nur wenige Stunden pro Woche tatsächlich abgefragt, muss aber jederzeit erreichbar sein — die Entwickler wollen keine Datenbank manuell starten müssen. Eine Wartezeit von einigen Sekunden beim ersten Zugriff nach einer Pause ist akzeptabel.\n\nWelche Konfiguration senkt die Kosten am stärksten?",
+    "choices": [
+      { "id": "A", "text": "Die Cluster auf die kleinstmögliche provisionierte Instanzklasse setzen und dauerhaft laufen lassen." },
+      { "id": "B", "text": "Aurora Serverless v2 mit einer Mindestkapazität von 0 ACU, sodass die Cluster bei Inaktivität pausieren." },
+      { "id": "C", "text": "Die Cluster per Lambda-Automatisierung abends stoppen und morgens automatisiert wieder starten lassen." },
+      { "id": "D", "text": "Reserved Instances über ein Jahr für die 15 Cluster erwerben, deren Rabatt die Grundkosten deutlich senkt." }
+    ],
+    "correct": ["B"],
+    "explanation": "Aurora Serverless v2 kann seit November 2024 auf 0 ACU herunterskalieren: Bei Inaktivität pausiert die Datenbank vollständig, es fallen nur noch Storage-Kosten an, und beim ersten Zugriff nimmt sie den Betrieb automatisch wieder auf — typischerweise in etwa 15 Sekunden. Genau das trifft das Szenario: keine manuelle Interaktion, jederzeit erreichbar, wenige Sekunden Wartezeit akzeptabel. Bei 15 kaum genutzten Clustern ist das der mit Abstand größte Hebel. (A) senkt den Stundenpreis, aber jeder Cluster läuft weiterhin 168 Stunden pro Woche für ein paar Stunden Nutzung — die Verschwendung bleibt. (C) funktioniert für RDS, geht bei Aurora aber nicht in derselben Form; zudem müssten die Entwickler außerhalb der Zeitfenster warten oder manuell starten. (D) zementiert den Fehler mit Rabatt: ein Jahres-Commitment auf Kapazität, die zu über 95 % leerläuft.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html"
+  },
+  {
+    "seedKey": "saa-c03-q-242",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Eine DynamoDB-Tabelle archiviert abgeschlossene Bestellungen. Sie umfasst 12 TB und wächst weiter; gelesen wird sie selten, geschrieben nur beim Abschluss einer Bestellung. Die Kostenanalyse zeigt: Rund 80 % der Tabellenkosten entfallen auf Storage, nur 20 % auf Lese- und Schreibdurchsatz. Die Daten müssen abfragbar bleiben.\n\nWelche Maßnahme senkt die Kosten?",
+    "choices": [
+      { "id": "A", "text": "Die Tabelle auf den On-Demand-Kapazitätsmodus umstellen, dessen nutzungsabhängige Abrechnung die Storage-Kosten senkt." },
+      { "id": "B", "text": "Eine TTL auf den Items setzen, damit alte Bestellungen nach Ablauf automatisch und kostenfrei entfernt werden." },
+      { "id": "C", "text": "Die Tabellenklasse auf DynamoDB Standard-Infrequent Access umstellen, deren Storage-Preis deutlich niedriger liegt." },
+      { "id": "D", "text": "Die Bestellungen nach S3 Glacier exportieren und in DynamoDB nur noch die Objektreferenzen der Bestellungen halten." }
+    ],
+    "correct": ["C"],
+    "explanation": "Die Standard-IA-Tabellenklasse ist exakt für dieses Profil gebaut: Sie senkt den Storage-Preis erheblich (bis zu 60 %) und erhöht im Gegenzug die Kosten pro Lese- und Schreibvorgang. AWS nennt als Faustregel den Wechsel, sobald die Storage-Kosten mehr als 50 % der Durchsatzkosten ausmachen — bei einem Verhältnis von 80 zu 20 liegt der Fall deutlich darüber. Die Tabelle bleibt voll abfragbar, die Umstellung ist eine Konfigurationsänderung. (A) verwechselt die Kostenarten: Der Kapazitätsmodus betrifft ausschließlich den Durchsatz — an den 80 % Storage-Kosten ändert er nichts. (B) senkt die Storage-Kosten wirksam und ist kostenlos, verstößt aber gegen die Anforderung: Die Bestellungen müssen abfragbar bleiben, dürfen also nicht gelöscht werden. (D) senkt die Kosten am stärksten, opfert aber genau die Abfragbarkeit — Glacier-Objekte lassen sich nicht wie DynamoDB-Items abfragen.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.tableclasses.html"
+  },
+  {
+    "seedKey": "saa-c03-q-243",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Eine DynamoDB-Tabelle bedient eine Ticketing-Plattform. Die Last ist extrem unregelmäßig: Wochenlang wenige Anfragen, dann bei einem Vorverkauf für Minuten das Hundertfache. Heute läuft die Tabelle im Provisioned-Modus mit Auto Scaling; bei jedem Vorverkauf kommt es zu Throttling, und zwischen den Vorverkäufen wird ungenutzte Kapazität bezahlt.\n\nWelche Konfiguration passt zu diesem Profil?",
+    "choices": [
+      { "id": "A", "text": "Die provisionierte Kapazität dauerhaft auf die Spitzenlast des größten bisherigen Vorverkaufs anheben." },
+      { "id": "B", "text": "Reserved Capacity für die Tabelle erwerben, deren Rabatt die Kosten der bereitgestellten Kapazität senkt." },
+      { "id": "C", "text": "Die Ziel-Auslastung des Auto Scaling deutlich senken, damit früher und aggressiver nachskaliert wird." },
+      { "id": "D", "text": "Auf den On-Demand-Kapazitätsmodus wechseln, der ohne Kapazitätsplanung nach tatsächlichem Verbrauch abrechnet." }
+    ],
+    "correct": ["D"],
+    "explanation": "On-Demand ist für genau dieses Profil gebaut: keine Kapazitätsplanung, sofortige Bedienung sprunghafter Last, Abrechnung pro Anfrage. In den wochenlangen Ruhephasen kostet die Tabelle fast nichts, und der Vorverkaufs-Spike wird ohne Throttling bedient. Seit der Preissenkung um 50 % im November 2024 ist On-Demand zudem der von AWS empfohlene Standardmodus für die meisten Workloads — der frühere Preisnachteil gegenüber Provisioned ist weitgehend geschmolzen. (A) funktioniert zuverlässig und ist die teuerste Variante: Die Jahresspitze wird an jedem leeren Tag mitbezahlt. (B) verschärft das Problem sogar: Reserved Capacity ist ein Commitment auf dauerhaft bereitgestellte Kapazität — das Gegenteil dessen, was eine sporadische Last braucht. (C) mildert nur: Auto Scaling reagiert über CloudWatch-Alarme mit Minuten Verzögerung, während ein Vorverkaufs-Spike in Sekunden aufläuft.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html"
+  },
+  {
+    "seedKey": "saa-c03-q-244",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Eine DynamoDB-Tabelle speichert Sitzungs-Token, die nach 24 Stunden fachlich wertlos sind. Heute löscht ein nächtlicher Lambda-Job die abgelaufenen Items per Scan und BatchWriteItem. Die Kostenanalyse zeigt, dass dieser Aufräum-Job einen erheblichen Teil der verbrauchten Kapazitätseinheiten der Tabelle ausmacht.\n\nWelche Maßnahme beseitigt diese Kosten?",
+    "choices": [
+      { "id": "A", "text": "Time to Live auf einem Ablaufzeitstempel-Attribut aktivieren, das die abgelaufenen Items ohne Kapazitätsverbrauch entfernt." },
+      { "id": "B", "text": "Den Aufräum-Job auf Query statt Scan umstellen, damit deutlich weniger Kapazitätseinheiten pro einzelnem Durchlauf verbraucht werden." },
+      { "id": "C", "text": "Die Tabellenklasse auf Standard-Infrequent Access umstellen, deren niedrigerer Storage-Preis die Aufräumkosten kompensiert." },
+      { "id": "D", "text": "Den Aufräum-Job in Zeitfenster mit geringer Last verlegen, damit die Kapazität der Tabelle günstiger ausgelastet wird." }
+    ],
+    "correct": ["A"],
+    "explanation": "DynamoDB Time to Live löscht Items, deren Ablaufzeitstempel überschritten ist, automatisch im Hintergrund — und zwar ohne Verbrauch von Schreibkapazität. Die Kosten des Aufräum-Jobs entfallen damit vollständig, ebenso die Lambda-Kosten und die Scan-Last. Genau dafür gibt es das Feature. (B) reduziert den Verbrauch spürbar, setzt aber einen passenden Index voraus und kostet weiterhin Lese- und vor allem Schreibkapazität für jedes gelöschte Item — die Ursache bleibt. (C) verwechselt die Kostenarten: Standard-IA senkt den Storage-Preis und erhöht die Durchsatzkosten — bei einem durchsatzintensiven Aufräum-Job wird es damit sogar teurer. (D) verschiebt die Last zeitlich, verbraucht aber dieselben Kapazitätseinheiten; DynamoDB rechnet nach Verbrauch ab, nicht nach Tageszeit.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html"
+  },
+  {
+    "seedKey": "saa-c03-q-245",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Ein Team stoppt seine RDS-for-MySQL-Testdatenbank freitags manuell und startet sie montags wieder, um Kosten zu sparen. Über die Weihnachtsfeiertage wurde die Datenbank für drei Wochen gestoppt — nach der Rückkehr stellte das Team fest, dass sie die ganze Zeit gelaufen und berechnet worden war.\n\nWarum, und wie wird das künftig verhindert?",
+    "choices": [
+      { "id": "A", "text": "Gestoppte RDS-Instanzen werden weiterhin voll berechnet; nur ein Snapshot mit anschließender Löschung spart tatsächlich Kosten." },
+      { "id": "B", "text": "Ein automatisches Backup-Fenster hat die Instanz gestartet; das Backup-Fenster muss deaktiviert werden." },
+      { "id": "C", "text": "Ein ausstehendes Wartungsereignis hat die Instanz gestartet; die Auto Minor Version Upgrades müssen abgeschaltet werden." },
+      { "id": "D", "text": "RDS startet gestoppte Instanzen nach spätestens 7 Tagen automatisch; ein Scheduler muss sie danach erneut stoppen." }
+    ],
+    "correct": ["D"],
+    "explanation": "RDS erlaubt das Stoppen einer Instanz für maximal sieben aufeinanderfolgende Tage. Danach startet AWS sie automatisch wieder — damit ausstehende Wartungsarbeiten angewendet werden können. Über drei Wochen lief die Datenbank also den größten Teil der Zeit. Die Lösung ist Automatisierung: Ein Scheduler (etwa der AWS Instance Scheduler oder eine EventBridge-gesteuerte Lambda) stoppt die Instanz nach jedem automatischen Neustart erneut. Für längere Pausen ist der saubere Weg ein finaler Snapshot mit anschließender Löschung der Instanz. (A) ist sachlich falsch: Für gestoppte RDS-Instanzen fallen keine Instanzstunden mehr an — nur Storage, Snapshots und die zugewiesene öffentliche IPv4-Adresse werden weiter berechnet. (B) und (C) benennen einen realen Nebeneffekt an der falschen Stelle: Wartungsarbeiten sind der Grund für die 7-Tage-Regel, aber weder das Backup-Fenster noch Minor-Version-Upgrades lassen sich so abschalten, dass die Instanz gestoppt bleibt.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html"
+  },
+  {
+    "seedKey": "saa-c03-q-246",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen betreibt mehrere RDS-for-MySQL-5.7-Instanzen samt Multi-AZ-Standby und Read Replicas. Auf der Rechnung erscheint seit einiger Zeit ein wachsender Posten für Extended Support, der pro vCPU-Stunde berechnet wird und sich zum 1. März 2026 verdoppelt hat. Die Kosten sollen dauerhaft verschwinden.\n\nWelche Maßnahme erreicht das?",
+    "choices": [
+      { "id": "A", "text": "Reserved Instances für die betroffenen Datenbanken kaufen, deren Rabatt auch die Extended-Support-Gebühren abdeckt." },
+      { "id": "B", "text": "Die Instanzen per Blue/Green Deployment auf eine unterstützte MySQL-Version aktualisieren." },
+      { "id": "C", "text": "Die Instanzklassen auf weniger vCPUs herunterdimensionieren, damit der Posten pro vCPU-Stunde geringer ausfällt." },
+      { "id": "D", "text": "Die Read Replicas abschalten, da Extended Support nur für zusätzliche Leseinstanzen eines Clusters berechnet wird." }
+    ],
+    "correct": ["B"],
+    "explanation": "Extended Support ist die Gebühr dafür, dass AWS eine Major Version nach ihrem regulären Ende weiterpflegt. Sie verschwindet nur auf einem Weg: durch das Upgrade auf eine unterstützte Version. Blue/Green Deployments sind dafür der von AWS vorgesehene Weg — eine gespiegelte Umgebung wird aktualisiert und getestet, der Umschwenk erfolgt mit minimaler Ausfallzeit. (A) beruht auf dem zentralen Irrtum dieser Frage: Extended-Support-Gebühren werden von Reserved Instances und Savings Plans nicht rabattiert — das Commitment senkt nur den Instanzpreis. (C) reduziert den Betrag, weil die Gebühr pro vCPU-Stunde anfällt, beseitigt ihn aber nicht — und opfert dafür Leistung. (D) senkt den Betrag ebenfalls, beruht aber auf einer falschen Begründung: Extended Support wird für jede betroffene Instanz berechnet, einschließlich Multi-AZ-Standby und Read Replicas — die primären Instanzen bleiben also weiterhin gebührenpflichtig.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/extended-support.html"
+  },
+  {
+    "seedKey": "saa-c03-q-247",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Eine RDS-for-PostgreSQL-Produktionsdatenbank läuft rund um die Uhr im Multi-AZ-Betrieb und hat seit zwei Jahren dieselbe Instanzklasse. Ein Wechsel der Engine oder der Größe ist nicht geplant. Die Datenbankkosten sollen mit einem Commitment gesenkt werden.\n\nWelche Option ist die richtige?",
+    "choices": [
+      { "id": "A", "text": "Ein Compute Savings Plan über drei Jahre, dessen breite Abdeckung auch die Datenbankinstanzen einschließt." },
+      { "id": "B", "text": "Die Datenbank auf Aurora Serverless v2 umstellen, dessen bedarfsgerechte Skalierung die Kosten automatisch senkt." },
+      { "id": "C", "text": "RDS Reserved Instances über einen Zeitraum von einem oder drei Jahren für die genutzte Instanzklasse erwerben." },
+      { "id": "D", "text": "Die Multi-AZ-Bereitstellung auf Single-AZ zurückbauen, wodurch die Instanzkosten der Datenbank halbiert werden." }
+    ],
+    "correct": ["C"],
+    "explanation": "RDS Reserved Instances sind das passende Instrument für eine stabile, dauerhaft laufende Produktionsdatenbank: ein Commitment über ein oder drei Jahre auf die genutzte Instanzklasse, mit erheblichem Rabatt gegenüber On-Demand. Innerhalb der Instanzfamilie besteht sogar eine gewisse Größenflexibilität. Alternativ deckt der neuere Database Savings Plan dieselbe Last mit einem flexibleren Commitment ab. (A) enthält den zentralen Irrtum: Compute Savings Plans decken EC2, Fargate und Lambda ab — RDS gehört ausdrücklich nicht dazu; das Commitment liefe ins Leere. (B) passt nicht zum Lastprofil: Aurora Serverless spielt seine Stärke bei schwankender oder sporadischer Last aus; bei konstanter 24/7-Last ist eine provisionierte Instanz mit RI in aller Regel günstiger. (D) senkt die Kosten tatsächlich und opfert dafür die Hochverfügbarkeit einer Produktionsdatenbank — ein Tausch, den niemand verlangt hat.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithReservedDBInstances.html"
+  },
+  {
+    "seedKey": "saa-c03-q-248",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "single",
+    "prompt": "Ein Redshift-Cluster dient ausschließlich einem monatlichen Reporting-Lauf: Wenige Tage im Monat laufen intensive Abfragen, den Rest der Zeit ist der Cluster praktisch untätig, wird aber durchgehend berechnet. Das Team will die Kosten an die tatsächliche Nutzung koppeln, ohne die Abfragen umzuschreiben.\n\nWelche Lösung passt?",
+    "choices": [
+      { "id": "A", "text": "Reserved Nodes für den bestehenden Cluster erwerben, deren Rabatt die Kosten der ungenutzten Zeit spürbar reduziert." },
+      { "id": "B", "text": "Den Cluster verkleinern und für den Reporting-Lauf jeweils per Elastic Resize temporär vergrößern." },
+      { "id": "C", "text": "Die Reporting-Abfragen auf Athena umstellen, das die Daten direkt und nutzungsabhängig aus S3 abfragt." },
+      { "id": "D", "text": "Auf Amazon Redshift Serverless wechseln, das nur die tatsächlich verbrauchte Rechenkapazität abrechnet." }
+    ],
+    "correct": ["D"],
+    "explanation": "Redshift Serverless rechnet nach tatsächlich verbrauchter Rechenkapazität ab und fährt zwischen den Abfragen herunter — genau die geforderte Kopplung an die Nutzung. Da es dieselbe Redshift-Engine und dieselbe SQL-Schnittstelle nutzt, bleiben die Abfragen unverändert. Für ein Muster aus wenigen intensiven Tagen und langer Untätigkeit ist das der größte Hebel. (A) verschlimmert die Grundlogik: Reserved Nodes sind ein Commitment auf dauerhaft laufende Kapazität — man rabattiert Leerlauf, statt ihn zu beenden. (B) funktioniert und reduziert die Grundkosten, lässt den Cluster aber weiterhin durchgehend laufen und erfordert Orchestrierung um jeden Reporting-Lauf herum. (C) funktioniert für viele Analytics-Fälle, bedeutet hier aber genau den Umbau, der ausgeschlossen wurde: andere Engine, anderes SQL-Dialekt-Verhalten, Umschreiben der Abfragen und Umstrukturieren der Daten in S3.",
+    "sourceRef": "https://docs.aws.amazon.com/redshift/latest/mgmt/serverless-considerations.html"
+  },
+  {
+    "seedKey": "saa-c03-q-249",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "type": "multiple",
+    "prompt": "Eine DynamoDB-Tabelle protokolliert Geräte-Events. Sie ist auf 9 TB angewachsen, wobei rund 70 % der Tabellenkosten auf Storage entfallen. Events, die älter als 90 Tage sind, werden fachlich nicht mehr benötigt und dürfen entfallen; jüngere Events müssen abfragbar bleiben. Die Zugriffslast ist gering und gleichmäßig.\n\nWelche ZWEI Maßnahmen senken die Kosten? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Time to Live auf einem Ablaufattribut aktivieren, das Events nach 90 Tagen ohne Kapazitätsverbrauch löscht." },
+      { "id": "B", "text": "Die Tabelle auf den On-Demand-Kapazitätsmodus umstellen, dessen Abrechnung die Storage-Kosten der Tabelle reduziert." },
+      { "id": "C", "text": "Die Tabellenklasse auf DynamoDB Standard-Infrequent Access umstellen, deren Storage-Preis deutlich niedriger liegt." },
+      { "id": "D", "text": "Einen Global Secondary Index auf das Zeitstempel-Attribut anlegen, über den alte Events effizienter gelöscht werden." },
+      { "id": "E", "text": "Die Tabelle in DynamoDB Global Tables überführen, deren Replikation die Storage-Kosten auf mehrere Regionen verteilt." }
+    ],
+    "correct": ["A", "C"],
+    "explanation": "Beide Maßnahmen greifen am dominierenden Kostenblock an, dem Storage. (A) reduziert die Datenmenge selbst: TTL löscht Items nach Ablauf automatisch im Hintergrund und verbraucht dabei keine Schreibkapazität — bei einer 90-Tage-Frist schrumpft die Tabelle dauerhaft auf ihr sinnvolles Volumen. (C) senkt den Preis pro verbleibendem GB: Standard-IA ist genau dann angezeigt, wenn Storage mehr als 50 % der Kosten ausmacht — bei 70 % und geringer, gleichmäßiger Zugriffslast ist der höhere Durchsatzpreis leicht verkraftbar. (B) betrifft ausschließlich den Durchsatz; die 70 % Storage-Kosten bleiben unberührt. (D) kostet zusätzliche Kapazität und zusätzlichen Storage für den Index — und das Löschen über den Index verbraucht weiterhin Schreibkapazität, die TTL kostenlos erledigt. (E) erhöht die Kosten deutlich: Replikation bedeutet mehrfachen Storage und replizierte Schreibvorgänge in jeder Region.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html"
+  },
+  {
+    "seedKey": "saa-c03-q-250",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Eine Datenverarbeitungsflotte läuft auf EC2-Instanzen in privaten Subnetzen und liest täglich rund 40 TB aus einem S3-Bucket derselben Region. Der Zugriff erfolgt über ein NAT Gateway. Die Kostenanalyse zeigt, dass die Verarbeitungsgebühr des NAT Gateways zur größten Netzwerkposition geworden ist.\n\nWelche Maßnahme senkt diese Kosten am stärksten?",
+    "choices": [
+      { "id": "A", "text": "Ein zweites NAT Gateway in einer weiteren Availability Zone ergänzen, das die Verarbeitungslast auf zwei Gateways verteilt." },
+      { "id": "B", "text": "Einen Gateway VPC Endpoint für S3 anlegen und die Routing-Tabellen der privaten Subnetze darauf verweisen." },
+      { "id": "C", "text": "Das NAT Gateway durch eine selbst betriebene NAT-Instanz ersetzen, deren Datenverkehr nicht pro GB berechnet wird." },
+      { "id": "D", "text": "Einen Interface VPC Endpoint für S3 einrichten, dessen PrivateLink-Verbindung den Verkehr am NAT Gateway vorbeiführt." }
+    ],
+    "correct": ["B"],
+    "explanation": "Das ist der klassische NAT-Kostenfall. Ein NAT Gateway berechnet einen Stundenpreis plus eine Verarbeitungsgebühr pro übertragenem GB — bei 40 TB täglich ist Letztere der dominierende Posten. Ein Gateway VPC Endpoint für S3 verursacht keinerlei zusätzliche Kosten: Er wird als Route in die Routing-Tabelle eingetragen, der S3-Verkehr verlässt die VPC gar nicht mehr über das NAT Gateway, und die Verarbeitungsgebühr entfällt für diesen Verkehr vollständig. (A) verdoppelt die Stundenkosten und ändert an der Gebühr pro GB nichts — der Verkehr bleibt derselbe. (C) verlagert die Kosten in Instanzstunden und Betriebsaufwand und schafft einen Engpass sowie einen Single Point of Failure — für 40 TB täglich zudem eine erhebliche Bandbreitenlast. (D) funktioniert und leitet den Verkehr am NAT vorbei, kostet aber Stundenpreis pro AZ und eine Gebühr pro GB — für S3 ist der kostenlose Gateway Endpoint die eindeutig bessere Wahl.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html"
+  },
+  {
+    "seedKey": "saa-c03-q-251",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Eine Anwendung läuft auf EC2-Instanzen in privaten Subnetzen. Die Prüfung ergibt: Die Instanzen greifen ausschließlich auf S3 und DynamoDB zu; sie brauchen keinerlei Verbindung ins Internet und auch keine Betriebssystem-Updates aus dem Netz. Ein NAT Gateway ist dennoch vorhanden und verursacht laufende Kosten.\n\nWelche Maßnahme ist die richtige?",
+    "choices": [
+      { "id": "A", "text": "Gateway VPC Endpoints für S3 und DynamoDB einrichten und das NAT Gateway anschließend entfernen." },
+      { "id": "B", "text": "Interface VPC Endpoints für S3 und DynamoDB einrichten und das NAT Gateway anschließend entfernen." },
+      { "id": "C", "text": "Das NAT Gateway beibehalten und den Datenverkehr per VPC-Endpoint-Policy auf S3 und DynamoDB begrenzen." },
+      { "id": "D", "text": "Die Instanzen in ein öffentliches Subnetz verschieben, wodurch das NAT Gateway ersatzlos entfallen kann." }
+    ],
+    "correct": ["A"],
+    "explanation": "S3 und DynamoDB sind die einzigen beiden Dienste, für die es Gateway VPC Endpoints gibt — und diese kosten nichts: weder Stundenpreis noch Gebühr pro GB. Da die Instanzen keinerlei sonstigen Internetzugang benötigen, kann das NAT Gateway vollständig entfallen; seine Stunden- und Verarbeitungsgebühren verschwinden damit komplett. (B) funktioniert technisch für beide Dienste, kostet aber Stundenpreis je AZ plus Gebühr pro GB — man ersetzt einen Kostenposten durch einen kleineren, obwohl eine kostenlose Option existiert. (C) behält den größten Kostenposten bei: Das NAT Gateway läuft und berechnet weiter, und eine Endpoint-Policy senkt keine Netzwerkkosten. (D) beseitigt zwar das NAT Gateway, öffnet die Instanzen aber zum Internet — ein erheblicher Sicherheitsrückschritt, und jede Instanz bräuchte eine öffentliche IPv4-Adresse, die seit Februar 2024 selbst stündlich kostet.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html"
+  },
+  {
+    "seedKey": "saa-c03-q-252",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Container-Tasks in privaten Subnetzen ziehen Images aus Amazon ECR, schreiben Logs nach CloudWatch und lesen Secrets aus Secrets Manager. Der gesamte Verkehr läuft heute über ein NAT Gateway und verursacht hohe Verarbeitungsgebühren. Ein Gateway VPC Endpoint kommt für diese Dienste nicht in Frage.\n\nWelche Maßnahme senkt die Kosten?",
+    "choices": [
+      { "id": "A", "text": "Den Verkehr auf ein NAT Gateway in derselben Availability Zone wie die Tasks lenken, um Cross-AZ-Gebühren zu sparen." },
+      { "id": "B", "text": "Ein zweites NAT Gateway ergänzen, dessen zusätzliche Bandbreite die Verarbeitungsgebühren pro GB reduziert." },
+      { "id": "C", "text": "Interface VPC Endpoints für ECR, CloudWatch Logs und Secrets Manager einrichten, die den NAT-Verkehr ersetzen." },
+      { "id": "D", "text": "Die Container-Images in einen S3-Bucket auslagern und über einen Gateway VPC Endpoint für S3 abrufen." }
+    ],
+    "correct": ["C"],
+    "explanation": "Gateway VPC Endpoints existieren nur für S3 und DynamoDB. Für alle anderen Dienste — hier ECR, CloudWatch Logs und Secrets Manager — sind Interface VPC Endpoints (PrivateLink) der Weg: Der Verkehr bleibt im AWS-Netz und läuft nicht mehr über das NAT Gateway. Interface Endpoints kosten zwar Stundenpreis je AZ plus eine Gebühr pro GB, liegen damit aber deutlich unter der NAT-Verarbeitungsgebühr, sobald nennenswertes Volumen fließt. Hinweis für die Praxis: ECR benötigt zusätzlich den S3-Gateway-Endpoint, da die Image-Layer aus S3 kommen. (A) spart allenfalls Cross-AZ-Transfer, während die eigentliche NAT-Verarbeitungsgebühr pro GB unverändert bestehen bleibt. (B) verdoppelt die Stundenkosten; die Gebühr pro GB ist volumenabhängig und wird durch ein zweites Gateway nicht kleiner. (D) funktioniert für keine der drei Anforderungen: ECR ist eine Registry mit eigener API, und Logs und Secrets lassen sich ohnehin nicht in einen Bucket verlagern.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html"
+  },
+  {
+    "seedKey": "saa-c03-q-253",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Ein Medienportal liefert Bilder und Videos direkt aus einem S3-Bucket an Nutzer weltweit aus. Die Datentransferkosten ins Internet dominieren inzwischen die Rechnung, und beliebte Dateien werden millionenfach identisch abgerufen. Die Kosten sollen sinken, ohne die Anwendung umzubauen.\n\nWelche Maßnahme ist die richtige?",
+    "choices": [
+      { "id": "A", "text": "S3 Transfer Acceleration für den Bucket aktivieren, dessen Edge-Standorte die Auslieferung beschleunigen und verbilligen." },
+      { "id": "B", "text": "Die Objekte per Cross-Region Replication in mehrere Regionen replizieren und Nutzer regional zum nächsten Bucket leiten." },
+      { "id": "C", "text": "Die Objekte in S3 Standard-IA verschieben, dessen niedrigere Preise auch die Transferkosten pro GB reduzieren." },
+      { "id": "D", "text": "Eine CloudFront-Distribution vor den Bucket setzen, deren Cache die wiederholten Abrufe am Edge bedient." }
+    ],
+    "correct": ["D"],
+    "explanation": "CloudFront wirkt hier gleich doppelt. Erstens ist der Datentransfer vom AWS-Origin zu CloudFront kostenlos — der Bucket zahlt keinen Internet-Egress mehr. Zweitens ist der CloudFront-Egress zum Nutzer günstiger als der direkte S3-Internet-Egress, und der Cache bedient die millionenfach identischen Abrufe am Edge, sodass der Origin gar nicht mehr angefragt wird. Für die Anwendung ändert sich nur der Domainname. (A) verwechselt zwei Dinge: Transfer Acceleration beschleunigt vor allem Uploads über weite Strecken und kostet einen Aufschlag pro GB — es macht die Rechnung größer, nicht kleiner. (B) senkt die Latenz, aber jede Region liefert weiterhin zum vollen S3-Egress-Preis aus, und die Replikation kostet zusätzlich Storage und Transfer. (C) verwechselt die Kostenarten: Standard-IA senkt den Speicherpreis, der Internet-Egress bleibt identisch — und Abrufgebühren kämen bei millionenfachem Zugriff sogar noch dazu.",
+    "sourceRef": "https://aws.amazon.com/cloudfront/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-q-254",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Eine CloudFront-Distribution liefert die Anwendung eines rein europäischen und nordamerikanischen Nutzerkreises aus. Die Analyse der Zugriffe zeigt, dass praktisch keine Anfragen aus Asien, Südamerika oder Ozeanien kommen. Die CloudFront-Kosten sollen sinken, ohne die Leistung für die tatsächlichen Nutzer zu verschlechtern.\n\nWelche Maßnahme ist die richtige?",
+    "choices": [
+      { "id": "A", "text": "Origin Shield in einer europäischen Region aktivieren, dessen zusätzliche Cache-Schicht die Auslieferungskosten senkt." },
+      { "id": "B", "text": "Die Distribution auf Price Class 100 umstellen, die nur die günstigsten Edge-Standorte in Nordamerika und Europa nutzt." },
+      { "id": "C", "text": "Geo Restriction für die nicht benötigten Länder aktivieren, wodurch die teureren Edge-Standorte nicht mehr abgerechnet werden." },
+      { "id": "D", "text": "Die TTL-Werte der Cache-Behaviors erhöhen, damit die Objekte länger am Edge bleiben und weniger Egress anfällt." }
+    ],
+    "correct": ["B"],
+    "explanation": "Die Preisklassen von CloudFront steuern, welche Edge-Standorte für die Auslieferung genutzt werden. Price Class 100 beschränkt die Distribution auf die günstigsten Regionen — Nordamerika und Europa — und senkt damit den Preis pro ausgeliefertem GB. Da der Nutzerkreis genau dort liegt, entsteht keinerlei Nachteil: Nutzer aus anderen Regionen würden weiterhin bedient, nur über weiter entfernte Edges. (A) verwechselt den Zweck: Origin Shield reduziert die Last auf dem Origin und verbessert die Cache-Hit-Ratio — es ist eine zusätzliche kostenpflichtige Schicht und senkt den Egress-Preis nicht. (C) verwechselt Zugriffskontrolle mit Preisgestaltung: Geo Restriction blockiert Zugriffe aus bestimmten Ländern, ändert aber nichts an der Preisklasse der Distribution. (D) verbessert die Cache-Hit-Ratio und senkt damit die Origin-Anfragen — der Egress zum Nutzer fällt jedoch unverändert an, und genau der ist die Kostenposition.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PriceClass.html"
+  },
+  {
+    "seedKey": "saa-c03-q-255",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen bemerkt seit Februar 2024 einen neuen, stetig wachsenden Posten auf der Rechnung: Gebühren für öffentliche IPv4-Adressen. Die Prüfung zeigt hunderte Instanzen mit automatisch zugewiesenen öffentlichen IPv4-Adressen, dazu dutzende Elastic IPs, von denen einige keiner Ressource zugeordnet sind. Die meisten dieser Instanzen brauchen keinen eingehenden Zugriff aus dem Internet.\n\nWelche Kombination senkt die Kosten am stärksten?",
+    "choices": [
+      { "id": "A", "text": "Die Elastic IPs den Instanzen fest zuordnen, da nur nicht zugeordnete Elastic IPs stündlich berechnet werden." },
+      { "id": "B", "text": "Die Instanzen auf größere Typen konsolidieren, sodass insgesamt weniger öffentliche IPv4-Adressen benötigt werden." },
+      { "id": "C", "text": "Die betroffenen Instanzen in öffentliche Subnetze verschieben, in denen die IPv4-Zuweisung nicht berechnet wird." },
+      { "id": "D", "text": "Ungenutzte Elastic IPs freigeben, Instanzen ohne Internet-Bedarf in private Subnetze verlagern und auf IPv6 umstellen." }
+    ],
+    "correct": ["D"],
+    "explanation": "Seit dem 1. Februar 2024 berechnet AWS jede öffentliche IPv4-Adresse stündlich — unabhängig davon, ob sie einer Ressource zugeordnet ist oder nicht. Der wirksame Hebel ist daher dreifach: nicht zugeordnete Elastic IPs freigeben, Instanzen ohne Bedarf an eingehendem Internet-Zugriff in private Subnetze verlagern (sie brauchen dann keine öffentliche IPv4 mehr), und wo öffentliche Erreichbarkeit nötig ist, auf IPv6 umstellen — IPv6-Adressen sind kostenlos. Public IP Insights hilft, die Verursacher zu identifizieren. (A) beruht auf dem zentralen Irrtum: Vor 2024 war nur die ungenutzte Elastic IP kostenpflichtig; heute kostet jede öffentliche IPv4, auch die zugeordnete. (B) reduziert die Anzahl der Adressen etwas, opfert dafür aber die Granularität der Architektur — und die eigentliche Ursache, unnötige öffentliche Adressierung, bleibt. (C) ist genau verkehrt herum: Öffentliche Subnetze sind der Ort, an dem öffentliche IPv4-Adressen zugewiesen und berechnet werden.",
+    "sourceRef": "https://aws.amazon.com/blogs/aws/new-aws-public-ipv4-address-charge-public-ip-insights/"
+  },
+  {
+    "seedKey": "saa-c03-q-256",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Eine datenintensive Verarbeitungspipeline besteht aus EC2-Workern und einem selbst betriebenen Cache-Cluster. Beide sind gleichmäßig über drei Availability Zones verteilt, und die Worker sprechen den Cache über einen internen Load Balancer an. Die Kostenanalyse weist einen erheblichen Posten für Datenübertragung innerhalb der Region aus.\n\nWelche Maßnahme senkt diesen Posten?",
+    "choices": [
+      { "id": "A", "text": "Für den internen Load Balancer Cross-Zone Load Balancing deaktivieren, damit der Verkehr in der Ursprungs-AZ bleibt." },
+      { "id": "B", "text": "Die Worker und den Cache in eine einzige Availability Zone konsolidieren, wodurch jeder AZ-übergreifende Verkehr entfällt." },
+      { "id": "C", "text": "Den Verkehr zwischen Workern und Cache über einen Gateway VPC Endpoint leiten, der die Übertragung kostenfrei stellt." },
+      { "id": "D", "text": "Die Worker auf größere Instanztypen konsolidieren, deren höhere Netzwerkbandbreite die Übertragungskosten senkt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Datenübertragung zwischen Availability Zones wird in beiden Richtungen berechnet, Verkehr innerhalb derselben AZ dagegen nicht. Mit aktiviertem Cross-Zone Load Balancing verteilt der Load Balancer die Anfragen gleichmäßig über alle Ziele — bei drei AZs landen also rund zwei Drittel des Verkehrs zonenübergreifend. Deaktiviert man Cross-Zone Load Balancing, bleibt der Verkehr in der Ursprungs-AZ, und der Cross-AZ-Posten schrumpft drastisch. Der Preis ist eine ungleichmäßigere Lastverteilung, wenn die Ziele nicht symmetrisch verteilt sind — hier sind sie es. (B) beseitigt die Kosten vollständig und opfert dafür die Multi-AZ-Resilienz der gesamten Pipeline — ein hoher Preis für eine Kostenposition. (C) beruht auf einem Irrtum: Gateway Endpoints gibt es nur für S3 und DynamoDB; für Verkehr zwischen eigenen EC2-Instanzen existieren sie nicht. (D) ändert nichts am übertragenen Volumen — mehr Bandbreite pro Instanz senkt keine Gebühr pro GB.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html"
+  },
+  {
+    "seedKey": "saa-c03-q-257",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen verbindet heute vier VPCs paarweise über VPC Peering. In den nächsten Monaten sollen 30 weitere VPCs hinzukommen, die alle untereinander erreichbar sein müssen. Das Netzwerk-Team fürchtet, dass die Zahl der Peering-Verbindungen und Routing-Einträge unbeherrschbar wird.\n\nWie sollte die Architektur entwickelt werden?",
+    "choices": [
+      { "id": "A", "text": "Das bestehende VPC-Peering-Modell beibehalten, da Peering keine Stundengebühren verursacht und damit stets günstiger bleibt." },
+      { "id": "B", "text": "Alle VPCs über Site-to-Site-VPN-Verbindungen koppeln, deren zentrale Terminierung die Routing-Komplexität begrenzt." },
+      { "id": "C", "text": "Ein Transit Gateway als zentralen Hub einsetzen, an das alle VPCs als Attachments angebunden werden." },
+      { "id": "D", "text": "Die VPCs zu wenigen großen VPCs zusammenlegen, wodurch die Zahl der Verbindungen erheblich reduziert wird." }
+    ],
+    "correct": ["C"],
+    "explanation": "VPC Peering ist nicht transitiv: Bei vollvermaschter Konnektivität wächst die Zahl der Verbindungen quadratisch — bei 34 VPCs wären es über 500 Peerings samt zugehöriger Routing-Einträge in jeder Routing-Tabelle. Ein Transit Gateway löst das als zentraler Hub: Jede VPC wird einmal als Attachment angebunden, das Routing läuft über die Transit-Gateway-Routing-Tabellen. Die Kosten (Attachment-Stunden plus Gebühr pro GB) sind der Preis für eine Architektur, die überhaupt beherrschbar bleibt. (A) verkennt die Skalierung: Peering ist bei wenigen VPCs tatsächlich günstiger — der reine Datentransferpreis stimmt, aber bei über 500 Verbindungen ist der Betrieb das eigentliche Problem, und AWS-Limits für Peerings pro VPC greifen ohnehin. (B) missbraucht VPN für Inter-VPC-Verkehr: Der Durchsatz je Tunnel ist begrenzt, und die Komplexität wird nicht kleiner. (D) beseitigt die Verbindungen und gibt dafür die Isolationsgrenzen auf, die es gute Gründe gab zu ziehen.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html"
+  },
+  {
+    "seedKey": "saa-c03-q-258",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "multiple",
+    "prompt": "Eine VPC mit privaten Subnetzen betreibt ein NAT Gateway, über das die Instanzen große Datenmengen aus S3 lesen, Logs nach CloudWatch schreiben und gelegentlich Betriebssystem-Pakete aus dem Internet nachladen. Die NAT-Kosten sollen deutlich sinken, der Paket-Download muss aber weiterhin möglich bleiben.\n\nWelche ZWEI Maßnahmen setzen das um? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Das NAT Gateway entfernen, da nach Einrichtung der VPC Endpoints kein Internetzugang mehr benötigt wird." },
+      { "id": "B", "text": "Einen Gateway VPC Endpoint für S3 anlegen, über den der S3-Verkehr am NAT Gateway vorbei geführt wird." },
+      { "id": "C", "text": "Die Instanzen in ein öffentliches Subnetz verschieben, sodass sie das NAT Gateway nicht mehr durchlaufen müssen." },
+      { "id": "D", "text": "Einen Interface VPC Endpoint für CloudWatch Logs einrichten, der diesen Verkehr aus dem NAT Gateway herausnimmt." },
+      { "id": "E", "text": "Das NAT Gateway durch eine NAT-Instanz ersetzen, deren Datenverkehr ohne Gebühr pro übertragenem GB abgerechnet wird." }
+    ],
+    "correct": ["B", "D"],
+    "explanation": "Der Trick liegt in der Nebenbedingung: Der Paket-Download aus dem Internet muss möglich bleiben, das NAT Gateway darf also nicht verschwinden. Sinnvoll ist, den volumenstarken Verkehr aus ihm herauszunehmen. (B) trifft den größten Posten: Der Gateway VPC Endpoint für S3 kostet nichts und nimmt den gesamten S3-Verkehr aus der NAT-Verarbeitungsgebühr heraus. (D) trifft den zweiten: Für CloudWatch Logs existiert kein Gateway Endpoint, wohl aber ein Interface Endpoint — dessen Stunden- und GB-Gebühren liegen bei nennenswertem Log-Volumen unter der NAT-Verarbeitungsgebühr. (A) verletzt die Anforderung: Ohne NAT Gateway gibt es keinen Paket-Download mehr. (C) beseitigt die NAT-Kosten und öffnet die Instanzen zum Internet — ein Sicherheitsrückschritt, der zudem kostenpflichtige öffentliche IPv4-Adressen nach sich zieht. (E) tauscht die Gebühr pro GB gegen Instanzstunden, Betriebsaufwand, begrenzte Bandbreite und einen Single Point of Failure.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html"
+  },
+  {
+    "seedKey": "saa-c03-q-259",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen überträgt monatlich rund 150 TB aus AWS in sein eigenes Rechenzentrum. Heute läuft der Verkehr über eine Site-to-Site-VPN-Verbindung durch das Internet, und die Egress-Kosten sind zur größten Netzwerkposition geworden. Das Volumen wird dauerhaft auf diesem Niveau bleiben.\n\nWelche Maßnahme senkt die Übertragungskosten nachhaltig?",
+    "choices": [
+      { "id": "A", "text": "Eine zweite VPN-Verbindung aufbauen und den Verkehr auf beide Tunnel verteilen, um den Durchsatz zu erhöhen." },
+      { "id": "B", "text": "Eine AWS-Direct-Connect-Verbindung einrichten, deren Egress-Rate deutlich unter dem Internet-Datentransfer liegt." },
+      { "id": "C", "text": "Den Verkehr über eine CloudFront-Distribution leiten, deren günstigere Egress-Preise die Kosten senken." },
+      { "id": "D", "text": "Die Daten vor der Übertragung komprimieren und die VPN-Verbindung ansonsten unverändert weiter betreiben." }
+    ],
+    "correct": ["B"],
+    "explanation": "Eine Site-to-Site-VPN-Verbindung läuft über das Internet — es fällt also der reguläre Internet-Egress an, der bei 150 TB monatlich die Rechnung dominiert. Direct Connect stellt eine dedizierte Leitung zum AWS-Netz her, und der Datentransfer über Direct Connect wird zu einer deutlich niedrigeren Rate abgerechnet als der Internet-Egress. Bei dauerhaft hohem, stabilem Volumen amortisieren sich Port-Stunden und Anbindungskosten schnell — genau das AWS-Standardmuster für diesen Fall, mit besserer Latenzstabilität als Nebeneffekt. (A) erhöht den Durchsatz und ändert an der Gebühr pro GB nichts — bei doppelter Bandbreite fließt dasselbe Volumen zum selben Preis. (C) verwechselt die Richtung: CloudFront ist ein CDN für die Auslieferung an viele verteilte Nutzer, nicht für Massentransfer in ein einzelnes Rechenzentrum. (D) senkt das Volumen und damit die Kosten anteilig, ist aber eine Ergänzung und keine Lösung — bei bereits komprimierten Daten verpufft der Effekt.",
+    "sourceRef": "https://aws.amazon.com/directconnect/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-q-260",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost Governance",
+    "type": "single",
+    "prompt": "Ein Sandbox-Account für Experimente hat sein Monatsbudget mehrfach massiv überschritten, weil Entwickler große Instanzen starteten und vergaßen, sie wieder zu beenden. Künftig soll beim Erreichen des Budgets automatisch eingegriffen werden — laufende EC2-Instanzen sollen gestoppt und das Starten neuer Ressourcen unterbunden werden, ohne dass jemand manuell reagieren muss.\n\nWelche Lösung erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "Cost Anomaly Detection einrichten, deren ML-basierte Erkennung ungewöhnliche Ausgaben zuverlässig identifiziert und meldet." },
+      { "id": "B", "text": "Einen CloudWatch-Alarm auf die Metrik EstimatedCharges legen, der eine Benachrichtigung an das Team versendet." },
+      { "id": "C", "text": "Ein AWS Budget mit Budget Actions konfigurieren, die eine Deny-Policy anwenden und EC2-Instanzen stoppen." },
+      { "id": "D", "text": "Eine Service Control Policy auf den Account anwenden, die das Starten großer Instanztypen grundsätzlich untersagt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Budget Actions sind der einzige der genannten Mechanismen, der beim Erreichen eines Schwellenwerts tatsächlich handelt statt nur zu informieren: Sie können eine IAM- oder Service-Control-Policy anwenden (was das Starten neuer Ressourcen unterbindet) und laufende EC2- oder RDS-Instanzen stoppen. Genau die geforderte Kombination, vollautomatisch. (A) erkennt Anomalien und meldet sie — sie greift nicht ein, und der Schaden ist entstanden, bevor jemand reagiert. (B) informiert ebenfalls nur; die Metrik EstimatedCharges ist zudem grob und verzögert. (D) verhindert künftige Exzesse teilweise und ist eine sinnvolle Leitplanke, ist aber statisch: Sie kennt das Budget nicht, greift unabhängig vom Verbrauch und stoppt keine bereits laufenden Instanzen — genau das Szenario, das den Schaden verursacht hat.",
+    "sourceRef": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-controls.html"
+  },
+  {
+    "seedKey": "saa-c03-q-261",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost Governance",
+    "type": "single",
+    "prompt": "Ein Unternehmen vermutet, dass ein erheblicher Teil seiner EC2-, EBS- und Lambda-Ressourcen überdimensioniert ist. Gesucht wird eine Auswertung auf Basis der tatsächlichen Auslastungsdaten, die konkrete Empfehlungen für kleinere Ressourcen samt erwarteter Ersparnis liefert. Der Support-Plan ist Developer, und zusätzliche Kosten sollen nicht entstehen.\n\nWelches Werkzeug ist die richtige Wahl?",
+    "choices": [
+      { "id": "A", "text": "AWS Compute Optimizer, dessen Empfehlungen auf CloudWatch-Metriken beruhen und ohne Zusatzkosten verfügbar sind." },
+      { "id": "B", "text": "AWS Trusted Advisor mit seinen Cost-Optimization-Checks, die ungenutzte und überdimensionierte Ressourcen aufzeigen." },
+      { "id": "C", "text": "Den AWS Cost and Usage Report nach S3 exportieren und die Auslastung anschließend mit Athena selbst auswerten." },
+      { "id": "D", "text": "AWS Cost Explorer mit Gruppierung nach Instanztyp, dessen Kostenverlauf die überdimensionierten Ressourcen sichtbar macht." }
+    ],
+    "correct": ["A"],
+    "explanation": "Compute Optimizer analysiert die tatsächlichen CloudWatch-Auslastungsdaten und liefert genau das Geforderte: konkrete Rightsizing-Empfehlungen für EC2, Auto Scaling Groups, EBS, Lambda und ECS auf Fargate, jeweils mit erwarteter Ersparnis. Die Basis-Empfehlungen sind für alle Konten kostenlos, unabhängig vom Support-Plan. (B) liefert wertvolle Cost-Checks, aber der volle Umfang der Trusted-Advisor-Prüfungen setzt Business- oder Enterprise-Support voraus — mit dem Developer-Plan sind nur wenige Kern-Checks verfügbar. (C) funktioniert und ist die detaillierteste Datenquelle überhaupt, verlangt aber erheblichen Eigenbau: Der CUR enthält Kosten und Nutzung, keine Auslastungsmetriken — die müssten separat beschafft und korreliert werden. (D) zeigt, wofür Geld ausgegeben wird, aber nicht, ob eine Ressource ausgelastet ist: Cost Explorer kennt keine CPU- oder Speicherauslastung und kann daher keine Überdimensionierung erkennen.",
+    "sourceRef": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html"
+  },
+  {
+    "seedKey": "saa-c03-q-262",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost Governance",
+    "type": "single",
+    "prompt": "Ein Unternehmen wurde von einer Rechnung überrascht: Ein fehlkonfigurierter Batch-Job hatte über zwei Wochen hinweg schrittweise immer mehr Instanzen gestartet. Der Anstieg lag jeweils unter den festen Budget-Schwellen und fiel niemandem auf. Künftig sollen solche ungewöhnlichen Kostenmuster automatisch erkannt und gemeldet werden, auch wenn kein fester Schwellenwert überschritten wird.\n\nWelches Werkzeug ist dafür gedacht?",
+    "choices": [
+      { "id": "A", "text": "AWS Budgets mit einem zusätzlichen Kostenbudget, dessen Schwellenwerte deutlich enger gesetzt werden." },
+      { "id": "B", "text": "AWS Compute Optimizer, dessen Auslastungsanalyse überdimensionierte und unnötige Ressourcen aufdeckt." },
+      { "id": "C", "text": "Der AWS Cost and Usage Report, dessen tägliche Detaildaten eine nachträgliche Ursachenanalyse überhaupt erst ermöglichen." },
+      { "id": "D", "text": "AWS Cost Anomaly Detection, deren Machine-Learning-Modelle Abweichungen vom gelernten Ausgabemuster melden." }
+    ],
+    "correct": ["D"],
+    "explanation": "Cost Anomaly Detection ist genau für dieses Muster gebaut: Sie lernt das übliche Ausgabeverhalten je Dienst, Konto oder Kostenstelle und meldet Abweichungen davon — auch dann, wenn kein starrer Schwellenwert gerissen wird. Ein schleichender Anstieg über zwei Wochen ist der Paradefall, den feste Budgets systematisch übersehen. Der Dienst ist kostenlos. (A) funktioniert nur, wenn man den richtigen Schwellenwert im Voraus kennt — enger gesetzte Schwellen erzeugen Fehlalarme im Normalbetrieb und verfehlen trotzdem eine ungewöhnliche Verteilung unterhalb der Grenze. (B) findet überdimensionierte Ressourcen anhand ihrer Auslastung; ein Batch-Job, der viele voll ausgelastete Instanzen startet, ist für Compute Optimizer unauffällig. (C) liefert die Daten für eine gründliche Analyse im Nachhinein — es ist ein Datenexport, kein Erkennungsmechanismus, und hätte niemanden gewarnt.",
+    "sourceRef": "https://docs.aws.amazon.com/cost-management/latest/userguide/manage-ad.html"
+  },
+  {
+    "seedKey": "saa-c03-q-263",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost Governance",
+    "type": "single",
+    "prompt": "Ein Konzern betreibt zwölf AWS-Konten für verschiedene Geschäftsbereiche, jedes mit eigener Rechnung. Einige Konten haben ungenutzte Reserved Instances, während andere gleichartige Instanzen zum On-Demand-Preis betreiben. Zudem erreicht kein einzelnes Konto die Volumenstufen für gestaffelte Preisnachlässe.\n\nWelche Maßnahme adressiert beides?",
+    "choices": [
+      { "id": "A", "text": "In jedem Konto Savings Plans abschließen, deren Rabatte die On-Demand-Nutzung des jeweiligen Kontos abdecken." },
+      { "id": "B", "text": "Die Konten in AWS Organizations mit Consolidated Billing zusammenführen, wodurch Rabatte und Volumen gepoolt werden." },
+      { "id": "C", "text": "Die ungenutzten Reserved Instances über den Reserved Instance Marketplace an andere Konten weiterverkaufen." },
+      { "id": "D", "text": "Alle Workloads in ein einziges AWS-Konto migrieren, in dem sich Reserved Instances und Volumen anschließend automatisch bündeln." }
+    ],
+    "correct": ["B"],
+    "explanation": "Consolidated Billing in AWS Organizations löst beide Probleme in einem Schritt. Erstens werden Reserved Instances und Savings Plans standardmäßig über alle Konten der Organisation hinweg geteilt: Eine ungenutzte RI in einem Konto rabattiert automatisch passende On-Demand-Nutzung in einem anderen. Zweitens wird der Verbrauch aller Konten für gestaffelte Preisnachlässe zusammengezählt, sodass die Organisation die Volumenstufen gemeinsam erreicht. Die Konten bleiben als Isolationsgrenzen erhalten. (A) verschärft das Problem: Noch mehr kontenspezifische Commitments in einer Landschaft, in der Commitments bereits ungenutzt verfallen. (C) funktioniert für Standard RIs, ist aber ein umständlicher manueller Verkaufsprozess mit Abschlägen — und löst das Volumenrabatt-Problem überhaupt nicht. (D) erreicht die Bündelung, gibt dafür aber die Konten-Isolation zwischen den Geschäftsbereichen auf — eine Migration mit erheblichem Risiko für einen Effekt, den Consolidated Billing ohne Umbau liefert.",
+    "sourceRef": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ri-behavior.html"
+  },
+  {
+    "seedKey": "saa-c03-q-264",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost Governance",
+    "type": "single",
+    "prompt": "Die Finanzabteilung verlangt eine Aufschlüsselung der AWS-Kosten nach Projekt und Kostenstelle. Alle Ressourcen sind bereits konsistent mit den Tags Project und CostCenter versehen, doch im Cost Explorer erscheinen diese Tags nicht als Gruppierungsoption.\n\nWas fehlt?",
+    "choices": [
+      { "id": "A", "text": "Die Tags müssen als AWS-generierte Cost Allocation Tags neu angelegt werden, da benutzerdefinierte Tags nicht auswertbar sind." },
+      { "id": "B", "text": "Der Cost and Usage Report muss aktiviert werden, da der Cost Explorer keine Aufschlüsselung nach Tags unterstützt." },
+      { "id": "C", "text": "Die Tags müssen in der Billing-Konsole als Cost Allocation Tags aktiviert werden; sie wirken dann ab dem Zeitpunkt der Aktivierung." },
+      { "id": "D", "text": "Eine Tag Policy in AWS Organizations muss die beiden Tags erzwingen, bevor sie in den Kostenberichten erscheinen." }
+    ],
+    "correct": ["C"],
+    "explanation": "Tags auf Ressourcen sind zunächst nur Metadaten — für die Kostenaufschlüsselung müssen sie in der Billing-Konsole ausdrücklich als Cost Allocation Tags aktiviert werden. Danach erscheinen sie im Cost Explorer und im Cost and Usage Report als Gruppierungsdimension. Wichtig für die Erwartungshaltung der Finanzabteilung: Die Aktivierung wirkt nicht rückwirkend — Kosten aus der Zeit davor bleiben unaufgeschlüsselt. (A) verdreht die Kategorien: Benutzerdefinierte Tags sind der Normalfall für Kostenaufschlüsselung; AWS-generierte Tags wie aws:createdBy sind eine kleine, feste Zusatzmenge. (B) ist sachlich falsch: Der Cost Explorer gruppiert sehr wohl nach aktivierten Cost Allocation Tags — der CUR liefert nur mehr Detailtiefe. (D) verwechselt Durchsetzung mit Auswertung: Tag Policies sorgen dafür, dass Tags konsistent gesetzt werden — hier sind sie bereits konsistent, sie sind nur nicht aktiviert.",
+    "sourceRef": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/custom-tags.html"
+  },
+  {
+    "seedKey": "saa-c03-q-265",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost Governance",
+    "type": "single",
+    "prompt": "Ein Architekt soll die Cloud-Kosten eines Unternehmens senken und beginnt mit einer Bestandsaufnahme. Gesucht sind Empfehlungen für ein Commitment: Welcher Savings-Plan-Typ, welche Laufzeit und welches Stundencommitment passen zur bisherigen Nutzung? Zusätzlich soll der Verlauf der Kosten der letzten zwölf Monate nach Dienst aufgeschlüsselt werden.\n\nWelches Werkzeug liefert beides?",
+    "choices": [
+      { "id": "A", "text": "AWS Cost Explorer mit seinen Savings-Plans-Empfehlungen und der Analyse des historischen Kostenverlaufs." },
+      { "id": "B", "text": "AWS Budgets mit einem Savings-Plans-Budget, dessen Auswertung das passende Commitment ermittelt." },
+      { "id": "C", "text": "AWS Compute Optimizer, dessen Analyse der Auslastung die passende Commitment-Höhe berechnet." },
+      { "id": "D", "text": "Der AWS Pricing Calculator, mit dem sich die Kosten der geplanten Commitments im Voraus modellieren lassen." }
+    ],
+    "correct": ["A"],
+    "explanation": "Cost Explorer ist das Werkzeug für beide Aufgaben: Es analysiert die historische Nutzung und leitet daraus konkrete Savings-Plans- und Reserved-Instance-Empfehlungen ab — inklusive Plan-Typ, Laufzeit, empfohlenem Stundencommitment und erwarteter Ersparnis. Zugleich zeigt es den Kostenverlauf der vergangenen Monate, gruppierbar nach Dienst, Konto, Region oder aktivierten Cost Allocation Tags. (B) verwechselt Überwachung mit Empfehlung: Ein Savings-Plans-Budget überwacht die Ausnutzung oder Abdeckung eines bestehenden Plans — es errechnet kein Commitment. (C) arbeitet auf der falschen Ebene: Compute Optimizer empfiehlt die richtige Ressourcengröße anhand der Auslastung, nicht das passende Preismodell — sinnvollerweise vor einem Commitment eingesetzt, aber kein Ersatz dafür. (D) modelliert die Kosten hypothetischer Architekturen im Voraus und kennt die tatsächliche Nutzung des Kontos nicht — es kann daher nichts empfehlen.",
+    "sourceRef": "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-sp-recommendations.html"
+  }
+]

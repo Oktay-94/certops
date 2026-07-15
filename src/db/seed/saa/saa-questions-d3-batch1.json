@@ -1,0 +1,429 @@
+[
+  {
+    "seedKey": "saa-c03-q-150",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Eine PostgreSQL-Datenbank auf EC2 nutzt ein 400-GiB-gp2-Volume. Tagsüber läuft sie stabil; während der nächtlichen Batch-Verarbeitung bricht die I/O-Performance nach etwa 40 Minuten drastisch ein, die CloudWatch-Metrik BurstBalance fällt in diesem Zeitraum auf 0. Die Kosten sollen möglichst wenig steigen.\n\nWelche Maßnahme behebt das Problem?",
+    "choices": [
+      { "id": "A", "text": "Das gp2-Volume auf 1 TiB vergrößern, damit die Baseline-IOPS proportional zur Größe mitwachsen." },
+      { "id": "B", "text": "Ein io2-Volume mit provisionierten IOPS in Höhe der nächtlichen Spitzenlast bereitstellen." },
+      { "id": "C", "text": "Das Volume auf gp3 migrieren und die benötigten IOPS unabhängig von der Größe konfigurieren." },
+      { "id": "D", "text": "Die Batch-Verarbeitung in kleinere Abschnitte teilen, damit sich die Burst-Credits erholen können." }
+    ],
+    "correct": ["C"],
+    "explanation": "Der Befund ist eindeutig: BurstBalance = 0 heißt, die I/O-Credits des gp2-Volumes sind aufgebraucht, und die Performance fällt auf die Baseline von 3 IOPS/GiB zurück. gp3 kennt dieses Credit-System nicht — es hält seine Baseline von 3.000 IOPS dauerhaft, und mehr IOPS lassen sich unabhängig von der Volume-Größe dazubuchen, bei niedrigerem GB-Preis als gp2. (A) funktioniert, weil ein größeres gp2-Volume eine höhere Baseline hat — man bezahlt aber Speicher, den man nicht braucht, nur um IOPS zu kaufen. (B) funktioniert ebenfalls und liefert sogar mehr, ist aber die teuerste Option für ein Problem, das gp3 im Standardpreis löst. (D) arbeitet um die Grenze herum, statt sie zu beheben, und verlängert das Batch-Fenster.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/general-purpose.html"
+  },
+  {
+    "seedKey": "saa-c03-q-151",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Ein Kafka-Cluster auf EC2 schreibt Log-Segmente sequenziell auf seine Volumes und liest sie sequenziell wieder aus; Random-I/O spielt kaum eine Rolle. Die Daten sind über Replikation im Cluster abgesichert. Der Speicher soll bei hohem Durchsatz so günstig wie möglich sein.\n\nWelcher EBS-Volume-Typ passt zu diesem Workload?",
+    "choices": [
+      { "id": "A", "text": "st1, dessen Durchsatz mit der Volume-Größe skaliert und der für sequenzielle Workloads gebaut ist." },
+      { "id": "B", "text": "gp3 mit zusätzlich provisioniertem Durchsatz bis zur maximalen Rate von 1.000 MiB/s." },
+      { "id": "C", "text": "sc1 als der günstigste HDD-Typ, dessen Kosten pro GiB unter allen Volume-Typen am niedrigsten liegen." },
+      { "id": "D", "text": "io2 Block Express, dessen Latenz unter einer halben Millisekunde für Streaming-Workloads sorgt." }
+    ],
+    "correct": ["A"],
+    "explanation": "st1 ist der throughput-optimierte HDD-Typ und genau für große, sequenzielle Workloads wie Kafka, Log-Processing und MapReduce gedacht: 40 MB/s Baseline pro TiB, Burst bis 250 MB/s pro TiB, maximal 500 MB/s pro Volume — zu einem Bruchteil der SSD-Kosten. Da die Daten repliziert sind, ist HDD hier kein Risiko. (B) liefert den Durchsatz ebenfalls, bezahlt ihn aber als SSD deutlich teurer, ohne dass der Workload die Random-I/O-Stärke je nutzt. (C) ist zwar noch günstiger, aber für seltenen Zugriff gedacht — mit 12 MB/s Baseline pro TiB bricht ein durchsatzhungriger Broker darauf ein. (D) ist die teuerste Option für einen Workload, der von Sub-Millisekunden-Latenz nichts hat.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/hard-disk-drives.html"
+  },
+  {
+    "seedKey": "saa-c03-q-152",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Eine selbstverwaltete Oracle-Datenbank auf einer Nitro-EC2-Instanz braucht dauerhaft rund 120.000 IOPS bei Latenzen unter einer Millisekunde. Zusätzlich verlangt die Fachseite die höchstmögliche Durability auf Volume-Ebene, weil ein Volume-Verlust einen aufwendigen Restore bedeutet.\n\nWelcher Volume-Typ erfüllt beide Anforderungen?",
+    "choices": [
+      { "id": "A", "text": "gp3 mit maximal provisionierten IOPS, verteilt über mehrere Volumes in einem Software-RAID-0." },
+      { "id": "B", "text": "io2 Block Express, das bis zu 256.000 IOPS bei einer Durability von 99,999 Prozent liefert." },
+      { "id": "C", "text": "Ein Instance-Store-Volume mit lokalem NVMe, das die niedrigste erreichbare Latenz bietet." },
+      { "id": "D", "text": "st1 mit maximaler Volume-Größe, dessen Durchsatz für Datenbank-Workloads ausgelegt ist." }
+    ],
+    "correct": ["B"],
+    "explanation": "io2 Block Express ist der einzige EBS-Typ, der beide Anforderungen nativ erfüllt: bis 256.000 IOPS auf Nitro-Instanzen, durchschnittliche Latenz unter 500 Mikrosekunden und eine Durability von 99,999 % — zwei Größenordnungen über den 99,8–99,9 % der übrigen Typen. Seit April 2025 ist jedes io2-Volume automatisch Block Express. (A) funktioniert rechnerisch (mehrere gp3 à 16.000 IOPS gestriped), aber RAID-0 multipliziert das Ausfallrisiko — die Durability sinkt, statt zu steigen. (C) liefert die beste Latenz überhaupt, ist aber ephemeral: Bei Stop oder Hardware-Fehler sind die Daten weg — das Gegenteil der geforderten Durability. (D) ist ein HDD-Typ mit maximal 500 IOPS und für diesen Workload strukturell ungeeignet.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/provisioned-iops.html"
+  },
+  {
+    "seedKey": "saa-c03-q-153",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Eine Video-Transkodierungs-Flotte schreibt während der Verarbeitung große temporäre Zwischendateien; das fertige Ergebnis landet in S3, die Zwischendateien werden danach verworfen. Die EBS-gp3-Volumes der Instanzen sind für diese Zwischenschritte der Engpass. Gesucht ist die höchste I/O-Performance für die temporären Daten zu möglichst geringen Kosten.\n\nWelche Lösung passt?",
+    "choices": [
+      { "id": "A", "text": "Die gp3-Volumes auf die maximale IOPS- und Durchsatz-Konfiguration anheben und beibehalten." },
+      { "id": "B", "text": "io2-Block-Express-Volumes einsetzen, deren Latenz und IOPS die von gp3 deutlich übertreffen." },
+      { "id": "C", "text": "Ein gemeinsames FSx-for-Lustre-Filesystem anbinden, auf das alle Instanzen parallel schreiben." },
+      { "id": "D", "text": "Instanztypen mit lokalem NVMe-Instance-Store wählen und die Zwischendateien dort ablegen." }
+    ],
+    "correct": ["D"],
+    "explanation": "Instance Store ist genau für diesen Fall gedacht: lokale NVMe-Disks, physisch am Host, mit der höchsten I/O-Performance, die eine Instanz erreichen kann — ohne den Umweg übers Netzwerk und ohne zusätzliche Speicherkosten, weil der Store im Instanzpreis enthalten ist. Dass die Daten bei Stop oder Hardware-Fehler verloren gehen, ist hier irrelevant: Es sind verwerfbare Zwischendateien, das Ergebnis liegt in S3. (A) und (B) funktionieren beide, bezahlen aber dauerhafte Persistenz-Garantien für Daten, die keine brauchen — (B) ist dabei die teuerste Variante. (C) löst ein Sharing-Problem, das nicht existiert: Jede Instanz braucht nur ihre eigenen Zwischendateien, und ein verteiltes Filesystem addiert Netzwerklatenz statt sie zu entfernen.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html"
+  },
+  {
+    "seedKey": "saa-c03-q-154",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Eine Anwendung lädt Videodateien zwischen 2 GB und 40 GB per PUT nach S3 hoch. Dateien unter 5 GB kommen an; alles darüber schlägt fehl. Zusätzlich bricht bei instabilen Verbindungen gelegentlich ein fast fertiger Upload ab und muss komplett neu gestartet werden.\n\nWelche Änderung behebt beide Probleme?",
+    "choices": [
+      { "id": "A", "text": "S3 Transfer Acceleration aktivieren, das Uploads über die Edge-Standorte beschleunigt und stabilisiert." },
+      { "id": "B", "text": "Auf Multipart Upload umstellen, das große Objekte in Teilen überträgt und fehlgeschlagene Teile wiederholt." },
+      { "id": "C", "text": "Die Dateien vor dem Upload komprimieren, damit sie unter der Grenze für einen einzelnen PUT bleiben." },
+      { "id": "D", "text": "Die Uploads über eine CloudFront-Distribution mit aktiviertem PUT-Support an den Bucket leiten." }
+    ],
+    "correct": ["B"],
+    "explanation": "Die 5-GB-Grenze ist das Limit eines einzelnen PUT — größere Objekte brauchen zwingend Multipart Upload (empfohlen ab 100 MB). Multipart löst auch das zweite Problem: Die Teile (5 MiB bis 5 GiB) werden unabhängig und parallel übertragen, und bei einem Abbruch wird nur der fehlgeschlagene Teil wiederholt statt der ganzen Datei. (A) beschleunigt den Netzwerkpfad, hebt aber die 5-GB-Grenze nicht auf — Transfer Acceleration und Multipart ergänzen sich, ersetzen sich aber nicht. (C) ist unzuverlässig: Bei bereits komprimierten Videoformaten ist kaum etwas zu holen, und 40 GB fallen nicht unter 5 GB. (D) ändert nur den Eintrittspunkt; die PUT-Grenze des einzelnen Requests bleibt bestehen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html"
+  },
+  {
+    "seedKey": "saa-c03-q-155",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Eine Analytics-Plattform legt täglich Millionen kleiner Objekte in einem S3-Bucket ab, alle unter demselben Schlüsselpfad logs/current/. In Spitzenzeiten liefert S3 vermehrt 503-Slow-Down-Antworten; die Schreiblast liegt bei rund 20.000 PUT-Requests pro Sekunde.\n\nWelche Maßnahme löst das Durchsatzproblem?",
+    "choices": [
+      { "id": "A", "text": "Die Objektschlüssel auf mehrere Präfixe verteilen, da die Request-Raten pro Präfix gelten und skalieren." },
+      { "id": "B", "text": "Ein Service-Quota-Increase für den Bucket beantragen, das die Request-Limits von S3 global anhebt." },
+      { "id": "C", "text": "S3 Transfer Acceleration aktivieren, damit die Requests über die Edge-Infrastruktur verteilt werden." },
+      { "id": "D", "text": "Die Objekte clientseitig zu größeren Archiven bündeln, bevor sie in den Bucket geschrieben werden." }
+    ],
+    "correct": ["A"],
+    "explanation": "S3 skaliert pro partitioniertem Präfix: mindestens 3.500 PUT/COPY/POST/DELETE und 5.500 GET/HEAD pro Sekunde — und die Anzahl der Präfixe ist unbegrenzt. 20.000 PUT/s auf einem einzigen Präfix überschreiten dessen Rate; verteilt über sechs oder mehr Präfixe (etwa logs/2026/07/13/00/ nach Stunde oder Shard) skaliert der Durchsatz linear mit. Zufällige Hash-Präfixe sind seit 2018 nicht mehr nötig, eine sinnvolle Struktur reicht. (B) gibt es so nicht — die Präfix-Raten sind kein anhebbares Konto-Quota. (C) beschleunigt den Transportweg zum Bucket, ändert aber nichts an der Partitionsrate dahinter. (D) funktioniert und reduziert die Request-Zahl tatsächlich, verändert dafür aber das Datenmodell und verschiebt Aufwand in die Clients — die Präfix-Verteilung löst das Problem ohne diesen Umbau.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html"
+  },
+  {
+    "seedKey": "saa-c03-q-156",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Feldteams auf mehreren Kontinenten laden täglich Messdaten von mehreren Gigabyte in einen zentralen S3-Bucket in eu-central-1 hoch. Teams aus Südamerika und Asien berichten um ein Vielfaches längere Upload-Zeiten als europäische Teams. Die Anwendung soll unverändert bleiben, nur der Endpunkt darf sich ändern.\n\nWelche Lösung verkürzt die Uploads der entfernten Teams?",
+    "choices": [
+      { "id": "A", "text": "Je Kontinent einen regionalen Bucket bereitstellen und die Daten per Replikation zentral zusammenführen." },
+      { "id": "B", "text": "Die Uploads über ein Site-to-Site VPN in die Zielregion leiten, das eine stabilere Route erzwingt." },
+      { "id": "C", "text": "S3 Transfer Acceleration am Bucket aktivieren, sodass Uploads am nächsten Edge-Standort eintreten." },
+      { "id": "D", "text": "Die Messdaten stärker komprimieren, damit weniger Bytes über die lange Strecke übertragen werden." }
+    ],
+    "correct": ["C"],
+    "explanation": "Transfer Acceleration ist genau dafür gebaut: Der Client lädt zum nächstgelegenen CloudFront-Edge-Standort hoch, und ab dort läuft der Transfer über das optimierte AWS-Backbone statt über das öffentliche Internet — je weiter der Client vom Bucket entfernt ist, desto größer der Gewinn. Die Anwendung ändert nur den Endpunkt (bucketname.s3-accelerate.amazonaws.com), und mit dem Speed-Comparison-Tool lässt sich der Effekt vorab messen. (A) funktioniert, verteilt aber die Architektur: mehrere Buckets, Replikationskosten und verzögerte Konsistenz am Ziel. (B) erzwingt eine Route, ersetzt aber nicht das Backbone — die Latenz der Strecke bleibt. (D) hilft graduell, skaliert aber nicht: Bereits komprimierte Messformate geben wenig her, und das Grundproblem der Distanz bleibt bestehen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html"
+  },
+  {
+    "seedKey": "saa-c03-q-157",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Ein Krankenhaus archiviert radiologische Aufnahmen, auf die im Schnitt nur einmal pro Quartal zugegriffen wird. Wenn ein Arzt eine Aufnahme anfordert, muss sie jedoch sofort — im Millisekundenbereich — verfügbar sein; ein Restore-Prozess mit Wartezeit ist medizinisch nicht akzeptabel. Die Speicherkosten sollen deutlich unter S3 Standard liegen.\n\nWelche Speicherklasse erfüllt beide Anforderungen?",
+    "choices": [
+      { "id": "A", "text": "S3 Glacier Flexible Retrieval, dessen Expedited-Abruf die Daten innerhalb weniger Minuten bereitstellt." },
+      { "id": "B", "text": "S3 Standard-IA, das seltene Zugriffe günstiger macht und Millisekunden-Latenz beibehält." },
+      { "id": "C", "text": "S3 Glacier Deep Archive, die günstigste Klasse für langfristig aufzubewahrende Archivdaten." },
+      { "id": "D", "text": "S3 Glacier Instant Retrieval, das Archivpreise mit Abruf in Millisekunden ohne Restore verbindet." }
+    ],
+    "correct": ["D"],
+    "explanation": "Glacier Instant Retrieval ist exakt für dieses Muster gebaut: Archivdaten, die quartalsweise gebraucht werden, aber im Zugriffsfall sofort da sein müssen. Die Latenz entspricht Standard-IA — Millisekunden, kein Restore-Vorgang — bei deutlich niedrigerem Speicherpreis. (A) scheitert an der harten Anforderung: Selbst Expedited braucht 1–5 Minuten und einen expliziten Restore, was hier ausgeschlossen wurde. (B) erfüllt die Latenz, ist aber teurer als Instant Retrieval — bei einem Zugriff pro Quartal verschenkt man die Differenz. (C) ist die günstigste Klasse, braucht aber 12 bis 48 Stunden für den Abruf und kennt nicht einmal Expedited — das Gegenteil der Anforderung.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/glacier-storage-classes.html"
+  },
+  {
+    "seedKey": "saa-c03-q-158",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Compliance-Unterlagen liegen in S3 Glacier Flexible Retrieval. Eine Aufsichtsbehörde fordert im Rahmen einer laufenden Prüfung einzelne Dokumente an, die binnen 15 Minuten vorliegen müssen. Das Archiv selbst soll aus Kostengründen in seiner Speicherklasse bleiben.\n\nWie werden die angeforderten Dokumente rechtzeitig bereitgestellt?",
+    "choices": [
+      { "id": "A", "text": "Einen Restore mit der Abrufoption Expedited starten, die einzelne Objekte in 1 bis 5 Minuten liefert." },
+      { "id": "B", "text": "Einen Restore mit der Abrufoption Standard starten, die Objekte innerhalb weniger Minuten liefert." },
+      { "id": "C", "text": "Die betroffenen Objekte per Lifecycle-Regel nach S3 Standard überführen und von dort ausliefern." },
+      { "id": "D", "text": "Einen Restore mit der Abrufoption Bulk starten, die als kostenlose Option keine Wartezeit kennt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Glacier Flexible Retrieval kennt drei Abrufoptionen: Expedited (1–5 Minuten, für einzelne dringende Objekte), Standard (3–5 Stunden) und Bulk (5–12 Stunden, kostenlos). Für eine 15-Minuten-Frist ist Expedited die einzige Option, die passt; für garantierte Expedited-Kapazität unter Last lässt sich Provisioned Capacity buchen. (B) unterschätzt die Standard-Option um Größenordnungen — sie braucht Stunden, nicht Minuten. (C) funktioniert nicht wie beschrieben: Lifecycle-Regeln bewegen Objekte in kältere Klassen, nicht zurück in wärmere; der Weg zurück führt immer über einen Restore. (D) verwechselt kostenlos mit schnell — Bulk ist die langsamste Option von allen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/restoring-objects-retrieval-options.html"
+  },
+  {
+    "seedKey": "saa-c03-q-159",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Ein Unternehmen archiviert Aufzeichnungen mit zehnjähriger Aufbewahrungspflicht so günstig wie möglich in S3 Glacier Deep Archive. Der neue DR-Plan legt für diese Daten ein Wiederherstellungsziel von maximal 8 Stunden fest. Ein Architekt prüft, ob die Speicherklasse dazu passt.\n\nWas ist die korrekte Einschätzung?",
+    "choices": [
+      { "id": "A", "text": "Deep Archive passt, weil die Abrufoption Expedited die Daten in wenigen Minuten bereitstellt." },
+      { "id": "B", "text": "Deep Archive passt nicht: Der schnellste Abruf dauert 12 Stunden, Expedited existiert dort nicht." },
+      { "id": "C", "text": "Deep Archive passt, sofern für die Restores Provisioned Capacity gebucht wird, die den Abruf beschleunigt." },
+      { "id": "D", "text": "Deep Archive passt nicht, kann aber per Lifecycle-Regel im Ernstfall sofort umgestuft werden." }
+    ],
+    "correct": ["B"],
+    "explanation": "Deep Archive kennt genau zwei Abrufoptionen: Standard mit 12 Stunden und Bulk mit bis zu 48 Stunden. Expedited existiert für diese Klasse nicht. Ein RTO von 8 Stunden ist damit strukturell unerreichbar — die Daten gehören in Glacier Flexible Retrieval (Standard-Abruf 3–5 Stunden) oder, wenn es schneller sein muss, in Instant Retrieval. (A) überträgt eine Option auf Deep Archive, die es dort nie gab. (C) hilft nicht: Provisioned Capacity garantiert Expedited-Kapazität in Flexible Retrieval — für eine Klasse ohne Expedited ist sie bedeutungslos. (D) scheitert an der Richtung: Lifecycle-Regeln stufen nur in kältere Klassen ab; der Weg zurück in eine wärmere Klasse führt immer über einen Restore, der hier 12 Stunden dauert.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/restoring-objects-retrieval-options.html"
+  },
+  {
+    "seedKey": "saa-c03-q-160",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Ein Medienarchiv mit mehreren hundert TB in S3 Standard hat völlig unvorhersehbare Zugriffsmuster: Manche Objekte werden jahrelang nicht angefasst und dann plötzlich wochenlang täglich abgerufen. Das Team will Speicherkosten senken, ohne Abruf-Wartezeiten zu riskieren und ohne Zugriffsanalysen und Lifecycle-Regeln selbst zu pflegen.\n\nWelche Lösung passt?",
+    "choices": [
+      { "id": "A", "text": "Eine Lifecycle-Regel, die Objekte nach 30 Tagen ohne Zugriff automatisch nach Standard-IA verschiebt." },
+      { "id": "B", "text": "S3 Storage Class Analysis aktivieren und die Empfehlungen regelmäßig in Lifecycle-Regeln umsetzen." },
+      { "id": "C", "text": "S3 Intelligent-Tiering, das Objekte anhand des Zugriffsmusters automatisch zwischen Stufen bewegt." },
+      { "id": "D", "text": "Die Objekte nach Glacier Instant Retrieval verschieben, das Archivpreise mit sofortigem Abruf verbindet." }
+    ],
+    "correct": ["C"],
+    "explanation": "Intelligent-Tiering ist für genau dieses Profil gebaut: Es beobachtet jedes Objekt und verschiebt es automatisch zwischen Frequent, Infrequent und Archive Instant Access — alle drei mit Millisekunden-Latenz, ohne Abrufgebühren und ohne dass jemand Regeln pflegt. Wird ein kaltes Objekt wieder heiß, wandert es selbstständig zurück. Die optionalen Deep-Archive-Stufen, die einen Restore bräuchten, bleiben einfach deaktiviert. (A) ist eine starre Regel für ein Muster, das sich nicht an Regeln hält — Standard-IA bestraft die plötzlichen Zugriffswellen mit Abrufgebühren und Mindestspeicherdauer. (B) funktioniert, ist aber genau die manuelle Analyse-und-Pflege-Schleife, die ausgeschlossen wurde. (D) rechnet sich nur für dauerhaft kalte Daten; die wochenlangen täglichen Abrufe machen die Ersparnis über Abrufgebühren zunichte.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/intelligent-tiering.html"
+  },
+  {
+    "seedKey": "saa-c03-q-161",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Ein ML-Team trainiert Modelle auf einem Cluster aus GPU-Instanzen. Die Trainingsdaten liegen als Objekte in S3; das Training verlangt ein gemeinsames POSIX-Filesystem mit einem Durchsatz von mehreren hundert GB/s und Latenzen unter einer Millisekunde. Die Daten sollen ohne manuelle Kopierprozesse aus S3 verfügbar sein.\n\nWelche Lösung erfüllt die Anforderungen?",
+    "choices": [
+      { "id": "A", "text": "Amazon EFS mit Elastic Throughput, das den Durchsatz automatisch an die Trainingslast anpasst." },
+      { "id": "B", "text": "Ein großes io2-Block-Express-Volume, das per Multi-Attach an alle GPU-Instanzen angebunden wird." },
+      { "id": "C", "text": "S3 Mountpoint auf jeder Instanz, das den Bucket als lokales Dateisystem in den Pfad einhängt." },
+      { "id": "D", "text": "FSx for Lustre mit einer Data Repository Association auf den S3-Bucket und Lazy Loading der Daten." }
+    ],
+    "correct": ["D"],
+    "explanation": "FSx for Lustre ist das HPC/ML-Filesystem von AWS: hunderte GB/s Durchsatz, Millionen IOPS, Sub-Millisekunden-Latenz — und über eine Data Repository Association direkt mit S3 verknüpft. Die Objekte erscheinen als Dateien und werden beim ersten Zugriff nachgeladen (Lazy Loading); Ergebnisse lassen sich nach S3 zurückexportieren. Kein Kopier-Workflow nötig. (A) ist ein solides geteiltes NFS, spielt aber in einer anderen Leistungsklasse — die maximalen Durchsatzwerte liegen weit unter dem geforderten Niveau. (B) scheitert doppelt: Multi-Attach ist auf 16 Instanzen in derselben AZ begrenzt und verlangt ein cluster-aware Filesystem; ein Standard-Dateisystem würde korrumpieren. (C) macht S3 bequem zugänglich, bleibt aber Objekt-Storage mit dessen Latenzprofil — kein vollständiges POSIX und keine Sub-Millisekunden.",
+    "sourceRef": "https://docs.aws.amazon.com/fsx/latest/LustreGuide/what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-q-162",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Ein Unternehmen migriert einen Windows-Fileserver nach AWS. Die Anwendungen greifen über SMB zu, nutzen NTFS-Berechtigungen und sind in ein Active Directory integriert; beides muss unverändert weiterfunktionieren. Gesucht ist ein vollständig verwalteter Dienst.\n\nWelcher Dienst passt?",
+    "choices": [
+      { "id": "A", "text": "Amazon FSx for Windows File Server, das SMB, NTFS-ACLs und die AD-Integration nativ mitbringt." },
+      { "id": "B", "text": "Amazon EFS mit aktiviertem SMB-Zugriff über einen vorgeschalteten Samba-Dienst auf EC2." },
+      { "id": "C", "text": "Amazon FSx for NetApp ONTAP, dessen Multiprotokoll-Zugriff SMB neben NFS und iSCSI erlaubt." },
+      { "id": "D", "text": "Ein S3-Bucket mit File Gateway, das den Anwendungen eine SMB-Schnittstelle zur Verfügung stellt." }
+    ],
+    "correct": ["A"],
+    "explanation": "FSx for Windows File Server ist der Dienst, der auf einem echten Windows-Server-Dateisystem aufsetzt: natives SMB, NTFS-Berechtigungen, DFS, Schattenkopien und die direkte Integration in ein bestehendes oder AWS-verwaltetes Active Directory — die Anwendungen merken vom Umzug nichts. (B) ist kein Feature, sondern ein Eigenbau: EFS spricht ausschließlich NFS, und ein Samba-Layer auf EC2 bedeutet selbst betriebene Infrastruktur samt HA-Problem. (C) funktioniert tatsächlich — ONTAP beherrscht SMB und AD-Integration —, ist aber die vielseitigere und komplexere Plattform; wer nur einen Windows-Fileserver ersetzt, bekommt mit (A) das passgenauere Werkzeug. (D) bietet SMB auf S3-Objekten, aber ohne vollwertige NTFS-ACL-Semantik und mit einem Cache-Gateway als Zwischenschicht — für einen primären Fileserver das falsche Muster.",
+    "sourceRef": "https://docs.aws.amazon.com/fsx/latest/WindowsGuide/what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-q-163",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Ein Forschungsteam startet mehrmals pro Woche kurze HPC-Simulationsläufe von je etwa sechs Stunden. Die Eingangsdaten kommen aus S3, die Ergebnisse gehen zurück nach S3; zwischen den Läufen wird das Filesystem nicht gebraucht. Ein Kollege schlägt FSx for Lustre im Persistent-Modus vor.\n\nWelche Konfiguration ist für dieses Nutzungsprofil angemessener, und warum?",
+    "choices": [
+      { "id": "A", "text": "Persistent mit der höchsten Durchsatzklasse, weil replizierter Speicher die Läufe zusätzlich beschleunigt." },
+      { "id": "B", "text": "Persistent mit HDD-Speicher, weil die niedrigere Durchsatzklasse die Kosten der Standzeiten auffängt." },
+      { "id": "C", "text": "Scratch, weil es für temporäre Verarbeitung gedacht ist und die Daten ohnehin in S3 gesichert sind." },
+      { "id": "D", "text": "Scratch, weil es als einziger Modus eine Data Repository Association mit einem S3-Bucket erlaubt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Scratch ist genau für kurzlebige, temporäre Verarbeitung gebaut: kein repliziertes Storage, dafür günstiger — und das fehlende Sicherheitsnetz ist hier irrelevant, weil Quelle und Ergebnis in S3 liegen. Das Filesystem wird je Lauf erzeugt, per Data Repository Association mit dem Bucket verknüpft und danach gelöscht; zwischen den Läufen fallen keine Kosten an. (A) bezahlt Replikation und Dauerbetrieb für ein Filesystem, das an fünf von sieben Tagen leerläuft — Persistenz beschleunigt zudem nichts, sie sichert nur ab. (B) senkt die Standkosten, kauft das aber mit HDD-Durchsatz (12–40 MB/s pro TiB), der einem HPC-Lauf nicht genügt. (D) ist schlicht falsch: Die S3-Anbindung per DRA funktioniert in beiden Modi und ist kein Scratch-Alleinstellungsmerkmal.",
+    "sourceRef": "https://docs.aws.amazon.com/fsx/latest/LustreGuide/using-fsx-lustre.html"
+  },
+  {
+    "seedKey": "saa-c03-q-164",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "single",
+    "prompt": "Ein EFS-Filesystem im Bursting-Throughput-Modus enthält nur 80 GiB an Daten, wird aber von einer CI/CD-Plattform mit stark schwankender, zeitweise sehr hoher Last genutzt. Die Builds werden regelmäßig langsam, sobald die Burst-Credits des Filesystems aufgebraucht sind.\n\nWelche Umstellung behebt das Problem dauerhaft und ohne Kapazitätsplanung?",
+    "choices": [
+      { "id": "A", "text": "Dummy-Daten ins Filesystem legen, bis die Baseline des Bursting-Modus die Spitzenlast abdeckt." },
+      { "id": "B", "text": "Auf Elastic Throughput umstellen, das den Durchsatz automatisch der tatsächlichen Last anpasst." },
+      { "id": "C", "text": "Auf Provisioned Throughput mit einem fest konfigurierten Wert oberhalb der Spitzenlast umstellen." },
+      { "id": "D", "text": "Den Performance-Modus des Filesystems von General Purpose auf Max I/O umkonfigurieren." }
+    ],
+    "correct": ["B"],
+    "explanation": "Im Bursting-Modus skaliert der Durchsatz mit der gespeicherten Datenmenge — 80 GiB ergeben eine winzige Baseline, und die Credits sind unter Dauerlast schnell weg. Elastic Throughput entkoppelt beides: Der Durchsatz folgt automatisch der tatsächlichen Last, abgerechnet wird nach Nutzung, und niemand plant Kapazität. Genau die Anforderung. (A) ist der bekannte alte Trick — er funktioniert, bezahlt aber dauerhaft Speicher für Daten, die niemand braucht. (C) funktioniert ebenfalls, verlangt aber genau die Kapazitätsplanung, die ausgeschlossen wurde, und der fest provisionierte Wert kostet auch in den Leerlaufphasen. (D) ist doppelt falsch: Max I/O ist eine Vorgängergeneration, von der AWS aktiv abrät, und mit Elastic Throughput ist er ohnehin nicht kombinierbar — am Credit-Problem ändert der Performance-Modus nichts.",
+    "sourceRef": "https://docs.aws.amazon.com/efs/latest/ug/performance.html"
+  },
+  {
+    "seedKey": "saa-c03-q-165",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "type": "multiple",
+    "prompt": "Eine Download-Plattform liefert Firmware-Images von 5 bis 20 GB aus einem S3-Bucket in eu-central-1 an Kunden weltweit aus. Zwei Beschwerden häufen sich: Downloads aus entfernten Regionen sind langsam, und bei instabilen Verbindungen bricht ein fast fertiger Download ab und beginnt von vorn.\n\nWelche ZWEI Maßnahmen verbessern die Auslieferung? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Byte-Range Fetches in der Download-Anwendung nutzen, um Teile parallel zu laden und einzeln zu wiederholen." },
+      { "id": "B", "text": "Die Objekte in die Speicherklasse S3 Express One Zone verschieben, deren Latenz um ein Vielfaches niedriger ist." },
+      { "id": "C", "text": "Eine CloudFront-Distribution vor den Bucket schalten, die die Images an den Edge-Standorten cacht." },
+      { "id": "D", "text": "Die Request-Rate des Buckets durch zusätzliche Präfixe erhöhen, über die die Images verteilt werden." },
+      { "id": "E", "text": "S3 Versioning aktivieren, damit unterbrochene Downloads auf einer stabilen Objektversion aufsetzen." }
+    ],
+    "correct": ["A", "C"],
+    "explanation": "(C) adressiert die Distanz: CloudFront cacht die Images an Edge-Standorten nahe der Kunden — wiederholte Downloads desselben Firmware-Images sind der Idealfall für einen CDN-Cache, und die Strecke zum Origin entfällt. (A) adressiert die Abbrüche: Byte-Range Fetches laden das Objekt in Teilen, parallel für mehr Durchsatz, und bei einem Abbruch wird nur der fehlende Bereich erneut angefordert statt der ganzen Datei. (B) beschleunigt Requests innerhalb der Region und für latenzkritische Kleinzugriffe — den Weltumweg eines Downloads aus Australien verkürzt es nicht, und die Klasse ist an eine einzige AZ gebunden. (D) löst ein Durchsatzproblem des Buckets, das hier nicht vorliegt: Es hakt an Distanz und Verbindungsstabilität, nicht an der Request-Rate. (E) verwaltet Objektstände und hat mit der Übertragung selbst nichts zu tun.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance-guidelines.html"
+  },
+  {
+    "seedKey": "saa-c03-q-166",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "single",
+    "prompt": "Ein Unternehmen migriert 90 TB von einem On-Premises-NAS (NFS) nach Amazon S3. Die 10-Gbit/s-Anbindung ist vorhanden, darf aber tagsüber nur begrenzt belastet werden. Während der mehrwöchigen Migration ändern sich die Quelldaten laufend; am Ende soll ein verifizierter, konsistenter Stand in S3 liegen.\n\nWelche Lösung erfüllt alle Anforderungen mit dem geringsten Betriebsaufwand?",
+    "choices": [
+      { "id": "A", "text": "AWS DataSync mit einem On-Premises-Agent, Bandbreiten-Limit, Zeitplänen und inkrementellen Folgeläufen." },
+      { "id": "B", "text": "Ein S3 File Gateway, über das die Anwendungen die Daten nach und nach in den Bucket schreiben." },
+      { "id": "C", "text": "Ein Skript auf Basis der AWS CLI, das die Verzeichnisse regelmäßig mit dem Bucket synchronisiert." },
+      { "id": "D", "text": "AWS Transfer Family mit einem SFTP-Endpunkt, an den das NAS die Dateien regelmäßig überträgt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Das ist der DataSync-Kernfall: Ein Agent liest das NFS-Share, überträgt mit eingebautem Bandbreiten-Throttling und Zeitplänen, verifiziert per Checksummen in-transit und am Ziel, und die inkrementellen Folgeläufe übertragen nur die Änderungen — bis zum finalen Delta-Lauf beim Cutover. Alles verwaltete Funktionen, nichts davon selbst gebaut. (B) ist für laufenden hybriden Dateizugriff gedacht, nicht für eine Migration: Die Daten müssten aktiv durch das Gateway geschrieben werden, und einen verifizierten Massentransfer orchestriert es nicht. (C) funktioniert — aws s3 sync kann inkrementell —, aber Bandbreitensteuerung, Retry-Verhalten, Parallelisierung und Integritätsnachweis sind dann Eigenbau und Eigenverantwortung. (D) ist ein verwalteter SFTP-Empfänger für Partner-Workflows; ein NAS migriert man damit nicht, das Übertragen müsste die Quellseite selbst organisieren.",
+    "sourceRef": "https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html"
+  },
+  {
+    "seedKey": "saa-c03-q-167",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "single",
+    "prompt": "Eine On-Premises-Anwendung schreibt und liest Dateien über NFS. Das Unternehmen will die Daten künftig in S3 halten — für Analytics und günstige Aufbewahrung —, aber die Anwendung kann nicht geändert werden und braucht bei den zuletzt genutzten Dateien lokale Zugriffsgeschwindigkeit.\n\nWelche Lösung verbindet beides?",
+    "choices": [
+      { "id": "A", "text": "AWS DataSync mit einem stündlichen Zeitplan, der das lokale Verzeichnis mit dem Bucket abgleicht." },
+      { "id": "B", "text": "Ein Volume Gateway im Cached-Modus, das der Anwendung ein iSCSI-Volume mit lokalem Cache bereitstellt." },
+      { "id": "C", "text": "Ein S3 File Gateway, das ein NFS-Share bereitstellt, Objekte in S3 ablegt und häufig Genutztes lokal cacht." },
+      { "id": "D", "text": "Amazon EFS, das über AWS Direct Connect als NFS-Mount in das lokale Rechenzentrum eingebunden wird." }
+    ],
+    "correct": ["C"],
+    "explanation": "Das S3 File Gateway ist genau diese Brücke: Die Anwendung spricht weiter NFS, jede Datei landet 1:1 als Objekt in S3 — dort für Analytics und Lifecycle-Regeln direkt nutzbar —, und der lokale Cache hält die zuletzt genutzten Daten mit LAN-Geschwindigkeit vor. Writes werden lokal bestätigt und asynchron hochgeladen. (A) ist ein Kopierwerkzeug, kein Dateisystem: Zwischen den Läufen divergieren beide Seiten, und die Anwendung greift nie direkt auf S3-Daten zu. (B) liefert Block-Storage über iSCSI — die Anwendung spricht aber NFS, und die Daten landen als EBS-Snapshot-Struktur, nicht als einzeln adressierbare S3-Objekte für Analytics. (D) funktioniert technisch, verfehlt aber das Ziel: Die Daten lägen in EFS statt in S3, zu einem Vielfachen des Speicherpreises und ohne die geforderte S3-Integration.",
+    "sourceRef": "https://docs.aws.amazon.com/filegateway/latest/files3/WhatIsStorageGateway.html"
+  },
+  {
+    "seedKey": "saa-c03-q-168",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "single",
+    "prompt": "Ein Unternehmen sichert seine Systeme mit Veritas NetBackup auf eine physische Tape-Library, deren Wartungsvertrag ausläuft. Die Backup-Software und die etablierten Backup-Jobs sollen unverändert bleiben; die Bänder selbst sollen verschwinden und die Archive günstig in der Cloud liegen.\n\nWelche Lösung erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "AWS Backup als zentraler Dienst, der die bestehenden Backup-Jobs übernimmt und nach S3 Glacier schreibt." },
+      { "id": "B", "text": "Ein S3 File Gateway, auf dessen SMB-Share die Backup-Software ihre Sicherungsdateien ablegt." },
+      { "id": "C", "text": "AWS DataSync, das die vorhandenen Tape-Images einmalig ausliest und nach S3 Deep Archive überträgt." },
+      { "id": "D", "text": "Ein Tape Gateway, das der Backup-Software eine virtuelle Tape Library über iSCSI-VTL präsentiert." }
+    ],
+    "correct": ["D"],
+    "explanation": "Das Tape Gateway emuliert eine Tape Library über das Standard-iSCSI-VTL-Interface — NetBackup, Veeam und Commvault sehen weiterhin Bänder und Laufwerke, die Jobs laufen unverändert. Die virtuellen Tapes liegen in S3; archivierte Tapes wandern nach Glacier oder Deep Archive. Genau der geforderte Tausch: Hardware weg, Software bleibt. (A) ersetzt nicht die Bänder, sondern die Backup-Software — AWS Backup sichert AWS-Ressourcen mit eigenen Plänen und übernimmt keine NetBackup-Jobs. (B) funktioniert, wenn die Software auf Disk-Targets schreiben kann, bedeutet aber die Umstellung aller Jobs von Tape auf Disk — das Gegenteil von unverändert. (C) verwechselt Migration mit Betrieb: Ein einmaliger Transfer alter Images löst das laufende Backup-Problem nicht, und Tape-Formate liest DataSync ohnehin nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/storagegateway/latest/tgw/WhatIsStorageGateway.html"
+  },
+  {
+    "seedKey": "saa-c03-q-169",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "single",
+    "prompt": "Eine On-Premises-Anwendung mit strengen Latenzanforderungen greift per iSCSI auf ihren gesamten Datenbestand zu — jeder Zugriff muss lokal beantwortet werden, ein Cache-Miss ist nicht akzeptabel. Zusätzlich sollen regelmäßige Snapshots des Bestands als Absicherung in AWS liegen und dort im DR-Fall als EBS-Volumes nutzbar sein.\n\nWelche Lösung erfüllt beide Anforderungen?",
+    "choices": [
+      { "id": "A", "text": "Ein Volume Gateway im Cached-Modus, dessen lokaler Cache auf die Größe des Datenbestands ausgelegt wird." },
+      { "id": "B", "text": "Ein Volume Gateway im Stored-Modus, das alle Daten lokal hält und asynchron Snapshots nach AWS sichert." },
+      { "id": "C", "text": "Ein S3 File Gateway, dessen lokaler Cache die Anwendung versorgt und dessen Objekte in AWS liegen." },
+      { "id": "D", "text": "AWS Elastic Disaster Recovery, das die Server der Anwendung blockweise nach AWS repliziert." }
+    ],
+    "correct": ["B"],
+    "explanation": "Der Stored-Modus ist genau dafür da: Die Primärdaten liegen vollständig on-premises — jeder Zugriff ist lokal, ein Cache-Miss ist strukturell unmöglich —, und das Gateway sichert asynchron Snapshots nach AWS, die dort als EBS-Snapshots vorliegen und im DR-Fall direkt zu Volumes werden. (A) ist die klassische Verwechslung: Im Cached-Modus liegen die Primärdaten in S3, und egal wie groß der Cache ist, bleibt er ein Cache — das Modell garantiert lokale Antworten nicht. (C) scheitert doppelt: falsches Protokoll (NFS/SMB statt iSCSI) und dasselbe Cache-Modell mit Primärdaten in der Cloud. (D) funktioniert als DR-Lösung — es repliziert ganze Server blockweise —, beantwortet aber eine andere Frage: Es liefert keine Storage-Schnittstelle für die Anwendung und keine EBS-Snapshot-Serie des Datenbestands.",
+    "sourceRef": "https://docs.aws.amazon.com/storagegateway/latest/vgw/WhatIsStorageGateway.html"
+  },
+  {
+    "seedKey": "saa-c03-q-170",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "single",
+    "prompt": "Mehrere hundert externe Geschäftspartner liefern täglich Dateien an ein Unternehmen — ausschließlich über SFTP, so wie es ihre eigenen, nicht änderbaren Systeme vorgeben. Die Dateien sollen künftig direkt in S3 landen und dort Verarbeitungspipelines anstoßen. Der bisher selbst betriebene SFTP-Server soll entfallen.\n\nWelche Lösung passt?",
+    "choices": [
+      { "id": "A", "text": "AWS Transfer Family mit einem SFTP-Endpunkt, der die eingehenden Dateien direkt in S3 ablegt." },
+      { "id": "B", "text": "AWS DataSync mit Agents bei den Partnern, die deren Verzeichnisse regelmäßig nach S3 spiegeln." },
+      { "id": "C", "text": "Ein S3 File Gateway im eigenen Rechenzentrum, dessen Share die Partner über das Netz beschreiben." },
+      { "id": "D", "text": "Presigned URLs, die den Partnern regelmäßig zugestellt werden und den direkten S3-Upload erlauben." }
+    ],
+    "correct": ["A"],
+    "explanation": "Transfer Family ist der verwaltete Dienst für genau dieses Muster: ein SFTP-Endpunkt (auch FTPS/FTP/AS2), hinter dem direkt S3 liegt. Die Partner ändern nichts — Host-Key und Zugangsdaten lassen sich sogar vom Altsystem übernehmen —, jede eingehende Datei ist sofort ein S3-Objekt und kann per Event-Notification die Pipeline anstoßen. Der eigene Server entfällt ersatzlos. (B) dreht die Verantwortung um: Agents in fremden, nicht änderbaren Umgebungen installieren ist genau das, was die Partner ausschließen. (C) behält selbst betriebene Infrastruktur im eigenen Haus — und ein NFS/SMB-Share über das Internet für hunderte Externe ist weder das Protokoll der Partner noch ein tragfähiges Modell. (D) verlangt, dass die Partnersysteme HTTP-Uploads mit wechselnden URLs beherrschen — sie können aber nur SFTP.",
+    "sourceRef": "https://docs.aws.amazon.com/transfer/latest/userguide/what-is-aws-transfer-family.html"
+  },
+  {
+    "seedKey": "saa-c03-q-171",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "single",
+    "prompt": "Eine On-Premises-Oracle-Datenbank soll nach Amazon Aurora PostgreSQL migriert werden. Die Anwendung darf nur ein Wartungsfenster von wenigen Minuten haben; bis zum Umschalttermin muss die Quelldatenbank produktiv weiterlaufen und alle Änderungen müssen am Ziel ankommen.\n\nWelches Vorgehen erfüllt die Anforderungen?",
+    "choices": [
+      { "id": "A", "text": "Einen konsistenten Datenbank-Export erstellen, nach S3 übertragen und in Aurora PostgreSQL importieren." },
+      { "id": "B", "text": "AWS DataSync für die initiale Kopie einsetzen und die letzten Änderungen im Wartungsfenster nachziehen." },
+      { "id": "C", "text": "Eine Aurora Read Replica der Oracle-Datenbank erstellen und sie zum Umschalttermin zum Ziel promoten." },
+      { "id": "D", "text": "Das Schema mit der DMS Schema Conversion umwandeln, dann AWS DMS mit Full Load plus laufender CDC." }
+    ],
+    "correct": ["D"],
+    "explanation": "Oracle nach Aurora PostgreSQL ist eine heterogene Migration — sie braucht zwei Schritte: erst die Schemakonvertierung (DMS Schema Conversion in der Konsole oder das klassische SCT), dann AWS DMS mit Full Load für den Bestand und Change Data Capture für alles, was sich währenddessen ändert. Die Quelle läuft durchgehend weiter; im Wartungsfenster wird nur noch das letzte Delta angewandt und umgeschaltet. (A) funktioniert bei kompatiblen Engines, scheitert hier aber doppelt: Ohne Schemakonvertierung passt der Export nicht, und ein Dump-Import bedeutet Downtime für die gesamte Ladezeit. (B) ist das falsche Werkzeug — DataSync bewegt Dateien und Objekte, keine laufenden Datenbanken mit Transaktionslogik. (C) existiert nicht: Read Replicas funktionieren nur innerhalb kompatibler Engines, eine Aurora-PostgreSQL-Replica einer Oracle-Datenbank kann man nicht erstellen.",
+    "sourceRef": "https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-q-172",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "single",
+    "prompt": "Ein Forschungsstandort muss 600 TB Messdaten in einen S3-Bucket bringen. Die Internetanbindung des Standorts liegt bei 250 Mbit/s und ist tagsüber weitgehend ausgelastet; eine schnellere Leitung ist auf Monate nicht verfügbar. Das Unternehmen setzt die AWS Snow Family bereits für andere Standorte ein. Die Daten sollen innerhalb weniger Wochen in S3 sein.\n\nWelche Lösung erreicht das?",
+    "choices": [
+      { "id": "A", "text": "AWS DataSync mit nächtlichen Übertragungsfenstern, in denen die Leitung exklusiv zur Verfügung steht." },
+      { "id": "B", "text": "S3 Transfer Acceleration, das die Uploads über den nächstgelegenen Edge-Standort beschleunigt." },
+      { "id": "C", "text": "Snowball-Edge-Storage-Optimized-Geräte bestellen, lokal beladen und zum Import an AWS zurücksenden." },
+      { "id": "D", "text": "AWS Direct Connect mit einer dedizierten 10-Gbit/s-Verbindung zum Standort neu bereitstellen." }
+    ],
+    "correct": ["C"],
+    "explanation": "Die Rechnung entscheidet: 600 TB über eine 250-Mbit/s-Leitung, die nur nachts frei ist, brauchen selbst im Idealfall weit über ein Jahr — Netzwerk scheidet bei diesem Verhältnis von Datenmenge zu Bandbreite aus. Snowball Edge Storage Optimized (210 TB pro Gerät) löst das offline: drei Geräte parallel beladen, zurücksenden, Import in S3 — innerhalb weniger Wochen erledigt. Da das Unternehmen die Snow Family bereits nutzt, greift auch die seit Ende 2025 geltende Beschränkung auf Bestandskunden nicht. (A) und (B) scheitern beide an derselben Physik: DataSync steuert die Bandbreite nur, Transfer Acceleration optimiert nur den Pfad — die 250 Mbit/s bleiben der Flaschenhals. (D) würde funktionieren, aber die Bereitstellung einer dedizierten Direct-Connect-Anbindung dauert typischerweise selbst Wochen bis Monate und schafft laufende Kosten für einen einmaligen Transfer.",
+    "sourceRef": "https://docs.aws.amazon.com/snowball/latest/developer-guide/whatisedge.html"
+  },
+  {
+    "seedKey": "saa-c03-q-173",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "multiple",
+    "prompt": "Ein Unternehmen ersetzt sein On-Premises-Storage in zwei Schritten: Erstens sollen 200 TB Bestandsdaten von einem NFS-NAS verifiziert nach S3 migriert werden; die 10-Gbit/s-Leitung ist dafür frei. Zweitens sollen die Windows-Clients nach der Migration weiterhin über SMB auf die in S3 liegenden Daten zugreifen können, mit lokalem Cache für häufig genutzte Dateien.\n\nWelche ZWEI Dienste bilden diese Lösung? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "AWS DataSync für die verifizierte Migration der Bestandsdaten vom NAS in den S3-Bucket." },
+      { "id": "B", "text": "AWS Transfer Family, das den Windows-Clients einen verwalteten Zugriffspfad auf S3 bereitstellt." },
+      { "id": "C", "text": "Ein Volume Gateway im Cached-Modus, das den Clients die migrierten Daten bereitstellt." },
+      { "id": "D", "text": "Ein S3 File Gateway, das nach der Migration ein SMB-Share auf denselben Bucket bereitstellt." },
+      { "id": "E", "text": "AWS Elastic Disaster Recovery, das das NAS blockweise nach AWS repliziert und dort vorhält." }
+    ],
+    "correct": ["A", "D"],
+    "explanation": "(A) erledigt Schritt eins: DataSync liest das NFS-NAS über einen Agent, nutzt die freie 10-Gbit/s-Leitung und verifiziert die Übertragung per Checksummen — der Standardweg für eine NAS-Migration nach S3. (D) erledigt Schritt zwei: Das S3 File Gateway stellt ein SMB-Share auf denselben Bucket bereit; die Windows-Clients arbeiten wie gewohnt, häufig genutzte Dateien liegen im lokalen Cache, und jede Datei bleibt ein direkt nutzbares S3-Objekt. Dass beide Dienste auf denselben Bucket zeigen, macht die Übergabe nahtlos. (B) ist ein Empfangsdienst für SFTP/FTPS-Übertragungen, kein Dateisystem für Clients. (C) liefert iSCSI-Block-Storage — Windows-Clients erwarten hier SMB, und die Daten wären keine adressierbaren S3-Objekte. (E) repliziert ganze Server für den DR-Fall und hat mit Dateizugriff nichts zu tun.",
+    "sourceRef": "https://docs.aws.amazon.com/filegateway/latest/files3/WhatIsStorageGateway.html"
+  },
+  {
+    "seedKey": "saa-c03-q-174",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datentransfer & Migration",
+    "type": "single",
+    "prompt": "Eine On-Premises-Anwendung nutzt ein 60-TB-iSCSI-Volume, von dem im Tagesgeschäft nur rund 4 TB aktiv gebraucht werden. Der lokale Storage-Array ist voll und soll nicht erweitert werden; der Datenbestand soll primär in AWS liegen, die aktiv genutzten Daten aber weiterhin mit lokaler Geschwindigkeit verfügbar sein.\n\nWelche Lösung erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "Ein Volume Gateway im Stored-Modus, das den Bestand lokal hält und Snapshots nach AWS sichert." },
+      { "id": "B", "text": "Ein Volume Gateway im Cached-Modus, das die Primärdaten in S3 hält und Aktives lokal cacht." },
+      { "id": "C", "text": "Ein S3 File Gateway, das den Datenbestand als Objekte ablegt und lokal zwischenspeichert." },
+      { "id": "D", "text": "Amazon EBS-Volumes in AWS, die der Anwendung über ein Site-to-Site VPN bereitgestellt werden." }
+    ],
+    "correct": ["B"],
+    "explanation": "Der Cached-Modus ist genau dieses Muster: Die Primärdaten liegen vollständig in S3 — der lokale Array muss nur noch den Cache tragen, nicht die 60 TB —, und die rund 4 TB aktiver Daten werden lokal mit LAN-Geschwindigkeit bedient. Die Anwendung spricht unverändert iSCSI. (A) ist die Verwechslung in Gegenrichtung: Im Stored-Modus bleibt der komplette Bestand on-premises — das volle Array wird damit nicht entlastet, sondern zementiert. (C) scheitert am Protokoll: Ein File Gateway spricht NFS/SMB, die Anwendung braucht aber Block-Storage über iSCSI. (D) funktioniert nicht wie erhofft: EBS-Volumes lassen sich nur an EC2-Instanzen anhängen, nicht über ein VPN an On-Premises-Server exportieren.",
+    "sourceRef": "https://docs.aws.amazon.com/storagegateway/latest/vgw/StorageGatewayConcepts.html"
+  }
+]

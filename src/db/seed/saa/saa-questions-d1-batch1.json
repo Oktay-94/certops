@@ -1,0 +1,792 @@
+[
+  {
+    "seedKey": "saa-c03-q-001",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Ein Entwickler hat eine Identity-Policy mit `Allow` auf `s3:GetObject` für alle Buckets. Die Bucket-Policy von `finance-reports` enthält ein explizites `Deny` für seine Rolle. Die SCP am Account erlaubt `s3:*`.\n\nWas passiert beim Lesezugriff auf `finance-reports`?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Zugriff erlaubt, da sowohl die Identity-Policy als auch die SCP die Aktion gestatten."
+      },
+      {
+        "id": "B",
+        "text": "Zugriff erlaubt — Identity-Policies haben Vorrang vor Resource-Policies."
+      },
+      {
+        "id": "C",
+        "text": "Zugriff erlaubt, da die SCP als übergeordnete Ebene das Deny der Bucket-Policy aufhebt."
+      },
+      {
+        "id": "D",
+        "text": "Zugriff verweigert — ein explizites Deny schlägt jedes Allow."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Die Auswertungsreihenfolge ist unumstößlich: **explicit Deny → explicit Allow → implicit Deny**. Kein Allow kann ein explizites Deny aufheben, gleich aus welcher Policy-Art es stammt.\n\n(A) und (B) unterstellen eine Rangordnung zwischen Identity- und Resource-Policies — die gibt es nicht; beide werden gemeinsam ausgewertet, und ein Deny in einer von beiden entscheidet. (C) verkennt die Rolle der SCP: Sie ist ein **Filter nach oben**, kein Übersteuerungsmechanismus nach unten. Eine SCP kann Rechte begrenzen, aber niemals ein Deny einer anderen Ebene neutralisieren.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-q-002",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Entwickler dürfen eigene IAM-Rollen für ihre Anwendungen erstellen. Diese Rollen dürfen jedoch **niemals** mehr können als S3- und CloudWatch-Zugriff — auch nicht, wenn versehentlich `AdministratorAccess` angehängt wird. Die Rechte anderer Principals im Account (CI/CD-Rolle, Plattform-Team) dürfen **nicht** eingeschränkt werden.\n\nWelche Lösung erfüllt beide Bedingungen?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Permissions Boundary vorgeben und per Condition bei der Rollenerstellung erzwingen."
+      },
+      {
+        "id": "B",
+        "text": "Eine SCP an den Account hängen, die ausschließlich S3- und CloudWatch-Aktionen zulässt."
+      },
+      {
+        "id": "C",
+        "text": "Den Entwicklern `iam:CreateRole` entziehen; das Plattform-Team legt Rollen an."
+      },
+      {
+        "id": "D",
+        "text": "Eine Resource-based Policy auf allen S3-Buckets und Log-Groups hinterlegen."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Eine **Permissions Boundary** deckelt die maximal möglichen Rechte einer IAM-Identity. Erzwungen wird sie über eine Condition (`iam:PermissionsBoundary`) in der Policy des Entwicklers: Rollen lassen sich nur mit angehängter Boundary anlegen. Effektiv gilt dann die Schnittmenge — `AdministratorAccess` läuft ins Leere.\n\n(B) **funktioniert technisch**, verletzt aber die zweite Bedingung: Eine SCP trifft **alle** Principals im Account, also auch CI/CD und Plattform-Team. Das ist der entscheidende Unterschied — nicht \"falsch\", sondern **zu grob**. (C) löst das Problem durch ein Verbot und nimmt den Entwicklern die vorausgesetzte Autonomie. (D) begrenzt nur den Zugriff auf **diese** Ressourcen — die Rolle könnte weiterhin EC2 starten oder IAM verändern.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html"
+  },
+  {
+    "seedKey": "saa-c03-q-003",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Eine auf EC2 laufende Anwendung greift auf S3 zu. Aktuell liegen langlebige IAM-Access-Keys in einer Konfigurationsdatei auf der Instanz.\n\nWelche Lösung ist am sichersten **und** verursacht den geringsten Betriebsaufwand?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Access Keys in Secrets Manager ablegen und automatisch rotieren lassen."
+      },
+      {
+        "id": "B",
+        "text": "Die Access Keys als SecureString im SSM Parameter Store hinterlegen und beim Boot laden."
+      },
+      {
+        "id": "C",
+        "text": "Eine IAM-Rolle über ein Instance Profile an die Instanz binden."
+      },
+      {
+        "id": "D",
+        "text": "Die Access Keys mit KMS verschlüsseln, den Key per Instance-Rolle bereitstellen."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Ein **Instance Profile** liefert über IMDS automatisch rotierte, **temporäre** Credentials. Es existiert kein langlebiger Key mehr — nichts, das geleakt, in ein AMI gebrannt oder committet werden könnte, und nichts zu verwalten.\n\n(A), (B) und (D) sind allesamt echte Verbesserungen gegenüber der Klartext-Datei und werden in der Praxis auch so gebaut. Sie teilen aber denselben Konstruktionsfehler: **Es existiert weiterhin ein langlebiger Access Key**, der rotiert, geschützt und im Leak-Fall widerrufen werden muss. (D) ist dabei besonders verführerisch, weil es die Verschlüsselung *korrekt* löst — nur eben das falsche Problem.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html"
+  },
+  {
+    "seedKey": "saa-c03-q-004",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "multiple",
+    "prompt": "Account A (Data) hostet einen S3-Bucket. Eine Lambda-Funktion in Account B (Analytics) muss Objekte daraus lesen.\n\nWelche **ZWEI** Schritte sind erforderlich? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Bucket-Policy in Account A, die die Lambda-Execution-Role aus B als Principal erlaubt."
+      },
+      {
+        "id": "B",
+        "text": "Ein VPC Peering zwischen den VPCs beider Accounts, damit der Netzwerkpfad verfügbar ist."
+      },
+      {
+        "id": "C",
+        "text": "Eine IAM-Policy an der Lambda-Rolle in B mit `s3:GetObject` auf den Bucket-ARN."
+      },
+      {
+        "id": "D",
+        "text": "Einen S3 Gateway Endpoint in der VPC der Lambda-Funktion, der auf Account A verweist."
+      },
+      {
+        "id": "E",
+        "text": "Einen Cross-Account-Share über AWS RAM, der den Bucket mit Account B teilt."
+      }
+    ],
+    "correct": [
+      "A",
+      "C"
+    ],
+    "explanation": "Bei **Cross-Account müssen beide Seiten zustimmen**: die Resource-based Policy im Ziel-Account (A) **und** die Identity-Policy des Principals im Quell-Account (C). Fehlt eine, ist der Zugriff verweigert. Innerhalb *eines* Accounts würde eine der beiden genügen — genau darin liegt der Unterschied.\n\n(B) und (D) sind Netzwerk-Maßnahmen. S3 wird über den Service-Endpoint erreicht; ob der Pfad übers Internet, über NAT oder über einen Endpoint läuft, ändert an der **Autorisierung** nichts. Ein Gateway Endpoint verweist zudem nie auf einen Account, sondern auf den S3-Service. (E) ist ein realer Dienst am falschen Ort: **AWS RAM teilt Ressourcen wie Subnets, Transit Gateways oder Resolver Rules — keine S3-Buckets.**",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-walkthroughs-managing-access-example2.html"
+  },
+  {
+    "seedKey": "saa-c03-q-005",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Eine IAM-Rolle benötigt `ec2:DescribeInstances`. Die Aktion unterstützt keine Resource-Level-Permissions und erzwingt `\"Resource\": \"*\"`. Das Security-Team verlangt, dass **diese Rolle** ausschließlich in `eu-central-1` wirkt — andere Rollen im Account dürfen nicht betroffen sein.\n\nWie setzt du das um?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den Resource-ARN auf `arn:aws:ec2:eu-central-1:*:instance/*` einschränken."
+      },
+      {
+        "id": "B",
+        "text": "Eine SCP an den Account hängen, die alle Regionen außer `eu-central-1` verweigert."
+      },
+      {
+        "id": "C",
+        "text": "Die Rolle in eine OU verschieben, deren SCP nur `eu-central-1` zulässt."
+      },
+      {
+        "id": "D",
+        "text": "Eine Condition mit `aws:RequestedRegion` in die Policy der Rolle aufnehmen."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**Condition Keys sind das Werkzeug, wenn Resource-Level-Permissions nicht verfügbar sind.** Der Wildcard bleibt stehen, `aws:RequestedRegion` schneidet die Berechtigung zu — und zwar exakt für diese eine Rolle.\n\n(A) scheitert daran, dass die Aktion **keine ARNs akzeptiert** — genau deshalb existiert der Wildcard. (B) **würde funktionieren**, trifft aber alle Principals im Account; die Aufgabe schließt das aus. (C) ist ein Kategorienfehler: **Rollen liegen in Accounts, nicht in OUs** — man kann eine einzelne Rolle nicht in eine OU verschieben.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html"
+  },
+  {
+    "seedKey": "saa-c03-q-006",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Ein Audit soll ermitteln, welche S3-Buckets, KMS-Keys, IAM-Rollen und SQS-Queues von **außerhalb der Organization** zugänglich sind — bevor jemand darauf zugreift.\n\nWelcher Dienst liefert das nativ?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Amazon GuardDuty mit aktivierter S3 Protection."
+      },
+      {
+        "id": "B",
+        "text": "IAM Access Analyzer mit organisationsweiter Zone of Trust."
+      },
+      {
+        "id": "C",
+        "text": "AWS Config mit einer Custom Rule, die Resource-Policies auswertet."
+      },
+      {
+        "id": "D",
+        "text": "Amazon Detective mit organisationsweiter Aktivierung."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**IAM Access Analyzer** wertet Resource-based Policies aus und meldet jede Ressource, die außerhalb der *Zone of Trust* erreichbar ist. Er ist **präventiv** — er findet die Lücke, bevor sie genutzt wird.\n\n(A) GuardDuty ist **Threat Detection aus Logs**: Es erkennt verdächtiges Verhalten, wenn es passiert — nicht die Möglichkeit dazu. (C) ist der stärkste Distraktor: Mit genügend Aufwand **ließe sich** eine Custom Rule bauen, die Policies auswertet. Es ist nur nicht der native Dienst dafür, und die Anforderung lautet \"nativ\". (D) Detective arbeitet **reaktiv** — es untersucht bestehende Findings.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html"
+  },
+  {
+    "seedKey": "saa-c03-q-007",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Nach einem Audit soll der Root-User des Management Accounts maximal abgesichert werden.\n\nWelche Maßnahme ist **wirksam**?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine SCP an die Organization Root hängen, die dem Root-User administrative Rechte entzieht."
+      },
+      {
+        "id": "B",
+        "text": "Eine Permissions Boundary an den Root-User binden, die nur Billing-Aktionen zulässt."
+      },
+      {
+        "id": "C",
+        "text": "Hardware-MFA für den Root-User aktivieren und alle Access Keys löschen."
+      },
+      {
+        "id": "D",
+        "text": "Den Root-User über IAM Identity Center föderieren und ihm ein Permission Set zuweisen."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Der Root-User steht **außerhalb** aller IAM-Guardrail-Mechanismen — das ist der Kern dieser Frage. Wirksam sind nur organisatorisch-technische Maßnahmen: **MFA (idealerweise Hardware), keine Access Keys, Nutzung ausschließlich für die wenigen Root-only-Aufgaben.**\n\n(A) SCPs greifen **nicht auf den Root-User** — auch nicht in Member Accounts. (B) Permissions Boundaries gelten für IAM-Users und -Roles; der Root-User ist **keines von beidem**. (D) Root ist **nicht föderierbar** — er ist an die Account-E-Mail gebunden und existiert außerhalb von IAM. Alle drei klingen plausibel und sind alle drei technisch unmöglich.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+  },
+  {
+    "seedKey": "saa-c03-q-008",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Ein Team schreibt eine Bucket-Policy und setzt die IAM-Group `Developers` als `Principal` ein, um allen Gruppenmitgliedern Lesezugriff zu gewähren.\n\nWas passiert?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Das Speichern schlägt fehl — Groups sind als Principal nicht zulässig."
+      },
+      {
+        "id": "B",
+        "text": "Die Policy greift für alle aktuellen und künftigen Mitglieder der Group."
+      },
+      {
+        "id": "C",
+        "text": "Die Policy greift nur für Mitglieder, die zusätzlich eine passende Identity-Policy besitzen."
+      },
+      {
+        "id": "D",
+        "text": "Die Policy greift nur, wenn Bucket und Group im selben AWS-Account liegen."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**IAM-Groups können niemals `Principal` in einer Resource-based Policy sein.** Zulässig sind nur Users, Roles, AWS-Accounts und AWS-Services. Der Aufruf schlägt fehl — die Policy lässt sich gar nicht erst speichern.\n\n(C) ist der raffinierteste Distraktor: Er beschreibt korrekt die **Cross-Account-Regel** (beide Seiten müssen erlauben) und wirkt dadurch fachlich fundiert — nur ist er hier gar nicht anwendbar, weil die Policy nie existiert. (B) und (D) setzen ebenfalls voraus, dass sie speicherbar wäre. Der korrekte Weg: Identity-Policy an die Group hängen, oder eine Rolle bereitstellen, die die Mitglieder assumen.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html"
+  },
+  {
+    "seedKey": "saa-c03-q-009",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Eine Multi-Tenant-SaaS-Anwendung nutzt **eine** IAM-Rolle mit Zugriff auf alle Mandanten-Präfixe in einem S3-Bucket (`s3://data/tenant-*/`). Jede Session darf nur auf das Präfix ihres eigenen Mandanten zugreifen. Die Lösung muss auf **tausende** Mandanten skalieren.\n\nWelcher Ansatz ist der richtige?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Für jeden Mandanten eine eigene IAM-Rolle mit mandantenspezifischer Policy anlegen."
+      },
+      {
+        "id": "B",
+        "text": "Eine Bucket-Policy pro Mandanten-Präfix, die den Zugriff entsprechend einschränkt."
+      },
+      {
+        "id": "C",
+        "text": "Eine Permissions Boundary an die geteilte Rolle hängen, die alle Präfixe abdeckt."
+      },
+      {
+        "id": "D",
+        "text": "Beim `AssumeRole` eine Session Policy mit dem Mandanten-Präfix übergeben."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Eine **Session Policy** verengt eine *einzelne* STS-Session: effektiv gilt die Schnittmenge aus Role-Policy und Session-Policy. Genau dieses Muster nutzt man für Multi-Tenancy — eine generische Rolle, pro Session dynamisch zugeschnitten.\n\n(A) **funktioniert korrekt**, scheitert aber an der Skalierungsanforderung: Bei tausenden Mandanten läuft man in IAM-Rollen-Limits und erzeugt eine unwartbare Rollen-Explosion. (B) scheitert an der Mechanik: Eine Bucket-Policy adressiert den **Principal** — bei einer geteilten Rolle ist der für alle Mandanten identisch, eine Unterscheidung ist unmöglich. (C) wirkt auf die **Rolle**, nicht auf die **Session** — alle Sessions wären identisch eingeschränkt.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#policies_session"
+  },
+  {
+    "seedKey": "saa-c03-q-010",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Eine neue IAM-Rolle wird angelegt. Ihre **Trust Policy** erlaubt einem Entwickler das Assumen. Eine **Permission Policy** wird nicht angehängt. Der Entwickler assumt die Rolle und versucht, S3-Buckets aufzulisten.\n\nWas passiert?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Der `AssumeRole`-Aufruf schlägt fehl, weil die Rolle keine Berechtigungen besitzt."
+      },
+      {
+        "id": "B",
+        "text": "`AssumeRole` gelingt, die S3-Aktion wird jedoch verweigert (implicit Deny)."
+      },
+      {
+        "id": "C",
+        "text": "Der Zugriff wird erlaubt — ohne angehängte Policy gilt keine Einschränkung."
+      },
+      {
+        "id": "D",
+        "text": "Der Zugriff wird erlaubt, aber automatisch auf lesende Operationen begrenzt."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Die Frage trennt **Trust Policy** von **Permission Policy** — zwei völlig verschiedene Dinge, die regelmäßig verwechselt werden. Die Trust Policy regelt, **wer** die Rolle übernehmen darf: Sie erlaubt es, also **gelingt der `AssumeRole`-Call**. Die Permission Policy regelt, **was die Rolle darf**: Sie fehlt, also greift der **implicit Deny** — IAM ist deny-by-default.\n\n(A) ist die Antwort, die genau diese Verwechslung offenlegt. (C) und (D) unterstellen, die Abwesenheit einer Policy sei eine Erlaubnis — sie ist ein Verbot.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-q-011",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "multiple",
+    "prompt": "Ein Unternehmen will erzwingen, dass IAM-Users **ohne aktives MFA nichts** tun können — mit einer Ausnahme: Sie müssen ihr eigenes MFA-Gerät einrichten und ihr Passwort ändern dürfen.\n\nWelche **ZWEI** Bausteine gehören in die Lösung? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "MFA in den Account-Einstellungen als organisationsweite Pflicht aktivieren."
+      },
+      {
+        "id": "B",
+        "text": "Ein `Deny` auf alle Aktionen mit der Condition `aws:MultiFactorAuthPresent: false`."
+      },
+      {
+        "id": "C",
+        "text": "Eine SCP, die alle Aktionen ohne gesetzte MFA-Condition accountweit verweigert."
+      },
+      {
+        "id": "D",
+        "text": "Eine `NotAction`-Ausnahme für `iam:*VirtualMFADevice` und `iam:ChangePassword`."
+      },
+      {
+        "id": "E",
+        "text": "Alle User in eine IAM-Group `MFA-Required` mit passender Policy verschieben."
+      }
+    ],
+    "correct": [
+      "B",
+      "D"
+    ],
+    "explanation": "Das kanonische AWS-Pattern. **(B)** ist der Kern: ein `Deny` auf alles, solange `aws:MultiFactorAuthPresent` `false` ist. **(D)** löst das dabei entstehende **Henne-Ei-Problem** — ohne die Ausnahme könnte der User sein MFA-Gerät nie einrichten und wäre dauerhaft ausgesperrt.\n\n(C) ist der gefährlichste Distraktor, weil er auf den ersten Blick eleganter wirkt (org-weit, zentral). Er trifft aber auch **Service-Rollen** — Lambda, EC2, CI/CD-Pipelines —, die technisch **kein MFA vorweisen können**. Ergebnis: totale Blockade der Automatisierung. (A) existiert nicht: Es gibt kein Account-Setting, das MFA erzwingt. (E) Groups sind reine Container — sie erzwingen von sich aus gar nichts.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_users-self-manage-mfa-and-creds.html"
+  },
+  {
+    "seedKey": "saa-c03-q-012",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Eine Lambda-Funktion schlägt beim Start fehl: *\"is not authorized to perform: sts:AssumeRole\"*.\n\nWo liegt die Ursache?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "In der Trust Policy — `lambda.amazonaws.com` fehlt als Service-Principal."
+      },
+      {
+        "id": "B",
+        "text": "In der Permission Policy — der Rolle fehlen die Rechte auf die Zielressourcen."
+      },
+      {
+        "id": "C",
+        "text": "In der Resource-Policy der Ressource, die die Funktion ansprechen will."
+      },
+      {
+        "id": "D",
+        "text": "Der Funktion fehlt ein Instance Profile, das die Rolle an sie bindet."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Der Fehler `sts:AssumeRole` fällt, **bevor** die Funktion überhaupt Code ausführt: Der Lambda-Service kann die Execution Role nicht übernehmen. Dafür ist die **Trust Policy** zuständig — sie muss `lambda.amazonaws.com` als Service-Principal führen.\n\n(B) und (C) beschreiben Fehler, die **später** aufträten — dann würde die Meldung auf die konkrete Aktion lauten (`s3:GetObject`, `dynamodb:PutItem`), nicht auf `sts:AssumeRole`. Die **Fehlermeldung selbst** ist der Schlüssel zur richtigen Antwort. (D) ist ein Kategorienfehler: Instance Profiles sind ein **EC2**-Konstrukt — Lambda nutzt die Execution Role direkt.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html"
+  },
+  {
+    "seedKey": "saa-c03-q-013",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "type": "single",
+    "prompt": "Ein Principal in einem Member Account will `s3:PutObject` ausführen:\n\n- **SCP** an der OU: erlaubt `s3:*`\n- **Permissions Boundary** der Rolle: erlaubt nur `s3:GetObject`\n- **Identity-Policy** der Rolle: erlaubt `s3:*`\n\nWas passiert?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Erlaubt — SCP und Identity-Policy gestatten es, die Boundary wirkt beratend."
+      },
+      {
+        "id": "B",
+        "text": "Erlaubt — die SCP als oberste Ebene setzt die Permissions Boundary außer Kraft."
+      },
+      {
+        "id": "C",
+        "text": "Verweigert — `s3:PutObject` fehlt in der Permissions Boundary der Rolle."
+      },
+      {
+        "id": "D",
+        "text": "Verweigert — SCPs überschreiben bei Konflikten grundsätzlich die Identity-Policy."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Die effektive Berechtigung ist die **Schnittmenge aller drei Ebenen**: SCP ∩ Permissions Boundary ∩ Identity-Policy. `s3:PutObject` fehlt in der Boundary → fällt aus der Schnittmenge → verweigert.\n\n(D) ist der lehrreichste Distraktor: Er **kommt zum richtigen Ergebnis mit falscher Begründung**. Die SCP erlaubt hier ja `s3:*` — sie ist gar nicht die Ursache. Wer nach Bauchgefühl \"verweigert\" wählt, kann trotzdem daneben liegen. (A) Boundaries sind harte Grenzen, keine Empfehlungen. (B) unterstellt eine Hierarchie mit Übersteuerung — es gibt nur die Schnittmenge: **jede Ebene kann verbieten, keine kann durchsetzen.**",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-q-014",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "type": "single",
+    "prompt": "Ein SaaS-Monitoring-Anbieter, der hunderte weitere Kunden betreut, soll eine IAM-Rolle in eurem Account assumen dürfen.\n\nWelche Maßnahme schützt gegen das **Confused-Deputy-Problem**?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "MFA für den `AssumeRole`-Aufruf der Rolle verpflichtend machen."
+      },
+      {
+        "id": "B",
+        "text": "Die Rolle per `aws:SourceIp`-Condition auf die IP-Ranges des Anbieters begrenzen."
+      },
+      {
+        "id": "C",
+        "text": "Eine Permissions Boundary an die Rolle hängen, die den Zugriff auf Metriken begrenzt."
+      },
+      {
+        "id": "D",
+        "text": "In der Trust Policy eine `sts:ExternalId` verlangen, die der Anbieter mitsenden muss."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Die **ExternalId** ist AWS' vorgesehener Schutz gegen den Confused Deputy: Der Vendor muss beim `AssumeRole` ein Geheimnis mitschicken, das nur zwischen euch beiden vereinbart ist. Ohne sie könnte ein **anderer Kunde** desselben Vendors ihn dazu bringen, mit *eurem* Role-ARN zuzugreifen — der Vendor wäre der \"verwirrte Stellvertreter\".\n\n(B) klingt nach solider Netzwerk-Härtung, verfehlt aber den Angriffsvektor komplett: Der Zugriff kommt ja **legitim vom Vendor** — nur im Auftrag der falschen Person. Eine IP-Beschränkung ändert daran nichts. (A) MFA ist bei automatisierten Service-zu-Service-Aufrufen nicht darstellbar. (C) begrenzt, **was** die Rolle darf — nicht, **in wessen Auftrag** sie assumiert wird.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html"
+  },
+  {
+    "seedKey": "saa-c03-q-015",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "type": "single",
+    "prompt": "Eine Anwendung assumt Rolle A. Mit deren Credentials assumt sie anschließend Rolle B und fordert dabei `DurationSeconds: 14400` (4 Stunden). Rolle B hat `MaxSessionDuration: 12 Stunden`.\n\nWas passiert?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Der Aufruf schlägt fehl — Role Chaining ist auf 1 Stunde begrenzt."
+      },
+      {
+        "id": "B",
+        "text": "Die Session ist 4 Stunden gültig, wie im `DurationSeconds` angefordert."
+      },
+      {
+        "id": "C",
+        "text": "Die Session wird stillschweigend auf 1 Stunde gekürzt, ohne dass ein Fehler entsteht."
+      },
+      {
+        "id": "D",
+        "text": "Die Session ist 12 Stunden gültig — `MaxSessionDuration` der Zielrolle hat Vorrang."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Beim **Role Chaining** (eine Rolle assumt die nächste) ist die Session **hart auf 1 Stunde begrenzt** — unabhängig von `MaxSessionDuration`. Ein höherer `DurationSeconds`-Wert lässt den Aufruf **fehlschlagen**.\n\n(C) ist der Distraktor, den die meisten wählen: Die Annahme, AWS würde den Wert stillschweigend kappen, ist intuitiv — und falsch. Der Unterschied zwischen \"wird gekürzt\" und \"wirft einen Fehler\" entscheidet in der Praxis darüber, ob dein Deployment durchläuft oder abbricht. Ausnahme, die man kennen sollte: Anwendungen über ein **EC2 Instance Profile** unterliegen der Chaining-Grenze nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html"
+  },
+  {
+    "seedKey": "saa-c03-q-016",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "type": "single",
+    "prompt": "Ein Unternehmen mit 5.000 Mitarbeitern und einem bestehenden on-premises Active Directory will Konsolen- und CLI-Zugriff auf **20 AWS-Accounts** bereitstellen — ohne IAM-Users, mit zentraler Rechteverwaltung und minimalem laufenden Aufwand.\n\nWas ist die beste Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "In jedem Account IAM-Users pro Mitarbeiter anlegen und über IAM-Groups verwalten."
+      },
+      {
+        "id": "B",
+        "text": "AWS IAM Identity Center mit dem Active Directory als Identity Source."
+      },
+      {
+        "id": "C",
+        "text": "Ein Amazon Cognito User Pool, der per SAML gegen das Active Directory föderiert."
+      },
+      {
+        "id": "D",
+        "text": "Pro Account eine IAM-Rolle, die die Mitarbeiter per SAML-Föderation assumen."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**IAM Identity Center** ist die Workforce-Lösung für Multi-Account-Zugriff: Föderation gegen das AD, **Permission Sets** je Account, zentrale Verwaltung, keine IAM-Users.\n\n(D) ist der **fachlich stärkste Distraktor** — das war jahrelang der Standardweg (SAML-Föderation direkt zu IAM-Rollen) und es **funktioniert**. Aber bei 20 Accounts bedeutet es: 20× IdP-Konfiguration, 20× Rollenpflege, keine zentrale Zuweisung. Die Anforderung \"minimaler laufender Aufwand\" entscheidet. (C) ist die Kernverwechslung des Cognito-Themas: **Cognito ist für Endnutzer deiner Anwendung**, nicht für Mitarbeiter. (A) wären 100.000 IAM-Users.",
+    "sourceRef": "https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-q-017",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "type": "single",
+    "prompt": "Eine Mobile-App erlaubt die Anmeldung mit einem Google-Konto. Danach sollen Nutzer Fotos **direkt** in ihren eigenen S3-Präfix hochladen — ohne eigenen Backend-Server dazwischen.\n\nWie erhält die App AWS-Credentials?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein Cognito User Pool stellt nach erfolgreicher Anmeldung AWS-Credentials aus."
+      },
+      {
+        "id": "B",
+        "text": "Die App bettet IAM-Access-Keys ein, deren Policy auf den S3-Präfix begrenzt ist."
+      },
+      {
+        "id": "C",
+        "text": "Für jeden Nutzer wird beim ersten Login ein IAM-User mit eigener Policy angelegt."
+      },
+      {
+        "id": "D",
+        "text": "Ein Cognito Identity Pool tauscht das Google-Token gegen temporäre Credentials."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Der **Identity Pool** (Federated Identities) tauscht ein Identitäts-Token — hier von Google — via `sts:AssumeRoleWithWebIdentity` gegen **temporäre AWS-Credentials**. Das ist die einzige Komponente, die AWS-Credentials ausstellen kann.\n\n(A) ist die **häufigste Verwechslung im gesamten Cognito-Themenfeld** und deshalb hier bewusst gleich lang formuliert: Der **User Pool authentifiziert** und liefert **JWT-Tokens** — niemals AWS-Credentials. Wer die beiden verwechselt, wählt (A) und liegt falsch. (B) Keys in einer Mobile-App sind trivial extrahierbar — die Präfix-Begrenzung ändert daran nichts, weil sie für **alle** Nutzer gleich wäre. (C) skaliert nicht und widerspricht dem Prinzip temporärer Credentials.",
+    "sourceRef": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html"
+  },
+  {
+    "seedKey": "saa-c03-q-018",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "type": "single",
+    "prompt": "Ein Data-Science-Batch-Job läuft **8 Stunden** unter einer assumten IAM-Rolle. Nach einer Stunde bricht er mit Credential-Fehlern ab.\n\nWelche Änderung löst das mit dem **geringsten Aufwand**?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den Job in vier Teiljobs à zwei Stunden zerlegen und sequenziell ausführen."
+      },
+      {
+        "id": "B",
+        "text": "Die Rolle durch einen IAM-User mit langlebigen Access Keys ersetzen."
+      },
+      {
+        "id": "C",
+        "text": "`MaxSessionDuration` erhöhen und `DurationSeconds` entsprechend anfordern."
+      },
+      {
+        "id": "D",
+        "text": "Die Credentials im Job alle 55 Minuten per erneutem `AssumeRole` auffrischen."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Die Session-Dauer hat **zwei Stellschrauben, und beide müssen stimmen**: Die Rolle muss die Dauer über `MaxSessionDuration` (1–12 Stunden) erlauben, **und** der Aufrufer muss sie über `DurationSeconds` anfordern. Der Default liegt bei **1 Stunde** — genau das erklärt den Abbruch nach 60 Minuten.\n\n(D) ist der beste Distraktor, weil er **tatsächlich funktioniert** — Credential-Refresh ist ein legitimes Muster und in vielen SDKs sogar eingebaut. Er erfordert nur **Code-Änderungen**, während (C) eine reine Konfigurationsänderung ist. Die Anforderung \"geringster Aufwand\" entscheidet. (B) ist ein Rückschritt zu langlebigen Credentials. (A) umgeht das Problem, statt es zu beheben.",
+    "sourceRef": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html"
+  },
+  {
+    "seedKey": "saa-c03-q-019",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "type": "multiple",
+    "prompt": "Ein Team in Account B benötigt Zugriff auf eine SQS-Queue in Account A.\n\nWelche **ZWEI** Ansätze sind gültige Lösungen? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Resource-based Policy auf der Queue, die den Principal aus Account B erlaubt."
+      },
+      {
+        "id": "B",
+        "text": "Ein VPC Peering zwischen beiden Accounts, damit die Queue erreichbar wird."
+      },
+      {
+        "id": "C",
+        "text": "Die Queue über AWS RAM mit Account B teilen."
+      },
+      {
+        "id": "D",
+        "text": "Eine Rolle in A, die B assumen darf, mit den nötigen SQS-Rechten."
+      },
+      {
+        "id": "E",
+        "text": "Eine SCP an Account B, die `sqs:*` auf die Queue in Account A erlaubt."
+      }
+    ],
+    "correct": [
+      "A",
+      "D"
+    ],
+    "explanation": "Beide Wege sind etabliert. **(A)** Resource-based Policy: direkter Zugriff, der Principal behält seine Identität — einfacher. **(D)** `AssumeRole`: Identitätswechsel mit temporären Credentials — besser auditierbar und der **einzige** Weg bei Services **ohne** Resource-based Policy.\n\n(C) ist der stärkste Distraktor: **AWS RAM existiert und teilt tatsächlich Ressourcen accountübergreifend** — aber Subnets, Transit Gateways, Resolver Rules und License Configurations. **SQS-Queues gehören nicht dazu.** (B) Netzwerk-Ebene: SQS wird über den Service-Endpoint erreicht. (E) **SCPs gewähren niemals Rechte** — sie begrenzen nur.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-basic-examples-of-sqs-policies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-020",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "type": "single",
+    "prompt": "Eine Lambda-Funktion in Account A soll eine Rolle in Account B assumen. Es muss sichergestellt sein, dass **ausschließlich diese eine Lambda-Execution-Role** das darf — keine andere Rolle aus Account A.\n\nWie setzt du das um?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den vollständigen ARN der Lambda-Execution-Role als Principal in der Trust Policy setzen."
+      },
+      {
+        "id": "B",
+        "text": "Die Account-ID von Account A als Principal in der Trust Policy setzen."
+      },
+      {
+        "id": "C",
+        "text": "Eine SCP in Account A, die nur der Lambda-Rolle `sts:AssumeRole` gestattet."
+      },
+      {
+        "id": "D",
+        "text": "In der Trust Policy eine Condition auf `aws:PrincipalTag/Function` setzen."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Der `Principal` in einer Trust Policy kann **so eng wie ein einzelner Role-ARN** sein — die direkteste und sicherste Umsetzung.\n\n(B) ist der Fehler, der in der Praxis am häufigsten passiert: Setzt man die **Account-ID**, delegiert man die Entscheidung an Account A — **jede** Rolle dort, deren Identity-Policy `sts:AssumeRole` erlaubt, kann die Rolle übernehmen. Genau das soll verhindert werden. (D) ist raffiniert: Tag-basierte Conditions **funktionieren tatsächlich**, sind hier aber indirekt und nur so sicher wie die Kontrolle darüber, **wer Tags setzen darf**. (C) SCPs begrenzen nur — sie können nicht selektiv einer einzelnen Rolle etwas erlauben.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_aws-accounts.html"
+  },
+  {
+    "seedKey": "saa-c03-q-021",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "type": "single",
+    "prompt": "Nach einem Vorfall zeigt CloudTrail, dass eine **geteilte** IAM-Rolle eine kritische Änderung durchgeführt hat. Welcher **Mensch** dahinterstand, ist nicht nachvollziehbar.\n\nWas hätte das zuverlässig verhindert?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "CloudTrail Data Events für den betroffenen Service aktivieren."
+      },
+      {
+        "id": "B",
+        "text": "AWS Config Rules zur Überwachung der Rollenkonfiguration einrichten."
+      },
+      {
+        "id": "C",
+        "text": "`sts:SourceIdentity` setzen und in der Trust Policy erzwingen."
+      },
+      {
+        "id": "D",
+        "text": "Den Session-Namen beim `AssumeRole` auf den Benutzernamen setzen."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**`sts:SourceIdentity`** trägt eine **unveränderliche** Identitätsangabe durch alle Role-Chains und erscheint in jedem CloudTrail-Event. Per Trust Policy (`sts:SetSourceIdentity`) lässt sie sich **erzwingen** — die Rolle kann ohne sie gar nicht assumiert werden.\n\n(D) ist der beste Distraktor der ganzen Domain: Der **Session-Name erscheint tatsächlich in CloudTrail** und wird in der Praxis oft dafür genutzt. Der entscheidende Unterschied: Er ist **vom Aufrufer frei wählbar** und **nicht erzwingbar** — wer etwas zu verbergen hat, setzt einfach einen anderen. Die Frage fragt nach \"zuverlässig\". (A) Data Events zeigen Objekt-Zugriffe, nicht die Identität dahinter. (B) Config prüft Zustände, keine Aufrufer.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_monitor.html"
+  },
+  {
+    "seedKey": "saa-c03-q-022",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Eine SCP an der OU erlaubt `s3:*`. Ein IAM-User im Member Account darunter hat **keine** IAM-Policy angehängt. Er versucht, S3-Buckets aufzulisten.\n\nWas passiert?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Zugriff erlaubt — die SCP gewährt die Berechtigung für alle Principals der OU."
+      },
+      {
+        "id": "B",
+        "text": "Zugriff erlaubt, aber begrenzt auf Listen-Operationen ohne Objektzugriff."
+      },
+      {
+        "id": "C",
+        "text": "Der User erbt die SCP als implizite Identity-Policy des Accounts."
+      },
+      {
+        "id": "D",
+        "text": "Zugriff verweigert — SCPs begrenzen nur, sie gewähren keine Rechte."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**Eine SCP gewährt niemals Rechte — sie setzt ausschließlich die Obergrenze.** Die tatsächliche Berechtigung muss aus einer IAM-Policy kommen. Effektiv gilt **SCP ∩ IAM-Policy**; hier ist die IAM-Seite leer → implicit Deny.\n\n(A), (B) und (C) beruhen alle auf demselben Denkfehler: dass eine SCP wie eine Identity-Policy *sendet*. Sie ist ein **Filter**, kein **Sender**. Das ist die wichtigste Einzelaussage zu SCPs und wird in der Prüfung immer wieder abgefragt.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+  },
+  {
+    "seedKey": "saa-c03-q-023",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Eine SCP an der **Organization Root** verweigert das Anlegen von Ressourcen außerhalb von `eu-central-1`. In den Member Accounts greift sie nachweislich. Trotzdem startet ein Administrator im **Management Account** erfolgreich eine EC2-Instanz in `us-east-1`.\n\nWarum?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die SCP wurde nicht korrekt an die Organization Root attached."
+      },
+      {
+        "id": "B",
+        "text": "SCPs greifen nicht auf Principals im Management Account."
+      },
+      {
+        "id": "C",
+        "text": "Der Administrator besitzt eine Allow-Policy, die die SCP überschreibt."
+      },
+      {
+        "id": "D",
+        "text": "EC2 unterliegt als globaler Service keinen regionalen SCP-Bedingungen."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**SCPs — und seit November 2024 auch RCPs — greifen ausschließlich in Member Accounts, niemals im Management Account.** Eine harte, oft übersehene Eigenschaft von AWS Organizations. Genau deshalb lautet die Best Practice: **keine Workloads im Management Account** betreiben.\n\n(A) wird durch die Aufgabenstellung ausgeschlossen — in den Member Accounts greift sie ja nachweislich. (C) ist unmöglich: Kein Allow kann ein SCP-Deny überschreiben; SCPs sind Obergrenzen. (D) ist faktisch falsch — EC2 ist ein **regionaler** Service.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+  },
+  {
+    "seedKey": "saa-c03-q-024",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Ein Entwickler ändert versehentlich eine S3-Bucket-Policy und gewährt einem **externen AWS-Account** Lesezugriff. Die bestehende SCP hat das nicht verhindert. Gefordert ist eine org-weite Kontrolle, die **jeden Zugriff von Principals außerhalb der Organization** unterbindet — unabhängig davon, was eine Bucket-Policy erlaubt.\n\nWelche Lösung erfüllt das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Resource Control Policy (RCP) mit `aws:PrincipalOrgID`-Condition."
+      },
+      {
+        "id": "B",
+        "text": "Eine SCP mit einer Deny-Regel, die Zugriffe externer Principals verweigert."
+      },
+      {
+        "id": "C",
+        "text": "S3 Block Public Access auf Account- und Bucket-Ebene aktivieren."
+      },
+      {
+        "id": "D",
+        "text": "IAM Access Analyzer mit einer Zone of Trust auf Organizations-Ebene."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**RCPs (seit November 2024) sind resource-centric**: Sie kontrollieren, **wer auf deine Ressourcen zugreifen darf** — auch externe Principals. Eine RCP mit `aws:PrincipalOrgID` sperrt jeden Fremdzugriff aus, **egal was die Bucket-Policy sagt**. Unterstützt u. a. S3, STS, KMS, SQS, Secrets Manager.\n\n(B) ist der Kern der Frage: **SCPs sind principal-centric** — sie regeln, was *deine eigenen* Identities dürfen. Einen **externen** Principal erreichen sie **strukturell gar nicht**. Genau diese Lücke schließen RCPs. (C) blockiert nur **öffentlichen** Zugriff (`Principal: \"*\"`) — ein benannter Fremd-Account ist nicht \"public\" und kommt weiterhin durch. (D) **findet** das Problem, **verhindert** es aber nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_rcps.html"
+  },
+  {
+    "seedKey": "saa-c03-q-025",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Ein Unternehmen will neue AWS-Accounts standardisiert bereitstellen: mit vorkonfigurierten Guardrails, zentralem CloudTrail-Log-Archiv, separatem Audit-Account und Drift-Erkennung.\n\nWelche Lösung erfordert den **geringsten Betriebsaufwand**?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS Organizations plus manuell eingerichtete SCPs, CloudTrail und Config je Account."
+      },
+      {
+        "id": "B",
+        "text": "CloudFormation StackSets, die bei jedem neuen Account ausgerollt werden."
+      },
+      {
+        "id": "C",
+        "text": "AWS Control Tower mit Account Factory und Guardrails."
+      },
+      {
+        "id": "D",
+        "text": "AWS Service Catalog mit vordefinierten Account-Produkten."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**AWS Control Tower** liefert exakt dieses Paket als vorkonfigurierte **Landing Zone**: Account Factory, preventive Guardrails (SCPs), detective Guardrails (Config Rules), zentrales Log-Archive- und Audit-Account sowie **Drift Detection**.\n\n(B) ist ein *Baustein* — Control Tower nutzt StackSets intern —, liefert aber weder Guardrails noch Account Factory noch Drift Detection. (D) Service Catalog verwaltet **Produkte innerhalb** von Accounts; die Account Factory von Control Tower nutzt ihn, aber allein provisioniert er keine Accounts mit Guardrails. (A) beschreibt genau die Handarbeit, die Control Tower automatisiert.",
+    "sourceRef": "https://docs.aws.amazon.com/controltower/latest/userguide/what-is-control-tower.html"
+  }
+]

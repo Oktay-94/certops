@@ -1,0 +1,542 @@
+[
+  {
+    "seedKey": "saa-c03-card-001",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "Ein IAM-User hat eine Identity-Policy mit `Allow` auf `s3:*`. Die Bucket-Policy des Ziel-Buckets enthält ein explizites `Deny` für seinen ARN. Was passiert?",
+    "back": "Zugriff verweigert. Ein **explizites Deny gewinnt immer** — es kann von keinem Allow überschrieben werden. Auswertungsreihenfolge: explicit Deny → explicit Allow → implicit Deny (Default).",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-card-002",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "Ein neu erstellter IAM-User hat überhaupt keine Policy attached. Auf was hat er Zugriff?",
+    "back": "Auf nichts. IAM ist **deny-by-default** (implicit Deny). Ein Allow muss aktiv erteilt werden — die Abwesenheit einer Policy ist bereits ein Deny.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-card-003",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "Eine Permissions Boundary erlaubt `s3:*`. Die Identity-Policy des Users erlaubt `ec2:*`. Was darf der User?",
+    "back": "Nichts von beidem. Effektive Rechte = **Schnittmenge** aus Identity-Policy UND Boundary. Die Boundary **gewährt nie** Rechte, sie deckelt sie nur. Hier ist die Schnittmenge leer.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-card-004",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "Warum darf man niemals statische Access Keys auf eine EC2-Instance legen — was ist die Alternative und warum ist sie sicherer?",
+    "back": "**IAM Role via Instance Profile.** Sie liefert über IMDS automatisch rotierte, temporäre Credentials. Statische Keys rotieren nicht, landen in AMIs/Backups/Git und sind bei Kompromittierung unbefristet gültig.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-card-005",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "Cross-Account-Zugriff auf einen S3-Bucket: Reicht es, wenn die Bucket-Policy den fremden Principal erlaubt?",
+    "back": "Nein. Bei Cross-Account müssen **beide Seiten** erlauben: die Resource-based Policy (Bucket-Policy) im Ziel-Account UND die Identity-Policy des Principals im Quell-Account. Innerhalb **eines** Accounts reicht dagegen eine der beiden.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-card-006",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "Kann eine IAM-Group als `Principal` in einer Bucket-Policy stehen?",
+    "back": "Nein. Als Principal in einer Resource-based Policy sind nur **Users, Roles, AWS-Accounts und Services** zulässig — **niemals Groups**. Groups sind reine Verwaltungshilfen für Identity-Policies.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-card-007",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "Eine Action unterstützt kein Resource-Level-Permission (z. B. `ec2:DescribeInstances`), erzwingt also `\"Resource\": \"*\"`. Wie hält man trotzdem Least Privilege ein?",
+    "back": "Über **Condition Keys** einschränken — z. B. `aws:RequestedRegion`, `aws:ResourceTag/...`, `aws:PrincipalOrgID`, `aws:SourceIp`. Der Resource-Wildcard bleibt, die Bedingung schneidet die Rechte zu.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  },
+  {
+    "seedKey": "saa-c03-card-008",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "Welche Aufgaben kann ausschließlich der Root-User erledigen — und warum ist das für Multi-Account-Design relevant?",
+    "back": "U. a. Account schließen, Support-Plan ändern, Root-Kontaktdaten ändern, IAM-Zugriff auf Billing freischalten, eine kaputte S3-Bucket-Policy reparieren. Relevanz: Root wird **weder von SCPs noch von RCPs eingeschränkt** → Hardware-MFA, keine Access Keys, nie im Alltag benutzen.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html"
+  },
+  {
+    "seedKey": "saa-c03-card-009",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "IAM & Policy Evaluation",
+    "front": "IAM Access Analyzer — was findet er, und was findet er *nicht*?",
+    "back": "Er findet **Ressourcen, die außerhalb deiner Zone of Trust erreichbar sind** (S3, IAM-Roles, KMS, Lambda, SQS, Secrets…) und validiert Policies. Er ist **keine** Threat Detection — laufende Angriffe sieht GuardDuty, nicht Access Analyzer.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html"
+  },
+  {
+    "seedKey": "saa-c03-card-010",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "front": "`sts:AssumeRole` — Minimum, Default und Maximum der Session-Dauer?",
+    "back": "**Minimum 900 s (15 min), Default 3600 s (1 h), Maximum = `MaxSessionDuration` der Rolle**, die zwischen 1 h und **12 h** liegen kann. Ein höherer Wert als das Rollen-Setting lässt den Call fehlschlagen.",
+    "sourceRef": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html"
+  },
+  {
+    "seedKey": "saa-c03-card-011",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "front": "Du assumest Rolle A und nutzt deren Credentials, um Rolle B zu assumen. Du forderst 4 h Session-Dauer und bekommst einen Fehler. Warum?",
+    "back": "**Role Chaining ist hart auf 1 Stunde gedeckelt.** `DurationSeconds > 3600` schlägt fehl, egal was `MaxSessionDuration` erlaubt. Ausnahme: Anwendungen, die über ein **EC2 Instance Profile** laufen, sind davon nicht betroffen.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html"
+  },
+  {
+    "seedKey": "saa-c03-card-012",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "front": "Ein SaaS-Anbieter soll eine Rolle in deinem Account assumen dürfen. Wozu dient die `ExternalId`?",
+    "back": "Sie verhindert das **Confused-Deputy-Problem**: Ohne ExternalId könnte der Vendor mit demselben Role-ARN-Muster versehentlich (oder böswillig) auf die Accounts *anderer* Kunden zugreifen. Die ExternalId ist ein Geheimnis, das nur ihr beide kennt.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html"
+  },
+  {
+    "seedKey": "saa-c03-card-013",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "front": "Beim `AssumeRole` übergibst du zusätzlich eine Session Policy. Was bewirkt sie?",
+    "back": "Sie **verengt** die Session weiter: Effektive Rechte = Schnittmenge aus Role-Policy UND Session-Policy. Eine Session Policy kann Rechte **niemals erweitern** — nur einschränken. Typischer Use-Case: eine generische Rolle pro Mandant zuschneiden.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html"
+  },
+  {
+    "seedKey": "saa-c03-card-014",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "front": "Wann nutzt man `AssumeRoleWithWebIdentity` statt `AssumeRole`?",
+    "back": "Wenn der Nutzer über einen **externen Web-IdP** (Google, Apple, Facebook, beliebiger OIDC-Provider) authentifiziert wurde und temporäre AWS-Credentials braucht — **ohne IAM-User**. In der Praxis meist über einen **Cognito Identity Pool** gekapselt.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html"
+  },
+  {
+    "seedKey": "saa-c03-card-015",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "STS & Cross-Account",
+    "front": "Cross-Account-Zugriff: Wann nimmt man eine Resource-based Policy, wann `AssumeRole`?",
+    "back": "**Resource-based Policy**: einfacher Direktzugriff, der Principal behält seine eigene Identität (gut für S3/SQS/KMS). **AssumeRole**: der Principal *wechselt* die Identität, bekommt temporäre Credentials, ist besser auditierbar (Session-Name, Source Identity) und funktioniert bei Services **ohne** Resource-based Policy.",
+    "sourceRef": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html"
+  },
+  {
+    "seedKey": "saa-c03-card-016",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "front": "Eine SCP erlaubt `s3:*`. Der User hat keine IAM-Policy. Darf er auf S3 zugreifen?",
+    "back": "Nein. **SCPs gewähren niemals Rechte** — sie deckeln nur die maximal möglichen. Effektiv = Schnittmenge aus SCP UND IAM-Policy. Ohne IAM-Allow bleibt es beim implicit Deny.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+  },
+  {
+    "seedKey": "saa-c03-card-017",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "front": "Du hängst eine restriktive SCP an die Organization Root. Warum sind die Admins im Management Account trotzdem unbeeindruckt?",
+    "back": "**SCPs (und RCPs) wirken nicht auf Users/Roles im Management Account** — ausschließlich auf Member Accounts. Genau deshalb: **keine Workloads im Management Account** betreiben.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+  },
+  {
+    "seedKey": "saa-c03-card-018",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "front": "SCP vs. RCP — was ist der fundamentale Unterschied?",
+    "back": "**SCP = principal-centric**: „Was dürfen *meine* Identities tun?\" **RCP = resource-centric**: „Wer darf auf *meine* Ressourcen zugreifen?\" Nur die RCP kann einen **externen** Principal blocken, dem eine Bucket-Policy Zugriff gewährt — das konnte eine SCP nie.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+  },
+  {
+    "seedKey": "saa-c03-card-019",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "front": "Für welche Services greifen RCPs — und was ist die typische Anwendung?",
+    "back": "Bei Einführung (Nov 2024): **S3, STS, KMS, SQS, Secrets Manager**. Typische Anwendung: **Data Perimeter** — „Kein Principal außerhalb meiner Organization ID darf je auf meine S3-Buckets zugreifen\", selbst wenn ein Entwickler die Bucket-Policy öffnet.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_rcps.html"
+  },
+  {
+    "seedKey": "saa-c03-card-020",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "front": "SCP vs. Permissions Boundary — beides sind Guardrails. Wo liegt der Unterschied?",
+    "back": "**SCP** wirkt auf **Organizations-Ebene** (Account/OU) für *alle* Principals darin. **Permissions Boundary** wirkt auf **IAM-Ebene** für *eine einzelne* Identity. Sind beide gesetzt, muss die Aktion von **SCP UND Boundary UND Identity-Policy** erlaubt sein.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+  },
+  {
+    "seedKey": "saa-c03-card-021",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "front": "Was liefert AWS Control Tower, das reines AWS Organizations nicht liefert?",
+    "back": "Eine vorkonfigurierte **Landing Zone**: Account Factory (standardisiertes Account-Provisioning), Guardrails (preventive via SCP, detective via Config), zentrales **Log-Archive-** und **Audit-Account**, plus **Drift Detection**.",
+    "sourceRef": "https://docs.aws.amazon.com/controltower/latest/userguide/what-is-control-tower.html"
+  },
+  {
+    "seedKey": "saa-c03-card-022",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "front": "Drei Teams in drei Accounts sollen dieselben Subnets nutzen. Welcher Dienst — und wo ist die Verwechslungsgefahr?",
+    "back": "**AWS RAM (Resource Access Manager)** — er *teilt* Ressourcen (Subnets, Transit Gateway, Route 53 Resolver Rules, License Configurations) accountübergreifend, statt sie zu duplizieren. Falle: **RAM teilt Ressourcen, IAM/STS gibt Zugriff auf APIs.** Das ist nicht dasselbe.",
+    "sourceRef": "https://docs.aws.amazon.com/ram/latest/userguide/what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-card-023",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "front": "Eine Mobile-App soll Nutzer einloggen UND ihnen direkten Upload in einen S3-Bucket erlauben. Welche Cognito-Komponente wofür?",
+    "back": "**User Pool** = Authentifizierung + User-Directory → liefert JWT-Tokens. **Identity Pool** = tauscht diese Tokens via STS gegen **temporäre AWS-Credentials**. Falle: Für den direkten S3-Zugriff brauchst du den **Identity Pool** — der User Pool allein reicht nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+  },
+  {
+    "seedKey": "saa-c03-card-024",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "front": "IAM Identity Center vs. Cognito — wann welches?",
+    "back": "**IAM Identity Center** (ex AWS SSO): **Workforce** — deine Mitarbeiter, Zugriff auf mehrere AWS-Accounts + SaaS-Apps über Permission Sets. **Cognito**: **Customer** — Endnutzer *deiner Anwendung*. Signalwort: „Mitarbeiter, mehrere Accounts\" → Identity Center. „App-Nutzer, Sign-up/Sign-in\" → Cognito.",
+    "sourceRef": "https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-card-025",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "front": "AWS Managed Microsoft AD vs. AD Connector vs. Simple AD — Entscheidungskriterium?",
+    "back": "**Managed Microsoft AD**: echter AD in AWS, unterstützt **Trusts** zu on-prem, Objekte liegen in AWS. **AD Connector**: reiner **Proxy** zum bestehenden on-prem AD — **keine Daten in AWS**, kein eigener Directory-Store. **Simple AD**: günstiger Samba-Standalone, **keine Trusts**, kein MFA — nur für einfache Fälle.",
+    "sourceRef": "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/what_is.html"
+  },
+  {
+    "seedKey": "saa-c03-card-026",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "front": "SAML-2.0-Föderation in AWS: Was passiert technisch nach dem Login beim IdP?",
+    "back": "Der IdP liefert eine **SAML-Assertion**; die App/Konsole ruft damit **`sts:AssumeRoleWithSAML`** auf und erhält **temporäre Credentials** für eine vorab definierte IAM-Role. Es entsteht **kein IAM-User** — die Identität bleibt beim IdP.",
+    "sourceRef": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+  },
+  {
+    "seedKey": "saa-c03-card-027",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "front": "Warum ist gerade für den Root-User **Hardware**-MFA die Empfehlung — und nicht nur virtuelles MFA?",
+    "back": "Root hat **unbeschränkte** Rechte und lässt sich weder per SCP noch per RCP einschränken. Ein virtuelles MFA lebt auf einem Endgerät, das kompromittiert werden kann; ein Hardware-Token ist an physischen Besitz gebunden. Bei Root ist der Blast Radius der gesamte Account.",
+    "sourceRef": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+  },
+  {
+    "seedKey": "saa-c03-card-028",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "front": "Anwendungsnutzer sollen sich mit Google **oder** mit E-Mail/Passwort anmelden können, mit MFA. Welche Komponente deckt das ab?",
+    "back": "Der **Cognito User Pool** — er kann beides: eigenes User-Directory (E-Mail/Passwort) **und** Federation (Social/SAML/OIDC), plus MFA und Advanced Security (Erkennung kompromittierter Credentials). Ein Identity Pool ist erst nötig, wenn direkte AWS-Ressourcen-Zugriffe dazukommen.",
+    "sourceRef": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+  },
+  {
+    "seedKey": "saa-c03-card-029",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "Wie groß darf ein Datenblock sein, den du direkt per `kms:Encrypt` verschlüsselst?",
+    "back": "**Maximal 4 KB.** Alles darüber läuft über **Envelope Encryption**: `GenerateDataKey` liefert einen Data Key, mit dem du **lokal** verschlüsselst; KMS verschlüsselt nur den Data Key.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"
+  },
+  {
+    "seedKey": "saa-c03-card-030",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "Warum nutzen AWS-Services Envelope Encryption statt direkt über KMS zu verschlüsseln?",
+    "back": "Drei Gründe: **keine 4-KB-Grenze**, **drastisch weniger KMS-API-Calls** (Kosten + Throttling) und **Performance** (die eigentliche Verschlüsselung passiert lokal). Der verschlüsselte Data Key wird neben den Daten abgelegt.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"
+  },
+  {
+    "seedKey": "saa-c03-card-031",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "KMS Automatic Key Rotation: Default-Intervall und konfigurierbare Spanne?",
+    "back": "**Default 365 Tage.** Seit April 2024 frei konfigurierbar zwischen **90 und 2560 Tagen** (~7 Jahre). Gilt nur für **symmetrische Customer Managed Keys mit KMS-generiertem Material**. **AWS managed keys** rotieren fix jährlich und lassen sich nicht abschalten.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html"
+  },
+  {
+    "seedKey": "saa-c03-card-032",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "Nach einer KMS-Key-Rotation: Müssen die alten Daten neu verschlüsselt werden?",
+    "back": "**Nein.** Key-ID, ARN und Alias bleiben identisch; KMS behält das alte Key-Material zum Entschlüsseln vor. Neue Verschlüsselungen nutzen automatisch das neue Material. **Kein Re-Encrypt, keine App-Änderung.**",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html"
+  },
+  {
+    "seedKey": "saa-c03-card-033",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "Du löschst einen KMS-Key. Wie lange dauert das, und was ist die sichere Alternative?",
+    "back": "Es gibt eine **Waiting Period von 7 bis 30 Tagen** (Default 30), die du abbrechen kannst. Danach ist die Löschung **unumkehrbar** — alle damit verschlüsselten Daten sind verloren. Sichere Alternative: den Key **disablen** statt löschen.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys.html"
+  },
+  {
+    "seedKey": "saa-c03-card-034",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "KMS vs. CloudHSM — welches Compliance-Argument erzwingt CloudHSM?",
+    "back": "Wenn gefordert ist, dass **AWS keinerlei Zugriff auf das Key-Material** hat (single-tenant, du allein verwaltest Keys und HSM-User) oder wenn **native Crypto-APIs** (PKCS#11, JCE, CNG) gebraucht werden. Sonst gewinnt KMS: managed, integriert in ~alle Services, günstiger.",
+    "sourceRef": "https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html"
+  },
+  {
+    "seedKey": "saa-c03-card-035",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "Du replizierst SSE-KMS-verschlüsselte S3-Objekte in eine zweite Region. Warum reicht ein normaler KMS-Key nicht?",
+    "back": "Ein KMS-Key ist **regional**. Für regionsübergreifendes Ent-/Verschlüsseln ohne Cross-Region-Call brauchst du einen **Multi-Region Key** (gleiches Key-Material, Replikate in mehreren Regions). Auch relevant für DynamoDB Global Tables und Cross-Region-Backups.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-overview.html"
+  },
+  {
+    "seedKey": "saa-c03-card-036",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "SSE-S3 vs. SSE-KMS vs. DSSE-KMS vs. SSE-C — Entscheidungskriterien?",
+    "back": "**SSE-S3**: AWS verwaltet den Key, AES-256, kostenlos, **kein Key-Audit-Trail**. **SSE-KMS**: eigener CMK → **Key-Policy-Kontrolle + CloudTrail-Audit**, aber KMS-Request-Limits/-Kosten. **DSSE-KMS**: doppelte Verschlüsselung für strenge Compliance. **SSE-C**: **du** lieferst den Key bei jedem Request, AWS speichert ihn nie.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html"
+  },
+  {
+    "seedKey": "saa-c03-card-037",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "Ein Szenario verlangt „alle S3-Objekte müssen at rest verschlüsselt sein\". Wie viel Arbeit ist das seit Januar 2023?",
+    "back": "**Keine.** Seit Januar 2023 verschlüsselt S3 **alle neuen Objekte automatisch mit SSE-S3** — ohne Konfiguration, ohne Zusatzkosten. Falle: Solche Fragen zielen deshalb fast immer auf die *nächste* Ebene — **Key-Kontrolle, Audit-Trail oder Compliance** (→ SSE-KMS), nicht auf das „ob\".",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html"
+  },
+  {
+    "seedKey": "saa-c03-card-038",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "Eine Anwendung schreibt Millionen kleiner Objekte mit SSE-KMS und läuft in KMS-Throttling. Was ist der Fix?",
+    "back": "**S3 Bucket Keys aktivieren.** Ein bucket-level Key ersetzt die KMS-Calls pro Objekt → bis zu ~99 % weniger KMS-Requests. Senkt gleichzeitig die KMS-Kosten deutlich. (Der Reflex „Limit-Erhöhung beantragen\" ist hier die schlechtere Antwort.)",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html"
+  },
+  {
+    "seedKey": "saa-c03-card-039",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "front": "Ein produktives EBS-Volume ist unverschlüsselt. Wie verschlüsselst du es?",
+    "back": "**Nicht in-place.** Weg: **Snapshot** erstellen → **verschlüsselte Kopie** des Snapshots (`--encrypted`) → neues Volume daraus → an die Instance hängen. Vorbeugend: **„EBS encryption by default\"** account- und regionsweit aktivieren.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-encryption.html"
+  },
+  {
+    "seedKey": "saa-c03-card-040",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "front": "Secrets Manager vs. SSM Parameter Store — was ist das entscheidende Unterscheidungsmerkmal in Prüfungsfragen?",
+    "back": "**Automatische Rotation.** Secrets Manager rotiert Credentials per Lambda automatisch (nativ für RDS/Redshift/DocumentDB), kann cross-region replizieren — kostet pro Secret. Parameter Store (Standard) ist **kostenlos**, kann aber **nicht** von selbst rotieren. Signalwort „automatische Rotation von DB-Passwörtern\" → Secrets Manager.",
+    "sourceRef": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html"
+  },
+  {
+    "seedKey": "saa-c03-card-041",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "front": "Wie funktioniert die Secrets-Manager-Rotation für RDS, ohne dass die App ausfällt?",
+    "back": "Ein Rotation-Lambda ändert das Passwort **in RDS und im Secret** (Multi-User-Strategie: zwei alternierende DB-User). Die App holt das Secret **bei jedem Verbindungsaufbau frisch** — kein hartkodiertes Passwort, kein Wartungsfenster.",
+    "sourceRef": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html"
+  },
+  {
+    "seedKey": "saa-c03-card-042",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "front": "Ein Team will das ACM-Zertifikat exportieren, um es auf einer EC2-Instance zu installieren. Was sagst du?",
+    "back": "**Klassische Antwort: Geht nicht** — Standard-Public-Zertifikate aus ACM sind an integrierte Services gebunden (CloudFront, ALB/NLB, API Gateway…), dafür **kostenlos und auto-renewing**. **Aktualität (Juni 2025):** ACM bietet jetzt **exportierbare Public-Zertifikate** — kostenpflichtig (15 $/FQDN, 149 $/Wildcard, 395 Tage gültig), aber **nur wenn bei der Erstellung `Export=ENABLED`** gesetzt wurde; ältere Zertifikate bleiben nicht exportierbar. Für EC2/on-prem außerdem: **ACM Private CA** oder Import. Prüfungserwartung meist noch: „nicht exportierbar\".",
+    "sourceRef": "https://docs.aws.amazon.com/acm/latest/userguide/acm-exportable-certificates.html"
+  },
+  {
+    "seedKey": "saa-c03-card-043",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "front": "In welcher Region muss ein ACM-Zertifikat für CloudFront liegen — und warum ist das eine Falle?",
+    "back": "**Zwingend `us-east-1` (N. Virginia)**, unabhängig davon, wo Origin und Nutzer sitzen. Falle: Für **ALB/NLB** gilt das Gegenteil — dort muss das Zertifikat in **derselben Region wie der Load Balancer** liegen.",
+    "sourceRef": "https://docs.aws.amazon.com/acm/latest/userguide/acm-regions.html"
+  },
+  {
+    "seedKey": "saa-c03-card-044",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "front": "Wie erzwingst du, dass ein S3-Bucket ausschließlich über HTTPS erreichbar ist?",
+    "back": "**Bucket-Policy mit `Deny`** und der Condition `\"Bool\": {\"aws:SecureTransport\": \"false\"}`. Damit werden alle unverschlüsselten HTTP-Requests abgelehnt. (Encryption *in transit* — nicht zu verwechseln mit SSE, das ist *at rest*.)",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html"
+  },
+  {
+    "seedKey": "saa-c03-card-045",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "Security Group vs. NACL — nenne alle vier Kernunterschiede.",
+    "back": "**SG**: stateful · wirkt an der ENI/Instance · **nur Allow** · alle Regeln werden gemeinsam ausgewertet. **NACL**: stateless · wirkt am **Subnet** · **Allow UND Deny** · Regeln werden **nach Nummer der Reihe nach** abgearbeitet, die **erste Übereinstimmung gewinnt**.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-best-practices.html"
+  },
+  {
+    "seedKey": "saa-c03-card-046",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "Eine NACL erlaubt Inbound HTTPS (443), aber die Antworten kommen nicht durch. Warum?",
+    "back": "NACLs sind **stateless** — die Rückantwort braucht eine **eigene Outbound-Regel** für die **ephemeral Ports (1024–65535)**. Bei Security Groups passiert das automatisch, weil sie stateful sind. Das ist der Klassiker unter den NACL-Fallen.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-best-practices.html"
+  },
+  {
+    "seedKey": "saa-c03-card-047",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "Der App-Tier soll nur Traffic vom Web-Tier annehmen, der in einer Auto Scaling Group mit wechselnden IPs läuft. Wie modellierst du das?",
+    "back": "**Security-Group-Referenz**: In der App-Tier-SG steht als Source die **SG-ID des Web-Tiers**, nicht eine CIDR. Neue Instances der ASG erben die SG und sind sofort berechtigt — **keine IP-Pflege**, kein CIDR-Drift.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-best-practices.html"
+  },
+  {
+    "seedKey": "saa-c03-card-048",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "Was ist der Unterschied zwischen der Default Security Group und einer neu erstellten SG?",
+    "back": "**Default SG**: erlaubt Inbound-Traffic von **sich selbst** (alle Instances in dieser SG dürfen untereinander kommunizieren). **Neue SG**: **kein einziger Inbound-Eintrag** (alles blockiert). Outbound ist bei beiden per Default „allow all\".",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-best-practices.html"
+  },
+  {
+    "seedKey": "saa-c03-card-049",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "Gateway Endpoint vs. Interface Endpoint — die drei entscheidenden Unterschiede?",
+    "back": "**Gateway Endpoint**: nur **S3 und DynamoDB** · Anbindung per **Route-Table-Eintrag** · **kostenlos**. **Interface Endpoint (PrivateLink)**: fast alle Services + eigene/Partner-Services · **ENI mit privater IP** im Subnet · kostet **pro Stunde + pro GB**.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html"
+  },
+  {
+    "seedKey": "saa-c03-card-050",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "Es gibt bereits ein NAT Gateway. Warum trotzdem einen VPC Endpoint für S3 bauen?",
+    "back": "Drei Gründe: Traffic verlässt **nie das AWS-Netz** (Compliance: „kein Internet\"), Zugriff lässt sich per **Endpoint Policy** einschränken, und der **Gateway Endpoint ist kostenlos** — er spart die **NAT-Datenverarbeitungsgebühr** pro GB. Signalwörter: „ohne Internetzugang\" oder „Datentransferkosten senken\".",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html"
+  },
+  {
+    "seedKey": "saa-c03-card-051",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "Ein Security-Team will nach einem Vorfall den Inhalt der Netzwerkpakete sehen. Reichen VPC Flow Logs?",
+    "back": "**Nein.** Flow Logs enthalten nur **Metadaten** (Source/Dest-IP, Ports, Protokoll, Bytes, ACCEPT/REJECT) — **keinen Paket-Inhalt**. Für Payload brauchst du **VPC Traffic Mirroring**. Flow Logs erfassen zudem u. a. keinen Traffic zum Amazon-DNS oder zur Instance-Metadata (169.254.169.254).",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html"
+  },
+  {
+    "seedKey": "saa-c03-card-052",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "VPC A ist mit B gepeert, B mit C. Kann A jetzt mit C sprechen?",
+    "back": "**Nein — VPC Peering ist nicht transitiv.** Jede Verbindung muss explizit aufgebaut werden; bei n VPCs sind das **n·(n−1)/2** Peerings. Ab ca. 5+ VPCs → **Transit Gateway** (zentraler Hub, transitiv, Route-Tables zur Segmentierung).",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html"
+  },
+  {
+    "seedKey": "saa-c03-card-053",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "front": "Zwei VPCs sollen gepeert werden. Beide nutzen `10.0.0.0/16`. Was passiert?",
+    "back": "**Das Peering lässt sich gar nicht erst anlegen** — **überlappende CIDR-Blöcke sind hart verboten** (Routing wäre nicht eindeutig). Einzige Lösung: eine VPC neu aufbauen oder die Kommunikation über PrivateLink/NAT abbilden. Gilt genauso für Transit Gateway.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/peering/invalid-peering-configurations.html"
+  },
+  {
+    "seedKey": "saa-c03-card-054",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "front": "An welche Ressourcen kann AWS WAF gehängt werden — und an welche ausdrücklich nicht?",
+    "back": "**Ja**: CloudFront, **ALB**, API Gateway, AppSync, Cognito User Pool, App Runner, Verified Access. **Nein**: **NLB** — der arbeitet auf **Layer 4**, WAF ist ein **Layer-7**-Filter. Klassische Falle: „NLB mit WAF schützen\" ist immer falsch.",
+    "sourceRef": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html"
+  },
+  {
+    "seedKey": "saa-c03-card-055",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "front": "Shield Standard vs. Shield Advanced — was rechtfertigt Advanced?",
+    "back": "**Standard**: automatisch, **kostenlos**, für alle AWS-Kunden, deckt gängige L3/L4-Angriffe ab. **Advanced**: kostenpflichtig, dafür **24/7 Shield Response Team (SRT)**, erweiterte L7-Mitigation, WAF für geschützte Ressourcen inklusive und **Cost Protection** (Erstattung der Scaling-Kosten, die ein Angriff verursacht hat).",
+    "sourceRef": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html"
+  },
+  {
+    "seedKey": "saa-c03-card-056",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "front": "Ausgehender Traffic aus der VPC soll nur zu einer Whitelist von Domains erlaubt sein. SG, NACL oder etwas anderes?",
+    "back": "**AWS Network Firewall.** SGs und NACLs kennen nur **IPs, Ports und Protokolle** — sie können **keine Domains oder Inhalte** filtern. Network Firewall ist eine stateful Managed-Firewall/IPS am VPC-Rand mit Domain-Filtering, Deep Packet Inspection und Suricata-Regeln.",
+    "sourceRef": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html"
+  },
+  {
+    "seedKey": "saa-c03-card-057",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "front": "Eine WAF-Regel soll in 50 Accounts gelten — auch in Ressourcen, die es heute noch gar nicht gibt. Womit?",
+    "back": "**AWS Firewall Manager** (setzt AWS Organizations voraus). Er rollt WAF-Rules, Shield-Advanced-Schutz, SG-Regeln und Network-Firewall-Policies org-weit aus und wendet sie **automatisch auf neu erstellte Ressourcen** an. Manuelles WAF-Anhängen skaliert hier nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/waf/latest/developerguide/fms-chapter.html"
+  },
+  {
+    "seedKey": "saa-c03-card-058",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Detection & Audit",
+    "front": "GuardDuty vs. Inspector vs. Macie vs. Detective — je ein Satz, der sie eindeutig trennt.",
+    "back": "**GuardDuty**: Threat Detection aus Logs (CloudTrail, VPC Flow Logs, DNS) — *„passiert gerade etwas Böses?\"* **Inspector**: Vulnerability-Scan von EC2, ECR-Images, Lambda — *„habe ich eine bekannte CVE?\"* **Macie**: findet **sensible Daten (PII) in S3**. **Detective**: **Root-Cause-Analyse** zu bereits vorhandenen Findings.",
+    "sourceRef": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html"
+  },
+  {
+    "seedKey": "saa-c03-card-059",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Detection & Audit",
+    "front": "„Wer hat gestern die Security Group geändert?\" vs. „Welche Security Groups erlauben aktuell 0.0.0.0/0?\" — welcher Dienst beantwortet was?",
+    "back": "Frage 1 → **CloudTrail** (WER hat WANN WELCHEN API-Call gemacht = **Aktivität**). Frage 2 → **AWS Config** (WIE ist/war eine Ressource konfiguriert + Compliance-Rules = **Zustand**). **Security Hub CSPM** aggregiert die Findings aus beiden plus GuardDuty/Inspector/Macie zu einer Gesamtsicht.",
+    "sourceRef": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html"
+  },
+  {
+    "seedKey": "saa-c03-card-060",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Detection & Audit",
+    "front": "CloudTrail ist aktiv, aber niemand kann nachvollziehen, wer ein bestimmtes S3-Objekt gelesen hat. Warum?",
+    "back": "**Data Events sind standardmäßig deaktiviert.** CloudTrail loggt per Default nur **Management Events** (Control Plane). S3-Objektzugriffe und Lambda-Invokes sind **Data Events** — sie müssen explizit aktiviert werden und **kosten extra**. Für alle Accounts/Regions: **Organization Trail**.",
+    "sourceRef": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html"
+  }
+]

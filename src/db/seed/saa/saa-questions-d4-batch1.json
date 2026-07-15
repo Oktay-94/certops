@@ -1,0 +1,446 @@
+[
+  {
+    "seedKey": "saa-c03-q-214",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein Bucket enthält 800 Millionen Sensor-Messwerte als einzelne JSON-Objekte von je 4 bis 20 KB. Die Zugriffsmuster sind unbekannt und schwanken. Ein Architekt aktiviert S3 Intelligent-Tiering, um Kosten zu senken — die monatliche Rechnung steigt daraufhin.\n\nWarum, und was ist die kostengünstigste Ablage?",
+    "choices": [
+      { "id": "A", "text": "Die Objekte werden zu häufig abgerufen; eine Lifecycle-Regel nach Glacier Instant Retrieval senkt die Kosten dauerhaft." },
+      { "id": "B", "text": "Objekte unter 128 KB werden nicht getiert, kosten aber Monitoring-Gebühr; S3 Standard ist hier günstiger." },
+      { "id": "C", "text": "Intelligent-Tiering berechnet Abrufgebühren je Tier-Wechsel; eine Umstellung auf Standard-IA vermeidet diese Gebühren." },
+      { "id": "D", "text": "Die Archive-Access-Tiers waren nicht aktiviert; nach deren Aktivierung sinken die Speicherkosten deutlich ab." }
+    ],
+    "correct": ["B"],
+    "explanation": "Intelligent-Tiering berechnet eine Monitoring- und Automatisierungsgebühr pro Objekt — bei 800 Millionen Objekten ist das ein erheblicher Posten. Objekte unter 128 KB werden gleichzeitig gar nicht automatisch in günstigere Tiers verschoben, sondern dauerhaft zum Frequent-Access-Preis berechnet. Ergebnis: dieselben Speicherkosten wie Standard, plus Gebühr — genau der beobachtete Anstieg. Bei Millionen kleiner Objekte ist S3 Standard die günstigere Ablage. (A) beschreibt eine funktionierende Archivierung, verfehlt aber die Ursache — und Glacier Instant Retrieval hat ebenfalls eine 128-KB-Mindestberechnung, macht es also eher schlimmer. (C) ist sachlich falsch: Intelligent-Tiering erhebt gerade keine Abrufgebühren, das ist sein Alleinstellungsmerkmal. (D) verschlimmert das Problem: Archive-Tiers ändern nichts an der Monitoring-Gebühr und bringen bei nicht-tierbaren Kleinobjekten ohnehin keinen Nutzen.",
+    "sourceRef": "https://aws.amazon.com/s3/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-q-215",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein Team legt Zwischenergebnisse einer täglichen Datenpipeline in S3 ab. Die Objekte sind je 50 MB groß, werden nach spätestens 7 Tagen nicht mehr gebraucht und dann gelöscht. Um Kosten zu senken, hat jemand eine Lifecycle-Regel eingerichtet, die sie nach einem Tag nach S3 Standard-IA verschiebt. Die Speicherkosten sind seitdem gestiegen.\n\nWas ist die Ursache?",
+    "choices": [
+      { "id": "A", "text": "Standard-IA berechnet die Objekte mit mindestens 128 KB, was bei dieser Objektgröße zu einem Aufschlag führt." },
+      { "id": "B", "text": "Die Transition-Requests nach Standard-IA sind bei 50-MB-Objekten teurer als die eingesparten Speicherkosten." },
+      { "id": "C", "text": "Standard-IA repliziert die Objekte zusätzlich über mehrere Availability Zones und verdoppelt dadurch den belegten Speicherbedarf." },
+      { "id": "D", "text": "Standard-IA hat 30 Tage Mindestspeicherdauer; die nach 7 Tagen gelöschten Objekte werden trotzdem 30 Tage berechnet." }
+    ],
+    "correct": ["D"],
+    "explanation": "Standard-IA hat eine Mindestspeicherdauer von 30 Tagen. Wird ein Objekt vorher gelöscht — hier nach 7 Tagen —, berechnet S3 trotzdem die vollen 30 Tage. Aus 7 Tagen Standard werden damit effektiv 30 Tage IA plus Transition-Gebühr: teurer statt günstiger. Für Daten mit einer Lebensdauer unter 30 Tagen ist S3 Standard ohne Lifecycle-Regel die richtige Wahl. (A) ist der falsche Grenzwert am falschen Ort: Die 128-KB-Mindestberechnung existiert zwar, greift bei 50-MB-Objekten aber offensichtlich nicht. (B) ist ein realer Nebeneffekt, aber bei 50-MB-Objekten sind die Transition-Requests pro GB vernachlässigbar — die Falle sind Millionen kleiner Objekte, nicht wenige große. (C) ist frei erfunden: Standard-IA speichert wie Standard über mindestens drei AZs und berechnet nichts doppelt.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html"
+  },
+  {
+    "seedKey": "saa-c03-q-216",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein Finanzdienstleister muss Transaktionsprotokolle zehn Jahre aufbewahren. Ein Abruf erfolgt praktisch nie; falls doch, akzeptiert die Compliance-Abteilung eine Wartezeit von bis zu zwölf Stunden. Die Speicherkosten sollen minimal sein.\n\nWelche Storage-Klasse ist die richtige?",
+    "choices": [
+      { "id": "A", "text": "S3 Glacier Deep Archive, per Lifecycle-Regel nach dem Ablegen der Protokolle angesteuert." },
+      { "id": "B", "text": "S3 Glacier Flexible Retrieval, dessen Standard-Abruf innerhalb weniger Stunden zur Verfügung steht." },
+      { "id": "C", "text": "S3 One Zone-IA, dessen Verzicht auf mehrere Availability Zones die Speicherkosten deutlich reduziert." },
+      { "id": "D", "text": "S3 Intelligent-Tiering mit aktivierten Archive-Access-Tiers, das die Objekte automatisch absteigend einordnet." }
+    ],
+    "correct": ["A"],
+    "explanation": "Deep Archive ist die günstigste S3-Klasse und für genau dieses Profil gebaut: jahrelange Aufbewahrung, praktisch kein Abruf, Standard-Retrieval innerhalb von zwölf Stunden — exakt das akzeptierte Fenster. Die Mindestspeicherdauer von 180 Tagen ist bei zehn Jahren irrelevant. (B) funktioniert und liefert schneller, kostet aber pro GB ein Mehrfaches von Deep Archive — man bezahlt eine Abrufgeschwindigkeit, die niemand braucht. (C) ist deutlich teurer als jede Glacier-Klasse und opfert zusätzlich die Multi-AZ-Redundanz — bei Compliance-Protokollen die schlechteste Kombination. (D) funktioniert ebenfalls, legt aber eine Monitoring-Gebühr pro Objekt auf einen Zugriffsverlauf, der von vornherein feststeht: Wenn das Zugriffsmuster bekannt ist, ist die direkte Lifecycle-Regel immer günstiger.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html"
+  },
+  {
+    "seedKey": "saa-c03-q-217",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Eine Bildplattform erzeugt aus jedem hochgeladenen Original mehrere Vorschaugrößen. Die Originale liegen in S3 Standard und sind unersetzlich. Die Vorschaubilder werden nach 60 Tagen nur noch selten abgerufen, lassen sich aber jederzeit in Minuten aus den Originalen neu berechnen. Die Kosten für die Vorschaubilder sollen sinken.\n\nWelche Storage-Klasse ist für die Vorschaubilder die richtige?",
+    "choices": [
+      { "id": "A", "text": "S3 Standard-IA, dessen Multi-AZ-Redundanz die Vorschaubilder gegen den Ausfall einer Zone absichert." },
+      { "id": "B", "text": "S3 Glacier Flexible Retrieval, dessen niedriger Speicherpreis die selten abgerufenen Bilder am günstigsten hält." },
+      { "id": "C", "text": "S3 One Zone-IA, da die Bilder bei Verlust einer Zone aus den Originalen neu erzeugt werden können." },
+      { "id": "D", "text": "S3 Standard, weil die Vorschaubilder für die Auslieferung jederzeit mit niedriger Latenz erreichbar bleiben müssen." }
+    ],
+    "correct": ["C"],
+    "explanation": "One Zone-IA ist günstiger als Standard-IA, weil es auf die Redundanz über mehrere Availability Zones verzichtet — beim Verlust einer AZ sind die Daten weg. Genau dieses Risiko ist hier akzeptabel: Die Vorschaubilder sind reproduzierbare Ableitungen, die Originale liegen sicher in Standard. Das ist der Lehrbuchfall für One Zone-IA. (A) funktioniert und ist die sichere Wahl, bezahlt aber Multi-AZ-Redundanz für Daten, die sich in Minuten neu berechnen lassen — genau die Redundanz, die man hier nicht braucht. (B) ist beim reinen Speicherpreis am günstigsten, aber Vorschaubilder müssen bei Abruf sofort da sein; Glacier Flexible braucht Minuten bis Stunden und erhebt Abrufgebühren. (D) ist die teuerste Option und ignoriert, dass die Bilder nach 60 Tagen ausdrücklich nur noch selten abgerufen werden.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html"
+  },
+  {
+    "seedKey": "saa-c03-q-218",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen betreibt 600 EC2-Instanzen mit gp2-Volumes. Die Auswertung zeigt: Die tatsächlich benötigten IOPS liegen deutlich unter dem, was die Volume-Größe an Baseline mitbringt — viele Volumes wurden nur vergrößert, um IOPS zu bekommen. Die Speicherkosten sollen ohne Ausfallzeit sinken.\n\nWelche Maßnahme ist die richtige?",
+    "choices": [
+      { "id": "A", "text": "Die Volumes auf io2 umstellen und die IOPS anschließend exakt auf den gemessenen tatsächlichen Bedarf provisionieren." },
+      { "id": "B", "text": "Die Volumes per Elastic Volumes im laufenden Betrieb auf gp3 umstellen, dessen IOPS von der Größe entkoppelt sind." },
+      { "id": "C", "text": "Snapshots der Volumes anlegen, sie kleiner neu erstellen und die Instanzen anschließend darauf umhängen." },
+      { "id": "D", "text": "Die Volumes auf st1 umstellen, dessen durchsatzoptimierte HDD-Auslegung den Preis pro GB spürbar senkt." }
+    ],
+    "correct": ["B"],
+    "explanation": "gp3 kostet rund 20 % weniger pro GB als gp2 und entkoppelt IOPS und Durchsatz von der Volume-Größe: 3.000 IOPS und 125 MB/s sind in der Baseline enthalten, unabhängig davon, wie klein das Volume ist. Genau das löst die beschriebene Verschwendung — niemand muss mehr Volumes aufblähen, um IOPS zu bekommen. Die Umstellung läuft per Elastic Volumes im laufenden Betrieb, ohne Downtime. (A) funktioniert und liefert exakt provisionierbare IOPS, ist aber pro GB deutlich teurer als gp2 — Kostensenkung wird zu Kostensteigerung. (C) funktioniert ebenfalls, bedeutet aber Snapshot, Neuanlage und Umhängen je Volume mit Ausfallzeit — genau das war ausgeschlossen. (D) senkt den GB-Preis, aber st1 ist eine HDD ohne Boot-Volume-Eignung und mit schlechter Random-I/O-Leistung; für allgemeine Instanz-Volumes ist das ein Leistungsbruch, kein Tuning.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/general-purpose.html"
+  },
+  {
+    "seedKey": "saa-c03-q-219",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen hält tausende EBS-Snapshots aus Compliance-Gründen sieben Jahre vor. Ein Restore kommt praktisch nie vor; falls doch, sind ein bis zwei Tage Wartezeit akzeptabel. Die Snapshot-Kosten sollen deutlich sinken, die Snapshots aber vollständig erhalten bleiben.\n\nWelche Maßnahme erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "Die Snapshots in einen S3-Bucket mit Glacier Deep Archive kopieren und die Originale anschließend löschen." },
+      { "id": "B", "text": "Die Snapshot-Frequenz per Data Lifecycle Manager reduzieren, sodass insgesamt weniger Snapshots anfallen." },
+      { "id": "C", "text": "Die Snapshots in eine kostengünstigere Region kopieren und die teureren Originale danach entfernen." },
+      { "id": "D", "text": "Die Snapshots in den EBS Snapshots Archive Tier verschieben, der rund 75 % günstiger ist." }
+    ],
+    "correct": ["D"],
+    "explanation": "Der EBS Snapshots Archive Tier ist genau für dieses Profil gebaut: selten oder nie benötigte Snapshots, die aus Compliance-Gründen vollständig erhalten bleiben müssen. Er kostet rund 75 % weniger als der Standard-Tier; der Preis dafür sind 90 Tage Mindestspeicherdauer (bei sieben Jahren irrelevant) und eine Wiederherstellungszeit von etwa 24 bis 72 Stunden — exakt im akzeptierten Fenster. (A) verfehlt den Mechanismus: EBS-Snapshots lassen sich nicht als Objekte in einen eigenen Bucket kopieren und von dort als Volume wiederherstellen — der Archive Tier ist der vorgesehene Weg. (B) senkt künftige Kosten, aber die Compliance verlangt die Aufbewahrung der bestehenden Snapshots — die dürfen gerade nicht wegfallen. (C) ändert am Speichervolumen nichts Grundsätzliches, verursacht Cross-Region-Transferkosten und verlagert Compliance-Daten in eine andere Region.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/snapshot-archive.html"
+  },
+  {
+    "seedKey": "saa-c03-q-220",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Eine Kostenanalyse zeigt einen hohen EBS-Posten, obwohl die Anzahl laufender Instanzen seit Monaten konstant ist. Die Prüfung ergibt: Hunderte Volumes im Status available gehören zu längst terminierten Instanzen. Sie sollen entfernt werden, aber ein versehentliches Löschen eines noch benötigten Volumes muss sich rückgängig machen lassen.\n\nWelches Vorgehen erfüllt beides?",
+    "choices": [
+      { "id": "A", "text": "Eine Recycle-Bin-Retention-Rule anlegen und die verwaisten Volumes anschließend löschen." },
+      { "id": "B", "text": "Die verwaisten Volumes auf den kleinstmöglichen gp3-Typ verkleinern und sie im Bestand belassen." },
+      { "id": "C", "text": "Von jedem Volume einen Snapshot erstellen, alle Volumes löschen und die Snapshots dauerhaft aufbewahren." },
+      { "id": "D", "text": "AWS Backup mit einer Cold-Storage-Regel auf die verwaisten Volumes anwenden und sie danach entfernen." }
+    ],
+    "correct": ["A"],
+    "explanation": "Der Recycle Bin ist genau dafür da: Eine Retention Rule fängt gelöschte EBS-Volumes und Snapshots für eine definierte Frist ab, statt sie sofort endgültig zu vernichten — ein versehentlich gelöschtes Volume lässt sich innerhalb der Frist vollständig wiederherstellen. Danach können die verwaisten Volumes gefahrlos gelöscht werden, und die Kosten fallen sofort weg. (B) reduziert die Kosten, beseitigt sie aber nicht — man bezahlt weiter für Speicher, den niemand nutzt, und schafft eine Altlast, die beim nächsten Audit wieder auftaucht. (C) funktioniert als Sicherheitsnetz und ist ein legitimes Muster, verursacht aber dauerhafte Snapshot-Kosten für Volumes, die niemand mehr braucht — es tauscht einen Kostenposten gegen einen kleineren. (D) verwechselt den Zweck: AWS Backup verwaltet Backups nach Plan; es ist kein Sicherheitsnetz gegen versehentliches Löschen der Live-Ressource.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recycle-bin.html"
+  },
+  {
+    "seedKey": "saa-c03-q-221",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein EFS-Dateisystem enthält 40 TB Projektdaten. Die Analyse zeigt: Nur etwa 3 TB werden regelmäßig gelesen; der Rest sind abgeschlossene Projekte, auf die pro Jahr vielleicht ein- oder zweimal zugegriffen wird. Die Anwendung braucht weiterhin POSIX-Semantik und darf nicht umgebaut werden.\n\nWelche Maßnahme senkt die Kosten?",
+    "choices": [
+      { "id": "A", "text": "Die abgeschlossenen Projekte nach S3 Glacier auslagern und im Dateisystem nur Verweise zurücklassen." },
+      { "id": "B", "text": "Das Dateisystem auf eine EFS-One-Zone-Klasse umstellen, deren Verzicht auf Multi-AZ die Kosten senkt." },
+      { "id": "C", "text": "EFS Lifecycle Management aktivieren, das inaktive Dateien nach Frist in die IA- und Archive-Klassen verschiebt." },
+      { "id": "D", "text": "Den Durchsatzmodus des Dateisystems auf Bursting umstellen, damit nicht dauerhaft Provisioned Throughput bezahlt wird." }
+    ],
+    "correct": ["C"],
+    "explanation": "EFS Lifecycle Management ist genau dafür gebaut: Dateien, die eine definierte Zeit nicht angefasst wurden, wandern automatisch nach EFS Infrequent Access und weiter nach EFS Archive — bei erheblich niedrigeren Speicherkosten. Der entscheidende Punkt: Die Dateien bleiben im selben Dateisystem und über denselben Pfad sichtbar; die Anwendung merkt nichts, POSIX-Semantik bleibt erhalten. Zugriffe auf verschobene Dateien kosten eine Abrufgebühr, was bei ein bis zwei Zugriffen pro Jahr keine Rolle spielt. (A) senkt die Speicherkosten stark, verlangt aber genau den Umbau, der ausgeschlossen wurde — S3 ist kein POSIX-Dateisystem. (B) senkt die Kosten und opfert die Multi-AZ-Redundanz für 40 TB Projektdaten — ein hoher Preis, der die eigentliche Ursache (kalte Daten im teuersten Tier) nicht anfasst. (D) betrifft den Durchsatz, nicht den Speicherpreis der 37 TB kalten Daten.",
+    "sourceRef": "https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html"
+  },
+  {
+    "seedKey": "saa-c03-q-222",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein Bucket nimmt große Video-Uploads per Multipart Upload entgegen. Die Kostenanalyse zeigt einen S3-Speicherverbrauch, der weit über der Summe der sichtbaren Objekte liegt. Beim Auflisten des Buckets erscheinen die fehlenden Daten nicht — viele Uploads brechen unterwegs ab, weil die Clients auf Mobilfunkverbindungen die Verbindung verlieren.\n\nWelche Maßnahme beseitigt die versteckten Kosten?",
+    "choices": [
+      { "id": "A", "text": "S3 Versioning deaktivieren, damit keine unsichtbaren früheren Objektversionen mehr Speicher belegen." },
+      { "id": "B", "text": "Eine Lifecycle-Regel mit AbortIncompleteMultipartUpload anlegen, die unvollständige Uploads nach einigen Tagen verwirft." },
+      { "id": "C", "text": "Transfer Acceleration aktivieren, damit die Uploads über die Edge-Standorte zuverlässiger abgeschlossen werden." },
+      { "id": "D", "text": "Die Clients auf einfache PUT-Uploads umstellen, sodass keine Multipart-Fragmente mehr entstehen können." }
+    ],
+    "correct": ["B"],
+    "explanation": "Abgebrochene Multipart Uploads hinterlassen ihre bereits hochgeladenen Parts im Bucket. Diese Parts belegen Speicher und werden berechnet, tauchen aber in keiner Objektliste auf — genau die Diskrepanz zwischen sichtbaren Objekten und bezahltem Speicher. Eine Lifecycle-Regel mit AbortIncompleteMultipartUpload räumt sie nach einer definierten Frist automatisch ab; AWS empfiehlt diese Regel für jeden Bucket mit Multipart-Uploads. (A) trifft ein anderes Phänomen: Versioning erzeugt frühere Versionen, die sich sehr wohl anzeigen lassen — und die Abschaltung würde bestehende Versionen ohnehin nicht löschen. (C) verbessert die Erfolgsquote der Uploads und reduziert damit künftige Fragmente, räumt die bereits bezahlten Altlasten aber nicht weg. (D) beseitigt die Ursache mit einem Rückschritt: Ohne Multipart brechen große Uploads über Mobilfunk komplett ab, statt fortsetzbar zu sein — und die 5-GB-Grenze für einfache PUTs steht ohnehin im Weg.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpu-abort-incomplete-mpu-lifecycle-config.html"
+  },
+  {
+    "seedKey": "saa-c03-q-223",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "multiple",
+    "prompt": "Ein versioniertes S3-Bucket dient als Ablage für Dokumente, die häufig überschrieben werden. Die Rechnung zeigt fünfmal so viel Speicher, wie die aktuellen Objektversionen ausmachen. Zusätzlich laden mehrere Clients große Dateien per Multipart Upload hoch, wobei ein Teil der Uploads scheitert. Ältere Dokumentversionen werden nach 90 Tagen nicht mehr benötigt.\n\nWelche ZWEI Lifecycle-Konfigurationen senken die Kosten? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Eine NoncurrentVersionExpiration-Regel, die nicht mehr aktuelle Objektversionen nach 90 Tagen löscht." },
+      { "id": "B", "text": "Eine Expiration-Regel, die alle Objekte des Buckets nach 90 Tagen endgültig aus dem Bucket entfernt." },
+      { "id": "C", "text": "Eine Transition-Regel, die die aktuellen Objektversionen nach 90 Tagen nach S3 Glacier Deep Archive verschiebt." },
+      { "id": "D", "text": "Eine AbortIncompleteMultipartUpload-Regel, die die Parts gescheiterter Uploads nach wenigen Tagen verwirft." },
+      { "id": "E", "text": "Das Deaktivieren von Versioning, wodurch die bereits vorhandenen älteren Objektversionen automatisch entfallen." }
+    ],
+    "correct": ["A", "D"],
+    "explanation": "Die Rechnung hat zwei versteckte Posten, und beide werden über Lifecycle-Regeln adressiert. (A) trifft den großen: In einem versionierten Bucket bleibt jede überschriebene Version als noncurrent version liegen und wird bezahlt — NoncurrentVersionExpiration nach 90 Tagen räumt genau das ab und passt exakt zur fachlichen Aufbewahrungsfrist. (D) trifft den zweiten: Parts gescheiterter Multipart Uploads belegen Speicher, ohne in Objektlisten aufzutauchen; AbortIncompleteMultipartUpload verwirft sie automatisch. (B) funktioniert technisch und wäre verheerend: Sie löscht die aktuellen Dokumente selbst, nicht nur die alten Versionen. (C) verschiebt die aktiven Dokumente in ein Archiv mit Stunden-Abrufzeit — sie werden aber weiterhin gebraucht. (E) beruht auf einem Irrtum: Das Aussetzen von Versioning verhindert nur neue Versionen; die bestehenden bleiben liegen und kosten weiter.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-configuration-examples.html"
+  },
+  {
+    "seedKey": "saa-c03-q-224",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein Forschungsinstitut stellt einen 200-TB-Datensatz in S3 kostenfrei für Wissenschaftler weltweit bereit. Die Datentransferkosten für die Downloads sind zur größten Position der Cloud-Rechnung geworden. Der Datensatz soll weiterhin öffentlich zugänglich bleiben, aber die Transferkosten sollen den Abrufenden zufallen.\n\nWelche Konfiguration erreicht das?",
+    "choices": [
+      { "id": "A", "text": "Eine CloudFront-Distribution mit Price Class 100 vor den Bucket setzen, deren Egress günstiger abgerechnet wird." },
+      { "id": "B", "text": "Den Datensatz nach S3 Glacier Instant Retrieval verschieben, dessen niedrigere Speicher- und Transferkosten die Rechnung senken." },
+      { "id": "C", "text": "Presigned URLs mit kurzer Gültigkeit ausgeben, damit das Downloadvolumen pro Nutzer wirksam begrenzt bleibt." },
+      { "id": "D", "text": "Requester Pays für den Bucket aktivieren, sodass die anfragenden AWS-Konten Transfer und Requests tragen." }
+    ],
+    "correct": ["D"],
+    "explanation": "Requester Pays ist genau für diesen Fall gedacht: Die Speicherkosten bleiben beim Bucket-Eigentümer, aber Datentransfer und Requests werden dem anfragenden AWS-Konto berechnet. Anfragende müssen sich authentifizieren und die Kostenübernahme explizit bestätigen — der Standardweg für große, öffentlich geteilte Forschungsdatensätze. (A) senkt den Preis pro übertragenem GB, aber die Kosten bleiben beim Institut — bei 200 TB Downloadvolumen bleibt es die größte Position. (B) verwechselt zwei Kostenarten: Glacier senkt den Speicherpreis, aber der Datentransfer ins Internet kostet unverändert — und Abrufgebühren kämen sogar noch dazu. (C) begrenzt den Zugang, nicht die Kosten: Wer die URL nutzt, verursacht denselben Transfer — und ein Limit pro Nutzer widerspricht dem Ziel der offenen Bereitstellung.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/RequesterPaysBuckets.html"
+  },
+  {
+    "seedKey": "saa-c03-q-225",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "type": "single",
+    "prompt": "Ein Team plant eine Lifecycle-Regel, die 300 Millionen Log-Objekte von je 8 KB nach 30 Tagen von S3 Standard nach S3 Glacier Flexible Retrieval verschiebt. Die Ersparnis-Kalkulation basiert allein auf dem Preisunterschied pro GB. Ein Architekt widerspricht.\n\nWarum ist die Rechnung falsch, und was ist die bessere Lösung?",
+    "choices": [
+      { "id": "A", "text": "Transition-Requests und Glacier-Objekt-Overhead machen die Ersparnis bei Kleinstobjekten zunichte; die Logs sollten vorher aggregiert werden." },
+      { "id": "B", "text": "Glacier Flexible Retrieval erlaubt keine Objekte unter 128 KB; die Logs müssen stattdessen in Standard-IA verschoben werden." },
+      { "id": "C", "text": "Die Mindestspeicherdauer von 90 Tagen macht die Regel unwirtschaftlich; die Transition sollte erst nach 90 Tagen greifen." },
+      { "id": "D", "text": "Glacier berechnet Abrufgebühren pro Objekt; eine Umstellung auf Intelligent-Tiering vermeidet diese Gebühren vollständig." }
+    ],
+    "correct": ["A"],
+    "explanation": "Bei Kleinstobjekten fressen zwei Posten die Ersparnis auf. Erstens kostet jede Lifecycle-Transition einen Request — bei 300 Millionen Objekten ein erheblicher Einmalbetrag, der die monatliche GB-Ersparnis über Monate übersteigen kann. Zweitens legt Glacier pro Objekt zusätzlichen Metadaten-Overhead an (32 KB im Archiv-Tarif plus 8 KB in Standard für den Index), was bei 8-KB-Objekten den bezahlten Speicher um ein Vielfaches aufbläht. Die saubere Lösung ist Aggregation: viele Logs zu großen Objekten zusammenfassen, dann archivieren. (B) erfindet eine Beschränkung — Glacier Flexible hat keine 128-KB-Mindestberechnung, und Standard-IA hätte sie sehr wohl. (C) benennt eine reale Grenze, aber die Logs würden ohnehin Jahre liegen bleiben — die 90 Tage sind hier kein Problem. (D) ist doppelt daneben: Glacier-Abrufgebühren richten sich nach Datenmenge und Abruf-Tier, und Intelligent-Tiering hätte bei 300 Millionen Objekten seinerseits eine schmerzhafte Monitoring-Gebühr.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-transition-general-considerations.html"
+  },
+  {
+    "seedKey": "saa-c03-q-226",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen betreibt eine stabile Produktionsumgebung: 80 m6i-Instanzen, rund um die Uhr, in einer Region, seit zwei Jahren unverändert. Ein Wechsel der Instance-Familie oder der Region ist nicht geplant. Die Compute-Kosten sollen mit einem dreijährigen Commitment maximal gesenkt werden.\n\nWelche Option liefert den höchsten Rabatt?",
+    "choices": [
+      { "id": "A", "text": "Ein Compute Savings Plan über drei Jahre, dessen Flexibilität auch spätere Wechsel der Instance-Familie abdeckt." },
+      { "id": "B", "text": "Convertible Reserved Instances über drei Jahre, die sich bei Bedarf in andere Instance-Familien tauschen lassen." },
+      { "id": "C", "text": "Ein EC2 Instance Savings Plan über drei Jahre, gebunden an die Instance-Familie m6i in dieser Region." },
+      { "id": "D", "text": "On-Demand Capacity Reservations mit einem dreijährigen Commitment auf die benötigte Instanzanzahl." }
+    ],
+    "correct": ["C"],
+    "explanation": "Der EC2 Instance Savings Plan bietet den höchsten Rabatt der Savings-Plans-Familie (bis zu 72 %) — der Preis dafür ist die Bindung an eine Instance-Familie und eine Region. Genau diese Bindung ist hier kostenlos: Die Umgebung ist seit zwei Jahren stabil, ein Wechsel ist nicht geplant. Innerhalb der Familie bleibt man flexibel bei Größe, Betriebssystem und Tenancy. (A) funktioniert und ist die flexibelste Option, erkauft die Flexibilität aber mit spürbar niedrigerem Rabatt (bis zu 66 %) — man bezahlt für eine Freiheit, die niemand nutzen wird. (B) funktioniert ebenfalls und ist die unflexibelste Rabattform mit dem geringsten Nachlass der drei — Convertible RIs liegen unter Standard RIs, und ihr Tauschrecht wird hier nicht gebraucht. (D) verwechselt zwei Konzepte: Capacity Reservations garantieren Kapazität, geben für sich genommen aber keinerlei Rabatt — sie werden zum On-Demand-Satz berechnet.",
+    "sourceRef": "https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html"
+  },
+  {
+    "seedKey": "saa-c03-q-227",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Animationsstudio rendert Einzelbilder in einer Warteschlange. Jeder Frame dauert wenige Minuten, Zwischenergebnisse werden nach S3 geschrieben, und ein unterbrochener Frame wird einfach neu eingereiht. Die Renderfarm läuft in Schüben und soll so günstig wie möglich betrieben werden, wobei Unterbrechungen möglichst selten und der Preis möglichst niedrig sein sollen.\n\nWelche Konfiguration ist die richtige?",
+    "choices": [
+      { "id": "A", "text": "Eine Auto Scaling Group mit Spot-Instanzen, mehreren Instance-Typen und der Allokationsstrategie price-capacity-optimized." },
+      { "id": "B", "text": "Eine Auto Scaling Group mit Spot-Instanzen auf einem einzelnen, besonders günstigen Instance-Typ und der Strategie lowest-price." },
+      { "id": "C", "text": "On-Demand-Instanzen, die per Scheduled Scaling nur während der Render-Schübe hochgefahren und danach beendet werden." },
+      { "id": "D", "text": "Reserved Instances über ein Jahr, deren Rabatt die Kosten der schubweise anfallenden Renderlast dauerhaft senkt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Der Workload ist der Spot-Lehrbuchfall: zustandslos, kurz, checkpointfähig, jederzeit wiederholbar — bei bis zu 90 % Nachlass gegenüber On-Demand. Entscheidend sind die beiden Detailentscheidungen: viele Instance-Typen statt eines einzigen (mehr Kapazitätspools, weniger Unterbrechungen) und die Strategie price-capacity-optimized, die AWS ausdrücklich als Standard empfiehlt, weil sie Preis und Pool-Kapazität gemeinsam gewichtet. (B) funktioniert, aber lowest-price wählt gezielt die knappsten Pools und wird von AWS nicht empfohlen — bei nur einem Instance-Typ ist die Unterbrechungsrate am höchsten, was dem Ziel widerspricht. (C) funktioniert zuverlässig, verzichtet aber auf den gesamten Spot-Nachlass für einen Workload, der Unterbrechungen ausdrücklich verkraftet. (D) ist die schlechteste Wahl: Ein Jahres-Commitment auf durchgehende Kapazität für eine Last, die nur schubweise anfällt — bezahlt wird auch die Leerlaufzeit.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-mixed-instances-groups-allocation-strategies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-228",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen gibt konstant rund 20 USD pro Stunde für EC2 aus. Die Architektur-Roadmap sieht vor, in den nächsten 18 Monaten Teile der Workloads auf Fargate und einzelne Dienste auf Lambda zu migrieren; welche Teile genau, steht noch nicht fest. Ein Commitment soll trotzdem jetzt abgeschlossen werden, ohne die Migration zu behindern.\n\nWelche Option passt?",
+    "choices": [
+      { "id": "A", "text": "Standard Reserved Instances über drei Jahre auf die heute genutzten Instance-Familien, mit dem maximal möglichen Rabatt." },
+      { "id": "B", "text": "Ein EC2 Instance Savings Plan über drei Jahre, dessen hoher Rabatt die Migration finanziell abfedert." },
+      { "id": "C", "text": "On-Demand belassen, bis die Migration abgeschlossen ist und der endgültige Bedarf verlässlich feststeht." },
+      { "id": "D", "text": "Ein Compute Savings Plan, der EC2, Fargate und Lambda gleichermaßen abdeckt und die Migration automatisch mitträgt." }
+    ],
+    "correct": ["D"],
+    "explanation": "Der Compute Savings Plan ist genau für diese Unsicherheit gebaut: Er ist ein Commitment in USD pro Stunde und deckt EC2, Fargate und Lambda gleichermaßen ab — unabhängig von Instance-Familie, Größe, Region, Betriebssystem und Tenancy. Wandert ein Workload von EC2 nach Fargate oder Lambda, greift der Rabatt dort einfach weiter; das Commitment läuft nie ins Leere. Der Preis dafür ist der etwas geringere Maximalrabatt (bis 66 % statt 72 %). (A) und (B) binden das Commitment an EC2 und an konkrete Instance-Familien: Jeder migrierte Workload lässt einen Teil des Commitments ungenutzt, das dann trotzdem bezahlt wird — genau die Behinderung, die vermieden werden soll. (C) vermeidet jedes Risiko und verzichtet dafür 18 Monate lang auf jeden Rabatt auf eine Grundlast, die nachweislich konstant ist.",
+    "sourceRef": "https://docs.aws.amazon.com/savingsplans/latest/userguide/plan-types.html"
+  },
+  {
+    "seedKey": "saa-c03-q-229",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen migriert eine kommerzielle Datenbank nach AWS. Der Softwarehersteller lizenziert pro physischem CPU-Core und verlangt für die Lizenzprüfung den Nachweis, welche physischen Cores und Sockets die Software nutzt. Die vorhandenen Lizenzen sollen weiterverwendet werden.\n\nWelche EC2-Bereitstellung erfüllt die Lizenzbedingung?",
+    "choices": [
+      { "id": "A", "text": "Dedicated Instances, deren Hardware physisch von anderen Kunden isoliert ist und keine Nachbarn zulässt." },
+      { "id": "B", "text": "Dedicated Hosts, die Sockets und physische Cores sichtbar machen und die Platzierung der Instanzen steuerbar halten." },
+      { "id": "C", "text": "Standard-Instanzen mit Shared Tenancy in einer Cluster Placement Group auf dedizierter Netzwerk-Hardware." },
+      { "id": "D", "text": "Reserved Instances mit einem dreijährigen Commitment, dessen Lizenzkonditionen die Nutzung eigener Lizenzen abdecken." }
+    ],
+    "correct": ["B"],
+    "explanation": "Das entscheidende Kriterium ist die Sichtbarkeit der physischen Cores und Sockets. Genau das leisten nur Dedicated Hosts: Man mietet einen physischen Server, sieht dessen Socket- und Core-Konfiguration und steuert, welche Instanzen darauf laufen — die Voraussetzung für Bring Your Own License bei per-Core- oder per-Socket-Lizenzierung, wie sie Oracle, Microsoft SQL Server oder Windows Server verlangen. (A) ist die klassische Verwechslung: Dedicated Instances laufen ebenfalls auf isolierter Hardware, geben aber keinerlei Einblick in Sockets und Cores und erlauben keine Platzierungskontrolle — für per-Core-Lizenzen unbrauchbar. (C) scheitert an der Tenancy: Shared Tenancy bedeutet geteilte physische Hardware, und eine Placement Group regelt Netzwerknähe, nicht Lizenz-Sichtbarkeit. (D) verwechselt Abrechnung mit Tenancy: Reserved Instances sind ein Preismodell und ändern nichts an der Hardware-Sichtbarkeit.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/dedicated-hosts-overview.html"
+  },
+  {
+    "seedKey": "saa-c03-q-230",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Zahlungsdienstleister hat Regional Reserved Instances für 40 c6i-Instanzen gekauft, um Rabatt zu erhalten. Bei einem Failover-Test in eine andere Availability Zone erhielt das Team InsufficientInstanceCapacity-Fehler und konnte die Instanzen dort nicht starten. Der Rabatt soll erhalten bleiben, aber die Kapazität in der Ziel-AZ muss künftig garantiert sein.\n\nWelche Maßnahme erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "Die Regional Reserved Instances auf ein dreijähriges Commitment verlängern, das die Kapazität dauerhaft absichert." },
+      { "id": "B", "text": "Einen EC2 Instance Savings Plan abschließen, dessen Commitment die benötigte Kapazität in der Ziel-AZ reserviert." },
+      { "id": "C", "text": "On-Demand Capacity Reservations in der Ziel-AZ anlegen, deren Kapazität der bestehende Rabatt weiterhin abdeckt." },
+      { "id": "D", "text": "Die Instanzen in der Ziel-AZ dauerhaft laufen lassen, damit die Kapazität dort nicht anderweitig vergeben wird." }
+    ],
+    "correct": ["C"],
+    "explanation": "Der Denkfehler ist verbreitet: Regional Reserved Instances sind ein reiner Abrechnungsrabatt — sie reservieren keine Kapazität in irgendeiner Availability Zone. Nur zonale RIs und On-Demand Capacity Reservations tun das. ODCRs garantieren die Kapazität in der gewünschten AZ und geben für sich genommen keinen Rabatt, lassen sich aber mit dem bestehenden Regional-RI-Rabatt (oder einem Savings Plan) kombinieren: Kapazitätsgarantie und Rabatt zugleich. (A) verlängert einen Rabatt, der niemals Kapazität enthielt — der Failover-Test würde erneut scheitern. (B) beruht auf demselben Irrtum: Savings Plans reservieren grundsätzlich keine Kapazität, sie sind ein Abrechnungsinstrument. (D) funktioniert tatsächlich als Kapazitätsanker, ist aber die teuerste Variante — man bezahlt 40 dauerhaft leerlaufende Instanzen für einen Failover, der vielleicht nie eintritt.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-capacity-reservations.html"
+  },
+  {
+    "seedKey": "saa-c03-q-231",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Webshop läuft hinter einem Application Load Balancer in einer Auto Scaling Group. Eine Grundlast von 12 Instanzen ist immer nötig und darf unter keinen Umständen wegbrechen; darüber hinaus skaliert die Gruppe tagsüber auf bis zu 60 Instanzen, wobei einzelne Ausfälle in dieser Spitzenschicht folgenlos bleiben. Die Kosten sollen sinken.\n\nWelche Konfiguration passt?",
+    "choices": [
+      { "id": "A", "text": "Eine Mixed Instances Policy mit On-Demand-Basiskapazität von 12 Instanzen und Spot-Instanzen für die Skalierung darüber." },
+      { "id": "B", "text": "Zwei getrennte Auto Scaling Groups hinter demselben Load Balancer, eine ausschließlich mit Spot, eine mit On-Demand." },
+      { "id": "C", "text": "Eine Auto Scaling Group vollständig auf Spot-Instanzen, deren breite Typ-Auswahl die Grundlast zuverlässig hält." },
+      { "id": "D", "text": "Eine Auto Scaling Group vollständig auf On-Demand, abgesichert durch einen Compute Savings Plan über die durchschnittliche Instanzzahl." }
+    ],
+    "correct": ["A"],
+    "explanation": "Die Mixed Instances Policy ist genau für diese Zweiteilung gebaut: OnDemandBaseCapacity legt fest, wie viele Instanzen garantiert als On-Demand laufen — hier die 12 der unverzichtbaren Grundlast —, und OnDemandPercentageAboveBaseCapacity bestimmt, dass die Skalierung darüber überwiegend oder vollständig aus Spot besteht. Die kritische Basis ist unterbrechungssicher, die unkritische Spitze läuft mit bis zu 90 % Nachlass; die Grundlast lässt sich zusätzlich mit einem Savings Plan rabattieren. (B) funktioniert und ist ein gängiges Muster, verdoppelt aber die zu verwaltenden Skalierungsgruppen und Policies für etwas, das eine einzelne Gruppe nativ kann. (C) setzt die Grundlast einem Risiko aus, das ausdrücklich ausgeschlossen wurde — breite Typ-Auswahl senkt die Unterbrechungswahrscheinlichkeit, garantiert aber nichts. (D) ist sicher und verschenkt den gesamten Spot-Vorteil in der Spitzenschicht, in der Ausfälle folgenlos wären.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-mixed-instances-groups.html"
+  },
+  {
+    "seedKey": "saa-c03-q-232",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen hat einen Compute Savings Plan abgeschlossen, der die EC2-Kosten deutlich gesenkt hat. Die Rechnung zeigt jedoch, dass die dauerhaft laufenden RDS-for-PostgreSQL-Instanzen und die ElastiCache-Cluster weiterhin voll zum On-Demand-Satz berechnet werden. Ein Architekt soll das erklären und beheben.\n\nWas ist die richtige Einordnung?",
+    "choices": [
+      { "id": "A", "text": "Der Compute Savings Plan wurde zu niedrig dimensioniert; ein höheres Stundencommitment deckt auch die Datenbanken ab." },
+      { "id": "B", "text": "Savings Plans greifen erst nach einer Angleichungsphase auf Datenbankdienste; die Rabatte erscheinen im Folgemonat." },
+      { "id": "C", "text": "Der Compute Savings Plan gilt nur für Instanzen mit Shared Tenancy; die Datenbanken laufen auf dedizierter Hardware." },
+      { "id": "D", "text": "Compute Savings Plans decken nur EC2, Fargate und Lambda ab; für die Datenbanken braucht es RDS Reserved Instances oder einen Database Savings Plan." }
+    ],
+    "correct": ["D"],
+    "explanation": "Der Geltungsbereich ist die entscheidende Grenze: Compute Savings Plans decken EC2, Fargate und Lambda ab — Datenbankdienste wie RDS, Aurora, ElastiCache oder DynamoDB gehören nicht dazu. Für stabile RDS- und ElastiCache-Last sind Reserved Instances beziehungsweise Reserved Nodes der klassische Weg; alternativ deckt der neuere Database Savings Plan diese Dienste mit einem einzigen Commitment ab. Kein Betrag und keine Wartezeit ändern etwas daran, welche Dienste ein Plan-Typ überhaupt umfasst. (A) beruht genau auf diesem Irrtum: Ein größeres Commitment auf einen Plan, der die Dienste nicht kennt, läuft ins Leere und würde ungenutzt verfallen. (B) erfindet eine Angleichungsphase, die es nicht gibt — Savings Plans greifen ab der ersten Abrechnungsstunde. (C) verwechselt die Dimensionen: Tenancy-Flexibilität ist gerade eine Stärke des Compute SP und hat mit der Dienst-Abdeckung nichts zu tun.",
+    "sourceRef": "https://docs.aws.amazon.com/savingsplans/latest/userguide/plan-types.html"
+  },
+  {
+    "seedKey": "saa-c03-q-233",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Eine Java-Microservice-Flotte läuft auf 200 m5-Instanzen. Der Code ist plattformunabhängig, die Abhängigkeiten sind aktuell, und eine Testumgebung steht bereit. Das Ziel ist ein deutlich besseres Preis-Leistungs-Verhältnis bei gleichbleibender Verfügbarkeit.\n\nWelche Maßnahme verspricht die größte Wirkung?",
+    "choices": [
+      { "id": "A", "text": "Die Instanzen auf T-Instanzen mit Unlimited Mode umstellen, deren Burst-Modell die Auslastungsspitzen günstiger abdeckt." },
+      { "id": "B", "text": "Auf Graviton-basierte m7g-Instanzen migrieren, nach erfolgreichem Test in der Vorabumgebung ausrollen." },
+      { "id": "C", "text": "Die Flotte auf Spot-Instanzen umstellen, deren Nachlass gegenüber On-Demand die Kosten am stärksten senkt." },
+      { "id": "D", "text": "Die vorhandenen m5-Instanzen jeweils eine Größe kleiner wählen und die Anzahl entsprechend erhöhen." }
+    ],
+    "correct": ["B"],
+    "explanation": "Graviton-Instanzen bieten laut AWS bis zu 40 % besseres Preis-Leistungs-Verhältnis als vergleichbare x86-Instanzen. Java ist dafür ein idealer Kandidat: Die JVM läuft nativ auf ARM, der Bytecode ist plattformunabhängig, und die gängigen Abhängigkeiten liefern arm64-Artefakte. Mit einer Testumgebung ist der Migrationsaufwand überschaubar, und die Verfügbarkeit bleibt unverändert. (A) passt nicht zum Profil: T-Instanzen sind für schwankende, meist niedrige Last mit gelegentlichen Bursts gedacht — eine 200-Instanzen-Microservice-Flotte unter Dauerlast würde im Unlimited Mode teuer und unberechenbar. (C) senkt die Kosten am stärksten, verändert aber die Verfügbarkeitszusage: Spot-Instanzen können jederzeit mit zwei Minuten Vorwarnung entzogen werden — für eine Produktionsflotte ohne weitere Absicherung riskant. (D) ist Rightsizing ohne Preisvorteil: Der Preis pro vCPU bleibt in derselben Familie nahezu identisch, und mehr Instanzen bedeuten mehr Overhead.",
+    "sourceRef": "https://aws.amazon.com/ec2/graviton/"
+  },
+  {
+    "seedKey": "saa-c03-q-234",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein wissenschaftliches Simulationsteam braucht 40 Instanzen, die genau sechs Stunden lang ununterbrochen rechnen müssen — eine Unterbrechung würde den gesamten Lauf verwerfen, da kein Checkpointing existiert. Ein Kollege schlägt vor, dafür Spot-Instanzen mit definierter Laufzeit zu buchen; der Vorschlag lässt sich nicht umsetzen.\n\nWas ist die korrekte Lösung?",
+    "choices": [
+      { "id": "A", "text": "Spot-Instanzen mit einem Maximalpreis oberhalb des On-Demand-Preises, wodurch eine Unterbrechung praktisch ausgeschlossen ist." },
+      { "id": "B", "text": "Spot-Instanzen mit der Strategie capacity-optimized, die aus den stabilsten Kapazitätspools schöpft und Unterbrechungen vermeidet." },
+      { "id": "C", "text": "On-Demand-Instanzen, bei Bedarf über eine On-Demand Capacity Reservation für die Dauer des Laufs abgesichert." },
+      { "id": "D", "text": "Reserved Instances über ein Jahr, deren garantierte Kapazität den ununterbrochenen Ablauf der Simulationsläufe sicherstellt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Spot-Instanzen mit definierter Laufzeit (Spot Blocks) wurden abgekündigt und stehen für neue Nutzung nicht mehr zur Verfügung — daher scheitert der Vorschlag. Sobald eine Unterbrechung den gesamten Lauf zerstört und kein Checkpointing existiert, ist Spot grundsätzlich das falsche Modell: Der Nachlass ist genau die Bezahlung für die Bereitschaft, unterbrochen zu werden. On-Demand ist die richtige Wahl; eine On-Demand Capacity Reservation stellt zusätzlich sicher, dass die 40 Instanzen zum Startzeitpunkt tatsächlich verfügbar sind. (A) beruht auf einem verbreiteten Irrtum: Der Maximalpreis schützt nicht vor Unterbrechung — Spot-Kapazität wird auch bei hohem Gebot entzogen, wenn AWS sie für On-Demand braucht. (B) senkt die Unterbrechungswahrscheinlichkeit deutlich, garantiert aber nichts — bei einem Alles-oder-nichts-Lauf ist das kein tragfähiges Fundament. (D) bindet ein Jahr Kapazität für sechs Stunden Rechenzeit und ist damit maximal unwirtschaftlich.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html"
+  },
+  {
+    "seedKey": "saa-c03-q-235",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "multiple",
+    "prompt": "Eine Lambda-basierte Bildverarbeitung verursacht hohe Kosten. Die Analyse zeigt: Die Funktionen sind mit 3.008 MB Speicher konfiguriert, nutzen laut CloudWatch aber selten mehr als 900 MB, und die Laufzeit verändert sich bei kleinerem Speicher kaum. Der Code ist in Python geschrieben und hat keine architekturspezifischen Abhängigkeiten.\n\nWelche ZWEI Maßnahmen senken die Kosten? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Die Funktionen auf die arm64-Architektur umstellen, die pro GB-Sekunde günstiger abgerechnet wird." },
+      { "id": "B", "text": "Provisioned Concurrency einrichten, damit weniger Cold Starts anfallen und die Gesamtlaufzeit sinkt." },
+      { "id": "C", "text": "Das Funktions-Timeout von 15 auf 3 Minuten senken, damit pro Aufruf weniger Laufzeit berechnet wird." },
+      { "id": "D", "text": "Die Speicherzuweisung anhand der Compute-Optimizer-Empfehlung auf den tatsächlichen Bedarf reduzieren." },
+      { "id": "E", "text": "Ein Compute Savings Plan abschließen, der auch die Request-Gebühren der Funktionen rabattiert." }
+    ],
+    "correct": ["A", "D"],
+    "explanation": "Lambda rechnet nach GB-Sekunden ab — Speicherzuweisung mal Laufzeit. (D) greift direkt an der ersten Größe an: 3.008 MB bei 900 MB Bedarf bedeutet, dass mehr als das Dreifache bezahlt wird; Compute Optimizer wertet die CloudWatch-Daten aus und empfiehlt den passenden Wert. Wichtig ist der Hinweis im Szenario, dass die Laufzeit bei kleinerem Speicher kaum steigt — sonst könnte weniger Speicher die Kosten sogar erhöhen, weil die CPU mit dem Speicher skaliert. (A) senkt den Preis der zweiten Größe: arm64 (Graviton) ist pro GB-Sekunde rund 20 % günstiger, und Python ohne architekturspezifische Abhängigkeiten läuft dort ohne Anpassung. (B) reduziert Cold-Start-Latenz, kostet aber zusätzlich für vorgehaltene Umgebungen — es macht die Rechnung größer, nicht kleiner. (C) beruht auf einem Irrtum: Das Timeout ist eine Obergrenze, keine berechnete Zeit; abgerechnet wird die tatsächliche Ausführungsdauer. (E) ist halb richtig und dadurch falsch: Compute Savings Plans rabattieren die Duration, aber nicht die Request-Gebühren.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-foundation-pricing.html"
+  },
+  {
+    "seedKey": "saa-c03-q-236",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Unternehmen will ein dreijähriges EC2-Commitment abschließen, rechnet aber damit, im Laufe der Laufzeit von der aktuellen Instance-Familie auf eine neuere Generation zu wechseln. Die Finanzabteilung besteht ausdrücklich auf Reserved Instances statt Savings Plans, weil ein Weiterverkauf im schlimmsten Fall möglich sein soll.\n\nWelche Reserved-Instance-Variante ist unter diesen Vorgaben die richtige — und welche Einschränkung gilt?",
+    "choices": [
+      { "id": "A", "text": "Convertible Reserved Instances, die sich in andere Instance-Familien tauschen lassen — allerdings zu einem niedrigeren Rabatt als Standard RIs." },
+      { "id": "B", "text": "Standard Reserved Instances, deren höherer Rabatt den späteren Wechsel der Instance-Familie finanziell ausgleicht." },
+      { "id": "C", "text": "Zonal Reserved Instances, deren Kapazitätsgarantie den Wechsel auf eine neuere Generation jederzeit absichert." },
+      { "id": "D", "text": "Regional Reserved Instances, deren Instance Size Flexibility den Wechsel auf jede beliebige Instance-Familie erlaubt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Convertible RIs erlauben den Tausch in eine andere Instance-Familie, Größe, Betriebssystem oder Tenancy während der Laufzeit — genau die geforderte Flexibilität. Der Preis dafür ist ein niedrigerer Rabatt als bei Standard RIs, und zu beachten ist, dass der Tausch nur gegen RIs mit gleichem oder höherem Gesamtwert erfolgt. (B) bietet zwar den höchsten RI-Rabatt, ist aber an die Instance-Familie gebunden: Ein Wechsel der Generation ist nicht möglich, und der höhere Rabatt gleicht ein ungenutztes Commitment nicht aus. (C) verwechselt die Achsen: Die zonale Ausprägung regelt Kapazitätsgarantie und Geltungsbereich, nicht die Tauschbarkeit der Instance-Familie. (D) enthält den klassischen Irrtum: Instance Size Flexibility erlaubt nur den Wechsel der Größe innerhalb derselben Familie und Generation, nicht den Sprung in eine andere Familie.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/reserved-instances-types.html"
+  },
+  {
+    "seedKey": "saa-c03-q-237",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Eine Entwicklungs- und Testumgebung umfasst 90 EC2-Instanzen und mehrere RDS-Instanzen. Die Teams arbeiten werktags von etwa 8 bis 19 Uhr; nachts und am Wochenende wird die Umgebung nicht genutzt, läuft aber durchgehend weiter. Die Kosten sollen ohne Änderung an den Anwendungen deutlich sinken.\n\nWelche Maßnahme hat die größte Wirkung?",
+    "choices": [
+      { "id": "A", "text": "Ein Compute Savings Plan über die durchschnittliche Auslastung der gesamten Entwicklungs- und Testumgebung abschließen." },
+      { "id": "B", "text": "Die Instanzen der Umgebung per Compute Optimizer auf kleinere Instanztypen herunterdimensionieren lassen." },
+      { "id": "C", "text": "Die Umgebung auf Spot-Instanzen umstellen, deren Nachlass die Kosten der ungenutzten Zeiten kompensiert." },
+      { "id": "D", "text": "Den AWS Instance Scheduler einsetzen, der die Instanzen außerhalb der Arbeitszeiten automatisch stoppt und startet." }
+    ],
+    "correct": ["D"],
+    "explanation": "Die Umgebung läuft rund 168 Stunden pro Woche, gebraucht wird sie etwa 55 — knapp zwei Drittel der Laufzeit sind reine Verschwendung. Der Instance Scheduler stoppt EC2- und RDS-Instanzen nach Zeitplan und startet sie morgens wieder; für gestoppte Instanzen fallen keine Instanzkosten mehr an (nur EBS-Speicher bleibt). Das ist der größte Hebel, und die Anwendungen bleiben unangetastet. Zu beachten: RDS startet nach sieben Tagen Stopp automatisch wieder — bei täglichem Zyklus irrelevant. (A) rabattiert Stunden, die niemand braucht: Ein Commitment auf eine Umgebung, die zwei Drittel der Zeit leerläuft, zementiert die Verschwendung. (B) ist sinnvolles Rightsizing und wirkt auf den Stundenpreis, nicht auf die 113 ungenutzten Stunden — der kleinere Hebel. (C) senkt den Stundenpreis erheblich, aber auch eine Spot-Instanz kostet in jeder ungenutzten Nachtstunde Geld — und Unterbrechungen in einer Testumgebung sind lästig.",
+    "sourceRef": "https://docs.aws.amazon.com/solutions/latest/instance-scheduler-on-aws/solution-overview.html"
+  },
+  {
+    "seedKey": "saa-c03-q-238",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Eine Verarbeitungsflotte läuft auf Spot-Instanzen. Beim Entzug einer Instanz gehen aktuell die Aufgaben verloren, die gerade in Bearbeitung sind. Die Anwendung soll den bevorstehenden Entzug erkennen, die laufende Aufgabe abschließen oder zurück in die Warteschlange legen und sich sauber aus dem Load-Balancer-Ziel abmelden.\n\nWie erhält die Anwendung diese Vorwarnung?",
+    "choices": [
+      { "id": "A", "text": "Über eine CloudWatch-Alarm-Regel auf die Metrik SpotInstanceTermination, die die Anwendung per Notification erreicht." },
+      { "id": "B", "text": "Über das Instance Metadata Service abfragbare Interruption Notice, ergänzt um EventBridge-Regeln auf Interruption- und Rebalance-Events." },
+      { "id": "C", "text": "Über den Spot-Maximalpreis, dessen Überschreitung die Anwendung anhand der aktuellen Spot-Preis-Historie selbst erkennen kann." },
+      { "id": "D", "text": "Über einen Auto-Scaling-Lifecycle-Hook im Terminating-Zustand, der die Instanz bis zum Abschluss der Aufgabe offen hält." }
+    ],
+    "correct": ["B"],
+    "explanation": "AWS kündigt den Entzug einer Spot-Instanz zwei Minuten vorher an. Die Anwendung erfährt das auf zwei Wegen: Sie pollt den Instance Metadata Service auf die Interruption Notice, oder sie reagiert auf das EC2-Spot-Instance-Interruption-Warning-Event in EventBridge. Ergänzend liefert die EC2 Instance Rebalance Recommendation ein noch früheres Signal, wenn das Entzugsrisiko steigt — Zeit für Draining, Requeueing und Deregistrierung am Load Balancer. (A) erfindet eine Metrik: Es gibt keine CloudWatch-Metrik SpotInstanceTermination; die Vorwarnung läuft über Metadata und EventBridge. (C) beruht auf einem überholten Modell: Der Entzug hängt an der Kapazitätslage, nicht am Preisvergleich — eine Instanz kann auch dann entzogen werden, wenn der Spot-Preis unter dem Maximalgebot liegt. (D) funktioniert für ASG-initiierte Terminierungen und ist dort das richtige Werkzeug — der Spot-Entzug durch AWS geht der ASG-Logik aber voraus und wird nicht durch einen Lifecycle Hook aufgehalten.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-interruptions.html"
+  },
+  {
+    "seedKey": "saa-c03-q-239",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "type": "single",
+    "prompt": "Ein Krankenhausbetreiber braucht für eine kritische Anwendung garantierte EC2-Kapazität in einer bestimmten Availability Zone — die Instanzen laufen rund um die Uhr und dürfen bei einem regionalen Kapazitätsengpass nicht ausfallen. Gleichzeitig soll die dauerhafte Grundlast rabattiert werden.\n\nWelche Kombination erfüllt beides?",
+    "choices": [
+      { "id": "A", "text": "Ein EC2 Instance Savings Plan allein, dessen Commitment die Kapazität in der gewünschten Availability Zone reserviert." },
+      { "id": "B", "text": "Regional Reserved Instances allein, deren Rabatt und Kapazitätsgarantie beide Anforderungen gleichzeitig abdecken." },
+      { "id": "C", "text": "On-Demand Capacity Reservations in der Ziel-AZ, kombiniert mit einem Savings Plan oder Regional Reserved Instances." },
+      { "id": "D", "text": "Dedicated Hosts in der Ziel-AZ, deren physisch zugewiesene Hardware Kapazität und Rabatt in einem Schritt liefert." }
+    ],
+    "correct": ["C"],
+    "explanation": "Die beiden Anforderungen brauchen zwei Instrumente, und AWS erlaubt ausdrücklich, sie zu stapeln. On-Demand Capacity Reservations reservieren Kapazität in einer bestimmten AZ, geben für sich genommen aber keinen Rabatt — sie werden zum On-Demand-Satz berechnet. Ein Savings Plan oder eine Regional RI legt sich darüber und rabattiert genau diese Nutzung. Ergebnis: garantierte Kapazität plus Commitment-Rabatt. (A) beruht auf einem Irrtum: Savings Plans reservieren niemals Kapazität, sie sind ein reines Abrechnungsinstrument. (B) enthält denselben Fehler an der anderen Stelle: Regional RIs sind ein Abrechnungsrabatt ohne Kapazitätsgarantie — nur zonale RIs reservieren Kapazität. (D) liefert tatsächlich physische Kapazität, ist aber für eine reine Kapazitätsgarantie überdimensioniert und teuer: Dedicated Hosts adressieren Lizenz- und Isolationsanforderungen, die hier niemand gestellt hat.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/capacity-reservations-pricing-billing.html"
+  }
+]

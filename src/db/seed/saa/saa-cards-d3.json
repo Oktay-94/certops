@@ -1,0 +1,434 @@
+[
+  {
+    "seedKey": "saa-c03-card-113",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "Ein 100-GiB-Volume braucht **dauerhaft** 3.000 IOPS. gp2 oder gp3 — und warum?",
+    "back": "**gp3.** Es liefert **3.000 IOPS / 125 MiB/s Baseline bei JEDER Größe** — unabhängig von der Kapazität und **ohne Burst-Credits**. gp2 gäbe bei 100 GiB nur **300 IOPS** Baseline (3 IOPS/GiB) und müsste die 3.000 aus Burst-Credits ziehen, die bei Dauerlast **leerlaufen**. Zusätzlich ist gp3 ~20 % günstiger.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-114",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "gp2: Wie berechnet sich die Baseline-IOPS — und wann bricht ein kleines Volume ein?",
+    "back": "**3 IOPS pro GiB**, Minimum **100**, Maximum **16.000** (erreicht bei 5.334 GiB). Volumes ≤ 33,33 GiB bekommen die Mindest-100. Kleine Volumes können auf **3.000 IOPS bursten** — aber nur solange **I/O-Credits** vorhanden sind. Bei anhaltender Last sind die Credits leer und die Performance fällt **hart auf die Baseline**.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-115",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "gp3: Bis wohin skalieren IOPS und Throughput — und wo ist der Haken?",
+    "back": "Bis **16.000 IOPS** und **1.000 MiB/s**, **unabhängig voneinander** buchbar. Haken: Die max. IOPS gibt es erst **ab 32 GiB** (Ratio 500 IOPS/GiB), den max. Throughput erst **ab 8.000 IOPS**. Wer **mehr als 16.000 IOPS** braucht, muss zu **io2 Block Express**.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-116",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "io1 vs io2 vs io2 Block Express — die Zahlen, und was hat sich 2025 geändert?",
+    "back": "**io1**: 64.000 IOPS · 1.000 MB/s · Ratio **50:1** · Durability 99,8–99,9 %. **io2 Block Express**: **256.000 IOPS** · 4.000 MB/s · Ratio **1.000:1** · Durability **99,999 %** · nur auf **Nitro**. **Aktualität:** Seit **30.04.2025 sind ALLE io2-Volumes automatisch Block Express** — die alte Trennung existiert nicht mehr. Ältere Kursmaterialien unterscheiden sie noch.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-117",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "st1 vs sc1 — Werte und der eine harte Ausschluss?",
+    "back": "**st1**: Baseline **40 MB/s pro TiB**, Burst 250 MB/s pro TiB, max **500 MB/s** (Big Data, Log-Processing, Data Warehouse). **sc1**: Baseline **12 MB/s pro TiB**, Burst 80, max **250 MB/s** (cold, selten). **Harter Ausschluss: HDD-Typen können NIEMALS Boot-Volume sein** — nur SSD (gp2/gp3/io1/io2).",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-118",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "Zwei EC2-Instances sollen **dasselbe** EBS-Volume gleichzeitig beschreiben. Was brauchst du — und was zerstört die Daten?",
+    "back": "**EBS Multi-Attach**: nur **io1/io2**, bis **16 Nitro-Instances**, alle in **derselben AZ**. **Zwingend nötig: ein cluster-aware Filesystem** (GFS2, OCFS2). Mit **XFS oder EXT4 → garantierte Datenkorruption**, weil beide Instances exklusiven Zugriff annehmen. In Prüfungsfragen ist oft **EFS** die bessere Antwort (Multi-AZ, kein Cluster-FS nötig).",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-119",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "Wann ist **Instance Store** die richtige Antwort — und wann sind die Daten weg?",
+    "back": "Bei **maximaler lokaler I/O** (physisches NVMe am Host): Cache, Scratch, Buffer, temporäre Verarbeitung, bereits replizierte Daten (Cassandra/Hadoop). **Daten überleben einen Reboot — aber NICHT Stop, Terminate oder Host-Failure.** Signalwort „höchste IOPS / temporäre Daten\" → Instance Store. „Muss persistent sein\" → EBS.",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-120",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "S3: Wie viele Requests pro Sekunde schafft ein Bucket — und wie skalierst du darüber hinaus?",
+    "back": "Mindestens **3.500 PUT/COPY/POST/DELETE** und **5.500 GET/HEAD** pro Sekunde — **pro Präfix**. Die **Anzahl der Präfixe ist unbegrenzt** → durch Verteilung über mehrere Präfixe skaliert es **linear**. **Veraltet:** die „Random-Prefix\"-Regel (Hash am Anfang des Keys) — seit 2018 nicht mehr nötig, steht aber noch in alten Kursen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html"
+  },
+  {
+    "seedKey": "saa-c03-card-121",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "S3: Ab wann Multipart Upload — und was ist die maximale Objektgröße?",
+    "back": "**Single PUT max 5 GB.** Multipart **ab 100 MB empfohlen**, **ab 5 GB Pflicht**. **10.000 Teile**, Teilgröße 5 MB–5 GB. **Zur Objektgröße Vorsicht:** Der klassische und **in der Prüfung erwartete** Wert ist **5 TB**. Die *aktuelle* AWS-Doku nennt inzwischen **bis 50 TB** per Multipart — im Zweifel in der Prüfung **5 TB** wählen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html"
+  },
+  {
+    "seedKey": "saa-c03-card-122",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "Nutzer in Australien laden große Dateien in einen Bucket in `eu-central-1` hoch. Es dauert ewig. Was beschleunigt das?",
+    "back": "**S3 Transfer Acceleration**: Der Upload geht an die **nächste CloudFront-Edge-Location** und von dort über den **AWS-Backbone** zum Bucket. Kombinierbar mit **Multipart Upload** (Parallelität). **CloudFront ist hier die falsche Antwort** — das ist ein Download-CDN, kein Upload-Beschleuniger.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html"
+  },
+  {
+    "seedKey": "saa-c03-card-123",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "EFS: Welche Throughput Modes gibt es — und was ist mit dem Performance Mode „Max I/O\"?",
+    "back": "**Throughput Modes**: **Bursting** (Default, 50 MiB/s pro TiB Baseline), **Provisioned** (fest, größenunabhängig), **Elastic** (skaliert automatisch — heute die Standardempfehlung). **Performance Modes**: General Purpose (niedrigste Latenz) und **Max I/O — „previous generation\"**: AWS rät aktiv ab, und es ist mit **One Zone und Elastic Throughput gar nicht kombinierbar**. Alte Kurse empfehlen es noch.",
+    "sourceRef": "https://docs.aws.amazon.com/efs/latest/ug/performance.html"
+  },
+  {
+    "seedKey": "saa-c03-card-124",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Storage-Performance",
+    "front": "Ein HPC-/ML-Cluster mit 500 Nodes braucht ein gemeinsames Dateisystem mit **hunderten GB/s** und Zugriff auf Trainingsdaten in S3. Was?",
+    "back": "**FSx for Lustre** — sub-ms Latenz, hunderte GB/s, und über eine **Data Repository Association (DRA)** direkt an **S3** angebunden (Lazy Loading). **Scratch** = keine Replikation, temporär (billiger). **Persistent** = repliziert in der AZ, Server werden automatisch ersetzt. EFS wäre zu langsam, EBS nicht shared, Instance Store weder shared noch persistent.",
+    "sourceRef": "https://docs.aws.amazon.com/fsx/latest/LustreGuide/what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-card-125",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "DynamoDB: Was ist **genau** 1 RCU und 1 WCU?",
+    "back": "**1 RCU** = **1 strongly consistent Read/s** für ein Item bis **4 KB** — **oder 2 eventually consistent Reads/s**. **1 WCU** = **1 Write/s** für ein Item bis **1 KB**. **Transaktionen kosten das Doppelte** (2 RCU / 2 WCU). Es wird **immer aufgerundet**: Ein 5-KB-Item kostet **2 RCU** (2 × 4 KB), nicht 1,25.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.html"
+  },
+  {
+    "seedKey": "saa-c03-card-126",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "DynamoDB Item-Size-Limit — und was zählt alles mit?",
+    "back": "**400 KB**, inklusive **Attributnamen UND Attributwerten**. Für größere Payloads: das Objekt in **S3** ablegen und nur den **Pointer** im Item speichern — dasselbe Muster wie bei der SQS Extended Client Library.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ServiceQuotas.html"
+  },
+  {
+    "seedKey": "saa-c03-card-127",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "Eine Tabelle hat **10.000 RCU** provisioniert und wird **trotzdem gedrosselt**. Warum?",
+    "back": "**Hot Partition.** Eine einzelne Partition liefert maximal **3.000 RCU** bzw. **1.000 WCU** und hält max. **~10 GB** — unabhängig davon, was die Tabelle insgesamt hat. Wenn ein Partition Key den Großteil des Traffics zieht, bringt **mehr Tabellenkapazität gar nichts**. Fix: Partition Key mit **hoher Kardinalität**, ggf. **Write Sharding**.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html"
+  },
+  {
+    "seedKey": "saa-c03-card-128",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "Löst **Adaptive Capacity** nicht automatisch das Hot-Partition-Problem?",
+    "back": "**Nur teilweise.** Es verschiebt ungenutzte Kapazität zu heißen Partitionen (bis zum **harten Partitions-Maximum** von 3.000 RCU / 1.000 WCU) und isoliert Hot Items. Aber: **Es wirkt über Minuten** — gegen einen **plötzlichen Spike** hilft es nicht. Die Lösung bleibt ein gut verteilter Partition Key.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html"
+  },
+  {
+    "seedKey": "saa-c03-card-129",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "Query vs. Scan — warum ist Scan fast immer die falsche Antwort?",
+    "back": "**Query** nutzt den Partition Key und liest **nur die passenden Items**. **Scan** liest die **gesamte Tabelle** und filtert erst danach — du **bezahlst für alle gelesenen Items**, nicht nur die zurückgegebenen. Beide liefern max. **1 MB pro Aufruf** (dann Pagination). Wenn eine Frage „Scan\" als Lösung anbietet, ist meist ein **GSI** die richtige Antwort.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.html"
+  },
+  {
+    "seedKey": "saa-c03-card-130",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "GSI vs. LSI — die fünf Unterschiede?",
+    "back": "**GSI**: **anderer** Partition Key möglich · **jederzeit** anlegbar · nur **eventually consistent** · **eigene** RCU/WCU · max **20**. **LSI**: **gleicher** Partition Key + anderer Sort Key · **nur bei Tabellenerstellung** · **strong consistency möglich** · teilt die Kapazität der Tabelle · max **5** (+ 10-GB-Limit pro Item Collection). Merkregel: **„anderer Partition Key ODER nachträglich\" → GSI. „strong consistency\" → LSI.**",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-indexes-general.html"
+  },
+  {
+    "seedKey": "saa-c03-card-131",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "DAX vor DynamoDB gesetzt — warum bringt es bei **strongly consistent Reads** nichts?",
+    "back": "Weil **DAX strongly consistent Reads NICHT cached** — sie werden direkt an DynamoDB **durchgereicht**. DAX liefert **Mikrosekunden**-Latenz nur für **eventually consistent** Reads (read-through/write-through Cache). Ungeeignet bei **write-intensiven** Workloads oder wenn strong consistency gefordert ist; lohnt sich ab hoher Cache-Hit-Rate.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html"
+  },
+  {
+    "seedKey": "saa-c03-card-132",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "DAX oder ElastiCache vor die Datenbank?",
+    "back": "**DAX**: nur für **DynamoDB**, aber **API-kompatibel** → **keine Code-Änderung** nötig. **ElastiCache**: für **jede** Datenquelle (RDS, Aurora, berechnete Ergebnisse), dafür musst du die Cache-Logik **selbst schreiben** (Lazy Loading / Write-Through). Signalwort „DynamoDB + Mikrosekunden + **ohne Code-Umbau**\" → **DAX**.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html"
+  },
+  {
+    "seedKey": "saa-c03-card-133",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "Wie viele Read Replicas — RDS vs. Aurora? Und was ist der *wichtigere* Unterschied?",
+    "back": "**RDS: bis 15 Read Replicas** für MySQL/MariaDB/PostgreSQL (seit Okt 2022 — ältere Kurse nennen pauschal 5; SQL Server: 5). **Aurora**: bis **15** Aurora Replicas. Der **wichtigere** Unterschied ist nicht die Zahl: **Aurora Replicas lesen vom gemeinsamen Storage-Layer** (Lag im **Millisekunden**-Bereich, jede kann per Failover-Priority automatisch zum Writer werden); **RDS Read Replicas kopieren Daten physisch** → deutlich größerer Lag, manuelle Promotion.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html"
+  },
+  {
+    "seedKey": "saa-c03-card-134",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "Aurora hat vier Endpoint-Typen. Welchen nutzt eine Reporting-Anwendung, die nur die großen Analytics-Instanzen treffen soll?",
+    "back": "Den **Custom Endpoint** — er zeigt auf eine **selbst definierte Untergruppe** von Instanzen. Die anderen: **Cluster/Writer** (Schreiben), **Reader** (Round-Robin über **alle** Replicas — würde hier auch die kleinen treffen), **Instance** (eine einzelne Instanz, meist nur zur Diagnose).",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html"
+  },
+  {
+    "seedKey": "saa-c03-card-135",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "Aurora Serverless v2: In welcher Einheit skaliert es — und wann ist es die richtige Wahl?",
+    "back": "In **ACUs** (Aurora Capacity Units, ~2 GiB RAM + zugehörige CPU), von **0 bis 256** in **0,5er-Schritten**. Seit Ende 2024 auch **Scale-to-Zero** (pausiert bei Inaktivität, Resume < 15 s). Richtig bei **variabler, unvorhersehbarer oder intermittierender** Last (Dev/Test, seltene Batch-Jobs). Bei **konstanter Dauerlast ist Provisioned günstiger**.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html"
+  },
+  {
+    "seedKey": "saa-c03-card-136",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Datenbank-Performance",
+    "front": "ElastiCache: Redis OSS vs. Memcached — und was ist **Valkey**?",
+    "back": "**Redis OSS**: Persistenz, Replikation, **Multi-AZ mit Auto-Failover**, komplexe Datenstrukturen (Sorted Sets, Hashes), Pub/Sub — aber **single-threaded pro Shard**. **Memcached**: **multi-threaded** (nutzt alle Cores), simple Key-Values, **keine** Persistenz/Replikation/Multi-AZ. **Valkey** ist seit 2024 eine **dritte Engine** (Redis-7.2-Fork der Linux Foundation, ~20 % günstiger) — **keine Umbenennung**, Redis OSS bleibt parallel verfügbar.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html"
+  },
+  {
+    "seedKey": "saa-c03-card-137",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute-Performance",
+    "front": "EC2-Familien: Welcher Buchstabe für welchen Workload?",
+    "back": "**C** = Compute-optimiert (Batch, HPC, Game-Server) · **M** = General Purpose/balanced · **R/X** = Memory-optimiert (In-Memory-DB; **X** für SAP HANA) · **I/D** = Storage-optimiert (**I** = hohe IOPS/NVMe, **D** = dichte HDD) · **P/G** = GPU (**P** = ML-Training, **G** = Grafik/Inferenz) · **T** = Burstable (kleine, schwankende Last).",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-138",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute-Performance",
+    "front": "Eine `t3.medium` bricht nach zwei Stunden Volllast massiv ein. Warum — und was sind die zwei Fixes?",
+    "back": "Die **CPU Credits sind aufgebraucht** → die Instance fällt auf ihre **Baseline** (ein Bruchteil einer vCPU) zurück. **Fix 1: Unlimited Mode** (bursted weiter, kostet Aufpreis bei Credit-Defizit). **Fix 2: Familie wechseln** (M oder C) — bei **echter Dauerlast ist T grundsätzlich die falsche Familie**.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html"
+  },
+  {
+    "seedKey": "saa-c03-card-139",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute-Performance",
+    "front": "Cluster vs. Spread vs. Partition Placement Group — Zweck und die **harten Limits**?",
+    "back": "**Cluster**: packt Instances eng zusammen in **einer AZ** → niedrigste Latenz, höchster Durchsatz (HPC, tightly-coupled). **Spread**: jede Instance auf **eigene Hardware/Rack** → **max 7 laufende Instances pro AZ** (für wenige kritische Einzelinstanzen). **Partition**: **max 7 Partitionen pro AZ**, jede auf eigenem Rack-Set → für große verteilte Systeme (HDFS, Cassandra, Kafka).",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html"
+  },
+  {
+    "seedKey": "saa-c03-card-140",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute-Performance",
+    "front": "Ein HPC-Cluster mit **MPI** braucht minimale Node-to-Node-Latenz. ENA oder EFA?",
+    "back": "**EFA (Elastic Fabric Adapter)** — er erlaubt **OS-Bypass**: MPI/NCCL sprechen **direkt mit der Hardware**, ohne den Kernel-Netzwerkstack. **ENA** ist „nur\" Enhanced Networking (hoher Durchsatz bis 100+ Gbps, aber normaler Stack). Signalwörter **„MPI\", „tightly-coupled HPC\", „verteiltes ML-Training\"** → **EFA + Cluster Placement Group**.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa.html"
+  },
+  {
+    "seedKey": "saa-c03-card-141",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute-Performance",
+    "front": "Eine Lambda-Funktion ist **CPU-gebunden** und zu langsam. Wie machst du sie schneller?",
+    "back": "**Mehr Memory zuweisen** — bei Lambda **skaliert die CPU proportional zum Memory**. Bei **1.769 MB** bekommt die Funktion genau **1 vCPU**; darüber mehrere (bis ~6 vCPUs bei 10.240 MB). **Es gibt keinen separaten CPU-Regler.** Nicht-intuitive Folge: Mehr Memory kann die Funktion **schneller UND günstiger** machen (kürzere Laufzeit × höherer Preis pro ms).",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html"
+  },
+  {
+    "seedKey": "saa-c03-card-142",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute-Performance",
+    "front": "Eine Lambda muss eine **3-GB-Datei** temporär auf Platte verarbeiten. Geht das?",
+    "back": "**Ja** — `/tmp` (Ephemeral Storage) ist von **512 MB bis 10.240 MB** konfigurierbar (Default 512 MB). Die Grenzen drumherum: **Timeout max 15 Min (900 s)**, Memory 128–10.240 MB, **synchrones Payload 6 MB**, Deployment-Package 50 MB gezippt / 250 MB entpackt (oder **Container-Image bis 10 GB**).",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html"
+  },
+  {
+    "seedKey": "saa-c03-card-143",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute-Performance",
+    "front": "Ein Job läuft **2 Stunden** und braucht **32 GB RAM**. Lambda?",
+    "back": "**Nein** — Lambda ist bei **15 Minuten** und **10 GB Memory** am Ende. Antwort: **AWS Batch** (managed Compute Environments, **On-Demand oder Spot**, Job Queues, Array Jobs) oder ECS/Fargate Tasks. Signalwörter für Batch: **„langlaufend\", „Batch-Verarbeitung\", „Spot zur Kostensenkung\"**.",
+    "sourceRef": "https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html"
+  },
+  {
+    "seedKey": "saa-c03-card-144",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute-Performance",
+    "front": "EC2 Hibernation: Wofür — und welche **zwei RAM-Grenzen** solltest du kennen?",
+    "back": "Der **RAM-Inhalt wird auf das (verschlüsselte!) EBS-Root-Volume geschrieben** → die Instance startet mit **warmem Cache und laufenden Prozessen** wieder hoch. Grenzen: **Linux mit > 150 GiB RAM kann NICHT hibernieren**, **Windows mit > 16 GiB RAM** ebenfalls nicht. Weitere Bedingungen: verschlüsseltes Root-Volume, kein Bare-Metal, max 60 Tage.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Hibernate.html"
+  },
+  {
+    "seedKey": "saa-c03-card-145",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "front": "CloudFront Functions vs. Lambda@Edge — wann welches?",
+    "back": "**CF Functions**: JavaScript, an **200+ Edge Locations**, **sub-Millisekunde**, 2 MB Memory, **nur viewer request/response**, **KEIN Netzwerk- oder Filesystem-Zugriff**, ~1/6 der Kosten → Header-Manipulation, URL-Rewrites, Cache-Key-Normalisierung, Token-Check. **Lambda@Edge**: Node/Python, an 13 Regional Edge Caches, bis **5 s (viewer) / 30 s (origin)**, **Netzwerk- UND Filesystem-Zugriff**, **alle 4 Trigger**, Request-Body-Zugriff. **Falle: „externe API am Edge aufrufen\" → nur Lambda@Edge.**",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/edge-functions.html"
+  },
+  {
+    "seedKey": "saa-c03-card-146",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "front": "Eine **UDP-Gaming-Anwendung** braucht globale Beschleunigung und **statische IPs**. CloudFront?",
+    "back": "**Nein — Global Accelerator.** GA arbeitet auf **Layer 4 (TCP/UDP)**, **cached nicht**, liefert **2 statische Anycast-IPs** und schaltet bei Ausfall **auf Netzwerkebene** um (kein Warten auf DNS-TTL). CloudFront ist ein **Layer-7-CDN mit Caching** für HTTP(S). Merkregel: **non-HTTP, statische IP oder Failover in Sekunden → GA. Cachebarer Web-Content → CloudFront.**",
+    "sourceRef": "https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html"
+  },
+  {
+    "seedKey": "saa-c03-card-147",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "front": "CloudFront: Signed URL oder Signed Cookie?",
+    "back": "**Signed URL** = Zugriff auf **eine einzelne Datei** (z. B. ein zeitlich begrenzter Download-Link). **Signed Cookie** = Zugriff auf **mehrere Dateien / einen ganzen Bereich** (z. B. eine komplette Video-Serie oder ein Premium-Bereich), **ohne für jede Datei eine eigene URL** erzeugen zu müssen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-choosing-signed-urls-cookies.html"
+  },
+  {
+    "seedKey": "saa-c03-card-148",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "front": "Die Cache-Hit-Rate ist niedrig und der Origin wird von vielen Edge Locations **gleichzeitig** befragt. Was hilft?",
+    "back": "**Origin Shield** — eine zusätzliche, **zentrale Caching-Schicht** vor dem Origin. Alle Edge Locations fragen **zuerst den Shield**; nur bei einem Miss dort geht ein Request zum Origin. Ergebnis: **höhere Cache-Hit-Ratio, deutlich weniger Origin-Last**.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html"
+  },
+  {
+    "seedKey": "saa-c03-card-149",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "front": "Direct Connect: Dedicated vs. Hosted — und erhöht eine **LAG** die Ausfallsicherheit?",
+    "back": "**Dedicated**: eigener physischer Port (1/10/100/400 Gbps), LAG- und MACsec-fähig. **Hosted**: über einen DX-Partner, 50 Mbps–25 Gbps, feiner granular. **FALLE:** Eine **LAG (Link Aggregation Group)** bündelt Verbindungen zu **mehr Bandbreite** — sie erhöht **NICHT die Resilienz**, weil alle Links am **selben Endpunkt** hängen. Echte HA braucht Verbindungen an **mehreren DX-Locations**.",
+    "sourceRef": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-150",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "front": "Eine On-Prem-Location soll über **eine** Direct-Connect-Verbindung VPCs in **drei Regionen** erreichen. Wie?",
+    "back": "**Direct Connect Gateway** — eine **globale** Ressource, die eine DX-Verbindung mit VPCs in **beliebigen Regionen** verbindet (kombiniert mit **Transit Gateway**, wenn es viele VPCs sind). Bonus: **SiteLink** verbindet zwei DX-Locations direkt über den AWS-Backbone, **ohne eine AWS-Region zu durchqueren**.",
+    "sourceRef": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/direct-connect-gateways.html"
+  },
+  {
+    "seedKey": "saa-c03-card-151",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "front": "Direct Connect ist teuer. Wie baust du Ausfallsicherheit, ohne eine **zweite** DX-Leitung zu kaufen?",
+    "back": "**Site-to-Site VPN als Backup-Pfad** über das Internet. Fällt DX aus, übernimmt das VPN — mit **geringerer und variabler** Performance, aber die Verbindung bleibt. Das ist das Standard-Resilienz-Pattern bei begrenztem Budget. **Maximale** Resilienz wäre: **zwei DX-Verbindungen an zwei verschiedenen Locations.**",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/vpn-connection-as-a-backup-to-aws-dx-connection-example.html"
+  },
+  {
+    "seedKey": "saa-c03-card-152",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Netzwerk-Performance",
+    "front": "Wo bringen **Jumbo Frames** in AWS etwas — und wo nicht?",
+    "back": "**Innerhalb einer VPC** (zwischen Instances) sind bis **9001 Bytes MTU** möglich → weniger Overhead, mehr Durchsatz bei großen Transfers. **Sobald der Traffic über ein Internet Gateway hinausgeht, wird er auf 1500 Bytes begrenzt.** Auch über Inter-Region-Peering und VPN gelten kleinere MTUs — Jumbo Frames helfen dort nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/network_mtu.html"
+  },
+  {
+    "seedKey": "saa-c03-card-153",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion & Analytics",
+    "front": "Kinesis Data Streams: Was leistet **ein** Shard?",
+    "back": "**Write: 1 MB/s ODER 1.000 Records/s. Read: 2 MB/s** — im Standard-Modus **geteilt unter allen Consumern**. Record-Größe: Default max **1 MiB**, konfigurierbar bis 10 MiB. **Aktualität:** Das Shard-Kontingent wurde im **April 2025 von 500 auf bis zu 20.000 pro Account** (in den großen Regionen) angehoben — alte Kursmaterialien nennen noch 500.",
+    "sourceRef": "https://docs.aws.amazon.com/streams/latest/dev/service-sizes-and-limits.html"
+  },
+  {
+    "seedKey": "saa-c03-card-154",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion & Analytics",
+    "front": "Fünf Consumer lesen denselben Kinesis-Stream und werden **alle** langsam. Warum — und was ist der Fix?",
+    "back": "Im **Standard-Modus teilen sich ALLE Consumer die 2 MB/s pro Shard** → bei fünf bleiben je ~400 KB/s, die Latenz steigt auf ~1 Sekunde. **Fix: Enhanced Fan-out** — jeder **registrierte** Consumer bekommt **eigene 2 MB/s pro Shard** und **Push-Zustellung via HTTP/2** (~70 ms statt ~200 ms). Grenze: **max 20 registrierte Consumer** pro Stream.",
+    "sourceRef": "https://docs.aws.amazon.com/streams/latest/dev/enhanced-consumers.html"
+  },
+  {
+    "seedKey": "saa-c03-card-155",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion & Analytics",
+    "front": "Der Kinesis-Stream ist am Durchsatz-Limit. Wie erhöhst du die Kapazität?",
+    "back": "**Resharding**: **Shard Split** (1 → 2, mehr Kapazität und mehr Kosten) bzw. **Shard Merge** (2 benachbarte → 1). Läuft immer **paarweise**; alternativ automatisch über **`UpdateShardCount`**. Oder: auf **On-Demand-Modus** wechseln, der selbst skaliert (akkommodiert bis zum **Doppelten des Peak-Durchsatzes der letzten 30 Tage**).",
+    "sourceRef": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html"
+  },
+  {
+    "seedKey": "saa-c03-card-156",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion & Analytics",
+    "front": "Streaming-Entscheidungsmatrix: **KDS · Data Firehose · MSK · Managed Service for Apache Flink** — welches wann?",
+    "back": "**KDS**: eigene Consumer-Apps, **Replay** (bis 365 Tage), strikte **Ordnung**. **Amazon Data Firehose**: managed **Delivery** nach S3/Redshift/OpenSearch/Splunk — **kein Code, kein Replay**, near-real-time. **MSK**: **Kafka-kompatibel** — wenn bestehende Kafka-Anwendungen migriert werden. **Flink**: echtes **Stream-Processing/Analytics** in Echtzeit (SQL/Java).",
+    "sourceRef": "https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html"
+  },
+  {
+    "seedKey": "saa-c03-card-157",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion & Analytics",
+    "front": "Firehose soll JSON-Events als **Parquet** nach S3 schreiben. Geht das ohne eigenen Code?",
+    "back": "**Ja** — Firehose beherrscht **Format-Konvertierung JSON → Parquet/ORC** nativ (nutzt das **Glue-Schema**), dazu **Dynamic Partitioning** und Kompression. Für komplexere Logik: eine **Lambda-Transformation** dazwischenschalten. Buffer: **1–128 MB oder 60–900 s** — genau deshalb ist Firehose **near-real-time**, nicht real-time.",
+    "sourceRef": "https://docs.aws.amazon.com/firehose/latest/dev/record-format-conversion.html"
+  },
+  {
+    "seedKey": "saa-c03-card-158",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion & Analytics",
+    "front": "Die Athena-Rechnung ist zu hoch. Die drei Hebel?",
+    "back": "Athena kostet **~5 $ pro gescanntem TB** — also senkt man die **gescannte Datenmenge**: **(1) Partitionierung** (Partition Pruning — nur relevante Partitionen werden gelesen). **(2) Columnar Format** (Parquet/ORC — nur die abgefragten Spalten). **(3) Kompression** (Snappy/GZIP/ZSTD). Zusammen typisch **85–99 % Ersparnis**. **„Größere Instanz\" gibt es nicht — Athena ist serverless.**",
+    "sourceRef": "https://docs.aws.amazon.com/athena/latest/ug/performance-tuning.html"
+  },
+  {
+    "seedKey": "saa-c03-card-159",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion & Analytics",
+    "front": "**Gelegentliche** Ad-hoc-SQL-Abfragen auf Daten in S3. Athena, Redshift, Redshift Spectrum oder EMR?",
+    "back": "**Athena** — serverless, kein Cluster, Bezahlung nur pro Query. **Redshift**: eigener Cluster für **dauerhafte, komplexe BI-Workloads** (columnar MPP). **Redshift Spectrum**: erweitert einen **bestehenden** Redshift-Cluster auf S3-Daten. **EMR**: wenn du Hadoop/Spark/Presto **selbst kontrollieren** musst. Signalwort **„gelegentlich, kein Cluster verwalten\"** → Athena.",
+    "sourceRef": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-card-160",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Data Ingestion & Analytics",
+    "front": "Glue, DMS und Lake Formation — je ein Satz zur Abgrenzung.",
+    "back": "**Glue**: serverless **ETL** + **Data Catalog** (zentrale Metadaten, auch von Athena/Redshift/EMR genutzt) + **Crawler** (automatische Schema-Erkennung). **DMS**: Datenbank-**Migration/Replikation** (homogen und heterogen, inkl. Schema-Konvertierung). **Lake Formation**: feingranulare **Berechtigungen** auf dem Data Lake (Tabellen-, Spalten-, Zeilenebene) — **Governance, kein ETL**.",
+    "sourceRef": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+  }
+]

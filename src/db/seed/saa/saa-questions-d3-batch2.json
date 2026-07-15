@@ -1,0 +1,429 @@
+[
+  {
+    "seedKey": "saa-c03-q-175",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Eine serverlose API nutzt Lambda-Funktionen, die direkt auf eine RDS-for-PostgreSQL-Instanz zugreifen. Bei Lastspitzen skaliert Lambda auf tausende gleichzeitige Ausführungen, und die Datenbank lehnt neue Verbindungen mit dem Fehler „too many connections“ ab. Die Datenbank selbst ist von CPU und I/O her kaum ausgelastet.\n\nWelche Lösung behebt die Ursache?",
+    "choices": [
+      { "id": "A", "text": "RDS Proxy zwischen die Lambda-Funktionen und die Datenbank schalten, der die Verbindungen poolt und teilt." },
+      { "id": "B", "text": "Die RDS-Instanz auf eine größere Instanzklasse heben, deren max_connections-Wert deutlich höher liegt." },
+      { "id": "C", "text": "Die Reserved Concurrency der Lambda-Funktionen begrenzen, damit deutlich weniger Ausführungen gleichzeitig laufen." },
+      { "id": "D", "text": "Eine Read Replica ergänzen und die Hälfte der Funktionen auf deren Endpunkt umkonfigurieren." }
+    ],
+    "correct": ["A"],
+    "explanation": "Das ist das klassische Lambda-zu-RDS-Problem: Jede Ausführungsumgebung öffnet ihre eigene Verbindung, und tausende kurzlebige Verbindungen erschöpfen max_connections, obwohl die Datenbank Kapazität hätte. RDS Proxy hält einen warmen Verbindungspool und multiplext die Lambda-Anfragen darüber — genau der von AWS empfohlene Einsatzfall, dazu mit transparentem Failover und IAM-Auth. (B) funktioniert, kauft aber Hardware gegen ein Verbindungsverwaltungsproblem — die nächste Spitze sprengt auch das neue Limit. (C) funktioniert ebenfalls, drosselt aber den Durchsatz der API: Anfragen werden abgewiesen, statt bedient. (D) verschiebt nur Leseverbindungen; die Schreibverbindungen erschöpfen den Primary weiterhin, und zwei Endpunkte verdoppeln das Problem eher, als es zu lösen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html"
+  },
+  {
+    "seedKey": "saa-c03-q-176",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Eine schreibintensive RDS-for-MySQL-8.0-Datenbank auf einer aktuellen Nitro-Instanzklasse erreicht ihren Durchsatz-Engpass beim Schreiben; die Analyse zeigt, dass der InnoDB-Doublewrite-Buffer jede Seite doppelt auf das Storage schreibt. Die Kosten sollen nicht steigen.\n\nWelche Maßnahme erhöht den Schreibdurchsatz?",
+    "choices": [
+      { "id": "A", "text": "Die provisionierten IOPS des Volumes verdoppeln, damit das doppelte Schreiben aufgefangen wird." },
+      { "id": "B", "text": "Auf eine Multi-AZ-Bereitstellung umstellen, deren Standby einen Teil der Schreiblast übernimmt." },
+      { "id": "C", "text": "RDS Optimized Writes aktivieren, das den Doublewrite-Buffer über atomare 16-KiB-Schreibvorgänge ersetzt." },
+      { "id": "D", "text": "Den Binlog der Datenbank deaktivieren, damit pro Transaktion weniger Schreibvorgänge anfallen." }
+    ],
+    "correct": ["C"],
+    "explanation": "RDS Optimized Writes setzt genau an dieser Stelle an: Das AWS Nitro System garantiert, dass 16-KiB-Datenbankseiten atomar geschrieben werden — Torn Writes sind damit ausgeschlossen, der Doublewrite-Buffer wird überflüssig, und jede Seite wird nur noch einmal geschrieben. AWS nennt bis zu doppelten Schreibdurchsatz, ohne Aufpreis und bei gleichen provisionierten IOPS; verfügbar ab RDS for MySQL 8.0.30 auf unterstützten Instanzklassen. (A) funktioniert, bezahlt aber dauerhaft doppelte IOPS für ein Problem, das sich kostenlos abstellen lässt. (B) hilft nicht: Das Standby repliziert synchron und übernimmt keinerlei Last — es macht Schreibvorgänge eher minimal langsamer. (D) reduziert Schreiblast tatsächlich, opfert dafür aber Point-in-Time Recovery und Replikation — ein Tausch von Performance gegen Wiederherstellbarkeit.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-optimized-writes.html"
+  },
+  {
+    "seedKey": "saa-c03-q-177",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Ein Aurora-MySQL-Cluster hat einen Writer und fünf Aurora Replicas. Zwei der Replicas laufen auf größeren Instanzklassen und sind für schwere Analytics-Abfragen gedacht; die übrigen drei bedienen die Anwendung. Heute verbinden sich die Analytics-Jobs über den Reader Endpoint und landen dabei regelmäßig auf den kleinen Replicas, die dadurch für die Anwendung einbrechen.\n\nWie werden die Analytics-Jobs sauber auf die beiden großen Replicas begrenzt?",
+    "choices": [
+      { "id": "A", "text": "Die Analytics-Jobs direkt auf die Instance Endpoints der beiden großen Replicas konfigurieren." },
+      { "id": "B", "text": "Einen Custom Endpoint anlegen, der nur die beiden großen Replicas enthält, und die Jobs darauf zeigen lassen." },
+      { "id": "C", "text": "Einen zweiten Aurora-Cluster für Analytics aufbauen, der per Aurora-Cloning aktuell gehalten wird." },
+      { "id": "D", "text": "Die kleinen Replicas auf dieselbe Instanzklasse wie die großen heben, damit die Verteilung egal wird." }
+    ],
+    "correct": ["B"],
+    "explanation": "Genau dafür gibt es Custom Endpoints: eine frei definierte Untergruppe von Cluster-Instanzen hinter einem eigenen DNS-Namen, inklusive Verteilung über die Mitglieder. Die Analytics-Jobs bekommen den Custom Endpoint mit den beiden großen Replicas, die Anwendung behält den Reader Endpoint — beide Welten sind getrennt, und fällt eine große Replica aus, verteilt der Endpoint auf die verbleibende. (A) funktioniert, verliert aber genau diese Eigenschaften: Instance Endpoints kennen keine Verteilung und kein Failover — fällt die Instanz, zeigt der Job ins Leere. (C) funktioniert und isoliert am stärksten, aber ein Clone ist ein Zeitpunkt-Abbild, das für Aktualität ständig neu erzeugt werden müsste — deutlich mehr Betrieb. (D) kauft Hardware, um ein Routing-Problem zu umgehen, und die Analytics-Last drückt weiterhin auf die Replicas der Anwendung.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html"
+  },
+  {
+    "seedKey": "saa-c03-q-178",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Ein Produktkatalog liegt in DynamoDB und wird extrem leseintensiv genutzt; über 95 % der Zugriffe sind eventually consistent GetItem-Aufrufe auf einen kleinen Kreis populärer Artikel. Das Team will die Leselatenz von einstelligen Millisekunden auf Mikrosekunden senken — ohne den Anwendungscode über den Austausch des Clients hinaus zu verändern.\n\nWelche Lösung erfüllt das?",
+    "choices": [
+      { "id": "A", "text": "Einen ElastiCache-Redis-Cluster einführen, den die Anwendung als Cache-Aside vor der Tabelle selbst pflegt." },
+      { "id": "B", "text": "Die Tabelle auf On-Demand-Kapazität umstellen, die Lastspitzen automatisch und sofort bedient." },
+      { "id": "C", "text": "Einen Global Secondary Index auf die populären Artikel anlegen, der die Lesezugriffe beschleunigt." },
+      { "id": "D", "text": "Einen DAX-Cluster vor die Tabelle schalten, dessen API-kompatibler Client die Aufrufe transparent cacht." }
+    ],
+    "correct": ["D"],
+    "explanation": "DAX ist der verwaltete, API-kompatible Cache für genau dieses Profil: read-heavy, eventually consistent, wiederkehrende Zugriffe auf heiße Items. Der Tausch des SDK-Clients gegen den DAX-Client ist die einzige Codeänderung — Cache-Logik, Invalidierung und Write-Through übernimmt DAX, und die Latenz fällt von Millisekunden auf Mikrosekunden. Wichtige Grenze: Strongly consistent Reads werden durchgereicht und nicht gecacht — hier irrelevant, weil die Zugriffe eventually consistent sind. (A) funktioniert und ist flexibler, bedeutet aber genau den Umbau, der ausgeschlossen wurde: Cache-Aside-Logik, Invalidierung und Konsistenz liegen dann im eigenen Code. (B) ändert die Abrechnungs- und Skalierungslogik, nicht die Latenz einer einzelnen Anfrage. (C) beschleunigt nichts — ein GSI ist ein alternativer Zugriffspfad über andere Schlüssel, kein Cache; GetItem auf den Primärschlüssel wird dadurch nicht schneller.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html"
+  },
+  {
+    "seedKey": "saa-c03-q-179",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Eine produktive DynamoDB-Tabelle speichert Bestellungen mit orderId als Partition Key. Ein neues Feature muss alle Bestellungen eines Kunden nach Datum abfragen — heute geht das nur per Scan mit Filter, der teuer und langsam ist. Die Tabelle kann nicht neu erstellt werden.\n\nWelche Lösung ermöglicht die neue Abfrage effizient?",
+    "choices": [
+      { "id": "A", "text": "Einen Global Secondary Index mit customerId als Partition Key und orderDate als Sort Key anlegen." },
+      { "id": "B", "text": "Einen Local Secondary Index mit orderDate als alternativem Sort Key zur Tabelle hinzufügen." },
+      { "id": "C", "text": "Die Scans mit einer FilterExpression auf customerId einschränken, damit weniger Items zurückkommen." },
+      { "id": "D", "text": "Eine zweite Tabelle mit customerId als Partition Key anlegen und per Streams synchron halten." }
+    ],
+    "correct": ["A"],
+    "explanation": "Ein GSI ist genau dafür da: Er definiert einen komplett anderen Partition Key (und Sort Key) als die Tabelle und lässt sich jederzeit nachträglich anlegen. Mit customerId/orderDate wird aus dem Scan eine gezielte Query — sortiert, eingrenzbar, effizient. Der Preis: eigene Kapazität und nur eventually consistent, was für dieses Feature unkritisch ist. (B) scheitert doppelt: Ein LSI kann nur den Sort Key ändern, nie den Partition Key — und er ist ausschließlich bei der Tabellenerstellung anlegbar, die hier ausgeschlossen ist. (C) spart nur Übertragung, nicht Kosten: Eine FilterExpression wirkt nach dem Lesen — bezahlt wird weiterhin der komplette Scan. (D) funktioniert und war vor den GSIs das übliche Muster, bedeutet aber eine eigene Replikations-Pipeline samt Fehlerbehandlung für etwas, das ein GSI eingebaut mitbringt.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html"
+  },
+  {
+    "seedKey": "saa-c03-q-180",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Ein Team entwirft eine neue DynamoDB-Tabelle für Kontobewegungen mit accountId als Partition Key und transactionId als Sort Key. Eine zweite Zugriffsart steht schon fest: Bewegungen eines Kontos nach Betrag sortiert abfragen — und diese Abfragen müssen strongly consistent sein, weil sie unmittelbar nach dem Schreiben korrekt sein müssen.\n\nWelche Index-Entscheidung ist richtig?",
+    "choices": [
+      { "id": "A", "text": "Nach dem Anlegen der Tabelle einen Global Secondary Index mit amount als Sort Key ergänzen." },
+      { "id": "B", "text": "Die Abfragen als Scan mit Sortierung im Anwendungscode umsetzen, da Indizes hier nicht nötig sind." },
+      { "id": "C", "text": "Bei der Tabellenerstellung einen Local Secondary Index mit amount als alternativem Sort Key anlegen." },
+      { "id": "D", "text": "Zwei getrennte Tabellen führen, deren zweite die Bewegungen dauerhaft nach Betrag sortiert speichert." }
+    ],
+    "correct": ["C"],
+    "explanation": "Die Anforderung strongly consistent entscheidet: Nur ein LSI unterstützt strongly consistent Reads — ein GSI ist grundsätzlich eventually consistent. Der LSI behält den Partition Key (accountId) und tauscht nur den Sort Key (amount), teilt sich die Kapazität mit der Tabelle und muss zwingend bei der Tabellenerstellung angelegt werden. Da die Tabelle neu entsteht und die Zugriffsart bekannt ist, ist genau jetzt der einzige Zeitpunkt dafür; zu beachten bleibt das 10-GB-Limit je Partition-Key-Wert für Item-Collections. (A) scheitert an der Konsistenz: Der GSI liefert eventually consistent — unmittelbar nach dem Schreiben genau das Risiko, das ausgeschlossen werden soll. (B) funktioniert, liest aber bei jeder Abfrage die ganze Partition oder Tabelle — teuer und langsam. (D) funktioniert mit eigener Synchronisation, die aber selbst wieder asynchron ist und die Konsistenzanforderung ebenso verfehlt.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html"
+  },
+  {
+    "seedKey": "saa-c03-q-181",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "multiple",
+    "prompt": "Eine DynamoDB-Tabelle für IoT-Messwerte nutzt deviceType als Partition Key — es gibt nur zwölf Gerätetypen, und zwei davon liefern 80 % aller Schreibvorgänge. Trotz reichlich provisionierter Kapazität auf Tabellenebene kommt es zu Throttling; die CloudWatch-Metriken zeigen, dass einzelne Partitionen ihr Limit erreichen, während andere leerlaufen.\n\nWelche ZWEI Maßnahmen beheben das Problem nachhaltig? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Die provisionierte Schreibkapazität der Tabelle verdreifachen, damit auch die heißen Partitionen genug haben." },
+      { "id": "B", "text": "Den Partition Key auf ein hochkardinales Attribut wie die deviceId umstellen, das die Last breit verteilt." },
+      { "id": "C", "text": "DynamoDB Auto Scaling aktivieren, das die Kapazität der Tabelle automatisch an die Last anpasst." },
+      { "id": "D", "text": "Write Sharding einsetzen, indem der Partition Key um ein berechnetes Suffix erweitert wird." },
+      { "id": "E", "text": "Die Tabelle auf On-Demand-Kapazität umstellen, die Throttling grundsätzlich ausschließt." }
+    ],
+    "correct": ["B", "D"],
+    "explanation": "Das Problem ist das Schlüsseldesign, nicht die Kapazität: Zwölf Werte mit massiver Schieflage konzentrieren die Last auf wenige Partitionen, und jede Partition ist hart auf 1.000 WCU begrenzt — egal, wie viel die Tabelle insgesamt hat. (B) ist die strukturelle Lösung: Ein hochkardinaler Schlüssel wie deviceId verteilt die Schreiblast über viele Partitionen. (D) ist das dokumentierte Muster, wenn der fachliche Schlüssel bleiben muss: Ein berechnetes Suffix (etwa deviceType#7) fächert eine heiße Partition auf mehrere auf; beim Lesen werden die Shards zusammengeführt. (A) und (C) skalieren die Tabellenkapazität — am 1.000-WCU-Deckel der einzelnen Partition ändern beide nichts. (E) nimmt denselben Deckel mit: Auch On-Demand throttelt eine heiße Partition; Adaptive Capacity mildert graduelle Schieflagen, hebt das Partitionslimit aber nicht auf.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html"
+  },
+  {
+    "seedKey": "saa-c03-q-182",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Eine neue Event-Registrierungs-Plattform nutzt DynamoDB. Der Traffic ist extrem spitzenlastig und nicht vorhersehbar: Wochenlang fast nichts, dann binnen Minuten das Tausendfache, wenn ein Veranstalter einen Vorverkauf startet. Beim letzten Vorverkauf wurde die provisionierte Tabelle trotz Auto Scaling massiv gedrosselt, weil das Nachskalieren zu langsam griff.\n\nWelche Konfiguration passt zu diesem Lastprofil?",
+    "choices": [
+      { "id": "A", "text": "Provisioned Capacity mit Auto Scaling und einer deutlich niedrigeren Ziel-Auslastung von 30 Prozent." },
+      { "id": "B", "text": "Der On-Demand-Kapazitätsmodus, der Anfragen ohne Kapazitätsplanung nach Verbrauch abrechnet." },
+      { "id": "C", "text": "Provisioned Capacity, die per Scheduled Scaling vor jedem angekündigten Vorverkauf angehoben wird." },
+      { "id": "D", "text": "Provisioned Capacity dauerhaft auf der Spitzenlast des größten bisherigen Vorverkaufs." }
+    ],
+    "correct": ["B"],
+    "explanation": "On-Demand ist genau für dieses Profil gebaut: keine Kapazitätsplanung, sofortige Bedienung stark schwankender Last, Abrechnung pro Request. Der Aufpreis pro Anfrage ist bei wochenlangem Leerlauf irrelevant — bezahlt wird nur, was tatsächlich passiert. Auto Scaling auf Provisioned reagiert dagegen über CloudWatch-Alarme mit Minuten Verzögerung; ein Vorverkaufs-Spike ist längst gedrosselt, bevor die neue Kapazität greift — exakt das beobachtete Verhalten. (A) mildert das nur: Mehr Puffer, aber derselbe träge Mechanismus, dazu dauerhaft bezahlte Reserve. (C) funktioniert für angekündigte Termine, bricht aber beim ersten Veranstalter, der spontan startet — und jemand muss den Kalender pflegen. (D) funktioniert zuverlässig und ist die teuerste Variante: Man bezahlt die Jahresspitze an jedem leeren Tag mit.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html"
+  },
+  {
+    "seedKey": "saa-c03-q-183",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Eine Gaming-Plattform braucht einen In-Memory-Store für Live-Ranglisten und Sitzungsdaten. Anforderungen: Sorted-Set-Operationen für die Ranglisten, automatisches Failover über mehrere Availability Zones und Snapshots, damit der Zustand einen Neustart übersteht.\n\nWelche Lösung erfüllt alle drei Anforderungen?",
+    "choices": [
+      { "id": "A", "text": "ElastiCache for Memcached mit mehreren Knoten, deren Threads die Last auf alle Kerne verteilen." },
+      { "id": "B", "text": "DynamoDB mit DAX, dessen Item-Cache die Ranglisten im Mikrosekundenbereich bereitstellt." },
+      { "id": "C", "text": "Eine selbst betriebene Redis-Installation auf EC2-Instanzen mit eigener Replikations-Konfiguration." },
+      { "id": "D", "text": "ElastiCache for Valkey oder Redis OSS mit Multi-AZ, automatischem Failover und Snapshots." }
+    ],
+    "correct": ["D"],
+    "explanation": "Die drei Anforderungen zeichnen das Profil der Redis-Familie: Sorted Sets sind eine native Datenstruktur (ideal für Ranglisten), Replikation mit Multi-AZ und automatischem Failover ist eingebaut, und Snapshots machen den Zustand persistent. ElastiCache bietet das verwaltet — mit Valkey (dem Redis-7.2-Fork, günstiger) und Redis OSS als gleichwertigen Engines. (A) scheitert an allen dreien: Memcached kennt keine Sorted Sets, keine Replikation, kein Failover und keine Persistenz — seine Stärke ist simples, multi-threaded Key-Value-Caching. (B) verfehlt die Datenstruktur: DAX cacht DynamoDB-Items; Sorted-Set-Operationen mit Rangabfragen müssten mühsam nachgebaut werden. (C) erfüllt fachlich alles — es ist ja Redis —, tauscht aber den verwalteten Dienst gegen Eigenbetrieb von Replikation, Failover und Patching.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/SelectEngine.html"
+  },
+  {
+    "seedKey": "saa-c03-q-184",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Ein Onlineshop cacht Produktpreise mit ElastiCache nach dem Lazy-Loading-Muster: Bei einem Cache-Miss wird der Preis aus der Datenbank geladen und ohne Ablaufzeit in den Cache geschrieben. Nach Preisänderungen zeigen Kunden teils stundenlang veraltete Preise. Die Preise ändern sich mehrmals täglich und müssen im Shop unmittelbar nach der Änderung stimmen.\n\nWelche Anpassung der Caching-Strategie löst das Problem?",
+    "choices": [
+      { "id": "A", "text": "Write-Through ergänzen, sodass jede Preisänderung den Cache-Eintrag im selben Schritt aktualisiert." },
+      { "id": "B", "text": "Eine TTL von 24 Stunden auf die Einträge setzen, damit veraltete Preise automatisch verfallen." },
+      { "id": "C", "text": "Den Cache bei jeder Preisänderung vollständig leeren, damit alle Einträge neu geladen werden." },
+      { "id": "D", "text": "Auf einen größeren Cache-Knoten wechseln, damit Einträge seltener verdrängt und erneut geladen werden." }
+    ],
+    "correct": ["A"],
+    "explanation": "Das Problem ist die fehlende Invalidierung: Lazy Loading aktualisiert einen Eintrag nur bei einem Miss — ein einmal geladener Preis bleibt stehen, bis er verdrängt wird. Write-Through schließt genau diese Lücke: Die Preisänderung schreibt Datenbank und Cache im selben Vorgang, der Eintrag ist ab der nächsten Anfrage korrekt. Die Kombination beider Muster ist der dokumentierte Standard — Lazy Loading füllt, Write-Through hält aktuell. (B) begrenzt das Veralten nur: Bis zu 24 Stunden falsche Preise sind das Gegenteil von unmittelbar; eine kurze TTL wiederum erhöht die Miss-Rate für alle Produkte. (C) funktioniert, ist aber ein Vorschlaghammer — jede Änderung eines einzelnen Preises kostet den gesamten Cache-Bestand und erzeugt eine Miss-Welle gegen die Datenbank. (D) adressiert Verdrängung durch Speicherdruck; der veraltete Eintrag wird dadurch nicht richtiger, sondern lebt sogar länger.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-185",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Eine Vertragsverwaltung speichert Metadaten in DynamoDB. Neuerdings sollen auch die unterschriebenen Vertrags-PDFs mit typischerweise 2 bis 8 MB direkt beim jeweiligen Item liegen. Die Schreibversuche schlagen mit einem ValidationException-Fehler zur Item-Größe fehl.\n\nWie wird die Anforderung korrekt umgesetzt?",
+    "choices": [
+      { "id": "A", "text": "Die PDFs mit einem verlustfreien Verfahren komprimieren, bis sie unter die Größengrenze passen." },
+      { "id": "B", "text": "Die PDFs in Segmente aufteilen und als Item-Collection unter demselben Partition Key ablegen." },
+      { "id": "C", "text": "Die PDFs nach S3 legen und im DynamoDB-Item nur den Objektschlüssel als Referenz speichern." },
+      { "id": "D", "text": "Die Tabelle auf On-Demand-Kapazität umstellen, deren Items größere Nutzlasten aufnehmen dürfen." }
+    ],
+    "correct": ["C"],
+    "explanation": "Das Item-Limit von DynamoDB liegt hart bei 400 KB — inklusive Attributnamen und -werten, unabhängig vom Kapazitätsmodus. Das dokumentierte Muster für größere Binärdaten ist die Auslagerung: Das PDF liegt in S3, das Item trägt den Objektschlüssel; Metadaten bleiben abfragbar, das Objekt ist über die Referenz direkt erreichbar. Nebeneffekt: S3 ist für Blobs dieser Größe auch deutlich günstiger pro GB. (A) ist unzuverlässig — PDFs sind bereits komprimiert, und aus 8 MB werden keine 400 KB. (B) funktioniert technisch (Segmente als einzelne Items), erfindet aber ein eigenes Chunking-Protokoll samt Reassemblierung und bezahlt jeden Lese- und Schreibvorgang über viele Items hinweg. (D) beruht auf einem Irrtum: On-Demand ändert die Abrechnung, nicht die Item-Grenze.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-use-s3-too.html"
+  },
+  {
+    "seedKey": "saa-c03-q-186",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Eine RDS-for-MySQL-Datenbank bedient ein Reporting-Modul, dessen komplexe Abfragen mit großen Sortierungen und Joins regelmäßig On-Disk-Temp-Tables erzeugen. Die Analyse zeigt: Der Engpass ist die EBS-Latenz genau dieser temporären Objekte, nicht die Datenzugriffe selbst.\n\nWelche Maßnahme adressiert diesen Engpass gezielt?",
+    "choices": [
+      { "id": "A", "text": "Die Datenbank auf eine Instanzklasse mit mehr Arbeitsspeicher heben, damit Temp-Tables seltener entstehen." },
+      { "id": "B", "text": "Auf eine Instanzklasse mit lokalem NVMe wechseln und RDS Optimized Reads die Temp-Objekte dorthin legen lassen." },
+      { "id": "C", "text": "Die provisionierten IOPS des EBS-Volumes erhöhen, damit die temporären Schreibvorgänge schneller werden." },
+      { "id": "D", "text": "Eine Read Replica für das Reporting ergänzen, damit der Primary von den Abfragen entlastet wird." }
+    ],
+    "correct": ["B"],
+    "explanation": "RDS Optimized Reads ist genau dafür gebaut: Auf Instanzklassen mit lokalem NVMe (etwa db.r6gd) landen temporäre Objekte — On-Disk-Temp-Tables, interne Temp-Files, Binlog-Cache — auf dem Instance Store statt auf EBS. Der Netzwerkumweg entfällt exakt für die Objekte, die hier der Engpass sind; AWS nennt deutlich schnellere Verarbeitung temp-lastiger Abfragen. Dass Temp-Objekte nicht in Snapshots landen, ist unkritisch — sie sind per Definition flüchtig. (A) funktioniert teilweise: Mehr RAM lässt mehr Sortierungen im Speicher stattfinden, aber die großen Abfragen kippen weiterhin auf Disk — dann mit derselben Latenz. (C) beschleunigt EBS, hebt aber den Netzwerkpfad nicht auf — lokales NVMe bleibt eine andere Liga, und die IOPS kosten dauerhaft. (D) verschiebt die Last auf eine andere Instanz, wo dieselben Temp-Tables mit derselben EBS-Latenz entstehen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-optimized-reads.html"
+  },
+  {
+    "seedKey": "saa-c03-q-187",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "DB-Performance",
+    "type": "single",
+    "prompt": "Eine RDS-for-PostgreSQL-Datenbank in eu-central-1 bedient Anwendungen in Europa und zunehmend auch in Singapur. Die Nutzer in Singapur beklagen langsame Lesezugriffe durch die Distanz; gleichzeitig wünscht sich das Management eine Absicherung, falls die europäische Region ausfällt. Schreibzugriffe erfolgen weiterhin nur in Europa.\n\nWelche Lösung adressiert beides?",
+    "choices": [
+      { "id": "A", "text": "Eine Multi-AZ-Bereitstellung, deren Standby in einer weiteren Availability Zone synchron mitläuft." },
+      { "id": "B", "text": "ElastiCache in Singapur, das die häufigsten Abfrageergebnisse nahe bei den Nutzern vorhält." },
+      { "id": "C", "text": "Einen Read-Replica-Endpunkt in eu-central-1, auf den die Anwendungen aus Singapur zugreifen." },
+      { "id": "D", "text": "Eine Cross-Region Read Replica in ap-southeast-1, die lokal liest und im Notfall promotet wird." }
+    ],
+    "correct": ["D"],
+    "explanation": "Eine Cross-Region Read Replica erledigt beide Aufgaben in einem: Die Anwendungen in Singapur lesen lokal mit niedriger Latenz, und im Katastrophenfall wird die Replica zur eigenständigen Primärdatenbank promotet — der klassische Doppelnutzen aus Read-Skalierung und Disaster Recovery. Die asynchrone Replikationsverzögerung ist der Preis, den reine Lesezugriffe verkraften. (A) hilft bei keinem der beiden Ziele: Das Standby ist nicht lesbar, und es steht in derselben Region — ein Regionsausfall trifft beide. (B) beschleunigt wiederkehrende Abfragen, aber jeder Cache-Miss reist weiter nach Europa, und eine DR-Absicherung ist ein Cache ohnehin nicht. (C) ändert nichts an der Physik: Der Endpunkt steht in Europa, die Latenz nach Singapur bleibt — und die Region bleibt dieselbe.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html"
+  },
+  {
+    "seedKey": "saa-c03-q-188",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Eine kundenseitige Checkout-API läuft auf Lambda hinter API Gateway. Nach ruhigen Phasen erleben Kunden spürbare Verzögerungen durch Cold Starts. Ein Entwickler hat bereits Reserved Concurrency von 200 konfiguriert, aber die Cold Starts treten unverändert auf. Die Latenz muss durchgehend im zweistelligen Millisekundenbereich liegen.\n\nWas ist die korrekte Maßnahme, und warum hat die bisherige nicht gewirkt?",
+    "choices": [
+      { "id": "A", "text": "Provisioned Concurrency auf einem Alias konfigurieren — Reserved Concurrency reserviert nur Kapazität, wärmt aber nicht vor." },
+      { "id": "B", "text": "Die Reserved Concurrency weiter anheben, weil der Wert von 200 für das Vorwärmen nicht ausreicht." },
+      { "id": "C", "text": "Den Speicher der Funktion maximieren, weil die zugeteilte CPU die Initialisierung dominiert." },
+      { "id": "D", "text": "Die Funktion per EventBridge-Zeitplan minütlich aufrufen, damit die Umgebungen nicht einschlafen." }
+    ],
+    "correct": ["A"],
+    "explanation": "Die beiden Begriffe sind die klassische Verwechslung: Reserved Concurrency garantiert einer Funktion Kapazität und deckelt sie zugleich — sie initialisiert aber keine einzige Umgebung vor; der erste Aufruf jeder Umgebung zahlt den Cold Start trotzdem. Provisioned Concurrency hält dagegen fertig initialisierte Umgebungen bereit, die in zweistelligen Millisekunden antworten. Sie gilt nur für publizierte Versionen oder Aliasse — API Gateway muss auf den Alias zeigen, sonst läuft der Traffic daran vorbei. (B) verstärkt nur das Missverständnis: Mehr vom falschen Mechanismus wärmt weiterhin nichts vor. (C) verkürzt die Init-Phase etwas, weil CPU mit Memory skaliert — sie beseitigt den Cold Start aber nicht. (D) ist der alte Keep-Warm-Trick: Er hält typischerweise eine Umgebung warm; sobald parallel skaliert wird, starten die zusätzlichen Umgebungen kalt.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html"
+  },
+  {
+    "seedKey": "saa-c03-q-189",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Eine Java-Lambda-Funktion mit einem Spring-Boot-Framework braucht beim Cold Start mehrere Sekunden für die Initialisierung. Das Team will die Startzeit auf unter eine Sekunde drücken — möglichst ohne laufende Zusatzkosten, da die Funktion nur sporadisch aufgerufen wird.\n\nWelche Lösung passt am besten?",
+    "choices": [
+      { "id": "A", "text": "Provisioned Concurrency für die Funktion konfigurieren, die dauerhaft warme Umgebungen vorhält." },
+      { "id": "B", "text": "Die Funktion in ein Container-Image verpacken, dessen Layer beim Start schneller geladen werden." },
+      { "id": "C", "text": "SnapStart aktivieren, das die initialisierte Umgebung als Snapshot einfriert und daraus startet." },
+      { "id": "D", "text": "Das Framework durch handgeschriebene Initialisierung ersetzen, die den Startpfad drastisch verkürzt." }
+    ],
+    "correct": ["C"],
+    "explanation": "SnapStart ist für genau diesen Fall gebaut: Beim Publizieren einer Version wird die fertig initialisierte Umgebung als Firecracker-Snapshot eingefroren; neue Umgebungen starten aus diesem Snapshot in Sub-Sekunden statt durch den vollen Framework-Bootstrap. Für Java kostet das nichts extra — ideal für sporadische Aufrufe. Unterstützt sind Java 11+, Python 3.12+ und .NET 8+; zu beachten sind eingefrorene Init-Werte (UUIDs, Zufalls-Seeds), die per Runtime-Hook erneuert werden müssen, und dass SnapStart und Provisioned Concurrency sich auf derselben Version ausschließen. (A) funktioniert und ist bei striktesten Latenzanforderungen sogar überlegen — kostet aber dauerhaft für Warmhaltung, die eine sporadisch genutzte Funktion kaum rechtfertigt. (B) beruht auf einem Irrtum: Container-Images starten eher langsamer, nicht schneller. (D) funktioniert, ist aber ein tiefer Eingriff mit ungewissem Ergebnis — das Framework-Init verschwindet nicht, es wird nur handgemacht.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+  },
+  {
+    "seedKey": "saa-c03-q-190",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Eine latenzkritische Node.js-Lambda-Funktion hinter API Gateway zeigt bei Lastanstiegen Cold-Start-Spitzen. Ein Architekt schlägt vor, SnapStart zu aktivieren. Der Vorschlag scheitert in der Konsole.\n\nWoran liegt das, und was ist der richtige Weg?",
+    "choices": [
+      { "id": "A", "text": "SnapStart verlangt Container-Images; die Funktion muss zuerst als Image neu paketiert werden." },
+      { "id": "B", "text": "SnapStart unterstützt Node.js nicht; für diese Runtime ist Provisioned Concurrency der richtige Hebel." },
+      { "id": "C", "text": "SnapStart erfordert eine aktivierte Function URL; hinter API Gateway steht diese Option nicht zur Verfügung." },
+      { "id": "D", "text": "SnapStart wirkt nur auf $LATEST; die Funktion nutzt Aliasse und muss darauf umgestellt werden." }
+    ],
+    "correct": ["B"],
+    "explanation": "SnapStart ist auf bestimmte Runtimes begrenzt: Java 11+, Python 3.12+ und .NET 8+ — Node.js und Ruby gehören nicht dazu, ebenso wenig Container-Images. Für Node.js führt der Weg zu Provisioned Concurrency: vorinitialisierte Umgebungen auf einem Alias, bei Bedarf mit Application Auto Scaling nach Zeitplan oder Auslastung gesteuert, damit die Warmhaltekosten der Last folgen. (A) verdreht die Einschränkung — Container-Images sind bei SnapStart gerade ausgeschlossen, keine Voraussetzung. (C) erfindet eine Abhängigkeit, die nicht existiert; Function URLs haben mit SnapStart nichts zu tun. (D) stellt die Versionslogik auf den Kopf: SnapStart wirkt ausschließlich auf publizierte Versionen und Aliasse — $LATEST wird gerade nicht unterstützt.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+  },
+  {
+    "seedKey": "saa-c03-q-191",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Ein Data-Science-Team betreibt seine Inferenz-Container heute auf ECS mit Fargate. Ein neues Modell benötigt zwingend GPU-Beschleunigung; die Container-Images und die ECS-Service-Definitionen sollen weitgehend erhalten bleiben.\n\nWie wird die GPU-Anforderung erfüllt?",
+    "choices": [
+      { "id": "A", "text": "In der Fargate-Task-Definition eine GPU als Ressourcenanforderung deklarieren und neu deployen." },
+      { "id": "B", "text": "Die Plattformversion der Fargate-Tasks anheben, da die neueren Versionen GPU-Unterstützung mitbringen." },
+      { "id": "C", "text": "Auf Fargate Spot wechseln, dessen Kapazitätspool auch GPU-beschleunigte Instanzen enthält." },
+      { "id": "D", "text": "Den Service auf den EC2-Launch-Type mit GPU-Instanzen in einer Capacity-Provider-Gruppe umstellen." }
+    ],
+    "correct": ["D"],
+    "explanation": "Fargate unterstützt keine GPUs — das ist eine harte Grenze des serverlosen Modells, unabhängig von Plattformversion oder Konfiguration. Wer GPU-Beschleunigung in ECS braucht, wechselt den Launch Type: Eine Auto Scaling Group aus GPU-Instanzen (etwa g5) wird als Capacity Provider angebunden, die Task-Definition deklariert die GPU-Anforderung, und ECS platziert die Tasks entsprechend. Container-Images und Service-Struktur bleiben dabei weitgehend unverändert — nur die Compute-Schicht darunter wechselt. (A) und (B) scheitern an derselben Tatsache: Es gibt in Fargate nichts zu deklarieren und keine Plattformversion, die GPUs nachliefert. (C) verwechselt das Preismodell mit der Hardware — Fargate Spot ist günstigere, unterbrechbare Fargate-Kapazität, keine andere Geräteklasse.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-gpu.html"
+  },
+  {
+    "seedKey": "saa-c03-q-192",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Ein Startup containerisiert seine Web-Anwendung für ECS. Die Last ist stark schwankend und unvorhersehbar, das Team besteht aus drei Entwicklern ohne dedizierten Betrieb, und niemand will EC2-Instanzen patchen, dimensionieren oder deren Auslastung optimieren.\n\nWelcher Launch Type passt, und warum?",
+    "choices": [
+      { "id": "A", "text": "Fargate, weil es Kapazität pro Task bereitstellt und das gesamte Host-Management entfällt." },
+      { "id": "B", "text": "EC2 mit einer Auto Scaling Group, weil eigene Instanzen bei jeder Auslastung günstiger bleiben." },
+      { "id": "C", "text": "EC2 mit Spot-Instanzen, weil deren Preisvorteil die schwankende Last am besten abfedert." },
+      { "id": "D", "text": "Fargate, weil es als einziger Launch Type Service Auto Scaling für ECS-Services unterstützt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Die Anforderungen — kein Host-Management, schwankende Last, kleines Team — beschreiben den Fargate-Kernfall: Kapazität wird pro Task bereitgestellt und abgerechnet, es gibt keine Instanzen zu patchen, zu dimensionieren oder auszulasten. Gerade bei schwankender Last ist Fargate auch wirtschaftlich im Vorteil, weil keine halbleeren Instanzen bezahlt werden. (B) stimmt in der Begründung nicht: EC2 wird erst bei hoher, stabiler Auslastung günstiger — und erkauft das mit genau dem Betriebsaufwand (AMIs, Patching, Bin-Packing), den das Team nicht leisten kann. (C) kombiniert den Preisvorteil mit Unterbrechbarkeit und demselben Host-Management; für die primäre Web-Anwendung eines Drei-Personen-Teams die falsche Baustelle. (D) kommt zum richtigen Ergebnis mit falscher Begründung: Service Auto Scaling funktioniert bei beiden Launch Types — es ist kein Fargate-Alleinstellungsmerkmal.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html"
+  },
+  {
+    "seedKey": "saa-c03-q-193",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "multiple",
+    "prompt": "Ein ECS-Service auf Fargate rendert Vorschaubilder; die Last folgt den eingehenden Anfragen über einen Application Load Balancer und schwankt stark. Zwei Ziele: Der Service soll automatisch mit der tatsächlichen Anfragelast skalieren, und die Compute-Kosten sollen sinken — kurze Unterbrechungen einzelner Tasks sind für diesen Workload verkraftbar.\n\nWelche ZWEI Maßnahmen setzen die Ziele um? (Wähle ZWEI.)",
+    "choices": [
+      { "id": "A", "text": "Service Auto Scaling mit Target Tracking auf die Metrik ALBRequestCountPerTarget konfigurieren." },
+      { "id": "B", "text": "Einen Lifecycle Hook am Load Balancer einrichten, der neue Tasks bei steigender Last anfordert." },
+      { "id": "C", "text": "Den Capacity Provider FARGATE_SPOT nutzen, dessen Tasks deutlich günstiger abgerechnet werden." },
+      { "id": "D", "text": "Die Task-Größe auf die kleinste vCPU-Memory-Kombination senken, damit jeder Task weniger kostet." },
+      { "id": "E", "text": "Ein EC2-Savings-Plan-Commitment abschließen, das die Fargate-Task-Preise dauerhaft senkt." }
+    ],
+    "correct": ["A", "C"],
+    "explanation": "(A) erledigt die Skalierung: Service Auto Scaling mit Target Tracking auf ALBRequestCountPerTarget koppelt die Task-Anzahl direkt an die Anfragen pro Ziel — die passende Metrik, wenn die Last den Requests folgt und nicht der CPU. (C) erledigt die Kosten: FARGATE_SPOT rechnet Tasks deutlich günstiger ab, mit dem Risiko einer Unterbrechung nach Vorwarnung — das der Workload ausdrücklich verkraftet; über eine Capacity-Provider-Strategie lässt sich eine Basis auf FARGATE mit Spot-Anteil kombinieren. (B) vermischt zwei Konzepte: Lifecycle Hooks gehören zu EC2 Auto Scaling Groups, nicht zu Load Balancern oder Fargate-Tasks. (D) senkt den Preis pro Task, aber unterdimensionierte Tasks brauchen mehr Instanzen oder werden langsam — das ist Tuning, keine Kostenstrategie für schwankende Last. (E) greift nicht: EC2-Savings-Plans decken Fargate nicht ab; dafür gibt es Compute Savings Plans.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-auto-scaling.html"
+  },
+  {
+    "seedKey": "saa-c03-q-194",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Eine Computational-Fluid-Dynamics-Simulation läuft auf 32 eng gekoppelten EC2-Instanzen, die während der Berechnung permanent untereinander kommunizieren. Die Analyse zeigt: Die Netzwerklatenz zwischen den Knoten dominiert die Gesamtlaufzeit. Verfügbarkeit ist zweitrangig — die Läufe sind kurz und wiederholbar.\n\nWelche Platzierungsstrategie verkürzt die Laufzeit?",
+    "choices": [
+      { "id": "A", "text": "Eine Partition Placement Group, deren getrennte Racks die Netzwerkpfade der Knoten entzerren." },
+      { "id": "B", "text": "Eine Spread Placement Group, die jede Instanz auf eigene Hardware mit eigener Netzanbindung legt." },
+      { "id": "C", "text": "Eine Cluster Placement Group, die die Instanzen für minimale Latenz dicht in einer AZ packt." },
+      { "id": "D", "text": "Eine Verteilung über drei Availability Zones, deren aggregierte Bandbreite die Kommunikation trägt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Die Cluster Placement Group ist das Werkzeug für tightly-coupled HPC: Sie packt die Instanzen physisch dicht zusammen in einer Availability Zone — niedrigste Latenz und höchster Durchsatz zwischen den Knoten, idealerweise kombiniert mit einem Elastic Fabric Adapter für MPI. Der Preis ist die gemeinsame Ausfalldomäne, die hier ausdrücklich verkraftbar ist. (A) und (B) optimieren in die Gegenrichtung: Beide verteilen Instanzen auf getrennte Hardware, um Ausfälle zu isolieren — genau die zusätzliche physische Distanz, die die Latenz erhöht statt senkt; Spread deckelt zudem bei 7 Instanzen pro AZ. (D) ist für die Kommunikationslatenz die schlechteste Wahl: Inter-AZ-Verkehr hat strukturell mehr Latenz als Verkehr innerhalb eines Racks — Multi-AZ schützt Verfügbarkeit, die hier niemand braucht.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html"
+  },
+  {
+    "seedKey": "saa-c03-q-195",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Ein selbstverwalteter Message-Broker-Verbund besteht aus sechs EC2-Instanzen, von denen jede einzelne kritisch ist. Nach einem Vorfall, bei dem ein einzelner Hardware-Defekt zwei Broker gleichzeitig riss, sollen die Instanzen so platziert werden, dass ein Hardware-Ausfall nie mehr als einen Broker trifft.\n\nWelche Platzierungsstrategie setzt das um?",
+    "choices": [
+      { "id": "A", "text": "Eine Cluster Placement Group, deren gemeinsames Netzsegment die Broker-Replikation beschleunigt." },
+      { "id": "B", "text": "Eine Spread Placement Group, die jede Instanz auf ein eigenes Rack mit eigener Stromversorgung legt." },
+      { "id": "C", "text": "Sechs Instanzen in sechs verschiedenen Regionen, die per Inter-Region-VPC-Peering miteinander verbunden werden." },
+      { "id": "D", "text": "Eine Partition Placement Group mit zwei Partitionen, auf die je drei Broker verteilt werden." }
+    ],
+    "correct": ["B"],
+    "explanation": "Die Spread Placement Group ist für genau diese Situation gebaut: eine kleine Zahl kritischer Einzelinstanzen, die strikt auf unterschiedliche Hardware gehören. Jede Instanz landet auf einem eigenen Rack mit eigener Stromversorgung und Netzanbindung — ein Hardware-Defekt trifft damit garantiert höchstens eine Instanz. Das Limit von 7 laufenden Instanzen pro AZ passt zu den sechs Brokern; über mehrere AZs verteilt wächst der Spielraum weiter. (A) optimiert in die Gegenrichtung — dichtes Packen für Latenz erhöht gerade die gemeinsame Ausfallwahrscheinlichkeit, die der Vorfall gezeigt hat. (C) funktioniert als maximale Isolation, ist aber massiv überzogen: sechs Regionen bedeuten Latenz, Datentransferkosten und Betriebskomplexität für ein Problem, das ein Rack-Level-Versprechen löst. (D) isoliert nur auf Partitionsebene: Innerhalb einer Partition teilen sich drei Broker weiterhin Racks — ein Defekt kann wieder mehrere gleichzeitig treffen.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html"
+  },
+  {
+    "seedKey": "saa-c03-q-196",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Eine nächtliche Genom-Analyse läuft heute als Container auf einer dauerhaft laufenden EC2-Instanz; einzelne Jobs brauchen 30 bis 90 Minuten und bis zu 64 GB Arbeitsspeicher. Das Team will die Jobs als verwaltete Batch-Verarbeitung mit Warteschlange betreiben und hat zunächst Lambda geprüft, das aber ausscheidet.\n\nWarum scheidet Lambda aus, und welcher Dienst passt?",
+    "choices": [
+      { "id": "A", "text": "Lambda unterstützt keine Container-Images; AWS Fargate mit einem Standalone-Task ersetzt es." },
+      { "id": "B", "text": "Lambda skaliert für nächtliche Läufe zu langsam; Amazon EC2 Auto Scaling übernimmt die Jobs." },
+      { "id": "C", "text": "Lambda kann keine Warteschlangen anbinden; Amazon SQS mit EC2-Workern ersetzt den Aufbau." },
+      { "id": "D", "text": "Lambda ist auf 15 Minuten Laufzeit und 10 GB Speicher begrenzt; AWS Batch führt die Jobs verwaltet aus." }
+    ],
+    "correct": ["D"],
+    "explanation": "Die Jobs sprengen zwei harte Lambda-Grenzen zugleich: das Timeout von 15 Minuten (900 Sekunden) und das Speichermaximum von 10.240 MB — 90 Minuten und 64 GB liegen weit darüber. AWS Batch ist genau der Dienst für diese Lücke: Er nimmt Container-Jobs in Job Queues an, provisioniert verwaltete Compute Environments (On-Demand, Spot oder Fargate) und räumt sie nach den Läufen wieder ab — Warteschlange, Scheduling und Retry inklusive. (A) nennt einen falschen Grund — Lambda unterstützt Container-Images durchaus, nur eben mit denselben Laufzeit- und Speichergrenzen; ein einzelner Fargate-Task hätte zudem keine Queue. (B) erfindet ein Skalierungsproblem, das nicht existiert, und eine nackte Auto Scaling Group bringt weder Queue noch Job-Verwaltung mit. (C) ist doppelt falsch: SQS ist eine der klassischen Lambda-Event-Quellen, und der vorgeschlagene Eigenbau repliziert von Hand, was Batch fertig liefert.",
+    "sourceRef": "https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html"
+  },
+  {
+    "seedKey": "saa-c03-q-197",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Ein internes Dashboard läuft auf einer t3.large-Instanz. An den meisten Tagen ist die CPU-Last niedrig; an Monatsabschluss-Tagen rechnen die Nutzer stundenlang intensive Auswertungen, und die Anwendung wird dabei zunehmend zäh. Die CloudWatch-Metrik CPUCreditBalance fällt an diesen Tagen auf 0. Die Änderung soll minimal sein.\n\nWelche Maßnahme behebt die Verlangsamung?",
+    "choices": [
+      { "id": "A", "text": "Den Unlimited Mode der Instanz aktivieren, der Bursts über die Credits hinaus gegen Aufpreis erlaubt." },
+      { "id": "B", "text": "Die Instanz auf t3.2xlarge vergrößern, deren höherer Credit-Verdienst die Auswertungen abdeckt." },
+      { "id": "C", "text": "Die Instanz durch eine Compute-optimierte c6i-Instanz ersetzen, die keine Credits kennt." },
+      { "id": "D", "text": "Eine zweite t3.large hinter einem Load Balancer ergänzen, die die Auswertungslast aufteilt." }
+    ],
+    "correct": ["A"],
+    "explanation": "Das Muster ist eindeutig: CPUCreditBalance = 0 heißt, die Burst-Credits der T-Instanz sind aufgebraucht, und die CPU wird auf die Baseline gedrosselt — daher die Zähigkeit genau an den intensiven Tagen. Der Unlimited Mode ist die minimale Änderung: Die Instanz darf über ihre Credits hinaus bursten, und nur die tatsächlich verbrauchten Surplus-Credits kosten extra — an den vielen ruhigen Tagen ändert sich nichts. Ein Konfigurationsschalter, kein Umbau. (B) funktioniert, kauft aber eine viermal größere Instanz für ein Ereignis, das wenige Tage im Monat betrifft. (C) funktioniert ebenfalls und ist die richtige Antwort, wenn die Last dauerhaft hoch wäre — hier bezahlt man konstante Leistung für gelegentlichen Bedarf. (D) verdoppelt Infrastruktur und bringt einen Load Balancer mit, obwohl ein einzelner Schalter genügt — und beide Instanzen hätten weiterhin dasselbe Credit-Modell.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/burstable-performance-instances-unlimited-mode.html"
+  },
+  {
+    "seedKey": "saa-c03-q-198",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Ein verteiltes ML-Training läuft über MPI und NCCL auf einem Cluster aus GPU-Instanzen in einer Cluster Placement Group. Die Profilierung zeigt: Der Engpass ist nicht die Bandbreite, sondern der Overhead des TCP/IP-Stacks bei der Knoten-zu-Knoten-Kommunikation — die Synchronisationsphasen dominieren die Trainingszeit.\n\nWelche Maßnahme reduziert diesen Overhead?",
+    "choices": [
+      { "id": "A", "text": "Jumbo Frames mit einer MTU von 9001 aktivieren, damit pro Paket mehr Nutzdaten übertragen werden." },
+      { "id": "B", "text": "Zusätzliche ENAs an jede Instanz anhängen, deren aggregierte Warteschlangen den Stack entlasten." },
+      { "id": "C", "text": "Einen Elastic Fabric Adapter einsetzen, dessen OS-Bypass die MPI-Kommunikation am Kernel vorbeiführt." },
+      { "id": "D", "text": "Die Instanzen auf den größten verfügbaren Typ heben, dessen Netzwerkleistung bei vollen 100 Gbit/s liegt." }
+    ],
+    "correct": ["C"],
+    "explanation": "Der Elastic Fabric Adapter ist genau für dieses Profil gebaut: tightly-coupled HPC- und ML-Workloads über MPI oder NCCL. Sein OS-Bypass lässt die Anwendung direkt mit der Netzwerk-Hardware sprechen — der Kernel- und TCP/IP-Overhead, den die Profilierung als Engpass identifiziert hat, entfällt, und die Latenz der Synchronisationsphasen sinkt deutlich. In einer Cluster Placement Group mit unterstützten Instanztypen ist EFA der vorgesehene nächste Schritt. (A) optimiert die Nutzlast pro Paket — das hilft bei Durchsatz, nicht beim Stack-Overhead pro Nachricht, der hier dominiert. (B) verteilt den Verkehr auf mehr Adapter, aber jedes Paket durchläuft weiterhin denselben Kernel-Pfad. (D) kauft Bandbreite, von der die Profilierung ausdrücklich sagt, dass sie nicht der Engpass ist.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa.html"
+  },
+  {
+    "seedKey": "saa-c03-q-199",
+    "cert": "SAA-C03",
+    "domain": "Design High-Performing Architectures",
+    "topic": "Compute & Serverless",
+    "type": "single",
+    "prompt": "Eine Lambda-Funktion konsumiert einen Kinesis Data Stream mit 20 Shards über ein Event Source Mapping. Die Metrik IteratorAge steigt kontinuierlich — die Verarbeitung kommt der Datenrate nicht hinterher. Ein Resharding des Streams soll vermieden werden, weil es die Kosten erhöht; die Reihenfolge je Partition Key muss erhalten bleiben.\n\nWelche Einstellung erhöht den Verarbeitungsdurchsatz?",
+    "choices": [
+      { "id": "A", "text": "Die Reserved Concurrency der Funktion anheben, damit Lambda mehr Instanzen parallel starten darf." },
+      { "id": "B", "text": "Den Parallelization Factor des Event Source Mappings erhöhen, der mehrere Batches je Shard erlaubt." },
+      { "id": "C", "text": "Die Batch-Größe des Event Source Mappings auf den Maximalwert setzen, damit weniger Aufrufe anfallen." },
+      { "id": "D", "text": "Einen zweiten Stream anlegen und die Producer-Last per Anwendungslogik auf beide Streams verteilen." }
+    ],
+    "correct": ["B"],
+    "explanation": "Standardmäßig verarbeitet Lambda einen Batch je Shard gleichzeitig — bei 20 Shards also maximal 20 parallele Ausführungen, egal welches Concurrency-Limit gilt. Der Parallelization Factor hebt genau diese Grenze: bis zu 10 gleichzeitige Batches je Shard, also bis zu 200 parallele Ausführungen, ohne Resharding. Die Reihenfolge bleibt gewahrt, weil Records mit demselben Partition Key weiterhin demselben Prozessor zugeordnet werden. (A) verwechselt Deckel mit Antrieb: Die Parallelität wird durch die Shard-Zuordnung begrenzt, nicht durch das Concurrency-Limit — mehr Reserve startet keine zusätzlichen Prozessoren. (C) hilft, wenn der Overhead pro Aufruf dominiert; bei zu langsamer Verarbeitung pro Record werden die Aufrufe nur größer und länger, die Parallelität bleibt bei 20. (D) funktioniert, ist aber genau das teurere Resharding durch die Hintertür — plus Routing-Logik im Producer und zwei Streams im Betrieb.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+  }
+]

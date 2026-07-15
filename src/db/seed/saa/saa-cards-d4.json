@@ -1,0 +1,425 @@
+[
+  {
+    "seedKey": "saa-c03-card-161",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Wann sind **Spot Instances** die richtige Antwort — und was ist die harte Bedingung?",
+    "back": "Bis zu **~90 % günstiger** als On-Demand. **Bedingung: Der Workload muss unterbrechbar sein** — AWS kann die Instanz mit **2 Minuten Vorwarnung** zurückholen. Ideal: Batch-Jobs, CI/CD, Big-Data-Verarbeitung, stateless Worker, **EMR Task-Nodes**. Falsch: Datenbanken, Stateful-Sessions, alles ohne Checkpointing.",
+    "sourceRef": "https://aws.amazon.com/ec2/spot/"
+  },
+  {
+    "seedKey": "saa-c03-card-162",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Compute Savings Plan vs. EC2 Instance Savings Plan — der Trade-off?",
+    "back": "**Compute SP**: bis **66 %**, dafür **total flexibel** — jede Instance-Family, jede Region, jedes OS, **und deckt zusätzlich Fargate UND Lambda ab**. **EC2 Instance SP**: bis **72 %**, aber gebunden an **eine Instance-Family in einer Region** (flexibel nur bei Size/OS/Tenancy), **kein** Fargate/Lambda. Faustregel: **6 Prozentpunkte mehr Rabatt gegen den Verlust jeder Flexibilität.**",
+    "sourceRef": "https://docs.aws.amazon.com/savingsplans/latest/userguide/sp-ris.html"
+  },
+  {
+    "seedKey": "saa-c03-card-163",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Savings Plans vs. Reserved Instances — die zwei Unterschiede, die in der Prüfung wirklich zählen?",
+    "back": "Der Rabatt ist **nicht** der Unterschied (SP 66/72 % ≈ RI 66/72 %). Entscheidend: **(1)** Savings Plans decken **auch Fargate und Lambda** ab — **RIs nur EC2**. **(2)** Nur **Standard RIs** lassen sich im **RI Marketplace weiterverkaufen** — Savings Plans **niemals**. Strukturell: SP = Commitment auf einen **$/Stunde-Betrag**, RI = Commitment auf einen **Instance-Typ**.",
+    "sourceRef": "https://docs.aws.amazon.com/savingsplans/latest/userguide/sp-ris.html"
+  },
+  {
+    "seedKey": "saa-c03-card-164",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "„Ein Savings Plan garantiert dir Kapazität in einer AZ.\" Richtig oder falsch?",
+    "back": "**Falsch.** Savings Plans geben **ausschließlich einen Preisnachlass — KEINE Kapazitätsgarantie**. Ist eine AZ ausverkauft, hilft dir dein SP nicht. Für garantierte Kapazität: **On-Demand Capacity Reservation (ODCR)** oder eine **Zonal Reserved Instance**. Beides ist **kombinierbar**: ODCR für die Kapazität + Savings Plan für den Preis.",
+    "sourceRef": "https://docs.aws.amazon.com/savingsplans/latest/userguide/sp-ris.html"
+  },
+  {
+    "seedKey": "saa-c03-card-165",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Standard RI vs. Convertible RI — und was ist die „Notausstiegstür\"?",
+    "back": "**Standard**: bis **72 %**, aber starr (Family/Region fix). **Einziger** RI-Typ, der im **RI Marketplace verkauft** werden kann — das ist die Notausstiegstür, wenn sich die Pläne ändern. **Convertible**: bis **66 %**, dafür **manuell tauschbar** (andere Family/Size/OS/Tenancy) — aber **nicht verkaufbar**.",
+    "sourceRef": "https://aws.amazon.com/ec2/pricing/reserved-instances/"
+  },
+  {
+    "seedKey": "saa-c03-card-166",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Ein Workload läuft auf `m5`-Instanzen. Wie senkst du die Kosten **ohne Architekturänderung**?",
+    "back": "Auf **Graviton (ARM)** wechseln — `m7g` statt `m5`. AWS nennt bis zu **~40 % besseres Preis-Leistungs-Verhältnis**. Voraussetzung: Die Software muss für ARM lauffähig sein (bei Java/Python/Node/Go meist trivial, bei nativen x86-Binaries nicht). **Falle:** Ein **EC2 Instance SP auf `m5` wird durch den Wechsel wertlos** — ein **Compute SP folgt dir**.",
+    "sourceRef": "https://aws.amazon.com/ec2/graviton/"
+  },
+  {
+    "seedKey": "saa-c03-card-167",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Die EC2-Flotte läuft bei 8 % CPU-Auslastung. Welcher Dienst sagt dir **konkret**, was du stattdessen buchen sollst?",
+    "back": "**AWS Compute Optimizer** — analysiert CloudWatch-Metriken und gibt **konkrete Rightsizing-Empfehlungen** (auch für EBS, Lambda, ECS/Fargate und Auto Scaling Groups). **Trusted Advisor** *meldet* nur „idle/underutilized\" als Check — Compute Optimizer liefert die **Empfehlung mit Zielinstanz**.",
+    "sourceRef": "https://aws.amazon.com/compute-optimizer/"
+  },
+  {
+    "seedKey": "saa-c03-card-168",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Ein Dev-Server läuft 24/7, wird aber nur wenige Stunden am Tag genutzt. Günstigste Option?",
+    "back": "**Ausschalten, wenn er nicht gebraucht wird** — per **Instance Scheduler** (Systems Manager / EventBridge). Bei 12 h × 5 Tagen statt 24/7 sind das **~70 % Ersparnis**. Ergänzend eine **T-Instance** (Burstable: niedrige Baseline + CPU-Credits für Spitzen). **Falle:** T-Instances sind bei **echter Dauerlast** die falsche Wahl — die Credits laufen leer.",
+    "sourceRef": "https://aws.amazon.com/solutions/implementations/instance-scheduler-on-aws/"
+  },
+  {
+    "seedKey": "saa-c03-card-169",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Wie senkst du die Kosten einer Lambda-Funktion — und warum ist „weniger Memory\" oft **falsch**?",
+    "back": "Lambda kostet **Requests + GB-Sekunden** (Memory × Laufzeit). **Weniger Memory = weniger CPU = längere Laufzeit** → das Produkt kann sogar **steigen**. Richtiger Weg: Memory **empirisch** optimieren (AWS Lambda Power Tuning). Zusätzlich: **Graviton (arm64)** für Lambda (~20 % günstiger) und ein **Compute Savings Plan deckt Lambda ab**.",
+    "sourceRef": "https://aws.amazon.com/lambda/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-170",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Container-Workload mit **konstanter 24/7-Last**. Fargate oder ECS auf EC2?",
+    "back": "**ECS auf EC2.** Bei konstanter Dauerlast ist Fargate teurer — und auf EC2 kannst du **Spot, Reserved Instances und Savings Plans** nutzen. **Fargate** lohnt bei **schwankender/unvorhersehbarer** Last und wenn der Operations-Overhead teurer ist als der Compute-Aufschlag. (Fargate Spot existiert, ist aber ebenfalls unterbrechbar.)",
+    "sourceRef": "https://aws.amazon.com/fargate/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-171",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Du verschiebst Objekte per Lifecycle nach **10 Tagen** von Standard nach Standard-IA. Warum wird es **teurer** statt billiger?",
+    "back": "**Mindestspeicherdauer.** Standard-IA berechnet **30 Tage**, egal ob du früher löschst oder weiterschiebst. Die Mindestdauern: **Standard-IA / One Zone-IA = 30 Tage · Glacier Instant Retrieval + Glacier Flexible = 90 Tage · Deep Archive = 180 Tage.** S3 Standard hat keine.",
+    "sourceRef": "https://aws.amazon.com/s3/storage-classes/"
+  },
+  {
+    "seedKey": "saa-c03-card-172",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Warum ist Standard-IA für **häufig gelesene** Daten teurer als Standard, obwohl der Speicherpreis niedriger ist?",
+    "back": "Wegen der **Abrufgebühr pro GB (Retrieval Fee)**. Der Storage ist billiger, aber **jeder GET kostet extra** — bei häufigem Zugriff frisst die Abrufgebühr die Ersparnis auf. Faustregel: **IA erst ab „seltener als etwa einmal im Monat\"**.",
+    "sourceRef": "https://aws.amazon.com/s3/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-173",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Die Zugriffsmuster auf einen Bucket sind **unbekannt und schwankend**. Welche Storage-Klasse?",
+    "back": "**S3 Intelligent-Tiering** — verschiebt Objekte automatisch zwischen Zugriffs-Tiers, **ohne Abrufgebühren** und ohne Mindestdauer (Frequent/Infrequent-Tiers). Kostet eine **Monitoring-Gebühr pro Objekt**. Genau richtig bei **unbekannten/schwankenden** Mustern. **Zwei Fallen:** Objekte **< 128 KB werden NICHT auto-getiert** (bleiben dauerhaft zum Frequent-Preis), und bei Millionen winziger Objekte kann die Pro-Objekt-Gebühr den Nutzen auffressen. Ist das Muster **bekannt** → direkte Lifecycle-Regel ist günstiger.",
+    "sourceRef": "https://aws.amazon.com/s3/storage-classes/intelligent-tiering/"
+  },
+  {
+    "seedKey": "saa-c03-card-174",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Wann ist **One Zone-IA** erlaubt — und wann ist es fahrlässig?",
+    "back": "**Erlaubt** bei **reproduzierbaren** Daten: Thumbnails, transkodierte Kopien, Zweitkopien, alles was sich neu erzeugen lässt. **~20 % günstiger** als Standard-IA. **Fahrlässig** bei Primärdaten: Die Objekte liegen in **einer einzigen AZ** — bei AZ-Verlust sind sie **weg**. Alle anderen S3-Klassen replizieren über **≥ 3 AZs**.",
+    "sourceRef": "https://aws.amazon.com/s3/storage-classes/"
+  },
+  {
+    "seedKey": "saa-c03-card-175",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Compliance verlangt **7 Jahre Archiv**, Abruf höchstens 1× jährlich, Wartezeit **egal**. Günstigste Klasse?",
+    "back": "**S3 Glacier Deep Archive** — die günstigste Klasse überhaupt. Abruf **12–48 Stunden**, Mindestdauer **180 Tage**. Zum Abgrenzen: Wäre **Millisekunden-Abruf** gefordert → **Glacier Instant Retrieval**. Reichte **Minuten bis Stunden** → **Glacier Flexible Retrieval** (Bulk 5–12 h).",
+    "sourceRef": "https://aws.amazon.com/s3/storage-classes/glacier/"
+  },
+  {
+    "seedKey": "saa-c03-card-176",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "S3 Lifecycle Policies: Welche **zwei** Aufräum-Aktionen vergisst fast jeder?",
+    "back": "**(1) Noncurrent Versions** — bei aktiviertem Versioning sammeln sich alte Objektversionen unbegrenzt an und kosten voll. **(2) `AbortIncompleteMultipartUpload`** — abgebrochene Multipart-Uploads liegen **unsichtbar** im Bucket und werden berechnet. Beides sind klassische versteckte Kostenposten, die eine Lifecycle-Regel in einer Zeile abräumt.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
+  },
+  {
+    "seedKey": "saa-c03-card-177",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Du hast 30 Snapshots eines 500-GB-Volumes. Zahlst du für 15 TB?",
+    "back": "**Nein — EBS Snapshots sind inkrementell.** Nur der erste ist voll; jeder weitere speichert **nur die geänderten Blöcke**. Löschst du einen Snapshot, bleiben die Blöcke erhalten, die andere noch brauchen. Für Langzeit-Archivierung: **EBS Snapshots Archive** (bis ~75 % günstiger, dafür Wiederherstellung bis 72 h).",
+    "sourceRef": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html"
+  },
+  {
+    "seedKey": "saa-c03-card-178",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Der einfachste EBS-Kosten-Quick-Win?",
+    "back": "**gp2 → gp3 migrieren.** gp3 ist **~20 % günstiger pro GB**, liefert **3.000 IOPS Baseline unabhängig von der Größe**, und der Wechsel läuft **online** (Elastic Volumes, kein Downtime). Bei gp2 musste man **Größe kaufen, um IOPS zu bekommen** (3 IOPS/GiB) — bei gp3 sind Kapazität und Performance **entkoppelt**.",
+    "sourceRef": "https://aws.amazon.com/ebs/general-purpose/"
+  },
+  {
+    "seedKey": "saa-c03-card-179",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Ein EFS-Filesystem wächst unaufhörlich, 90 % der Dateien werden nie wieder angefasst. Was tust du?",
+    "back": "**EFS Lifecycle Management** aktivieren — es verschiebt Dateien, die *n* Tage nicht angefasst wurden, automatisch nach **EFS Standard-IA** oder **EFS Archive** (deutlich günstiger pro GB). Ein Zugriff holt sie transparent zurück. Bei **reproduzierbaren** Daten zusätzlich: **One Zone** statt Standard.",
+    "sourceRef": "https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html"
+  },
+  {
+    "seedKey": "saa-c03-card-180",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Storage-Kosten",
+    "front": "Du stellst ein großes öffentliches Dataset in S3 bereit. Die Egress-Kosten explodieren. Was tun?",
+    "back": "**Requester Pays** auf dem Bucket aktivieren — dann zahlt der **Abrufende** die Request- und Datentransferkosten, du nur noch den **Storage**. Voraussetzung: Der Anfragende muss **authentifiziert** sein (anonymer Zugriff ist damit ausgeschlossen). Alternative für offene Daten: das **AWS Open Data Program**.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/RequesterPaysBuckets.html"
+  },
+  {
+    "seedKey": "saa-c03-card-181",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "DynamoDB **On-Demand** oder **Provisioned** — die Kostenlogik?",
+    "back": "**Seit Nov 2024 (Preissenkung um 50 %) ist On-Demand die AWS-Default-Empfehlung**: kein Capacity Planning, Bezahlung pro Request, ideal bei unvorhersehbarer/spiky Last und neuen Anwendungen. **Provisioned + Auto Scaling** lohnt noch bei **stetiger, hoch ausgelasteter** Last — und nur dort gibt es zusätzlich **Reserved Capacity**. **Falle:** Ältere Materialien nennen On-Demand pauschal „deutlich teurer pro Request\" — diese Kostenlogik ist seit der Preissenkung überholt.",
+    "sourceRef": "https://aws.amazon.com/dynamodb/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-182",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Ein reines Key-Value-Zugriffsmuster läuft auf RDS und ist zu teuer. Warum kann DynamoDB billiger sein?",
+    "back": "**RDS kostet pro Instanz-Stunde** — auch nachts, wenn niemand zugreift. **DynamoDB On-Demand kostet pro Request** — bei Leerlauf **nahezu nichts**. Bedingung: Das Zugriffsmuster muss **key-basiert** sein (keine komplexen Joins, keine Ad-hoc-Queries). Signalwort: **„einfache Lookups + stark schwankende Last\"**.",
+    "sourceRef": "https://aws.amazon.com/dynamodb/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-183",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Eine Dev/Test-Datenbank läuft 24/7, wird aber nur werktags ein paar Stunden genutzt. Günstigste Option?",
+    "back": "**Aurora Serverless v2 mit Scale-to-Zero** — skaliert bei Inaktivität auf **0 ACU** herunter (Resume < 15 s), du zahlst dann **nur noch den Storage**. Bei einer provisionierten Instanz zahlst du **24/7 die volle Instanzstunde**. **Falle:** Bei **konstanter Dauerlast** ist Serverless **teurer** als Provisioned.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html"
+  },
+  {
+    "seedKey": "saa-c03-card-184",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Eine Produktions-RDS läuft seit zwei Jahren unverändert. Der Kostenhebel?",
+    "back": "**RDS Reserved Instances** — deutlicher Rabatt bei 1- oder 3-Jahres-Commitment. **Wichtig für die Prüfung:** Die klassischen **Compute Savings Plans decken EC2, Fargate und Lambda ab — NICHT die RDS-Instanzstunden.** (AWS hat Ende 2025 separate *Database Savings Plans* eingeführt; die erwartete SAA-C03-Antwort bleibt aber **RDS Reserved Instances**.)",
+    "sourceRef": "https://aws.amazon.com/rds/reserved-instances/"
+  },
+  {
+    "seedKey": "saa-c03-card-185",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Die DB ist read-lastig. Read Replica hinzufügen **oder** ElastiCache davorsetzen?",
+    "back": "**Das Entscheidungskriterium ist die Cache-Hit-Rate.** Sind es **wiederkehrende** Reads → **ElastiCache**: meist günstiger *und* schneller (eine Cache-Node kostet weniger als eine vollwertige DB-Replica, Reads kommen aus dem RAM). Sind die Reads **divers** oder müssen sie **immer aktuell** sein → **Read Replica**.",
+    "sourceRef": "https://aws.amazon.com/elasticache/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-186",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Welche drei RDS-Kostenfallen übersieht man am häufigsten?",
+    "back": "**(1)** **Provisioned IOPS** (io1/io2) gebucht, obwohl **gp3** reicht — jede provisionierte IOPS kostet extra. **(2)** **Snapshots und automatische Backups**, die über die Retention hinaus liegen bleiben. **(3)** **Multi-AZ verdoppelt die Instanzkosten** — richtig für Produktion, **falsch für Dev/Test**.",
+    "sourceRef": "https://aws.amazon.com/rds/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-187",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Eine DynamoDB-Tabelle wächst unbegrenzt, aber die Daten sind nach 90 Tagen wertlos. Was tust du?",
+    "back": "**TTL (Time To Live)** aktivieren — DynamoDB löscht abgelaufene Items **automatisch und kostenlos** (verbraucht **keine WCU**). Ein manueller Lösch-Batch würde **WCUs verbrennen**. Bonus: TTL-Löschungen erscheinen in **DynamoDB Streams** — man kann die Items vorher automatisch nach S3 archivieren.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html"
+  },
+  {
+    "seedKey": "saa-c03-card-188",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Ein Aurora-Cluster hat auffällig hohe **I/O-Kosten**. Welche Option gibt es?",
+    "back": "**Aurora I/O-Optimized** — eine Cluster-Konfiguration, bei der **I/O nicht mehr einzeln abgerechnet** wird (dafür höherer Instanz- und Storage-Preis). AWS nennt als Faustregel: **lohnt ab etwa 25 % I/O-Anteil an der Aurora-Rechnung**. Bei niedrigem I/O bleibt **Aurora Standard** günstiger.",
+    "sourceRef": "https://aws.amazon.com/rds/aurora/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-189",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "front": "Welche Datentransfers in AWS kosten Geld — und welche nicht?",
+    "back": "**KOSTENLOS:** Data Transfer **IN** aus dem Internet · Traffic **innerhalb einer AZ über private IPs**. **KOSTET:** Data Transfer **OUT** ins Internet (der große Posten) · Traffic **zwischen AZs** — und zwar **in beide Richtungen** · Traffic **zwischen Regionen** · Traffic über eine **öffentliche IP**, selbst innerhalb derselben AZ.",
+    "sourceRef": "https://aws.amazon.com/ec2/pricing/on-demand/"
+  },
+  {
+    "seedKey": "saa-c03-card-190",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "front": "Die NAT-Gateway-Rechnung ist enorm. Zwei Ursachen, zwei Fixes?",
+    "back": "NAT kostet **pro Stunde + pro verarbeitetem GB**. **Ursachen:** (1) Der gesamte **S3-/DynamoDB-Traffic** läuft durchs NAT. (2) **Ein NAT pro AZ** (nötig für HA — verdreifacht bei 3 AZs die Stundenkosten). **Fixes:** (1) **Gateway Endpoints** für S3/DynamoDB — **kostenlos**, umgehen das NAT komplett. (2) HA-Bedarf gegen Kosten abwägen: ein zentrales NAT ist billiger, aber ein Single Point of Failure.",
+    "sourceRef": "https://aws.amazon.com/vpc/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-191",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "front": "Gateway Endpoint vs. Interface Endpoint — die **Kostenseite**?",
+    "back": "**Gateway Endpoint** (nur **S3 und DynamoDB**): **komplett kostenlos** — kein Stundenpreis, keine Datengebühr. **Interface Endpoint** (PrivateLink, fast alle Services): kostet **pro Stunde je ENI je AZ + pro GB**. Bei vielen Endpoints über 3 AZs summiert sich das — ist aber bei hohem Volumen **immer noch günstiger als NAT-Datenverarbeitung**.",
+    "sourceRef": "https://aws.amazon.com/privatelink/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-192",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "front": "Warum **senkt** CloudFront die Kosten, obwohl es ein zusätzlicher Dienst ist?",
+    "back": "Zwei Effekte: **(1)** Data Transfer **OUT von CloudFront ist billiger** als direkt aus EC2/S3. **(2)** Gecachter Content erreicht den Origin **gar nicht erst**. Dazu: Der **Origin-Fetch von S3/EC2 zu CloudFront ist kostenlos**. Wer statischen Content **direkt** aus S3 ins Internet liefert, zahlt drauf.",
+    "sourceRef": "https://aws.amazon.com/cloudfront/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-193",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "front": "Wo entstehen in einer Multi-AZ-Architektur die **unsichtbaren** Datentransferkosten?",
+    "back": "**Zwischen den AZs — und zwar in beide Richtungen berechnet.** Typische Quellen: **Cross-Zone Load Balancing beim NLB** (beim ALB ist es inklusive), App-Server in AZ-A, die die **DB in AZ-B** abfragen, sowie Replikation zwischen AZs. Kein Grund, HA aufzugeben — aber ein Grund, Traffic **AZ-lokal** zu halten, wo es geht.",
+    "sourceRef": "https://aws.amazon.com/ec2/pricing/on-demand/"
+  },
+  {
+    "seedKey": "saa-c03-card-194",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "front": "Ab wann lohnt **Direct Connect** gegenüber Internet-Egress?",
+    "back": "DX hat **hohe Fixkosten** (Port-Stunden + Partner-Gebühren), aber deutlich **niedrigere Data-Transfer-Out-Raten pro GB**. Es lohnt bei **konstant hohem, vorhersehbarem Volumen** (mehrere TB/Monat). Bei **sporadischem** Traffic ist Internet/VPN günstiger. In Prüfungsfragen ist DX aber meist die Antwort auf **konsistente Latenz**, nicht auf Kosten.",
+    "sourceRef": "https://aws.amazon.com/directconnect/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-195",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "front": "In einer **Kosten**-Frage: Wann ist Global Accelerator die richtige Antwort?",
+    "back": "**Fast nie.** GA hat einen **festen Stundenpreis + Data-Transfer-Aufschlag** — es ist ein **Performance-/Failover-Werkzeug** (non-HTTP, statische IPs, Sub-Minuten-Failover), **kein Kostenhebel**. In Kostenfragen ist **CloudFront** die Antwort, weil es Egress **verbilligt**. GA nur, wenn die Frage nach Latenz/Failover/statischer IP fragt.",
+    "sourceRef": "https://aws.amazon.com/global-accelerator/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-196",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Netzwerk-Kosten",
+    "front": "Eine Elastic IP liegt **ungenutzt** herum. Kostet das etwas?",
+    "back": "**Ja.** Für eine EIP, die **nicht** an eine laufende Instanz gebunden ist, fällt eine **Stundengebühr** an. Seit **Februar 2024** berechnet AWS zudem **jede öffentliche IPv4-Adresse** — auch die gebundenen. Hebel: ungenutzte EIPs **freigeben**, **IPv6** nutzen, oder Instanzen **ohne Public IP** hinter NAT/ALB betreiben.",
+    "sourceRef": "https://aws.amazon.com/vpc/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-card-197",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost-Tools & Governance",
+    "front": "Cost Explorer, AWS Budgets, Cost and Usage Report — wer macht was?",
+    "back": "**Cost Explorer**: **rückblickend** analysieren und visualisieren (13 Monate Historie + Forecast), inkl. **RI-/SP-Empfehlungen**. **AWS Budgets**: proaktiv **warnen UND handeln** — **Budget Actions** können IAM-/SCP-Policies anwenden und **EC2-/RDS-Instanzen wirklich stoppen**, nicht nur alarmieren. **CUR**: der **Rohdaten-Export** nach S3 für eigene Analysen (Athena/QuickSight) — dokumentiert, erkennt aber nichts. **Signalwort „automatisch eingreifen\" → Budget Actions.**",
+    "sourceRef": "https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-costmanagement.html"
+  },
+  {
+    "seedKey": "saa-c03-card-198",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost-Tools & Governance",
+    "front": "Der CFO will wissen, welche Abteilung wie viel verursacht. Wie — und was ist die Falle?",
+    "back": "**Cost Allocation Tags**: Ressourcen taggen (z. B. `Department=Marketing`), die Tags dann in der Billing-Console **aktivieren**; danach kann Cost Explorer nach Tag gruppieren. **Falle: Tags wirken erst AB der Aktivierung — rückwirkend gibt es nichts.** Durchsetzen lässt sich Tagging über **Tag Policies** (Organizations) oder eine **SCP**, die ungetaggte Ressourcen verbietet.",
+    "sourceRef": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html"
+  },
+  {
+    "seedKey": "saa-c03-card-199",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost-Tools & Governance",
+    "front": "Was gewinnst du **kostenmäßig** durch AWS Organizations?",
+    "back": "**Consolidated Billing**: Die Nutzung **aller Accounts wird zusammengerechnet** — dadurch greifen **(a) Volumen-Staffelpreise** (z. B. bei S3) früher, und **(b) Reserved Instances / Savings Plans werden accountübergreifend geteilt**: Eine ungenutzte RI in Account A kommt Account B zugute. Plus: **eine Rechnung statt zwanzig**.",
+    "sourceRef": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html"
+  },
+  {
+    "seedKey": "saa-c03-card-200",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost-Tools & Governance",
+    "front": "Welcher Dienst gibt dir **ohne eigene Analyse** konkrete Spar-Hinweise — und was ist der Haken?",
+    "back": "**AWS Trusted Advisor** — prüft automatisch gegen Best Practices in fünf Kategorien (**Cost Optimization**, Performance, Security, Fault Tolerance, Service Limits). Findet idle EC2-Instanzen, ungenutzte Elastic IPs, verwaiste Load Balancer, unterausgelastete RDS. **Haken: Der volle Check-Umfang setzt Business- oder Enterprise-Support voraus** — im Basic/Developer-Plan gibt es nur einen Teil.",
+    "sourceRef": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/"
+  },
+  {
+    "seedKey": "saa-c03-card-201",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "Eine Oracle-Lizenz ist an **physische Cores/Sockets** gebunden (BYOL). Dedicated Instances oder Dedicated Host?",
+    "back": "**Dedicated Host** — nur er macht **Sockets und physische Cores sichtbar** und bietet Placement-Kontrolle (Instanz bleibt auf demselben Host) → Voraussetzung für per-socket/per-core-BYOL (Oracle, SQL Server, Windows Server). **Dedicated Instances** isolieren zwar ebenfalls physisch, zeigen aber **keine Host-Details** und tragen solche Lizenzmodelle **nicht**. Merksatz: **„Lizenz an Hardware gebunden → Host, nicht Instance.\"**",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/dedicated-hosts-overview.html"
+  },
+  {
+    "seedKey": "saa-c03-card-202",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "„Unsere **Regional** Reserved Instance garantiert uns Kapazität in der AZ.\" Stimmt das?",
+    "back": "**Nein.** Eine **Regional RI gibt nur den Rabatt — KEINE Kapazität.** Kapazität garantieren ausschließlich: **zonale RIs** (Rabatt + Kapazität in genau einer AZ) und **On-Demand Capacity Reservations (ODCR)** (Kapazität, aber **kein** Rabatt). **Kombination ist der Königsweg: ODCR + Savings Plan/Regional RI sind stapelbar** → garantierte Kapazität UND Rabatt. Eine der härtesten Prüfungsfallen der Domain.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/reserved-instances-scope.html"
+  },
+  {
+    "seedKey": "saa-c03-card-203",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Eine DynamoDB-Tabelle hält riesige, selten gelesene Historien-Daten. Welcher Kostenhebel — und ab wann lohnt er?",
+    "back": "Die **Table Class „Standard-Infrequent Access\" (Standard-IA)**: bis zu **60 % geringere Storage-Kosten**, dafür **höhere Durchsatzkosten**. **Faustregel: lohnt, wenn Storage > 50 % der Tabellenkosten** ausmacht. Der Wechsel ist eine **Einstellung** — kein Datenumzug, keine Code-Änderung. Bei traffic-lastigen Tabellen bleibt **Standard** günstiger. Ergänzend: **TTL** löscht Ablaufdaten kostenlos.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.TableClasses.html"
+  },
+  {
+    "seedKey": "saa-c03-card-204",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Compute-Kosten",
+    "front": "„Spot Blocks geben mir Spot-Preise mit garantierter Laufzeit.\" Und welche Spot-Allokationsstrategie empfiehlt AWS heute?",
+    "back": "**Spot Blocks sind ABGEKÜNDIGT** — garantierte Laufzeit gibt es bei Spot nicht mehr; dafür **On-Demand oder ODCR** nehmen. Für Spot-Flotten empfiehlt AWS **price-capacity-optimized** (bester Mix aus Preis und geringem Unterbrechungsrisiko); **lowest-price wird explizit NICHT empfohlen** (höchste Interruption-Rate). **Zusatzfalle:** Der gesetzte Maximalpreis schützt **nicht** vor Unterbrechung — die **Kapazitätslage** entscheidet, nicht der Preisvergleich.",
+    "sourceRef": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/allocation-strategies.html"
+  },
+  {
+    "seedKey": "saa-c03-card-205",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Eine RDS MySQL 5.7 läuft weiter, obwohl die Version End-of-Life ist. Was passiert auf der Rechnung?",
+    "back": "**RDS Extended Support** greift automatisch: Zusatzgebühr **pro vCPU-Stunde** — für **jede** betroffene Instanz, inklusive **Multi-AZ-Standby und jeder Read Replica**. Sie wird **NICHT durch RIs oder Savings Plans rabattiert** und **verdoppelt sich ab Jahr 3** (für MySQL 5.7 / PostgreSQL 11 seit 1. März 2026). **Einziger Ausweg: das Versions-Upgrade** — z. B. per **Blue/Green Deployment** mit minimaler Downtime.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/extended-support.html"
+  },
+  {
+    "seedKey": "saa-c03-card-206",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Datenbank-Kosten",
+    "front": "Eine RDS-Dev-Instanz soll einen **Monat** pausieren. Reicht „Stop\"?",
+    "back": "**Nein.** RDS-Stop gilt **maximal 7 aufeinanderfolgende Tage** — danach startet die Instanz **automatisch wieder** (für Wartung/Patches). Optionen: ein **Scheduler**, der nach jedem Auto-Restart erneut stoppt, oder **finaler Snapshot + Instanz löschen** (später per Restore zurück). Gestoppt entfallen die **Instanzstunden** — weiter berechnet werden **Storage, Snapshots und die öffentliche IPv4**. Instanzen mit **Read Replicas lassen sich gar nicht stoppen**.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html"
+  },
+  {
+    "seedKey": "saa-c03-card-207",
+    "cert": "SAA-C03",
+    "domain": "Design Cost-Optimized Architectures",
+    "topic": "Cost-Tools & Governance",
+    "front": "Die Kosten steigen **schleichend**, ohne dass ein Budget-Schwellenwert reißt. Welcher Dienst erkennt das?",
+    "back": "**AWS Cost Anomaly Detection** — **ML-basiert und kostenlos**: lernt das normale Ausgabenmuster je Service/Account und meldet **Abweichungen ohne festen Schwellenwert** — auch schleichende Anstiege und Spikes einzelner Services. Abgrenzung: **Budgets** = feste Schwellen (+ Actions, die stoppen können) · **CUR** = Rohdaten, erkennt nichts · **Compute Optimizer** = Rightsizing-Empfehlungen, keine Anomalien. Signalwort **„ungewöhnlich/unerwartet, ohne Schwellenwert\"** → Anomaly Detection.",
+    "sourceRef": "https://docs.aws.amazon.com/cost-management/latest/userguide/manage-ad.html"
+  }
+]

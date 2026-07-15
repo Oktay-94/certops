@@ -1,0 +1,942 @@
+[
+  {
+    "seedKey": "saa-c03-q-026",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Ein Unternehmen wechselt von der Deny-List- zur Allow-List-Strategie. An der **Organization Root** wird `FullAWSAccess` entfernt und stattdessen eine SCP mit `Allow` auf `ec2:*` angehängt. An der **OU \"Development\"** wird eine SCP mit `Allow` auf `s3:*` angehängt.\n\nDanach können die Entwickler **weder EC2 noch S3** nutzen. Warum?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Schnittmenge über alle Ebenen ist leer — Root erlaubt nur EC2, die OU nur S3."
+      },
+      {
+        "id": "B",
+        "text": "SCPs an der Organization Root überschreiben die SCPs untergeordneter OUs."
+      },
+      {
+        "id": "C",
+        "text": "Allow-SCPs müssen am Account hängen, nicht an Root oder OU."
+      },
+      {
+        "id": "D",
+        "text": "Nach dem Entfernen von `FullAWSAccess` müssen alle IAM-Policies neu erstellt werden."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "SCPs werden über die **gesamte Hierarchie geschnitten**: Eine Aktion muss auf **jeder** Ebene (Root, OU, Account) erlaubt sein. Hier erlaubt die Root nur `ec2:*`, die OU nur `s3:*` — die Schnittmenge ist **leer**, also geht gar nichts mehr.\n\nDas ist die klassische Falle der Allow-List-Strategie: Wer `FullAWSAccess` entfernt, muss **jede** benötigte Aktion auf **jeder** Ebene explizit erlauben. Der Distraktor mit der \"Überschreibung\" unterstellt eine Hierarchie mit Vorrang — SCPs kennen nur die Schnittmenge. Der Account-Distraktor ist falsch: SCPs sind an Root, OU **und** Account anhängbar.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_strategies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-027",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Eine SCP verweigert `ec2:RunInstances` in allen Member Accounts. Trotzdem startet eine bestehende **Auto Scaling Group** weiterhin erfolgreich Instanzen.\n\nWarum?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Auto Scaling Group läuft im Management Account, wo SCPs nicht greifen."
+      },
+      {
+        "id": "B",
+        "text": "SCPs schränken Service-Linked Roles nicht ein."
+      },
+      {
+        "id": "C",
+        "text": "Die ASG nutzt ein Launch Template, das die SCP-Prüfung umgeht."
+      },
+      {
+        "id": "D",
+        "text": "SCPs wirken nur auf IAM-Users, nicht auf IAM-Roles."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**SCPs haben eine dokumentierte Ausnahme: Service-Linked Roles.** Auto Scaling handelt über `AWSServiceRoleForAutoScaling` — diese Rolle wird von SCPs **nicht** eingeschränkt. Dasselbe gilt für andere Service-Linked Roles (ELB, RDS, etc.).\n\nDer Management-Account-Distraktor beschreibt eine **echte** SCP-Ausnahme — nur nicht diese. Das Launch Template hat keinerlei Einfluss auf die Autorisierung. Und SCPs wirken sehr wohl auf Rollen — nur eben nicht auf **Service-Linked** Roles.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+  },
+  {
+    "seedKey": "saa-c03-q-028",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Alle Ressourcen sollen ein `CostCenter`-Tag tragen. Aktuell taggen die Teams uneinheitlich: `costcenter`, `Cost-Center`, `CostCenter`. Gefordert ist eine **org-weit erzwungene, einheitliche Schreibweise** mit definierten erlaubten Werten.\n\nWelche Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine AWS Config Rule `required-tags`, die nicht-konforme Ressourcen meldet."
+      },
+      {
+        "id": "B",
+        "text": "Eine SCP, die das Anlegen von Ressourcen ohne `CostCenter`-Tag verweigert."
+      },
+      {
+        "id": "C",
+        "text": "Eine Tag Policy in AWS Organizations mit aktiviertem Enforcement."
+      },
+      {
+        "id": "D",
+        "text": "Eine Permissions Boundary mit einer `aws:RequestTag`-Condition je Team."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**Tag Policies** sind der einzige Mechanismus, der eine **Schreibweise standardisiert** und **erlaubte Werte** definiert — mit optionalem Enforcement, das nicht-konforme Operationen blockiert.\n\nDie SCP ist der stärkste Distraktor: Sie kann die **Existenz** eines Tags erzwingen (`aws:RequestTag`), aber sie kann `costcenter` nicht von `CostCenter` unterscheiden oder normalisieren — für sie sind das zwei verschiedene Tag-Keys. Die Config Rule **findet** Verstöße, verhindert sie aber nicht. Die Permissions Boundary skaliert nicht und löst das Schreibweisen-Problem ebenfalls nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_tag-policies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-029",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Ein Unternehmen will SCPs einsetzen. In der Organizations-Konsole ist die Option jedoch **nicht verfügbar** — der Reiter für Policies fehlt.\n\nWas ist die Ursache?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Der ausführende Account ist nicht der Management Account der Organization."
+      },
+      {
+        "id": "B",
+        "text": "SCPs sind nur in Verbindung mit AWS Control Tower nutzbar."
+      },
+      {
+        "id": "C",
+        "text": "SCPs müssen zunächst per CLI oder API im Account aktiviert werden."
+      },
+      {
+        "id": "D",
+        "text": "Die Organization läuft im Modus \"Consolidated Billing Only\"."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "AWS Organizations kennt **zwei Feature Sets**: **\"Consolidated Billing Only\"** (nur gemeinsame Abrechnung) und **\"All Features\"**. **SCPs — und alle anderen Policy-Typen — erfordern \"All Features\".** Der Wechsel ist ein expliziter, einmaliger Schritt, der die Zustimmung aller Member Accounts benötigt.\n\nDer Management-Account-Distraktor ist real relevant (nur dort lassen sich SCPs verwalten), erklärt aber nicht das **Fehlen des gesamten Policy-Reiters**. Control Tower **nutzt** SCPs, ist aber keine Voraussetzung. Eine CLI-Aktivierung existiert nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html"
+  },
+  {
+    "seedKey": "saa-c03-q-030",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Organizations, SCP & RCP",
+    "type": "single",
+    "prompt": "Das Security-Team arbeitet in einem eigenen Security-Account und soll **GuardDuty für die gesamte Organization** verwalten — Findings aller Accounts einsehen, Detektoren konfigurieren. Es darf **keinen Zugriff auf den Management Account** erhalten.\n\nWie setzt du das um?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den Security-Account als Delegated Administrator für GuardDuty benennen."
+      },
+      {
+        "id": "B",
+        "text": "Eine Cross-Account-Rolle einrichten, mit der das Team in den Management Account wechselt."
+      },
+      {
+        "id": "C",
+        "text": "GuardDuty in jedem Account einzeln aktivieren und Findings per EventBridge sammeln."
+      },
+      {
+        "id": "D",
+        "text": "Dem Security-Team ein eingeschränktes Permission Set im Management Account zuweisen."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**Delegated Administrator** ist genau dafür gebaut: Der Management Account delegiert die Verwaltung eines Services (GuardDuty, Security Hub, Config, IAM Access Analyzer, Macie, Inspector …) an einen Member Account. Das Security-Team bekommt volle Kontrolle über GuardDuty **ohne** Zugang zum Management Account.\n\nDie beiden Management-Account-Distraktoren verletzen exakt die Anforderung — sie geben dem Team Zugriff dorthin, wo er ausgeschlossen sein soll. Die EventBridge-Variante **funktioniert** für das Sammeln von Findings, erlaubt aber keine **zentrale Konfiguration** der Detektoren und ist erheblich mehr Aufwand.",
+    "sourceRef": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_organizations.html"
+  },
+  {
+    "seedKey": "saa-c03-q-031",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "type": "single",
+    "prompt": "Eine Single-Page-App nutzt einen Cognito **User Pool** für die Anmeldung. Nach erfolgreichem Login soll sie eine DynamoDB-Tabelle **direkt** abfragen — ohne Backend. Der Aufruf scheitert mit `AccessDeniedException`.\n\nWas fehlt?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine IAM-Policy, die direkt am Cognito User Pool hinterlegt wird."
+      },
+      {
+        "id": "B",
+        "text": "Ein Lambda Authorizer, der die DynamoDB-Zugriffe der App autorisiert."
+      },
+      {
+        "id": "C",
+        "text": "Ein Cognito Identity Pool, der das JWT gegen AWS-Credentials tauscht."
+      },
+      {
+        "id": "D",
+        "text": "Ein API Gateway mit Cognito Authorizer zwischen App und DynamoDB."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Der **User Pool** liefert nach dem Login **JWT-Tokens** (ID, Access, Refresh) — **niemals AWS-Credentials**. Um direkt gegen einen AWS-Service zu sprechen, braucht die App SigV4-signierte Requests, also **temporäre AWS-Credentials**. Die liefert ausschließlich der **Identity Pool**, der das Token via STS eintauscht.\n\nDer API-Gateway-Distraktor ist eine **völlig legitime Architektur** — nur schließt die Aufgabe sie aus (\"ohne Backend\"). Ein Lambda Authorizer schützt API Gateway, er autorisiert keine direkten DynamoDB-Aufrufe. Eine IAM-Policy lässt sich nicht an einen User Pool hängen — der ist kein IAM-Principal.",
+    "sourceRef": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html"
+  },
+  {
+    "seedKey": "saa-c03-q-032",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "type": "single",
+    "prompt": "Eine interne Web-Anwendung läuft hinter einem Application Load Balancer. Sie soll nur für authentifizierte Mitarbeiter erreichbar sein. Der **Anwendungscode darf nicht geändert werden**.\n\nWelche Lösung erfordert den geringsten Aufwand?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Lambda@Edge-Funktion vor den ALB schalten, die Tokens prüft."
+      },
+      {
+        "id": "B",
+        "text": "Die `authenticate-cognito`-Action am HTTPS-Listener des ALB konfigurieren."
+      },
+      {
+        "id": "C",
+        "text": "Ein API Gateway mit Cognito Authorizer vor den ALB schalten."
+      },
+      {
+        "id": "D",
+        "text": "Eine AWS WAF Rule, die Requests ohne gültiges Session-Cookie blockiert."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Der **ALB kann nativ authentifizieren**: Die `authenticate-cognito`-Action (nur auf **HTTPS**-Listenern) leitet unauthentifizierte Nutzer zum Cognito-Login um und reicht das validierte JWT im Header `x-amzn-oidc-data` an das Target weiter. **Null Code-Änderung.**\n\nLambda@Edge ist an **CloudFront** gebunden — es lässt sich nicht \"vor einen ALB\" schalten. Das API Gateway **funktioniert**, fügt aber einen zusätzlichen Hop, zusätzliche Kosten und zusätzliche Konfiguration hinzu. WAF filtert Requests nach Mustern — es kann **keinen Login-Flow durchführen** und keine Tokens ausstellen.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html"
+  },
+  {
+    "seedKey": "saa-c03-q-033",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "type": "single",
+    "prompt": "Ein Unternehmen betreibt ein on-premises Active Directory. Windows-EC2-Instanzen in AWS sollen der Domäne beitreten. Eine Compliance-Vorgabe untersagt, dass **Verzeichnisdaten in AWS gespeichert** werden.\n\nWelcher Dienst erfüllt das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS Managed Microsoft AD mit einem two-way forest trust zum on-prem AD."
+      },
+      {
+        "id": "B",
+        "text": "Simple AD mit regelmäßiger Replikation aus dem on-prem AD."
+      },
+      {
+        "id": "C",
+        "text": "IAM Identity Center mit dem on-prem AD als Identity Source."
+      },
+      {
+        "id": "D",
+        "text": "AD Connector als Proxy zum bestehenden on-prem AD."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**AD Connector ist ein reiner Proxy**: Er leitet Authentifizierungsanfragen an das on-prem AD weiter und **speichert keinerlei Verzeichnisdaten in AWS**. Genau die Compliance-Anforderung. Er unterstützt Seamless Domain Join für EC2.\n\n**Managed Microsoft AD ist der stärkste Distraktor**: Es funktioniert technisch einwandfrei — aber es legt ein **eigenes Verzeichnis in AWS** an (auch bei bestehendem Trust), und damit liegen Verzeichnisobjekte in AWS. Die Compliance-Vorgabe schließt es aus. Simple AD kann **keinen Trust** und ist kein AD-Replikat. IAM Identity Center regelt Konsolen-SSO, keinen Domain Join.",
+    "sourceRef": "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_ad_connector.html"
+  },
+  {
+    "seedKey": "saa-c03-q-034",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "type": "single",
+    "prompt": "Ein AWS Managed Microsoft AD wird per Trust mit einem on-premises AD verbunden. Über diesen Trust sollen **Amazon WorkSpaces** für die on-prem Benutzer bereitgestellt werden.\n\nWelche Trust-Richtung ist erforderlich?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein two-way trust — AWS Enterprise Applications setzen ihn voraus."
+      },
+      {
+        "id": "B",
+        "text": "Ein one-way trust, bei dem AWS dem on-prem AD vertraut."
+      },
+      {
+        "id": "C",
+        "text": "Kein Trust — WorkSpaces authentifizieren direkt gegen das on-prem AD."
+      },
+      {
+        "id": "D",
+        "text": "Ein one-way trust, bei dem das on-prem AD dem AWS-Verzeichnis vertraut."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**AWS Enterprise Applications — WorkSpaces, WorkDocs, WorkMail, QuickSight, IAM Identity Center und der Konsolen-Zugriff — benötigen einen `two-way` Trust.** Das ist eine harte, dokumentierte Anforderung.\n\nDer one-way-Distraktor ist deshalb so gefährlich, weil er für **andere** Workloads korrekt wäre: **EC2, RDS und FSx funktionieren mit one-way ODER two-way**. Wer die Regel pauschal als \"one-way reicht\" merkt, fällt bei WorkSpaces durch. Ohne Trust ginge es nur mit AD Connector — dann aber ohne Managed Microsoft AD im Spiel.",
+    "sourceRef": "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_setup_trust.html"
+  },
+  {
+    "seedKey": "saa-c03-q-035",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "type": "single",
+    "prompt": "Entwickler sollen ausschließlich EC2-Instanzen verwalten dürfen, die mit **ihrem eigenen Team** getaggt sind. Die Team-Zugehörigkeit steht als Attribut im Active Directory. Es gibt 40 Teams, und es sollen **nicht 40 Rollen** entstehen.\n\nWie setzt du das um?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein Permission Set pro Team mit hartkodierten Ressourcen-ARNs."
+      },
+      {
+        "id": "B",
+        "text": "ABAC: das AD-Attribut als Session Tag durchreichen und in der Policy `aws:PrincipalTag` gegen den Ressourcen-Tag prüfen."
+      },
+      {
+        "id": "C",
+        "text": "Eine SCP je Team-OU, die den Zugriff auf fremde Instanzen verweigert."
+      },
+      {
+        "id": "D",
+        "text": "Eine Permissions Boundary je Entwickler mit dem jeweiligen Team-Tag."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**ABAC (Attribute-Based Access Control)** ist exakt dafür gebaut. IAM Identity Center reicht AD-Attribute als **Session Tags** durch; die Policy vergleicht dann `aws:PrincipalTag/Team` mit `ec2:ResourceTag/Team`. **Eine einzige Policy für alle 40 Teams** — neue Teams brauchen keine neue Rolle, nur den korrekten Tag.\n\nDer Permission-Set-Distraktor **funktioniert**, erzeugt aber genau die 40 Konstrukte, die ausgeschlossen wurden. SCPs sind Guardrails an Account-/OU-Grenzen — sie unterscheiden nicht zwischen Instanzen innerhalb eines Accounts. Permissions Boundaries deckeln Rechte pro Identity und skalieren bei hunderten Entwicklern ebenso wenig.",
+    "sourceRef": "https://docs.aws.amazon.com/singlesignon/latest/userguide/configure-abac-policies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-036",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "type": "single",
+    "prompt": "Eine Anwendung benötigt **Erkennung kompromittierter Zugangsdaten** und **risikobasierte adaptive Authentifizierung** für ihre Endnutzer.\n\nWelche Cognito-Konfiguration ist erforderlich?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Der Lite-Tier mit aktivierter MFA-Pflicht für alle Nutzer."
+      },
+      {
+        "id": "B",
+        "text": "Der Essentials-Tier mit Managed Login und passwordless Authentifizierung."
+      },
+      {
+        "id": "C",
+        "text": "Der Plus-Tier, der Threat Protection enthält."
+      },
+      {
+        "id": "D",
+        "text": "Advanced Security Features als kostenpflichtiges Add-on zum Lite-Tier."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Seit November 2024 gibt es die Feature-Tiers **Lite / Essentials / Plus**. **Threat Protection** — also Compromised-Credentials-Erkennung und adaptive Authentifizierung — ist ausschließlich im **Plus-Tier** enthalten.\n\nDer Add-on-Distraktor beschreibt das **alte** Modell: Früher waren die \"Advanced Security Features\" (ASF) separat zubuchbar; heute sind sie im Plus-Tier gebündelt. Wer mit älteren Kursmaterialien lernt, wählt genau diese Antwort. Essentials liefert Managed Login und passwordless Login — aber **keine** Threat Protection. MFA im Lite-Tier ist keine Risikoerkennung.",
+    "sourceRef": "https://aws.amazon.com/about-aws/whats-new/2024/11/new-feature-tiers-essentials-plus-amazon-cognito/"
+  },
+  {
+    "seedKey": "saa-c03-q-037",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "type": "multiple",
+    "prompt": "Ein Unternehmen betreibt zwei Föderations-Szenarien: **(1)** Mitarbeiter melden sich über ADFS (SAML 2.0) an der AWS-Konsole an. **(2)** Kunden melden sich in einer Mobile-App über Google (OIDC) an und greifen anschließend auf S3 zu.\n\nWelche **ZWEI** STS-Operationen kommen dabei zum Einsatz? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "`sts:AssumeRoleWithSAML` für die Mitarbeiter-Föderation über ADFS."
+      },
+      {
+        "id": "B",
+        "text": "`sts:GetFederationToken` für beide Szenarien."
+      },
+      {
+        "id": "C",
+        "text": "`sts:AssumeRoleWithWebIdentity` für die Kunden-Föderation über Google."
+      },
+      {
+        "id": "D",
+        "text": "`sts:AssumeRole` mit einer `ExternalId` für beide Szenarien."
+      },
+      {
+        "id": "E",
+        "text": "`sts:GetSessionToken` mit MFA für die Mitarbeiter-Föderation."
+      }
+    ],
+    "correct": [
+      "A",
+      "C"
+    ],
+    "explanation": "Die beiden Föderations-APIs sind sauber getrennt: **`AssumeRoleWithSAML`** verarbeitet eine **SAML-Assertion** (Enterprise-IdP wie ADFS, Okta, Azure AD). **`AssumeRoleWithWebIdentity`** verarbeitet ein **OIDC-Token** (Google, Apple, Facebook, Cognito Identity Pool). Beide liefern temporäre Credentials **ohne IAM-User**.\n\n`GetFederationToken` existiert tatsächlich, ist aber für einen anderen Fall gedacht (ein langlebiger IAM-User stellt Credentials für Federated Users aus) und heute ein Legacy-Pfad. `AssumeRole` mit `ExternalId` löst das Confused-Deputy-Problem bei **Third-Party-Zugriff**, nicht die Nutzer-Föderation. `GetSessionToken` liefert MFA-verstärkte Credentials für einen **bestehenden** IAM-User — keine Föderation.",
+    "sourceRef": "https://docs.aws.amazon.com/STS/latest/APIReference/API_Operations.html"
+  },
+  {
+    "seedKey": "saa-c03-q-038",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Föderation, Directory & Cognito",
+    "type": "single",
+    "prompt": "Ein Startup mit 300 Mitarbeitern braucht ein einfaches, kostengünstiges Verzeichnis für die Anmeldung an Linux-EC2-Instanzen. Es gibt **kein bestehendes on-prem AD**, es wird **kein Trust** benötigt und **kein MFA** gefordert.\n\nWelche Option passt — und was ist dabei zu beachten?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AD Connector in der Größe Small, verbunden mit einem neu aufzubauenden AD."
+      },
+      {
+        "id": "B",
+        "text": "AWS Managed Microsoft AD, Standard Edition."
+      },
+      {
+        "id": "C",
+        "text": "Ein Cognito User Pool mit aktivierter Linux-PAM-Integration."
+      },
+      {
+        "id": "D",
+        "text": "Simple AD (Small) — allerdings ist der Dienst für Neukunden auslaufend."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**Simple AD (Small)** deckt bis **500 Nutzer** ab, ist Samba-4-basiert, günstig und genau für dieses Profil gebaut (kein Trust, kein MFA, kein bestehendes AD). **Aktualitätshinweis:** AWS schließt Simple AD ab **30.07.2026 für Neukunden** — in der Prüfung bleibt es die erwartete Antwort, in der Praxis wäre Managed Microsoft AD der zukunftssichere Weg.\n\n**Managed Microsoft AD ist der stärkste Distraktor**: Es funktioniert einwandfrei, ist aber für 300 Nutzer ohne Trust-Bedarf deutlich überdimensioniert und teurer — die Anforderung lautet \"kostengünstig\". **AD Connector setzt ein bestehendes AD zwingend voraus** — hier gibt es keins. Eine Linux-PAM-Integration für Cognito existiert nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_simple_ad.html"
+  },
+  {
+    "seedKey": "saa-c03-q-039",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Eine IAM-Rolle besitzt eine Identity-Policy mit `Allow` auf `kms:Decrypt` für einen bestimmten Customer Managed Key. Der Aufruf schlägt dennoch mit `AccessDeniedException` fehl. Der Key ist aktiv und liegt in derselben Region.\n\nWas ist die Ursache?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Key Policy des KMS-Keys erlaubt diesem Principal keinen Zugriff."
+      },
+      {
+        "id": "B",
+        "text": "Der Rolle fehlt zusätzlich die Berechtigung `kms:Encrypt`."
+      },
+      {
+        "id": "C",
+        "text": "Es fehlt ein Grant, der die Entschlüsselung freigibt."
+      },
+      {
+        "id": "D",
+        "text": "Der Key benötigt einen passenden Encryption Context in der Policy."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**Das ist die wichtigste KMS-Regel überhaupt — und die häufigste Prüfungsfalle.** Jeder KMS-Key hat **genau eine Key Policy**, und sie ist die **primäre Autorisierungsinstanz**. AWS formuliert es unmissverständlich: *\"Unless the key policy explicitly allows it, you cannot use IAM policies to allow access to a KMS key.\"* Eine erlaubende IAM-Policy **allein reicht niemals**.\n\nÜblicherweise enthält die Key Policy eine Klausel, die den **Account als Principal** mit `kms:*` erlaubt — erst dadurch werden IAM-Policies überhaupt wirksam. Fehlt sie, greift keine IAM-Policy. Ein Grant **wäre** eine mögliche Alternative, ist aber nicht die Ursache. `kms:Encrypt` ist für ein Decrypt nicht nötig, und ein Encryption Context ist optional.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-040",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "multiple",
+    "prompt": "Eine Anwendung in **Account B** muss Daten entschlüsseln, die mit einem Customer Managed Key aus **Account A** verschlüsselt wurden.\n\nWelche **ZWEI** Voraussetzungen müssen erfüllt sein? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Key Policy in Account A muss den Principal aus Account B explizit erlauben."
+      },
+      {
+        "id": "B",
+        "text": "Der Key muss als Multi-Region Key angelegt sein."
+      },
+      {
+        "id": "C",
+        "text": "Eine IAM-Policy in Account B muss `kms:Decrypt` auf den Key-ARN erlauben."
+      },
+      {
+        "id": "D",
+        "text": "In Account B muss ein Interface Endpoint für KMS existieren."
+      },
+      {
+        "id": "E",
+        "text": "Der Key muss in beide Accounts repliziert werden."
+      }
+    ],
+    "correct": [
+      "A",
+      "C"
+    ],
+    "explanation": "Cross-Account-Zugriff auf einen KMS-Key erfordert **beide Seiten**: Die **Key Policy in Account A** muss den fremden Principal erlauben, **und** die **IAM-Policy in Account B** muss `kms:Decrypt` auf den Key-ARN gestatten. Das ist strenger als bei anderen Services — bei KMS ist die Key Policy **immer** zwingend.\n\nEin **Multi-Region Key ist ausdrücklich nicht nötig**: MRKs lösen ein **regionsübergreifendes**, kein accountübergreifendes Problem. Ein VPC Endpoint ändert nur den **Netzwerkpfad**, nicht die Autorisierung. Und KMS-Keys werden **nicht in andere Accounts repliziert** — sie werden über Policies freigegeben.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-modifying-external-accounts.html"
+  },
+  {
+    "seedKey": "saa-c03-q-041",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Eine Anwendung muss eine **500 MB große Datei** mit einem KMS-Key verschlüsseln, bevor sie sie in einem eigenen Dateisystem ablegt.\n\nWie geht sie vor?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Datei in 4-KB-Blöcke zerlegen und jeden Block per `kms:Encrypt` verschlüsseln."
+      },
+      {
+        "id": "B",
+        "text": "`GenerateDataKey` aufrufen und die Datei lokal mit dem Data Key verschlüsseln."
+      },
+      {
+        "id": "C",
+        "text": "`kms:Encrypt` direkt auf die vollständige Datei anwenden."
+      },
+      {
+        "id": "D",
+        "text": "Einen asymmetrischen KMS-Key verwenden, der keiner Größenbeschränkung unterliegt."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Envelope Encryption.** Die `Encrypt`-API von KMS verarbeitet **maximal 4.096 Bytes**. Für größere Daten ruft man **`GenerateDataKey`** auf: KMS liefert einen Data Key im Klartext **und** verschlüsselt. Die Anwendung verschlüsselt die Datei **lokal** mit dem Klartext-Key, verwirft ihn aus dem Speicher und legt den **verschlüsselten** Data Key neben der Datei ab.\n\nDer Block-Distraktor ist raffiniert, weil er technisch funktionieren *würde*: 500 MB ÷ 4 KB = **128.000 KMS-Aufrufe** — absurd langsam, absurd teuer und sofort im Throttling. Der Direktaufruf scheitert an der 4-KB-Grenze. Asymmetrische Keys haben eine **noch kleinere** Nutzlastgrenze (bei RSA je nach Padding wenige hundert Bytes).",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#enveloping"
+  },
+  {
+    "seedKey": "saa-c03-q-042",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Eine Compliance-Vorgabe verlangt, dass Verschlüsselungsschlüssel **alle 180 Tage** rotiert werden.\n\nWie erfüllst du das mit dem geringsten Betriebsaufwand?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Alle 180 Tage einen neuen Key anlegen und die bestehenden Daten neu verschlüsseln."
+      },
+      {
+        "id": "B",
+        "text": "Die automatische Rotation aktivieren — sie läuft jährlich und gilt als ausreichend."
+      },
+      {
+        "id": "C",
+        "text": "Die automatische Rotation aktivieren und das Intervall auf 180 Tage setzen."
+      },
+      {
+        "id": "D",
+        "text": "Eine EventBridge-Regel, die halbjährlich eine On-Demand-Rotation auslöst."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Seit **April 2024** ist das Rotationsintervall bei KMS **konfigurierbar: 90 bis 2.560 Tage** (Default 365). 180 Tage lassen sich also direkt einstellen — eine reine Konfigurationsänderung, kein Code, kein Re-Encrypting.\n\nDer Re-Encrypting-Distraktor beruht auf einem verbreiteten Missverständnis: **Bei einer Key-Rotation müssen alte Daten nicht neu verschlüsselt werden** — Key-ID, ARN und Alias bleiben identisch, und KMS behält das alte Key-Material zum Entschlüsseln vor. Der EventBridge-Distraktor **funktioniert**, ist aber Automatisierungs-Overhead für etwas, das ein Konfigurationsfeld erledigt. Die Jahres-Rotation erfüllt die Vorgabe schlicht nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/rotating-keys-enable.html"
+  },
+  {
+    "seedKey": "saa-c03-q-043",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Ein Auditor verlangt, dass das Unternehmen die **Key Policy selbst kontrolliert**, das **Rotationsintervall selbst festlegt** und den Schlüssel im Ernstfall **deaktivieren** kann.\n\nWelcher Key-Typ ist erforderlich?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein AWS Owned Key, der vom jeweiligen Service verwaltet wird."
+      },
+      {
+        "id": "B",
+        "text": "Ein AWS Managed Key (z. B. `aws/s3`)."
+      },
+      {
+        "id": "C",
+        "text": "Ein in KMS importierter Schlüssel (BYOK) mit AWS-Managed-Status."
+      },
+      {
+        "id": "D",
+        "text": "Ein Customer Managed Key."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Nur beim **Customer Managed Key** kontrolliert der Kunde **Key Policy, Rotation, Aktivierung/Deaktivierung und Löschung** vollständig.\n\n**AWS Managed Keys sind der stärkste Distraktor**: Sie sind in CloudTrail sichtbar und ihre Key Policy ist **einsehbar** — aber ausdrücklich **nicht änderbar**. AWS formuliert es so: *\"you cannot change any properties of AWS managed keys, rotate them, change their key policies, or schedule them for deletion.\"* Die Rotation läuft fix jährlich. **AWS Owned Keys** sind überhaupt nicht sichtbar — weder Metadaten noch CloudTrail-Events. Der BYOK-Distraktor mischt zwei Konzepte: Importiertes Key-Material ist eine Eigenschaft eines **Customer Managed Keys**, kein eigener Typ.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html"
+  },
+  {
+    "seedKey": "saa-c03-q-044",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Ein Security-Audit will nachvollziehen, wann der KMS-Key einer DynamoDB-Tabelle zum Entschlüsseln verwendet wurde. In CloudTrail finden sich **keinerlei KMS-Events** zu dieser Tabelle — obwohl die Tabelle verschlüsselt ist und CloudTrail aktiv.\n\nWarum?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Tabelle nutzt einen AWS Owned Key, der in CloudTrail nicht sichtbar ist."
+      },
+      {
+        "id": "B",
+        "text": "CloudTrail Data Events sind für DynamoDB nicht aktiviert."
+      },
+      {
+        "id": "C",
+        "text": "KMS-Events erscheinen ausschließlich im CloudTrail des Key-Besitzer-Accounts."
+      },
+      {
+        "id": "D",
+        "text": "DynamoDB verschlüsselt intern ohne KMS und erzeugt daher keine Events."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "DynamoDB verschlüsselt standardmäßig mit einem **AWS Owned Key**. Diese Keys gehören **nicht deinem Account**, sind **weder in der Konsole noch in CloudTrail sichtbar** und lassen sich nicht auditieren. Wer Nachvollziehbarkeit braucht, muss die Tabelle auf einen **AWS Managed Key** (`aws/dynamodb`) oder einen **Customer Managed Key** umstellen.\n\nDer Data-Events-Distraktor ist stark, weil er eine **echte** CloudTrail-Eigenheit beschreibt — nur betrifft sie Item-Zugriffe, nicht KMS-Key-Nutzung. Die letzte Option ist schlicht falsch: **DynamoDB ist immer verschlüsselt** (Encryption at Rest ist nicht abschaltbar) — die Frage ist nur, mit welchem Key-Typ.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html"
+  },
+  {
+    "seedKey": "saa-c03-q-045",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Eine Batch-Anwendung benötigt für die Dauer eines Jobs `kms:Decrypt` auf einen Key. Die Berechtigung soll nach dem Job **wieder entzogen** werden — und die **Key Policy soll dafür nicht bei jedem Job geändert** werden.\n\nWelcher Mechanismus?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Session Policy beim `AssumeRole` der Batch-Rolle."
+      },
+      {
+        "id": "B",
+        "text": "Ein KMS Grant, der nach dem Job zurückgezogen wird."
+      },
+      {
+        "id": "C",
+        "text": "Eine Permissions Boundary an der Batch-Rolle."
+      },
+      {
+        "id": "D",
+        "text": "Ein zweiter, dedizierter KMS-Key nur für Batch-Jobs."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Grants** sind KMS' Mechanismus für **temporäre, programmatische Delegation**. Sie werden per API erstellt (`CreateGrant`) und per `RetireGrant`/`RevokeGrant` wieder entfernt — **ohne die Key Policy anzufassen**. Genau der geschilderte Fall. Limit: 50.000 Grants pro Key.\n\nDie Session Policy ist der beste Distraktor: Sie **verengt** eine Session — sie kann aber **keine Rechte hinzufügen**, die die Key Policy nicht ohnehin schon erlaubt. Dasselbe gilt für die Permissions Boundary: Sie deckelt, sie gewährt nicht. Ein zweiter Key löst das Zeitproblem gar nicht — die Berechtigung wäre weiterhin dauerhaft.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/grants.html"
+  },
+  {
+    "seedKey": "saa-c03-q-046",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Eine Anwendung schreibt Millionen kleiner Objekte mit **SSE-KMS** nach S3. Sie läuft regelmäßig in `ThrottlingException` von KMS, und die KMS-Rechnung steigt stark.\n\nWas ist die wirksamste Maßnahme — ohne die Key-Kontrolle aufzugeben?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Erhöhung der KMS-Request-Quota für die Region beantragen."
+      },
+      {
+        "id": "B",
+        "text": "Die Objekte über mehrere KMS-Keys verteilen, um die Last zu streuen."
+      },
+      {
+        "id": "C",
+        "text": "S3 Bucket Keys für den Bucket aktivieren."
+      },
+      {
+        "id": "D",
+        "text": "Auf SSE-S3 umstellen, das ohne KMS-Aufrufe auskommt."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**S3 Bucket Keys** ersetzen die KMS-Aufrufe **pro Objekt** durch einen **bucket-level Key** — laut AWS eine Reduktion der KMS-Anfragen und -Kosten um **bis zu 99 %**. Der Encryption Context wechselt dabei vom Objekt-ARN auf den **Bucket-ARN**. Die Key-Kontrolle bleibt vollständig erhalten.\n\nDie Quota-Erhöhung **würde helfen**, behandelt aber nur das Symptom und senkt die Kosten nicht. Das Key-Sharding **funktioniert ebenfalls**, erzeugt aber erheblichen Verwaltungsaufwand (Key-Zuordnung, Rotation über n Keys). Der SSE-S3-Wechsel behebt beides — **opfert aber genau die Key-Kontrolle**, die laut Aufgabe erhalten bleiben soll. Bucket Keys sind übrigens **nicht** mit DSSE-KMS kombinierbar.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html"
+  },
+  {
+    "seedKey": "saa-c03-q-047",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Eine Compliance-Vorgabe verlangt, dass **AWS zu keinem Zeitpunkt den Verschlüsselungsschlüssel speichert**. Die Anwendung soll den Schlüssel bei **jedem Request mitliefern**, S3 soll damit verschlüsseln und ihn anschließend verwerfen.\n\nWelche Option erfüllt das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "SSE-KMS mit einem Customer Managed Key und aktivierter Key-Rotation."
+      },
+      {
+        "id": "B",
+        "text": "DSSE-KMS mit zwei unabhängigen Verschlüsselungsebenen."
+      },
+      {
+        "id": "C",
+        "text": "Client-Side Encryption mit dem AWS Encryption SDK vor dem Upload."
+      },
+      {
+        "id": "D",
+        "text": "SSE-C, bei dem der Schlüssel im Request-Header mitgeschickt wird."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**SSE-C (Server-Side Encryption with Customer-provided Keys)** ist exakt das beschriebene Modell: Der Schlüssel reist im Request-Header mit, S3 ver-/entschlüsselt damit und **verwirft ihn danach** — AWS speichert ihn nie. Voraussetzung: HTTPS ist zwingend, und der Kunde trägt die volle Verantwortung für Aufbewahrung und Verlust des Keys.\n\n**Client-Side Encryption ist der stärkste Distraktor** — und aus Sicherheitssicht sogar *strenger*: AWS sieht die Daten dort **nie** im Klartext. Aber die Aufgabe beschreibt einen anderen Ablauf: *S3 soll verschlüsseln, mit einem mitgelieferten Key.* Bei Client-Side verschlüsselt die **Anwendung selbst** und liefert gar keinen Key mit. Bei SSE-KMS und DSSE-KMS liegt der Key dauerhaft **in AWS** — Vorgabe verletzt.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerSideEncryptionCustomerKeys.html"
+  },
+  {
+    "seedKey": "saa-c03-q-048",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Ein Bucket mit SSE-KMS wird per **Cross-Region Replication** in eine zweite Region repliziert. Ein Architekt schlägt vor, einen **Multi-Region Key** einzusetzen, damit S3 die Daten beim Replizieren nicht neu verschlüsseln muss.\n\nWie bewertest du den Vorschlag?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Er greift nicht — S3 CRR entschlüsselt und verschlüsselt die Data Keys immer neu, auch bei Multi-Region Keys."
+      },
+      {
+        "id": "B",
+        "text": "Er ist korrekt — Multi-Region Keys vermeiden das Re-Encrypting bei CRR."
+      },
+      {
+        "id": "C",
+        "text": "Er ist korrekt, aber nur wenn Quell- und Ziel-Bucket im selben Account liegen."
+      },
+      {
+        "id": "D",
+        "text": "Er ist unmöglich — S3 CRR unterstützt keine Multi-Region Keys."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**Das ist eine der wenigen Stellen, an denen die verbreitete Community-Annahme falsch ist.** Die AWS-Dokumentation ist explizit: S3 Cross-Region Replication *\"decrypts and re-encrypts the data keys … under the KMS key in the destination Region, **even when the KMS key in both Regions is a related multi-Region key**.\"* Für S3 CRR bringt ein MRK also **keinen Vorteil beim Re-Encrypting**.\n\nMulti-Region Keys sind echt und nützlich — nur für **andere** Zwecke: **Disaster Recovery, Global Data Management, Distributed Signing, Active-Active-Architekturen**, bei denen eine Anwendung in Region A verschlüsselt und in Region B ohne Cross-Region-KMS-Call entschlüsselt. Das letzte Distraktor-Argument ist ebenfalls falsch: S3 CRR **unterstützt** MRKs — es profitiert nur nicht davon.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-overview.html"
+  },
+  {
+    "seedKey": "saa-c03-q-049",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Ein Customer Managed Key wird nicht mehr benötigt und soll entfernt werden. Das Team ist sich **nicht sicher**, ob noch produktive Daten damit verschlüsselt sind.\n\nWelches Vorgehen ist am sichersten?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Löschung mit der kürzestmöglichen Wartezeit von 7 Tagen einplanen."
+      },
+      {
+        "id": "B",
+        "text": "Den Key deaktivieren, die Nutzung überwachen und erst danach über die Löschung entscheiden."
+      },
+      {
+        "id": "C",
+        "text": "Die Löschung planen — KMS blockiert sie automatisch, falls noch Daten verschlüsselt sind."
+      },
+      {
+        "id": "D",
+        "text": "Den Key in einen Archiv-Account verschieben und dort aufbewahren."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**KMS prüft nicht, ob noch Daten mit einem Key verschlüsselt sind** — die Löschung ist nach Ablauf der Wartezeit **unumkehrbar**, und alle damit verschlüsselten Daten sind dann dauerhaft verloren. Der sichere Weg ist deshalb: **Key deaktivieren** (`DisableKey`), CloudTrail bzw. CloudWatch auf Zugriffsversuche beobachten, und erst bei nachgewiesener Nicht-Nutzung löschen.\n\nDer Automatik-Distraktor ist die gefährlichste Fehlannahme des ganzen Themas — **KMS bietet diesen Schutz nicht**. Die 7-Tage-Variante verkürzt genau das Sicherheitsnetz (die Wartezeit beträgt **7 bis 30 Tage**, Default 30). Und KMS-Keys lassen sich **nicht zwischen Accounts verschieben**.",
+    "sourceRef": "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys.html"
+  },
+  {
+    "seedKey": "saa-c03-q-050",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Eine Compliance-Vorgabe verlangt **FIPS 140-3 Level 3** für die Schlüsselverwaltung. Ein Architekt behauptet, dafür sei zwingend AWS CloudHSM nötig.\n\nWie ist die Lage heute?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Korrekt — nur CloudHSM erreicht Level 3, KMS bleibt auf Level 2."
+      },
+      {
+        "id": "B",
+        "text": "Level-3-Compliance erfordert in jedem Fall einen CloudHSM Custom Key Store in KMS."
+      },
+      {
+        "id": "C",
+        "text": "Nicht mehr zutreffend — die KMS-HSMs sind seit Februar 2025 ebenfalls FIPS 140-3 Level 3 validiert."
+      },
+      {
+        "id": "D",
+        "text": "Weder KMS noch CloudHSM erreichen Level 3; dafür ist ein eigenes On-Prem-HSM nötig."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**Aktualitätsfrage.** Seit **Februar 2025** sind die HSMs hinter AWS KMS **FIPS 140-3 Level 3** validiert. Wer CloudHSM früher **allein wegen der Level-3-Anforderung** einsetzen musste, kann heute KMS verwenden — deutlich einfacher und günstiger.\n\nCloudHSM bleibt weiterhin nötig, wenn **andere** Anforderungen dazukommen: **single-tenant** Hardware, eigene Crypto-User-Verwaltung, oder native Krypto-APIs (**PKCS#11, JCE, CNG**). Der Custom-Key-Store-Distraktor beschreibt eine **existierende** Architektur (KMS-Interface + CloudHSM-Backend) — sie ist für reine Level-3-Compliance aber nicht mehr erforderlich. Ältere Kursmaterialien behaupten hier durchweg noch das Gegenteil.",
+    "sourceRef": "https://aws.amazon.com/blogs/security/aws-kms-now-fips-140-2-level-3-what-does-this-mean-for-you/"
+  },
+  {
+    "seedKey": "saa-c03-q-051",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "KMS & Encryption at Rest",
+    "type": "single",
+    "prompt": "Eine Behörde verlangt für hochsensible Daten in S3 **zwei voneinander unabhängige Verschlüsselungsebenen** (Anforderung nach CNSSP-15).\n\nWelche Konfiguration erfüllt das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "SSE-S3 und SSE-KMS gemeinsam auf demselben Objekt aktivieren."
+      },
+      {
+        "id": "B",
+        "text": "SSE-KMS mit einem Multi-Region Key und aktivierten S3 Bucket Keys."
+      },
+      {
+        "id": "C",
+        "text": "SSE-C kombiniert mit aktivierter S3-Standardverschlüsselung."
+      },
+      {
+        "id": "D",
+        "text": "DSSE-KMS als Verschlüsselungsmethode für den Bucket."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**DSSE-KMS (Dual-layer Server-Side Encryption, seit Juni 2023)** legt **zwei unabhängige AES-256-Schichten** über die Objekte — genau für Anforderungen wie **CNSSP-15**. Hinweis: DSSE-KMS ist **nicht** mit S3 Bucket Keys kombinierbar.\n\nDer erste Distraktor beschreibt etwas **strukturell Unmögliches**: S3 erlaubt pro Objekt **genau eine** Server-Side-Encryption-Methode — man kann SSE-S3 und SSE-KMS nicht übereinanderlegen. Multi-Region Keys und Bucket Keys sind reale Features, lösen aber **Regions- bzw. Kostenprobleme**, keine Doppelverschlüsselung. Auch SSE-C plus Default-Encryption ergibt keine zweite Ebene — die letzte gesetzte Methode gewinnt.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingDSSEncryption.html"
+  },
+  {
+    "seedKey": "saa-c03-q-052",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "type": "single",
+    "prompt": "Die Zugangsdaten einer produktiven RDS-Datenbank sollen automatisch rotiert werden. Während der Rotation dürfen **keine Verbindungen fehlschlagen** — die Anwendung läuft rund um die Uhr.\n\nWelche Rotationsstrategie in Secrets Manager?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Single-User-Rotation, bei der das Passwort desselben DB-Users geändert wird."
+      },
+      {
+        "id": "B",
+        "text": "Alternating-Users-Rotation mit zwei abwechselnd genutzten DB-Usern."
+      },
+      {
+        "id": "C",
+        "text": "Manuelle Rotation in einem geplanten Wartungsfenster."
+      },
+      {
+        "id": "D",
+        "text": "Eine eigene Lambda-Funktion, die das Passwort direkt in RDS und im Secret setzt."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Die **Alternating-Users-Strategie** nutzt **zwei DB-User im Wechsel**: Während User A produktiv verbunden ist, wird das Passwort von User B rotiert und anschließend umgeschaltet. Dadurch existiert **kein Zeitfenster**, in dem gültige Credentials fehlen — echte Zero-Downtime-Rotation. Voraussetzung ist ein Superuser-Secret.\n\n**Single-User ist der stärkste Distraktor**: Sie ist die einfachere und häufiger genutzte Strategie — hat aber genau die Lücke, die hier ausgeschlossen ist: Zwischen Passwort-Änderung in der DB und Aktualisierung des Secrets können Verbindungen scheitern. Die eigene Lambda-Funktion **baut Alternating Users faktisch nach** — nur ohne AWS' erprobte Vorlage und mit vollem Wartungsaufwand. Das Wartungsfenster widerspricht \"rund um die Uhr\".\n\n**Wichtiges Detail für die Praxis:** RDS Proxy unterstützt die Alternating-Users-Strategie **nicht**.",
+    "sourceRef": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets_strategies.html"
+  },
+  {
+    "seedKey": "saa-c03-q-053",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "type": "single",
+    "prompt": "Ein Team will **10.000 Konfigurationswerte** zentral verwalten: Feature-Flags, Endpoint-URLs, Timeouts. Es handelt sich **nicht** um Geheimnisse, eine Rotation ist **nicht** erforderlich, und jeder Wert ist **unter 4 KB**. Die Kosten sollen minimal sein.\n\nWelcher Dienst?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS Secrets Manager mit deaktivierter Rotation."
+      },
+      {
+        "id": "B",
+        "text": "SSM Parameter Store im Standard Tier."
+      },
+      {
+        "id": "C",
+        "text": "SSM Parameter Store im Advanced Tier."
+      },
+      {
+        "id": "D",
+        "text": "Eine DynamoDB-Tabelle mit verschlüsselten Items und einer Caching-Schicht."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Der **Standard Tier** des Parameter Store deckt exakt dieses Profil ab: **kostenlos**, bis **10.000 Parameter** pro Region und Account, **4 KB** pro Wert. Alle drei Bedingungen sind erfüllt.\n\n**Secrets Manager ist der teure Distraktor**: Er kostet **pro Secret und Monat** — bei 10.000 Werten ist das eine erhebliche Rechnung für Daten, die gar keine Geheimnisse sind. Der **Advanced Tier** wird erst nötig, wenn man **mehr als 10.000 Parameter**, **Werte über 4 KB** oder **Parameter Policies** (Expiration/TTL) braucht — nichts davon liegt vor, und er kostet pro Parameter. Die DynamoDB-Eigenbauvariante ersetzt einen fertigen Managed Service durch Code und Betrieb.",
+    "sourceRef": "https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-advanced-parameters.html"
+  },
+  {
+    "seedKey": "saa-c03-q-054",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "type": "single",
+    "prompt": "Eine CloudFront-Distribution mit Origin in `eu-central-1` soll ein eigenes ACM-Zertifikat für die Custom Domain nutzen. Das Zertifikat wurde in `eu-central-1` angefordert und erfolgreich validiert — es erscheint jedoch **nicht** in der Auswahlliste der CloudFront-Konsole.\n\nWarum?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Das Zertifikat muss zuerst einem Alternate Domain Name (CNAME) der Distribution zugeordnet werden."
+      },
+      {
+        "id": "B",
+        "text": "CloudFront akzeptiert ausschließlich importierte Zertifikate, keine von ACM ausgestellten."
+      },
+      {
+        "id": "C",
+        "text": "ACM-Zertifikate für CloudFront müssen in `us-east-1` angefordert werden."
+      },
+      {
+        "id": "D",
+        "text": "Das Zertifikat muss per DNS-Validierung bestätigt sein; Email-Validierung genügt CloudFront nicht."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**CloudFront ist ein globaler Service mit Control Plane in `us-east-1`** — ACM-Zertifikate für CloudFront müssen daher **zwingend in `us-east-1` (N. Virginia)** angefordert werden, **unabhängig davon, wo der Origin steht**. Zertifikate lassen sich nicht zwischen Regionen verschieben; das Zertifikat muss in `us-east-1` neu angefordert werden.\n\n**Für ALB, NLB und API Gateway gilt genau das Gegenteil:** Dort muss das Zertifikat in **derselben Region wie die Ressource** liegen. Der CNAME-Distraktor beschreibt eine **echte Voraussetzung** (die Distribution braucht einen Alternate Domain Name) — nur ist sie nicht der Grund für die leere Auswahlliste. Die Validierungsart spielt für die Auswahl keine Rolle.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cnames-and-https-requirements.html"
+  },
+  {
+    "seedKey": "saa-c03-q-055",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "type": "single",
+    "prompt": "Ein Team betreibt einen nginx-Reverse-Proxy auf EC2 und will dafür das **bestehende ACM-Public-Zertifikat** verwenden, das aktuell am ALB hängt.\n\nWas ist die richtige Einschätzung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Das Zertifikat lässt sich per `acm export-certificate` herunterladen und auf der Instanz installieren."
+      },
+      {
+        "id": "B",
+        "text": "Das Zertifikat kann per IAM-Rolle an die Instanz gebunden werden, ohne es zu exportieren."
+      },
+      {
+        "id": "C",
+        "text": "Der ALB kann das Zertifikat über einen Interface Endpoint an die Instanz weiterreichen."
+      },
+      {
+        "id": "D",
+        "text": "Standard-ACM-Public-Zertifikate sind nicht exportierbar — nötig ist ein exportierbares Zertifikat oder AWS Private CA."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**Standard-ACM-Public-Zertifikate sind nicht exportierbar** — der private Schlüssel verlässt ACM niemals. Sie funktionieren ausschließlich mit **integrierten Services** (CloudFront, ALB/NLB, API Gateway, App Runner …). Für EC2 oder On-Premises braucht man: ein **exportierbares Public Certificate** (seit 2025 verfügbar, kostenpflichtig), **AWS Private CA** oder ein extern beschafftes Zertifikat.\n\nDer Export-Distraktor ist der klassische Fehler — der Befehl `export-certificate` existiert tatsächlich, funktioniert aber **nur für Private-CA-Zertifikate** (und seit 2025 für explizit exportierbare Public Certs), nicht für Standard-Public-Zertifikate. Die anderen beiden Optionen beschreiben Mechanismen, die es **nicht gibt**: Zertifikate sind keine IAM-Ressourcen und werden von einem ALB nicht an Targets weitergereicht.",
+    "sourceRef": "https://docs.aws.amazon.com/acm/latest/userguide/acm-services.html"
+  }
+]

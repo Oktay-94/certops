@@ -1,0 +1,787 @@
+[
+  {
+    "seedKey": "saa-c03-q-081",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Disaster Recovery",
+    "type": "single",
+    "prompt": "Ein Unternehmen baut Cross-Region-DR auf. Ein RTO von **einigen zehn Minuten** ist akzeptabel. Das Budget ist knapp: Die Datenbank soll kontinuierlich in die DR-Region repliziert werden, der **Compute dort aber nicht laufen**.\n\nWelche DR-Strategie beschreibt das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Pilot Light — Daten repliziert, Compute nicht deployed."
+      },
+      {
+        "id": "B",
+        "text": "Warm Standby — verkleinerte, aber laufende Kopie der Umgebung."
+      },
+      {
+        "id": "C",
+        "text": "Multi-Site Active/Active — Vollbetrieb in beiden Regionen."
+      },
+      {
+        "id": "D",
+        "text": "Backup & Restore — Wiederherstellung aus Cross-Region-Backups."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**Der Unterschied zwischen Pilot Light und Warm Standby ist genau eine Frage: Läuft der Compute?**\n\n**Pilot Light: nein.** Die Daten werden repliziert, die Datenbank läuft — der Compute ist **nicht deployed**. AWS beziffert das mit **\"RPO in minutes, RTO in tens of minutes\"**, weil im Ernstfall erst Server hochgefahren werden müssen. Genau die Beschreibung der Aufgabe.\n\n**Warm Standby: ja** — eine verkleinerte, aber **laufende** Kopie, die **sofort** (reduziert) Traffic verarbeiten kann (**RPO in seconds, RTO in minutes**). Das ist der stärkste Distraktor: Es funktioniert und ist schneller — aber es kostet laufend Compute, was die Aufgabe explizit ausschließt.\n\n**Multi-Site** ist die teuerste Option (RTO nahe null) und übererfüllt die Anforderung. **Backup & Restore** liegt bei **RPO/RTO in Stunden** — zu langsam für zehn Minuten.",
+    "sourceRef": "https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_planning_for_recovery_disaster_recovery.html"
+  },
+  {
+    "seedKey": "saa-c03-q-082",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Disaster Recovery",
+    "type": "single",
+    "prompt": "Eine geschäftskritische Anwendung braucht Cross-Region-DR mit einem RTO **in Minuten**. Beim Failover muss die DR-Region **sofort** Traffic übernehmen können — wenn auch zunächst mit reduzierter Kapazität. Es darf **kein Warten auf startende Instanzen** geben.\n\nWelche Strategie erfüllt das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Pilot Light mit vorbereiteten AMIs und einer ASG, deren Desired Capacity auf 0 steht."
+      },
+      {
+        "id": "B",
+        "text": "Warm Standby mit dauerhaft laufender, verkleinerter Kapazität."
+      },
+      {
+        "id": "C",
+        "text": "Backup & Restore mit automatisierten Cross-Region-Snapshots."
+      },
+      {
+        "id": "D",
+        "text": "Multi-Site Active/Active mit voller Kapazität in beiden Regionen."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Warm Standby** hält eine **verkleinerte, aber laufende** Kopie bereit. Sie verarbeitet **sofort** Traffic und muss beim Failover **nur noch hochskaliert** werden — nicht erst gestartet. AWS: *\"warm standby only requires you to scale up (everything is already deployed and running).\"*\n\n**(A) ist der stärkste Distraktor — und beschreibt exakt Pilot Light.** Eine ASG mit **Desired = 0** bedeutet: **keine einzige Instanz läuft**. Beim Failover muss erst gestartet werden — genau das, was die Aufgabe ausschließt. Die vorbereiteten AMIs ändern daran nichts, sie verkürzen nur die Startzeit.\n\n**Multi-Site** würde die Anforderung ebenfalls erfüllen — sogar besser (RTO nahe null). Es ist aber die **teuerste** Option: voller Betrieb in beiden Regionen. Für ein RTO \"in Minuten\" ist das Überversorgung. **Backup & Restore** liegt bei Stunden.",
+    "sourceRef": "https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_planning_for_recovery_disaster_recovery.html"
+  },
+  {
+    "seedKey": "saa-c03-q-083",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Nach einem Ransomware-Vorfall bei einem Wettbewerber fordert die Geschäftsführung: Backups müssen **unlöschbar** sein — auch für einen Administrator mit vollen IAM-Rechten und auch für den **Root-User**.\n\nWie setzt du das um?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS Backup Vault Lock im Governance Mode auf den Backup Vault anwenden."
+      },
+      {
+        "id": "B",
+        "text": "S3 Versioning mit MFA Delete auf dem Bucket mit den Backups aktivieren."
+      },
+      {
+        "id": "C",
+        "text": "AWS Backup Vault Lock im Compliance Mode mit abgelaufener Grace Period."
+      },
+      {
+        "id": "D",
+        "text": "Eine IAM-Policy, die `backup:DeleteRecoveryPoint` für alle Principals verweigert."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Nur der **Compliance Mode** ist wirklich immutable. Nach Ablauf der **Grace Period** (mindestens 3 Tage) gilt laut AWS: *\"the vault and its lock are immutable and cannot be changed or deleted by any user or by AWS.\"* Und explizit: *\"If any user (including the root user) attempts to delete a backup ... AWS Backup will deny the operation.\"* Die einzige Umgehung wäre, den gesamten AWS-Account zu schließen.\n\n**Der Governance Mode ist der gefährlichste Distraktor**: Er sieht in der Konsole nahezu identisch aus, kann aber von jedem Nutzer mit **ausreichenden IAM-Rechten entfernt** werden — also genau von dem kompromittierten Administrator, gegen den man sich schützen wollte.\n\n**MFA Delete** schützt S3-Objektversionen, nicht AWS-Backup-Recovery-Points. Eine **IAM-Policy** kann den **Root-User nicht binden** — er kann sie ändern.",
+    "sourceRef": "https://docs.aws.amazon.com/aws-backup/latest/devguide/vault-lock.html"
+  },
+  {
+    "seedKey": "saa-c03-q-084",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Disaster Recovery",
+    "type": "single",
+    "prompt": "Eine interne Reporting-Anwendung ist **nicht** geschäftskritisch. Ein Ausfall von mehreren Stunden ist akzeptabel, ebenso der Verlust der Daten der letzten Stunden.\n\nWelche DR-Strategie ist am **kosteneffizientesten**?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Pilot Light mit einem kontinuierlich replizierten RDS in der DR-Region."
+      },
+      {
+        "id": "B",
+        "text": "Warm Standby mit einer minimal dimensionierten Auto Scaling Group."
+      },
+      {
+        "id": "C",
+        "text": "Aurora Global Database mit einer Secondary Region als Read-Standby."
+      },
+      {
+        "id": "D",
+        "text": "Backup & Restore mit Cross-Region-Kopien der Backups."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**Alle vier Optionen funktionieren.** Genau das macht die Frage zu einer echten SAA-C03-Frage: Sie testet nicht, welche Technik die beste ist, sondern welche die Anforderung **gerade so** erfüllt.\n\nDie Anforderung lautet: RTO in Stunden, RPO in Stunden. Das ist die **exakte Definition von Backup & Restore** — AWS: *\"RPO/RTO in hours\"*, die **günstigste und am wenigsten komplexe** Strategie. Es entstehen praktisch nur Speicherkosten.\n\nDie drei anderen liefern **bessere** RTO/RPO-Werte — und kosten dafür **dauerhaft** Geld für Ressourcen, die diese Anwendung nicht benötigt: Pilot Light für eine laufende Replikat-DB, Warm Standby zusätzlich für laufenden Compute, Aurora Global Database für dedizierte Replikations-Infrastruktur.\n\n**Überversorgung ist bei \"MOST cost-effective\" immer die falsche Antwort** — auch wenn die Technik beeindruckender ist.",
+    "sourceRef": "https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_planning_for_recovery_disaster_recovery.html"
+  },
+  {
+    "seedKey": "saa-c03-q-085",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Disaster Recovery",
+    "type": "single",
+    "prompt": "Ein Unternehmen betreibt physische Server im eigenen Rechenzentrum und hat **kein zweites Rechenzentrum**. Es will DR nach AWS aufbauen: **RPO in Sekunden, RTO in Minuten** — ohne die Anwendungen umzuschreiben.\n\nWelcher Dienst?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS Elastic Disaster Recovery mit kontinuierlicher Block-Level-Replikation."
+      },
+      {
+        "id": "B",
+        "text": "AWS Backup mit einem Backup Gateway für die on-premises Server."
+      },
+      {
+        "id": "C",
+        "text": "AWS DataSync für die laufende Replikation der Server-Daten nach S3."
+      },
+      {
+        "id": "D",
+        "text": "Nächtliche VM-Images nach S3 kopieren und im Notfall auf EC2 starten."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**AWS Elastic Disaster Recovery (DRS)** — der Nachfolger von CloudEndure — repliziert **kontinuierlich auf Block-Ebene** in eine kostengünstige Staging-Area. AWS: *\"AWS DRS enables RPOs of seconds and RTOs of minutes.\"* Die Anwendungen bleiben unverändert (Lift-and-Shift-DR). Die tatsächliche RTO hängt stark vom Boot ab: Linux typischerweise ~5 Minuten, Windows ~20.\n\n**AWS Backup ist der stärkste Distraktor**: Es funktioniert für on-prem (via Backup Gateway) — aber es arbeitet in **Backup-Fenstern**, nicht kontinuierlich. Der RPO liegt damit bei Stunden, nicht Sekunden.\n\n**DataSync** repliziert **Daten**, nicht ganze Server — es entsteht kein bootfähiger Zustand. Die **nächtlichen VM-Images** funktionieren, bedeuten aber einen **RPO von bis zu 24 Stunden**.\n\n*(CloudEndure ist seit 31.03.2024 in den meisten Regionen abgekündigt.)*",
+    "sourceRef": "https://aws.amazon.com/disaster-recovery/"
+  },
+  {
+    "seedKey": "saa-c03-q-086",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Disaster Recovery",
+    "type": "multiple",
+    "prompt": "Ein Team definiert die DR-Ziele für eine neue Anwendung.\n\nWelche **ZWEI** Aussagen über RTO und RPO sind korrekt? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "RPO bezeichnet den maximal tolerierbaren Datenverlust, gemessen als Zeit vor dem Ausfall."
+      },
+      {
+        "id": "B",
+        "text": "RTO bezeichnet die maximal tolerierbare Zeit bis zur Wiederherstellung des Dienstes."
+      },
+      {
+        "id": "C",
+        "text": "Ein RPO von null lässt sich mit stündlichen Snapshots zuverlässig erreichen."
+      },
+      {
+        "id": "D",
+        "text": "RTO und RPO hängen zusammen — ein niedriger RTO erzwingt einen niedrigen RPO."
+      },
+      {
+        "id": "E",
+        "text": "Backup & Restore erreicht typischerweise einen RPO von wenigen Sekunden."
+      }
+    ],
+    "correct": [
+      "A",
+      "B"
+    ],
+    "explanation": "**(A)** RPO = *Recovery Point Objective*: Wie viel **Daten** darf ich verlieren? Es blickt **rückwärts** vom Ausfall — auf den letzten brauchbaren Wiederherstellungspunkt. **(B)** RTO = *Recovery Time Objective*: Wie lange darf der Dienst **weg** sein? Es blickt **vorwärts** vom Ausfall.\n\n**(C)** ist falsch: Stündliche Snapshots bedeuten einen RPO von **bis zu einer Stunde**. Ein RPO von null verlangt **synchrone Replikation**.\n\n**(D) ist der lehrreichste Distraktor** — die beiden Werte sind **unabhängig**. Man kann sehr wohl einen niedrigen RPO mit einem hohen RTO kombinieren: kontinuierliche Replikation (kaum Datenverlust), aber eine langsame, manuelle Wiederherstellung. Genau das ist Pilot Light.\n\n**(E)** ist falsch: Backup & Restore liegt beim RPO **in Stunden** (mit Point-in-Time Recovery lässt es sich auf etwa 5 Minuten drücken).",
+    "sourceRef": "https://aws.amazon.com/blogs/architecture/disaster-recovery-dr-architecture-on-aws-part-i-strategies-for-recovery-in-the-cloud/"
+  },
+  {
+    "seedKey": "saa-c03-q-087",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "RDS Hochverfügbarkeit",
+    "type": "single",
+    "prompt": "Eine RDS-Datenbank ist überlastet: Ein Reporting-Team fährt schwere Analyse-Queries, die das operative Geschäft ausbremsen. Die Datenbank ist bereits als **Multi-AZ DB Instance** konfiguriert.\n\nWas ist die richtige Maßnahme?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den Reporting-Traffic auf den Multi-AZ-Standby in der zweiten AZ umleiten."
+      },
+      {
+        "id": "B",
+        "text": "Eine Read Replica anlegen und den Reporting-Traffic dorthin umleiten."
+      },
+      {
+        "id": "C",
+        "text": "Auf eine größere Instanzklasse mit mehr CPU und Arbeitsspeicher skalieren."
+      },
+      {
+        "id": "D",
+        "text": "ElastiCache vor die Datenbank schalten und Query-Ergebnisse cachen."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Der Multi-AZ-Standby bedient keinerlei Traffic — auch keine Lesezugriffe.** AWS ist da unmissverständlich: *\"You do not interact directly with the standby (e.g. for read operations) at any point prior to promotion.\"* Er existiert ausschließlich für das **Failover**.\n\nDas ist **die häufigste Verwechslung der gesamten Prüfung**: **Multi-AZ = Hochverfügbarkeit** (synchron, kein Read-Offload). **Read Replica = Read-Skalierung** (asynchron, eigener Endpoint, bis zu 15 Stück, promotable).\n\n**Die beiden anderen Distraktoren funktionieren tatsächlich** — und werden in der Praxis auch eingesetzt: Eine **größere Instanz** schafft Luft, ist aber teurer und stößt irgendwann an eine Obergrenze (vertikal statt horizontal). **ElastiCache** hilft bei **wiederholten** Abfragen — Reporting-Queries sind aber typischerweise variabel und schlecht cachebar.",
+    "sourceRef": "https://aws.amazon.com/rds/features/multi-az/"
+  },
+  {
+    "seedKey": "saa-c03-q-088",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "RDS Hochverfügbarkeit",
+    "type": "single",
+    "prompt": "Eine RDS-PostgreSQL-Datenbank braucht zwei Dinge: ein **deutlich schnelleres Failover** als beim klassischen Multi-AZ-Deployment und **Standbys, die auch Lesezugriffe bedienen**. Der Verwaltungsaufwand soll minimal bleiben.\n\nWelche Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Multi-AZ DB Instance beibehalten und zwei Read Replicas ergänzen."
+      },
+      {
+        "id": "B",
+        "text": "Auf Aurora PostgreSQL migrieren und zwei Aurora Replicas anlegen."
+      },
+      {
+        "id": "C",
+        "text": "Auf ein Multi-AZ DB Cluster Deployment umstellen."
+      },
+      {
+        "id": "D",
+        "text": "Eine Single-AZ-Instanz mit zwei Cross-Region Read Replicas betreiben."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "Das **Multi-AZ DB Cluster** Deployment (seit 2022) liefert **beides nativ**: einen Writer und **zwei lesbare Standbys** über drei AZs, mit einem eingebauten Reader-Endpoint. AWS: *\"Failover times are typically under 35 seconds\"* — deutlich schneller als das klassische Multi-AZ-Deployment, weil kein Crash-Recovery-Schritt nötig ist.\n\n**Einschränkung: nur MySQL und PostgreSQL.** Hier passt es.\n\n**(A) funktioniert** und ist ein völlig übliches Setup — man bekommt HA **und** Lesekapazität. Aber: Das **Failover bleibt langsam** (klassisches Multi-AZ), und man verwaltet nun **drei separate Ressourcen** statt einer.\n\n**(B) funktioniert ebenfalls** und ist technisch sogar leistungsfähiger — aber es ist eine **Engine-Migration** mit Test- und Umstellungsaufwand. **(D)** opfert die Hochverfügbarkeit komplett: Single-AZ ist der Ausgangspunkt jedes Ausfalls.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts-failover.html"
+  },
+  {
+    "seedKey": "saa-c03-q-089",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Aurora",
+    "type": "single",
+    "prompt": "Ein Architekt evaluiert Aurora für eine kritische Workload und will verstehen, **wie Aurora einen kompletten AZ-Ausfall ohne Datenverlust übersteht**.\n\nWelche Aussage beschreibt das Aurora-Storage-Modell korrekt?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Aurora hält 3 Kopien über 3 AZs; ein Schreibvorgang muss von allen 3 bestätigt werden."
+      },
+      {
+        "id": "B",
+        "text": "Aurora hält 2 Kopien je AZ über 2 AZs; das Schreib-Quorum liegt bei 3 von 4."
+      },
+      {
+        "id": "C",
+        "text": "Aurora repliziert synchron auf einen Standby in einer zweiten AZ, wie RDS Multi-AZ."
+      },
+      {
+        "id": "D",
+        "text": "Aurora hält 6 Kopien über 3 AZs; ein Schreibvorgang braucht 4 von 6 Bestätigungen."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Aurora verteilt **6 Kopien über 3 Availability Zones** (2 pro AZ). Das **Write-Quorum liegt bei 4/6**, das **Read-Quorum bei 3/6**.\n\nDaraus folgt die Resilienz direkt: Beim Verlust einer **kompletten AZ** fallen 2 Kopien aus — 4 bleiben übrig, das Write-Quorum ist **weiterhin erfüllt**. Aurora schreibt ohne Unterbrechung weiter. Selbst **AZ + eine weitere Kopie** (3 Ausfälle) lässt Lesevorgänge noch zu.\n\n**(C) ist der lehrreichste Distraktor**: Er beschreibt **korrekt RDS Multi-AZ** — und genau deshalb ist er falsch. Aurora funktioniert **grundlegend anders**: Es gibt keine Instanz-zu-Instanz-Replikation, sondern einen **geteilten, verteilten Storage Layer**, auf den alle Instanzen zugreifen. Deshalb ist ein Aurora-Replica-Lag typischerweise im **Millisekunden**-Bereich, und ein Failover ist eine bloße **Promotion**, kein Datenabgleich.",
+    "sourceRef": "https://aws.amazon.com/blogs/database/amazon-aurora-under-the-hood-quorum-and-correlated-failure/"
+  },
+  {
+    "seedKey": "saa-c03-q-090",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Aurora",
+    "type": "single",
+    "prompt": "Eine globale Anwendung nutzt eine **relationale PostgreSQL-Datenbank**. Gefordert sind Cross-Region-DR mit **RPO unter einer Sekunde** und **RTO unter einer Minute**. Die Sekundärregion soll zusätzlich **lokale Lesezugriffe** mit niedriger Latenz bedienen.\n\nWelche Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Aurora Global Database mit einer Secondary Region."
+      },
+      {
+        "id": "B",
+        "text": "Aurora PostgreSQL mit einem Cross-Region Read Replica."
+      },
+      {
+        "id": "C",
+        "text": "RDS PostgreSQL Multi-AZ mit einem Cross-Region Read Replica."
+      },
+      {
+        "id": "D",
+        "text": "DynamoDB Global Tables mit Replikaten in beiden Regionen."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**Aurora Global Database** nutzt eine **dedizierte Replikations-Infrastruktur** auf Storage-Ebene — nicht die Datenbank-Engine. Die Cross-Region-Latenz liegt *\"typically under a second\"*, und AWS beziffert das Ergebnis mit *\"an effective RPO of typically less than 1 second and an RTO of less than 1 minute\"*. Bis zu **10 Secondary Regions**, die alle lokale Reads bedienen. Exakt die Anforderung.\n\n**Cross-Region Read Replicas (b, c) funktionieren als DR** — sie werden auch so eingesetzt. Aber sie replizieren über die **Engine** (Binlog/WAL), was höhere Latenz und einen schlechteren RPO bedeutet; die Promotion dauert länger als ein Global-Database-Failover.\n\n**(D) ist der Reflex-Distraktor**: Wer \"Multi-Region\" hört, denkt an Global Tables. Aber DynamoDB ist **NoSQL** — die Aufgabe verlangt explizit eine relationale Datenbank.",
+    "sourceRef": "https://aws.amazon.com/rds/aurora/global-database/"
+  },
+  {
+    "seedKey": "saa-c03-q-091",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Aurora",
+    "type": "single",
+    "prompt": "Für eine **geplante** Wartung soll eine Aurora Global Database von der Primärregion in die Sekundärregion umgeschaltet werden. Es darf dabei **kein einziger Datensatz** verloren gehen.\n\nWelches Verfahren?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein Unplanned Failover (Detach and Promote) auf die Secondary Region auslösen."
+      },
+      {
+        "id": "B",
+        "text": "Ein Switchover (managed planned failover) der Global Database durchführen."
+      },
+      {
+        "id": "C",
+        "text": "Die Secondary Region zu einem eigenständigen Cluster promoten und umstellen."
+      },
+      {
+        "id": "D",
+        "text": "Einen Snapshot der Primary anlegen und in der Secondary wiederherstellen."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Nur der Switchover garantiert RPO = 0.** Aurora synchronisiert dabei die Regionen **vorab vollständig**, bevor die Rollen getauscht werden — kein Datensatz geht verloren. Das ist das Verfahren für **geplante** Umschaltungen (Wartung, DR-Übungen, regulatorische Region-Rotation).\n\n**Das Unplanned Failover (Detach and Promote) ist der stärkste Distraktor** — es funktioniert und ist die richtige Wahl im **echten Notfall**, wenn die Primärregion nicht mehr erreichbar ist. Aber es hat einen **RPO ungleich null**: Alles, was noch nicht repliziert war (Replication Lag, typischerweise Sekunden), ist verloren. Bei einer **geplanten** Aktion ist dieser Datenverlust unnötig — und damit inakzeptabel.\n\n**(C)** ist im Kern dasselbe wie (A). **(D) funktioniert**, dauert aber deutlich länger und hat einen RPO in der Größenordnung der Snapshot-Erstellung.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-global-database-disaster-recovery.html"
+  },
+  {
+    "seedKey": "saa-c03-q-092",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Aurora",
+    "type": "single",
+    "prompt": "Eine Entwicklungs-Datenbank wird nur während der Arbeitszeit genutzt — nachts und am Wochenende gar nicht. Die **Compute-Kosten für ungenutzte Zeit sollen auf null sinken**, ohne dass jemand die Datenbank manuell stoppt.\n\nWelche Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die kleinste verfügbare Provisioned-Instanzklasse für den Cluster wählen."
+      },
+      {
+        "id": "B",
+        "text": "Aurora Serverless v1 mit aktiviertem Auto-Pause einsetzen."
+      },
+      {
+        "id": "C",
+        "text": "Aurora Serverless v2 mit einer Minimum-Kapazität von 0 ACUs konfigurieren."
+      },
+      {
+        "id": "D",
+        "text": "Eine EventBridge-Regel, die den Cluster abends stoppt und morgens startet."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**Aurora Serverless v2 unterstützt seit dem 20.11.2024 das Skalieren auf 0 ACUs.** Bei Inaktivität fallen dann **keine Compute-Kosten** mehr an (Storage wird weiter berechnet). Das Auto-Pause-Delay ist konfigurierbar, das Wiederanlaufen dauert typischerweise unter 15 Sekunden.\n\n**Ein wichtiger Fallstrick:** Ein **RDS Proxy** oder eine dauerhaft offene Verbindung **verhindert Scale-to-Zero** — die Verbindung hält den Cluster wach.\n\n**(B) war jahrelang die richtige Antwort — heute ist sie falsch: Aurora Serverless v1 ist seit dem 31.12.2024 EOL.** Genau solche veralteten Reflexe testet die Prüfung.\n\n**(A) funktioniert** — die kleinste Instanz kostet aber **rund um die Uhr**. **(D) funktioniert ebenfalls** und wird oft gebaut — es ist jedoch Eigenbau-Automatik mit Wartungsaufwand für etwas, das der Service inzwischen nativ kann.",
+    "sourceRef": "https://aws.amazon.com/about-aws/whats-new/2024/11/amazon-aurora-serverless-v2-scaling-zero-capacity/"
+  },
+  {
+    "seedKey": "saa-c03-q-093",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Aurora",
+    "type": "single",
+    "prompt": "Ein Entwickler hat versehentlich ein `DELETE` **ohne `WHERE`-Klausel** auf einer Aurora-**MySQL**-Datenbank ausgeführt. Der Zustand von vor 20 Minuten soll **so schnell wie möglich** wiederhergestellt werden. Backtrack war aktiviert.\n\nWas geht am schnellsten?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Point-in-Time Recovery aus dem Automated Backup auf einen Zeitpunkt davor."
+      },
+      {
+        "id": "B",
+        "text": "Den letzten manuellen Snapshot des Clusters wiederherstellen."
+      },
+      {
+        "id": "C",
+        "text": "Einen Aurora Clone aus dem letzten Snapshot erzeugen und umstellen."
+      },
+      {
+        "id": "D",
+        "text": "Den Cluster per Aurora Backtrack auf einen Zeitpunkt vor dem Fehler zurückspulen."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**Backtrack spult den Cluster \"in place\" zurück** — es entsteht **kein neuer Cluster**, kein Restore läuft, die Anwendung muss **nicht umgestellt** werden. Das ist der entscheidende Geschwindigkeitsvorteil.\n\nEinschränkungen: **nur Aurora MySQL**, Backtrack-Window maximal **72 Stunden**, und es muss **vorher aktiviert** worden sein (hier gegeben). AWS betont ausdrücklich, dass Backtrack **kein Ersatz für Backups** ist.\n\n**Point-in-Time Recovery ist der stärkste Distraktor** — es **funktioniert einwandfrei** und trifft den Zeitpunkt genauso präzise. Aber es erzeugt einen **neuen Cluster** mit neuem Endpoint: Restore abwarten, Anwendung umkonfigurieren, testen. Das dauert um Größenordnungen länger als ein Backtrack.\n\n**(B)** verliert alles seit dem Snapshot. **(C)** erzeugt eine Kopie und lässt den kaputten Cluster unberührt.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Backtrack.html"
+  },
+  {
+    "seedKey": "saa-c03-q-094",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "RDS Hochverfügbarkeit",
+    "type": "single",
+    "prompt": "Eine Lambda-Funktion öffnet bei jedem Aufruf eine neue Verbindung zu Aurora. Bei Lastspitzen erschöpft sie das Connection-Limit der Datenbank. Zusätzlich soll das **Failover schneller** ablaufen.\n\nWelche Lösung adressiert beides?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Einen RDS Proxy zwischen Lambda und Datenbank schalten."
+      },
+      {
+        "id": "B",
+        "text": "Die Lambda-Funktion mit Reserved Concurrency auf weniger Aufrufe begrenzen."
+      },
+      {
+        "id": "C",
+        "text": "Auf eine größere Instanzklasse mit höherem Connection-Limit skalieren."
+      },
+      {
+        "id": "D",
+        "text": "Connection Pooling innerhalb der Lambda-Funktion implementieren."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**RDS Proxy poolt und teilt Datenbankverbindungen** — er ist genau für das Lambda-Problem gebaut: Tausende kurzlebige Funktionsaufrufe teilen sich eine überschaubare Zahl echter DB-Verbindungen.\n\nDer zweite, oft übersehene Vorteil: **RDS Proxy reduziert die Failover-Zeit für Aurora um bis zu 66%**, weil er das DNS-Caching der Clients umgeht und selbst auf den neuen Writer umschwenkt.\n\n**(B) funktioniert** — löst das Problem aber durch **Drosselung**: Man begrenzt den Durchsatz der Anwendung, um die Datenbank zu schonen. **(C) funktioniert** ebenfalls, ist teurer, und das Problem kehrt bei der nächsten Lastverdopplung zurück.\n\n**(D) ist der lehrreichste Distraktor**: Ein Pool **innerhalb** einer Lambda-Funktion hilft kaum, weil **jede Concurrency-Instanz ihren eigenen Pool** hätte — bei 1.000 gleichzeitigen Aufrufen also 1.000 Pools. Das Pooling muss **außerhalb** liegen.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy.html"
+  },
+  {
+    "seedKey": "saa-c03-q-095",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "RDS Hochverfügbarkeit",
+    "type": "multiple",
+    "prompt": "Ein Team diskutiert die Eigenschaften von RDS Multi-AZ.\n\nWelche **ZWEI** Aussagen sind korrekt? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Beim klassischen Multi-AZ-Deployment bedient der Standby keinerlei Lesezugriffe."
+      },
+      {
+        "id": "B",
+        "text": "Nach einem Failover bleibt die Verbindungs-URL gleich; der DNS-Eintrag wird umgeschwenkt."
+      },
+      {
+        "id": "C",
+        "text": "Multi-AZ repliziert asynchron, um die Schreiblatenz nicht zu erhöhen."
+      },
+      {
+        "id": "D",
+        "text": "Das Multi-AZ DB Cluster Deployment steht für alle RDS-Engines zur Verfügung."
+      },
+      {
+        "id": "E",
+        "text": "Eine Read Replica kann nicht zu einer eigenständigen Datenbank promoted werden."
+      }
+    ],
+    "correct": [
+      "A",
+      "B"
+    ],
+    "explanation": "**(A)** Der Standby eines klassischen Multi-AZ-Deployments ist **unsichtbar** — kein Read, kein Write, bis zur Promotion. **(B)** Der Endpoint bleibt konstant; AWS schwenkt den **DNS-CNAME** auf die neue Instanz um. Genau deshalb ist eine **niedrige DNS-TTL beim Client** wichtig — ein aggressiv cachender Client verbindet sich sonst weiter zur toten Instanz.\n\n**(C)** ist falsch und dreht das Kernmerkmal um: Multi-AZ repliziert **synchron**. Das ist der Preis für einen RPO von null — und der Grund, warum die Schreiblatenz **steigt**. **Asynchron** sind die Read Replicas.\n\n**(D)** ist falsch: Das Multi-AZ **DB Cluster** Deployment gibt es nur für **MySQL und PostgreSQL**.\n\n**(E)** ist falsch: Read Replicas **können** promoted werden — das ist ein etabliertes DR- und Migrationsmuster.",
+    "sourceRef": "https://aws.amazon.com/rds/features/multi-az/"
+  },
+  {
+    "seedKey": "saa-c03-q-096",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DynamoDB",
+    "type": "single",
+    "prompt": "Eine NoSQL-Anwendung läuft in Europa und Nordamerika. Nutzer **beider** Regionen müssen **lokal lesen UND schreiben** — mit niedriger Latenz.\n\nWelche Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "DynamoDB in einer Region, repliziert per DynamoDB Streams und Lambda in die zweite."
+      },
+      {
+        "id": "B",
+        "text": "DynamoDB Global Tables mit einem Replikat in jeder Region."
+      },
+      {
+        "id": "C",
+        "text": "DynamoDB mit einem DAX-Cluster in jeder der beiden Regionen."
+      },
+      {
+        "id": "D",
+        "text": "Aurora Global Database mit einer Secondary Region in Nordamerika."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Global Tables sind multi-active**: **Jede** Region ist ein vollwertiger Writer. Ein Nutzer in Frankfurt schreibt lokal, ein Nutzer in Virginia schreibt lokal — AWS repliziert *\"typically within a second or less\"* und löst Konflikte per **Last Writer Wins**. SLA: 99,999%.\n\n**(A) ist der stärkste Distraktor** — es ist die **manuelle Nachbildung** von Global Tables. Es funktioniert sogar. Aber man baut Konfliktauflösung, Retry-Logik, Fehlerbehandlung und Monitoring selbst. Und Streams haben nur **24 Stunden Lifetime** — ein längerer Ausfall der Lambda bedeutet Datenverlust.\n\n**(C)** verwechselt Cache mit Replikation: **DAX ist ein Cache**, die **Writes gehen weiterhin in die eine Region**. Die Schreiblatenz für die entfernte Region bleibt.\n\n**(D) hat nur einen einzigen Writer** — lokale Writes in beiden Regionen sind damit strukturell unmöglich. (Und es ist relational, nicht NoSQL.)",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/V2globaltables_HowItWorks.html"
+  },
+  {
+    "seedKey": "saa-c03-q-097",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Storage-Resilienz",
+    "type": "single",
+    "prompt": "EC2-Instanzen in **drei Availability Zones** müssen auf **dieselben Dateien** lesend und schreibend zugreifen (POSIX-Semantik). Der Ausfall einer AZ darf den Zugriff nicht unterbrechen.\n\nWelche Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein io2-Volume mit EBS Multi-Attach an alle Instanzen anhängen."
+      },
+      {
+        "id": "B",
+        "text": "Amazon EFS in der One-Zone-Storage-Klasse als günstigste Variante."
+      },
+      {
+        "id": "C",
+        "text": "Amazon EFS im Regional-Modus über alle drei Availability Zones mounten."
+      },
+      {
+        "id": "D",
+        "text": "Einen S3-Bucket als gemeinsamen Speicher über Mountpoint for S3 einbinden."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**EFS Regional** repliziert über mehrere AZs und ist aus **allen** AZs mountbar — das einzige native **Multi-AZ-Shared-POSIX-Dateisystem** in AWS.\n\n**(A) ist die klassische Falle: EBS Multi-Attach ist AZ-gebunden.** Ein Volume existiert immer nur in **einer** AZ — Instanzen aus anderen AZs können es gar nicht anhängen. Es löst \"mehrere Instanzen, ein Volume\", aber niemals \"mehrere AZs\".\n\n**(B) ist der Kostenfalle-Distraktor**: EFS One Zone ist tatsächlich günstiger — es lebt aber in **einer einzigen AZ**. AWS: Daten *\"may be lost during a disaster or other fault within the AZ\"*. Es trifft also exakt das Szenario, das die Aufgabe ausschließt.\n\n**(D)** ist Objektspeicher: Mountpoint for S3 existiert, bietet aber **keine POSIX-Semantik** — kein File-Locking, keine Random-Writes. Für gemeinsame Schreibzugriffe ungeeignet.",
+    "sourceRef": "https://aws.amazon.com/efs/storage-classes/"
+  },
+  {
+    "seedKey": "saa-c03-q-098",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Storage-Resilienz",
+    "type": "single",
+    "prompt": "Eine Datenverarbeitungs-Pipeline legt Zwischenergebnisse in S3 ab. Sie werden im Verlauf des Jobs **mehrfach gelesen** und ließen sich bei Verlust in wenigen Stunden **neu erzeugen**. Die Kosten sollen minimal sein.\n\nWelche Storage Class?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "S3 Standard für maximale Verfügbarkeit während der Verarbeitung."
+      },
+      {
+        "id": "B",
+        "text": "S3 Standard-Infrequent Access mit Replikation über mindestens drei AZs."
+      },
+      {
+        "id": "C",
+        "text": "S3 Glacier Instant Retrieval für die günstigsten Speicherkosten."
+      },
+      {
+        "id": "D",
+        "text": "S3 One Zone-Infrequent Access, gespeichert in einer einzigen AZ."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**One Zone-IA speichert in genau einer AZ** und ist dafür **20% günstiger als Standard-IA**. Der Preis: Zerstört ein Ereignis diese AZ, sind die Daten **weg**.\n\nGenau deshalb ist es hier **richtig**. Der entscheidende Satz der Aufgabe lautet: *\"ließen sich bei Verlust neu erzeugen\"*. Für **reproduzierbare** Daten ist die Multi-AZ-Redundanz eine Versicherung, die man nicht braucht — und nicht bezahlen muss. Ohne diesen Satz wäre One Zone-IA die falsche Antwort.\n\n**(B) funktioniert und ist sicherer** (≥3 AZs) — aber man zahlt für eine Absicherung ohne Gegenwert. **(A)** ist für selten abgerufene Daten schlicht zu teuer.\n\n**(C) ist der Kostenfallen-Distraktor**: Der reine **Speicherpreis** von Glacier IR ist niedriger — aber es fallen **Abrufgebühren** an und es gilt eine **Mindestspeicherdauer von 90 Tagen**. Bei mehrfach gelesenen, kurzlebigen Zwischenergebnissen wird es teurer, nicht günstiger.",
+    "sourceRef": "https://aws.amazon.com/s3/storage-classes/"
+  },
+  {
+    "seedKey": "saa-c03-q-099",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Caching-Resilienz",
+    "type": "single",
+    "prompt": "Ein ElastiCache-for-Redis-Cluster hält Session-Daten. Fällt er aus, werden **alle Nutzer ausgeloggt**. Der Cache soll den Ausfall einer AZ **automatisch** überstehen, ohne Änderung am Anwendungscode.\n\nWelche Maßnahme?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Multi-AZ mit Automatic Failover und einer Replica in einer zweiten AZ aktivieren."
+      },
+      {
+        "id": "B",
+        "text": "Einen zweiten Cluster in einer anderen AZ betreiben und im Code umschalten."
+      },
+      {
+        "id": "C",
+        "text": "Die Session-Daten zusätzlich nach DynamoDB spiegeln und dort nachschlagen."
+      },
+      {
+        "id": "D",
+        "text": "Cluster Mode aktivieren und die Daten über mehrere Shards verteilen."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**Multi-AZ mit Automatic Failover** promotet bei einem AZ-Ausfall automatisch eine Replica in einer anderen AZ zum Primary. Der **Endpoint bleibt gleich** — die Anwendung merkt nichts, es ist keine Codeänderung nötig. Ohne Replica gibt es nichts zu promoten.\n\n**(D) ist der raffinierteste Distraktor**: \"Cluster Mode\" **klingt** nach Hochverfügbarkeit — es ist aber **Sharding**, also **Skalierung**. Es verteilt die Daten auf mehrere Shards, um mehr Speicher und Durchsatz zu erreichen. Fällt eine AZ aus und hat ein Shard dort **keine Replica**, ist dieser Shard **komplett weg**. Sharding und HA sind orthogonal.\n\n**(B) funktioniert** — baut aber im Anwendungscode nach, was der Service nativ kann, und verletzt die Vorgabe \"ohne Codeänderung\". **(C) funktioniert** als Fallback, verdoppelt aber Schreibpfade und Komplexität.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/AutoFailover.html"
+  },
+  {
+    "seedKey": "saa-c03-q-100",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Storage-Resilienz",
+    "type": "single",
+    "prompt": "Eine Compliance-Vorgabe verlangt, dass Objekte eines S3-Buckets **innerhalb von 15 Minuten** in eine zweite Region repliziert sind — **mit einem vertraglich zugesicherten SLA**.\n\nWelche Lösung erfüllt das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "S3 Cross-Region Replication in der Standardkonfiguration einrichten."
+      },
+      {
+        "id": "B",
+        "text": "S3 Cross-Region Replication mit aktiviertem Replication Time Control (RTC)."
+      },
+      {
+        "id": "C",
+        "text": "S3 Same-Region Replication in einen zweiten Bucket der Zielregion."
+      },
+      {
+        "id": "D",
+        "text": "Eine EventBridge-Regel, die bei jedem PUT eine kopierende Lambda auslöst."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Replication Time Control (RTC)** ist die **einzige** Option mit einem echten **SLA**: AWS sichert vertraglich zu, dass **99,9% der Objekte innerhalb von 15 Minuten** repliziert werden (Design-Ziel: 99,99%). Dazu kommen Replikations-Metriken und Benachrichtigungen bei Überschreitung.\n\n**(A) ist der entscheidende Distraktor**: Standard-CRR repliziert **zuverlässig — aber \"best effort\", ohne jede Zeitgarantie**. Meist sind Objekte in Sekunden drüben, bei großen Dateien oder Lastspitzen aber auch deutlich später. Für eine Compliance-Vorgabe **mit Frist** reicht das nicht: Man kann die Einhaltung weder zusichern noch nachweisen.\n\n**(C)** bleibt in derselben Region — gefordert war Cross-Region. **(D) funktioniert**, ist aber Eigenbau **ohne SLA**, mit selbstgebauter Fehlerbehandlung, Retry-Logik und Monitoring.\n\n*(Beide Replikationsarten erfassen nur neue Objekte — für den Bestand: S3 Batch Replication.)*",
+    "sourceRef": "https://aws.amazon.com/s3/features/replication/"
+  },
+  {
+    "seedKey": "saa-c03-q-101",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Ein fehlerhafter Batch-Job hat vor **drei Stunden** tausende Items einer DynamoDB-Tabelle überschrieben. Die Tabelle nutzt Global Tables und hat Point-in-Time Recovery aktiviert.\n\nWie stellst du den Zustand kurz vor dem Job wieder her?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "DynamoDB Streams auswerten und die alten Werte per Lambda zurückschreiben."
+      },
+      {
+        "id": "B",
+        "text": "Das letzte On-Demand-Backup der Tabelle wiederherstellen."
+      },
+      {
+        "id": "C",
+        "text": "Point-in-Time Recovery auf einen Zeitpunkt unmittelbar vor dem Batch-Job."
+      },
+      {
+        "id": "D",
+        "text": "Das Global-Tables-Replikat aus der zweiten Region zurückspielen."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**DynamoDB PITR** erlaubt die Wiederherstellung mit **Sekunden-Granularität** bis zu **35 Tage** zurück (frühestens 5 Minuten vor jetzt). Es ist hier aktiviert — der Zeitpunkt lässt sich exakt treffen.\n\n**Wichtig: Der Restore erzeugt immer eine NEUE Tabelle.** Die beschädigte wird nicht überschrieben. Die Anwendung muss also umgestellt oder die Tabelle umbenannt werden.\n\n**(D) ist der wichtigste Distraktor der Frage: Global Tables sind KEIN Backup.** Sie replizieren **jede** Änderung — auch die fehlerhafte. Das Replikat in der zweiten Region ist **genauso kaputt** wie das Original, und zwar innerhalb einer Sekunde. Replikation schützt gegen **Infrastrukturausfall**, niemals gegen **logische Fehler**.\n\n**(A)** scheitert praktisch an der **24-Stunden-Lifetime** der Streams und an selbstgebauter Rückschreibe-Logik. **(B)** verliert alles seit dem Backup.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html"
+  },
+  {
+    "seedKey": "saa-c03-q-102",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Backup & Recovery",
+    "type": "single",
+    "prompt": "Ein Unternehmen mit **30 AWS-Accounts** will Backups für EC2, RDS, EFS und DynamoDB **zentral** verwalten — mit einheitlichen Aufbewahrungsfristen und Cross-Region-Kopien.\n\nWelche Lösung hat den geringsten Betriebsaufwand?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "In jedem Account einen Data Lifecycle Manager für automatische Snapshots einrichten."
+      },
+      {
+        "id": "B",
+        "text": "Ein CloudFormation StackSet, das Backup-Lambdas in alle Accounts ausrollt."
+      },
+      {
+        "id": "C",
+        "text": "RDS Automated Backups und eigene Snapshot-Skripte je Account betreiben."
+      },
+      {
+        "id": "D",
+        "text": "AWS Backup mit organisationsweiten Backup Policies über AWS Organizations."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**AWS Backup** ist der zentrale Dienst genau dafür: **Backup Plans** (Zeitpläne, Aufbewahrung, Lifecycle), **Backup Vaults**, **Cross-Region- und Cross-Account-Kopien** — und über AWS Organizations **organisationsweite Backup Policies**, die automatisch in allen Accounts greifen, auch in neu hinzugefügten. Unterstützt EC2/EBS, RDS, Aurora, DynamoDB, EFS, FSx, Storage Gateway und weitere.\n\n**(A) ist der beste falsche Kandidat**: Der Data Lifecycle Manager automatisiert Snapshots zuverlässig — aber **nur für EBS** (und AMIs). RDS, EFS und DynamoDB bleiben ungedeckt, man bräuchte drei weitere Mechanismen.\n\n**(B) und (C) funktionieren** — beides sind reale, in freier Wildbahn anzutreffende Lösungen. Über **30 Accounts** und vier Dienste hinweg bedeuten sie aber erheblichen Eigenbau: Fehlerbehandlung, Retry, Monitoring, Aufbewahrungslogik — alles selbst gepflegt.",
+    "sourceRef": "https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html"
+  },
+  {
+    "seedKey": "saa-c03-q-103",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Stateless Design",
+    "type": "single",
+    "prompt": "Eine Web-App hinter einem ALB nutzt **Sticky Sessions**. Bei jedem Scale-In verlieren die Nutzer, deren Session auf der terminierten Instanz lag, ihre Anmeldung und ihren Warenkorb.\n\nWas ist die architektonisch richtige Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den Session-State nach ElastiCache oder DynamoDB auslagern."
+      },
+      {
+        "id": "B",
+        "text": "Den Deregistration Delay der Target Group auf den Maximalwert setzen."
+      },
+      {
+        "id": "C",
+        "text": "Scale-In über die Scaling Policy unterbinden und nur hochskalieren."
+      },
+      {
+        "id": "D",
+        "text": "Die Sticky Sessions durch Source-IP-Affinität an einem NLB ersetzen."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**Sticky Sessions sind ein Anti-Pattern in elastischen Architekturen.** Sie binden einen Nutzer an eine **konkrete Instanz** — und Instanzen sind in einer ASG per Definition **flüchtig**. Das Problem ist nicht das Scale-In, sondern der **State auf der Instanz**.\n\nDie Lösung heißt **Statelessness**: Session-Daten in einen externen Store auslagern. AWS Well-Architected (Reliability Pillar) empfiehlt genau das: *\"Amazon ElastiCache or Amazon DynamoDB are good destinations for offloaded state.\"* Danach ist **jede** Instanz austauschbar — und Auto Scaling funktioniert, wie es soll.\n\n**(B) mildert nur den Übergang**: Der Deregistration Delay lässt **laufende Requests** auslaufen — die Session ist danach trotzdem weg. **(C) opfert Elastizität**, um ein Designproblem zu umgehen: Man zahlt dauerhaft für nie schrumpfende Kapazität. **(D) tauscht nur die Affinitäts-Mechanik aus** — der State liegt weiterhin auf der Instanz.",
+    "sourceRef": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_fault_isolation_use_bulkhead.html"
+  },
+  {
+    "seedKey": "saa-c03-q-104",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Route 53",
+    "type": "single",
+    "prompt": "Eine Anwendung läuft primär in `eu-central-1` und hat eine **passive** DR-Umgebung in `eu-west-1`. Fällt die Primärregion aus, soll der Traffic **automatisch** auf die DR-Region wechseln.\n\nWelche Route-53-Konfiguration?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Weighted Routing mit 100% Gewicht auf der Primär- und 0% auf der DR-Region."
+      },
+      {
+        "id": "B",
+        "text": "Failover Routing (Active/Passive) mit einem Health Check auf die Primärregion."
+      },
+      {
+        "id": "C",
+        "text": "Latency-based Routing zwischen den Endpunkten beider Regionen."
+      },
+      {
+        "id": "D",
+        "text": "Multivalue Answer Routing mit den Endpunkten beider Regionen."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Failover Routing (Active/Passive) plus Health Check** ist genau dieses Muster: Route 53 liefert den Primary-Record aus, solange der Health Check grün ist — schlägt er fehl, antwortet Route 53 mit dem Secondary.\n\n**Der Health Check ist dabei nicht optional, sondern der eigentliche Motor.** Ohne ihn weiß Route 53 nicht, dass die Region tot ist, und liefert weiter den Primary aus. Bei einem ELB-Alias empfiehlt AWS stattdessen **Evaluate Target Health = Yes**.\n\n**(A) ist der stärkste Distraktor** — es sieht aus wie Active/Passive und ist es nicht: Weighted Routing kennt **kein Failover-Konzept**. Bei 0% Gewicht bekäme die DR-Region auch im Ernstfall keinen Traffic; man müsste die Gewichte **manuell** ändern.\n\n**(C)** schickt Traffic in die **schnellste**, nicht in die **gesunde** Region. **(D)** verteilt auf bis zu 8 gesunde Records — DNS-Streuung, kein Active/Passive.\n\n**Praxis:** Die **TTL** bestimmt, wie schnell das Failover greift.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-failover.html"
+  },
+  {
+    "seedKey": "saa-c03-q-105",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Route 53",
+    "type": "single",
+    "prompt": "Die Domain `example.com` — **ohne** Subdomain, also am Zone Apex — soll auf einen Application Load Balancer zeigen.\n\nWelcher DNS-Eintrag?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein CNAME-Record für `example.com`, der auf den DNS-Namen des ALB zeigt."
+      },
+      {
+        "id": "B",
+        "text": "Ein A-Record für `example.com` mit der aktuellen IP-Adresse des ALB."
+      },
+      {
+        "id": "C",
+        "text": "Ein Route 53 Alias-Record für `example.com`, der auf den ALB verweist."
+      },
+      {
+        "id": "D",
+        "text": "Ein Redirect-Server, der `example.com` auf `www.example.com` weiterleitet."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**Ein CNAME am Zone Apex ist durch die DNS-Spezifikation verboten** — das ist keine AWS-Einschränkung, sondern eine Eigenschaft von DNS selbst (der Apex trägt bereits SOA- und NS-Records, und ein CNAME duldet keine Geschwister).\n\nRoute 53 löst das mit dem **Alias-Record**: Er verhält sich nach außen wie ein A-Record, zeigt intern aber auf eine AWS-Ressource (ALB, CloudFront, S3-Website, API Gateway). Alias-Queries auf AWS-Ziele sind **kostenlos**, und der Record passt sich automatisch an, wenn AWS die Adressen der Ressource ändert.\n\n**(B) ist die gefährlichste Antwort**: Ein **ALB hat keine feste IP** — die Adressen wechseln mit Skalierung und Wartung. Der Eintrag funktioniert heute und bricht irgendwann still. (Ein **NLB** hätte statische IPs — ein ALB nicht.)\n\n**(D) funktioniert**, fügt aber eine Komponente mit Betriebsaufwand hinzu für etwas, das Route 53 nativ kann.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html"
+  }
+]

@@ -1,0 +1,470 @@
+[
+  {
+    "seedKey": "saa-c03-card-061",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Drei unabhängige Systeme (Rechnung, Versand, Analytics) müssen **jede** Bestellung erhalten. Warum reicht eine SQS-Queue mit drei Consumern nicht?",
+    "back": "Weil eine Queue jede Nachricht an **genau einen** Consumer liefert — die drei würden sich die Bestellungen aufteilen, nicht jeder alle bekommen. Lösung: **SNS-Topic → je eine SQS-Queue pro System** (Fan-out). Jedes System hat dann seinen eigenen Puffer und Retry.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-062",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "SQS: maximale Nachrichtengröße — und was tust du bei größeren Payloads?",
+    "back": "**Seit August 2025: 1 MiB** (Standard + FIFO). Der alte — und in vielen Prüfungsfragen noch erwartete — Wert war **256 KB**. Für größere Payloads: **SQS Extended Client Library** — das Payload landet in **S3**, in die Queue geht nur ein Pointer (bis **2 GB**). „Payload aufteilen\" ist in Prüfungsfragen fast immer die schlechtere Antwort. Merke: Das **Konzept** (Extended Client für Übergrößen) bleibt identisch, nur die Grenze ist gewandert.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html"
+  },
+  {
+    "seedKey": "saa-c03-card-063",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Ein Consumer braucht 5 Minuten pro Nachricht. Nachrichten werden doppelt verarbeitet. Warum?",
+    "back": "Der **Visibility Timeout** (Default **30 Sekunden**, max **12 Stunden**) ist abgelaufen, bevor der Consumer fertig war → die Nachricht wurde wieder sichtbar und ein zweiter Consumer hat sie gezogen. Fix: Timeout hochsetzen **oder** per `ChangeMessageVisibility` verlängern (Heartbeat).",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html"
+  },
+  {
+    "seedKey": "saa-c03-card-064",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Wie lange bleibt eine unverarbeitete SQS-Nachricht in der Queue?",
+    "back": "**Default 4 Tage**, konfigurierbar von **60 Sekunden bis 14 Tage**. Danach wird sie gelöscht. Relevant, wenn ein Szenario sagt: „Der Consumer war 10 Tage offline\" — bei Default-Retention sind die Daten weg.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-065",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "SQS Standard vs. FIFO — was gewinnst du, was zahlst du?",
+    "back": "**Standard**: nahezu unbegrenzter Durchsatz, **at-least-once**, nur Best-Effort-Reihenfolge. **FIFO**: strikte Reihenfolge + **exactly-once processing**, aber gedeckelt auf **300 msg/s** (ohne Batching), **3.000 msg/s** (mit Batching) bzw. bis **70.000 msg/s** im **High-Throughput-Mode**. Ordnung kostet Durchsatz.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html"
+  },
+  {
+    "seedKey": "saa-c03-card-066",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Eine fehlerhafte Nachricht („Poison Pill\") wird endlos neu zugestellt und blockiert die Verarbeitung. Was baust du ein?",
+    "back": "Eine **Dead-Letter Queue (DLQ)** mit `maxReceiveCount`: Nach n gescheiterten Zustellversuchen wandert die Nachricht in die DLQ und die Queue läuft weiter. Detail: Die **DLQ einer FIFO-Queue muss selbst FIFO** sein.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+  },
+  {
+    "seedKey": "saa-c03-card-067",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Die SQS-Rechnung ist hoch, obwohl kaum Nachrichten fließen. Woran liegt es?",
+    "back": "**Short Polling** (Default): Jeder `ReceiveMessage`-Call kostet, auch wenn er leer zurückkommt — bei einer leeren Queue pollt der Consumer permanent ins Nichts. Fix: **Long Polling** über `ReceiveMessageWaitTimeSeconds` (bis **20 Sekunden**) → drastisch weniger leere API-Calls.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-068",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Die Consumer-Flotte soll mit der Länge der Queue mitwachsen. Auf welche Metrik skalierst du?",
+    "back": "`ApproximateNumberOfMessagesVisible` — besser noch als **Backlog pro Instance** (Queue-Tiefe ÷ laufende Instances) als Custom Metric mit **Target Tracking**. CPU-basiertes Scaling ist hier die falsche Antwort: Ein wartender Consumer hat kaum CPU-Last, obwohl die Queue explodiert.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-069",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Delay Queue vs. Visibility Timeout — beide „verstecken\" Nachrichten. Was ist der Unterschied?",
+    "back": "**Delay Queue**: verzögert die **erste** Sichtbarkeit einer **neuen** Nachricht (max **15 Minuten**). **Visibility Timeout**: versteckt eine bereits **abgerufene** Nachricht, während der Consumer sie verarbeitet. Ersteres wirkt beim Einliefern, Letzteres beim Abholen.",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-070",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Beim Fan-out: Warum SNS → **SQS** → Lambda, und nicht SNS → Lambda direkt?",
+    "back": "Weil die Queue **puffert und wiederholt**. Fällt ein Consumer aus oder wird gedrosselt, liegen die Nachrichten sicher in seiner Queue (mit DLQ). Bei SNS→Lambda direkt gibt es nur begrenzte Retries — danach ist die Nachricht weg. **Der Puffer ist der Punkt der Entkopplung.**",
+    "sourceRef": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-071",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Von 5 Subscribern soll jeder nur *seinen* Nachrichtentyp bekommen. Musst du 5 Topics bauen?",
+    "back": "Nein — **SNS Message Filtering**: Jede Subscription bekommt eine **Filter Policy** auf die Message Attributes. Ein Topic, gefilterte Zustellung. Die Alternativen („5 Topics\" oder „Filterlogik im Consumer\") sind in Prüfungsfragen die Ablenker.",
+    "sourceRef": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html"
+  },
+  {
+    "seedKey": "saa-c03-card-072",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "SNS vs. EventBridge — woran erkennst du in der Frage, welches gemeint ist?",
+    "back": "**SNS**: simples, hochdurchsatziges **Fan-out** an bekannte Subscriber (Pub/Sub). **EventBridge**: **content-based Routing** per Rules, 200+ **AWS-Service-Events** und SaaS-Partner als Quelle, Schema Registry, **Archive & Replay**. Signalwörter für EventBridge: „auf AWS-Events reagieren\", „Events archivieren/wiederholen\", „nach Inhalt routen\".",
+    "sourceRef": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+  },
+  {
+    "seedKey": "saa-c03-card-073",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "EventBridge vs. Kinesis Data Streams — wann welches?",
+    "back": "**EventBridge**: diskrete Events an Ziele **routen** (kein Ordering-/Shard-Modell). **Kinesis**: **geordneter, replaybarer Stream** mit Retention (**24 h Default, bis 365 Tage**), aus dem **mehrere Consumer unabhängig** dieselben Daten lesen. Signalwort für Kinesis: „Reihenfolge\", „erneut abspielen\", „hoher, kontinuierlicher Durchsatz\".",
+    "sourceRef": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html"
+  },
+  {
+    "seedKey": "saa-c03-card-074",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Step Functions **Standard** vs. **Express** — die vier harten Unterschiede?",
+    "back": "**Standard**: bis **1 Jahr** Laufzeit · **exactly-once** · volle Execution History (90 Tage) · unterstützt `.waitForTaskToken` und `.sync`. **Express**: bis **5 Minuten** · **at-least-once** (async) · nur CloudWatch Logs · **unterstützt `.waitForTaskToken`/`.sync` NICHT**, dafür massiv günstiger bei hohem Volumen.",
+    "sourceRef": "https://docs.aws.amazon.com/step-functions/latest/dg/concepts-standard-vs-express.html"
+  },
+  {
+    "seedKey": "saa-c03-card-075",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Entkopplung & Messaging",
+    "front": "Wann ist Amazon MQ die richtige Antwort statt SQS/SNS?",
+    "back": "**Nur bei Migration.** MQ ist managed ActiveMQ/RabbitMQ und spricht **Standard-Protokolle** (JMS, AMQP, MQTT, STOMP, OpenWire). Signalwort: „bestehende On-Prem-Anwendung nutzt JMS/AMQP und soll **ohne Code-Umbau** in die Cloud\". Für alles Neue: **SQS/SNS** — skaliert besser, serverless, günstiger.",
+    "sourceRef": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-076",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "RDS Multi-AZ vs. Read Replica — der Unterschied in drei Dimensionen?",
+    "back": "**Replikation**: Multi-AZ **synchron**, Read Replica **asynchron**. **Lesbarkeit**: Multi-AZ-Standby ist **nicht lesbar**, Read Replica schon. **Failover**: Multi-AZ **automatisch**, Read Replica **manuell** (Promotion). Kernaussage: **Multi-AZ ist HA — kein Read-Scaling.**",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html"
+  },
+  {
+    "seedKey": "saa-c03-card-077",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Beim RDS-Multi-AZ-Failover: Muss die Anwendung den Connection-String ändern?",
+    "back": "**Nein.** RDS schwenkt den **DNS-CNAME des Endpoints** auf die Standby-Instance in der anderen AZ — der Endpoint-Name bleibt identisch. Die App muss lediglich **reconnecten** (und ihren DNS-Cache respektieren). Typische Failover-Dauer: rund **60–120 Sekunden**.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html"
+  },
+  {
+    "seedKey": "saa-c03-card-078",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Es gibt eine dritte RDS-Option neben „Single-AZ\" und „Multi-AZ Instance\": Welche, und was ist ihr Vorteil?",
+    "back": "**Multi-AZ DB Cluster**: 1 Writer + **2 lesbare Standbys** in **3 AZs**. Vorteile gegenüber der klassischen Multi-AZ-Instance: die Standbys sind **lesbar** (Read-Kapazität!) und der **Failover ist deutlich schneller** (typisch unter ~35 s statt 60–120 s).",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts.html"
+  },
+  {
+    "seedKey": "saa-c03-card-079",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Warum ist eine Aurora-Instanz auch **ohne** Replica bereits AZ-übergreifend haltbar?",
+    "back": "Weil der **Storage** entkoppelt ist: Aurora hält **6 Kopien über 3 AZs**. Ein Write braucht ein **4/6-Quorum**, ein Read **3/6** — der Storage ist selbstheilend. Die Compute-Instanz ist ersetzbar, die Daten überleben den Verlust einer kompletten AZ.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.StorageReliability.html"
+  },
+  {
+    "seedKey": "saa-c03-card-080",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Aurora Replicas vs. RDS Read Replicas — warum ist Aurora hier fundamental besser?",
+    "back": "Aurora Replicas (**bis 15**) lesen vom **gemeinsamen Storage-Layer** — es werden keine Daten kopiert. Ergebnis: Replikations-Lag typisch im **Millisekunden**-Bereich, und jede Replica kann per **Failover-Priority (Tier)** automatisch zum Writer werden. RDS Read Replicas replizieren physisch → größerer Lag, manuelle Promotion.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html"
+  },
+  {
+    "seedKey": "saa-c03-card-081",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Aurora Global Database: Welche RPO/RTO-Werte nennt AWS?",
+    "back": "**RPO ~1 Sekunde, RTO unter 1 Minute**, typische Cross-Region-Replikationslatenz **unter 1 Sekunde**, bis zu **10 Secondary Regions**. Bei geplantem **Switchover** (statt Failover) ist der **RPO 0** — es gehen keine Daten verloren.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-global-database.html"
+  },
+  {
+    "seedKey": "saa-c03-card-082",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Die App soll in **mehreren Regionen gleichzeitig schreiben**. Aurora Global Database oder DynamoDB Global Tables?",
+    "back": "**DynamoDB Global Tables** — sie sind **multi-writer / active-active** (Konfliktauflösung: last-writer-wins). **Aurora Global Database** hat **genau eine Writer-Region**; die Secondaries sind read-only, bis eine promoted wird. Signalwort „gleichzeitig in mehreren Regionen schreiben\" → Global Tables.",
+    "sourceRef": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html"
+  },
+  {
+    "seedKey": "saa-c03-card-083",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Eine Lambda-Funktion mit hoher Concurrency bringt die RDS-Datenbank durch zu viele Verbindungen an die Grenze. Fix?",
+    "back": "**RDS Proxy** davorschalten: **Connection Pooling** (viele Lambda-Instanzen teilen sich wenige DB-Verbindungen), **kürzerer Failover** (der Proxy hält die Client-Verbindung und schwenkt intern um) sowie **IAM-Auth + Secrets-Manager-Integration**. „Größere DB-Instanz\" ist hier der teure Ablenker.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html"
+  },
+  {
+    "seedKey": "saa-c03-card-084",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Eine ASG läuft mit `min=2` über 2 AZs. Eine AZ fällt aus. Warum ist das trotzdem ein Ausfall?",
+    "back": "Weil nach dem AZ-Verlust nur **eine** Instance übrig ist — die halbe Kapazität. HA heißt **den AZ-Ausfall überleben, ohne unter den Bedarf zu fallen**. Faustregel: bei **2 AZs** je AZ die volle Bedarfskapazität (2×), bei **3 AZs** je AZ die Hälfte (1,5×). Das ist der Preis echter Fault Tolerance.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html"
+  },
+  {
+    "seedKey": "saa-c03-card-085",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "HA & Fault Tolerance",
+    "front": "Auto Scaling greift, die Instanzen sind gesund — trotzdem bricht die App bei der Lastspitze ein. Wonach suchst du?",
+    "back": "Nach einem erreichten **Service Quota** (Limit) — sie gelten **pro Account und Region** und sind oft **soft** (erhöhbar). Klassiker: Lambda-Concurrency, EC2-vCPU-Limit, API-Throttling, Elastic-IP-Limit. **Mehr Compute hilft nicht, wenn die Wand ein Quota ist.**",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html"
+  },
+  {
+    "seedKey": "saa-c03-card-086",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "RPO vs. RTO — welches ist welches?",
+    "back": "**RPO = Recovery Point Objective = DATEN**: Wie viel Datenverlust ist tolerierbar (Zeitfenster *rückwärts* vom Vorfall)? **RTO = Recovery Time Objective = ZEIT**: Wie lange darf die Wiederherstellung dauern (*vorwärts*)? Merksatz: **RP**O = **P**unkt in den Daten, **RT**O = **T**ime bis zurück.",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+  },
+  {
+    "seedKey": "saa-c03-card-087",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "Die vier DR-Strategien von AWS — in aufsteigender Reihenfolge von Kosten und Bereitschaft?",
+    "back": "**1. Backup & Restore** → **2. Pilot Light** → **3. Warm Standby** → **4. Multi-Site Active/Active.** Von links nach rechts: RPO und RTO sinken, Kosten und Komplexität steigen. Jede Prüfungsfrage zu DR fragt im Kern: *Wo auf dieser Achse liegt das Szenario?*",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+  },
+  {
+    "seedKey": "saa-c03-card-088",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "Backup & Restore: Welche RPO/RTO-Größenordnung, und was läuft in der DR-Region?",
+    "back": "**RPO: Stunden. RTO: Stunden (bis ~24 h).** In der DR-Region läuft **nichts** — nur Backups/AMIs/Snapshots liegen dort. Im Ernstfall wird die gesamte Umgebung neu aufgebaut. **Günstigste Option**, akzeptabel nur bei unkritischen Workloads.",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+  },
+  {
+    "seedKey": "saa-c03-card-089",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "Pilot Light: Was läuft, was nicht?",
+    "back": "**Die Daten werden kontinuierlich repliziert** (DB läuft in der DR-Region), aber die **Compute-Schicht ist AUS** (AMIs/Templates liegen bereit). RPO: Minuten, RTO: Zehner-Minuten. AWS formuliert es so: Pilot Light kann **ohne zusätzliche Aktion keine Requests verarbeiten** — genau daran erkennst du es.",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+  },
+  {
+    "seedKey": "saa-c03-card-090",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "Warm Standby: Was unterscheidet es von Pilot Light?",
+    "back": "Beim Warm Standby läuft eine **verkleinerte, aber vollständig funktionsfähige Kopie** der Umgebung — sie kann **sofort Traffic annehmen**, nur mit **reduzierter Kapazität**; im Ernstfall wird hochskaliert. RPO: Sekunden, RTO: Minuten. **Der Unterschied ist genau die Frage: Läuft die Compute-Schicht schon? Pilot Light nein, Warm Standby ja.**",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+  },
+  {
+    "seedKey": "saa-c03-card-091",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "Multi-Site Active/Active: RPO/RTO und der Preis?",
+    "back": "**RPO und RTO nahe Null** — beide Regionen bedienen produktiv Traffic, im Ausfall übernimmt die andere. Preis: **doppelte Infrastruktur** und die eigentliche Härte, **Datenkonsistenz über Regionen** zu lösen (Global Tables, Aurora Global DB mit Write Forwarding). Teuerste und komplexeste Option.",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+  },
+  {
+    "seedKey": "saa-c03-card-092",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "Anforderung: **RTO wenige Minuten, RPO wenige Sekunden**, Budget aber begrenzt. Welche Strategie?",
+    "back": "**Warm Standby.** Backup & Restore (Stunden) und Pilot Light (Zehner-Minuten) reißen die RTO. Multi-Site Active/Active würde die Anforderung übererfüllen und unnötig kosten. **Nimm die günstigste Strategie, die RPO und RTO gerade noch einhält** — das ist die Logik hinter jeder DR-Frage.",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+  },
+  {
+    "seedKey": "saa-c03-card-093",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "Backups über EBS, RDS, DynamoDB, EFS und FSx hinweg — zentral, mit Cross-Region- und Cross-Account-Kopie. Wie?",
+    "back": "**AWS Backup**: policy-basierte Backup-Pläne über viele Services hinweg, **Cross-Region UND Cross-Account Copy**, plus **Backup Vault Lock (WORM)** — unveränderlich, schützt gegen Ransomware und böswillige Admins. Ersetzt selbstgebaute Snapshot-Lambdas (der klassische Ablenker).",
+    "sourceRef": "https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html"
+  },
+  {
+    "seedKey": "saa-c03-card-094",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "S3: Wie schützt du gegen versehentliches **und** böswilliges Löschen — drei Stufen?",
+    "back": "**1. Versioning**: Ein `DELETE` setzt nur einen **Delete Marker**, die Version bleibt. **2. MFA Delete**: permanentes Löschen von Versionen erfordert MFA. **3. Object Lock (WORM)**: im **Compliance Mode** kann **niemand** löschen — auch der Root-User nicht. Steigende Härte, steigende Unumkehrbarkeit.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html"
+  },
+  {
+    "seedKey": "saa-c03-card-095",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "DR-Strategien & RPO/RTO",
+    "front": "Was bedeutet „Immutable Infrastructure\" konkret für eine EC2/ASG-Umgebung?",
+    "back": "Server werden **nicht gepatcht, sondern ersetzt**: neues AMI bauen → neue **Launch-Template-Version** → **Instance Refresh** (oder Blue/Green). Vorteil: **kein Konfigurations-Drift**, jedes Deployment reproduzierbar, **Rollback = alte Template-Version wieder ausrollen**. „Per SSH auf die Instanzen patchen\" ist der Anti-Pattern-Ablenker.",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+  },
+  {
+    "seedKey": "saa-c03-card-096",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "ALB vs. NLB vs. GWLB — Layer und Kernzweck?",
+    "back": "**ALB**: **Layer 7** (HTTP/HTTPS) — Content-based Routing nach Host/Pfad/Header, WAF-fähig, Lambda als Target. **NLB**: **Layer 4** (TCP/UDP/TLS) — extremer Durchsatz, niedrigste Latenz, **statische/Elastic IP**, erhält die **Source-IP**. **GWLB**: **Layer 3** — schleift **Third-Party-Security-Appliances** (Firewalls, IDS) transparent ein (GENEVE).",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+  },
+  {
+    "seedKey": "saa-c03-card-097",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "Wann NLB statt ALB? Nenne die vier Auslöser.",
+    "back": "**(1)** Eine **statische IP / Elastic IP** wird gebraucht (Kunde muss sie in seiner Firewall whitelisten). **(2)** **Nicht-HTTP-Protokolle** (TCP/UDP). **(3)** **Extreme Performance** (Millionen Requests/s, ultraniedrige Latenz). **(4)** Die **Client-Source-IP** muss unverändert an der Instanz ankommen.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+  },
+  {
+    "seedKey": "saa-c03-card-098",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "Cross-Zone Load Balancing: Wie sind die Defaults bei ALB und NLB — und warum ist das eine Falle?",
+    "back": "**ALB: standardmäßig AN** (und kostenlos). **NLB: standardmäßig AUS** (und verursacht bei Aktivierung Cross-AZ-Datentransferkosten). Falle: Ungleich viele Instances pro AZ + NLB ohne Cross-Zone → **eine AZ mit einer Instanz bekommt genauso viel Traffic wie eine AZ mit zehn**.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+  },
+  {
+    "seedKey": "saa-c03-card-099",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "Beim Deployment brechen laufende Requests mit 5xx ab, sobald Instanzen entfernt werden. Welche Einstellung fehlt?",
+    "back": "**Deregistration Delay / Connection Draining** (Default **300 Sekunden**): Der Load Balancer schickt **keine neuen** Requests mehr an das Target, lässt **laufende aber zu Ende laufen**. Ist der Wert zu niedrig (oder das Target hart entfernt), werden offene Verbindungen gekappt.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+  },
+  {
+    "seedKey": "saa-c03-card-100",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "Die App verliert Sessions, sobald der ALB einen Nutzer auf eine andere Instanz schickt. Was ist die **beste** Lösung?",
+    "back": "**Den State auslagern** — Session-Daten in **ElastiCache** oder **DynamoDB**, App **stateless** machen. **Sticky Sessions** (ALB-Cookie) sind nur der Workaround: Sie verhindern gleichmäßige Lastverteilung und beim Instanzausfall ist die Session trotzdem weg. In der Prüfung ist „stateless machen\" fast immer die bessere Option.",
+    "sourceRef": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+  },
+  {
+    "seedKey": "saa-c03-card-101",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "Nenne die klassischen sieben Route-53-Routing-Policies — und die achte, die oft fehlt.",
+    "back": "**Simple · Weighted · Latency · Failover · Geolocation · Geoproximity · Multivalue Answer** — plus als achte, neuere Policy **IP-based Routing** (Zuordnung nach Client-CIDR, seit 2022). Multivalue liefert bis zu **8 gesunde** Records zurück — einfacher DNS-Lastausgleich mit Health Checks, aber **kein** Ersatz für einen Load Balancer.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html"
+  },
+  {
+    "seedKey": "saa-c03-card-102",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "Latency vs. Geolocation vs. Geoproximity — woran hängst du die Entscheidung auf?",
+    "back": "**Latency**: nach gemessener **Netzwerk-Latenz** → Antwort auf *„beste Performance\"*. **Geolocation**: nach **Standort des Users** → Antwort auf *„EU-Nutzer müssen auf EU-Server\"* (Compliance, Sprache, Lizenzrecht). **Geoproximity**: nach **geografischer Nähe**, mit **Bias** zum Vergrößern/Verkleinern des Einzugsgebiets. **Nächste Region ≠ niedrigste Latenz** — genau darauf zielt die Falle.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html"
+  },
+  {
+    "seedKey": "saa-c03-card-103",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "Route 53 Failover Routing: Was ist zwingend nötig, damit es funktioniert?",
+    "back": "Ein **Health Check** auf dem Primary-Record. Wird er ungesund, antwortet Route 53 mit dem **Secondary**-Record. Das ist der DNS-Baustein von **Pilot Light** und **Warm Standby**. **Ohne Health Check kein Failover** — Route 53 hat sonst keine Information, dass etwas kaputt ist.",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-failover.html"
+  },
+  {
+    "seedKey": "saa-c03-card-104",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "`example.com` (ohne www) soll auf einen ALB zeigen. Alias oder CNAME?",
+    "back": "**Nur Alias.** Ein **CNAME kann nicht auf dem Zone Apex** (der nackten Domain) stehen — das verbietet der DNS-Standard. **Alias** ist AWS-spezifisch, funktioniert am Apex, ist bei Anfragen **kostenlos** und zeigt auf AWS-Ressourcen (ALB/NLB, CloudFront, S3-Website, API Gateway).",
+    "sourceRef": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html"
+  },
+  {
+    "seedKey": "saa-c03-card-105",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Load Balancing & Route 53",
+    "front": "Wie skalierst du eine Kinesis-Ingestion, die 5 MB/s aufnehmen und von 3 Consumern gelesen werden soll?",
+    "back": "Ein **Shard** leistet **1 MB/s bzw. 1.000 Records/s** rein und **2 MB/s** raus (im Shared Fan-out unter **allen** Consumern geteilt!). Für 5 MB/s Ingest → **mindestens 5 Shards**. Damit die 3 Consumer sich nicht gegenseitig aushungern: **Enhanced Fan-out** → jeder bekommt eigene **2 MB/s pro Shard**.",
+    "sourceRef": "https://docs.aws.amazon.com/streams/latest/dev/service-sizes-and-limits.html"
+  },
+  {
+    "seedKey": "saa-c03-card-106",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Serverless & Container-Resilienz",
+    "front": "Lambda: Reserved Concurrency vs. Provisioned Concurrency — was löst welches Problem?",
+    "back": "**Reserved**: reserviert einen Teil der Account-Concurrency für diese Funktion **und deckelt sie zugleich** → verhindert, dass eine Funktion das Account-Limit auffrisst und andere aushungert. **Provisioned**: hält Instanzen **warm** → beseitigt **Cold Starts**. Signalwort „Cold Start\" → Provisioned. Signalwort „eine Funktion darf die anderen nicht verdrängen\" → Reserved.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
+  },
+  {
+    "seedKey": "saa-c03-card-107",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Serverless & Container-Resilienz",
+    "front": "Seit die Lambda-Funktion in der VPC läuft, erreicht sie S3 nicht mehr. Warum, und was sind die zwei Fixes?",
+    "back": "In einem privaten Subnet hat Lambda **keinen Internetzugang** — und der S3-Zugriff läuft normalerweise über einen öffentlichen Endpoint. Fixes: **(1) Gateway Endpoint für S3** (kostenlos, Traffic bleibt im AWS-Netz — die bessere Antwort) oder **(2) NAT Gateway** in einem öffentlichen Subnet (kostet pro Stunde + pro GB).",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-108",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Serverless & Container-Resilienz",
+    "front": "Lambda-Fehlerbehandlung: Was passiert bei synchronem, asynchronem und Stream-basiertem Aufruf?",
+    "back": "**Synchron** (API Gateway, ALB): Fehler geht direkt an den Aufrufer, **kein Auto-Retry**. **Asynchron** (S3, SNS, EventBridge): **2 automatische Retries**, dann **DLQ / On-Failure-Destination**. **Stream-basiert** (Kinesis, DynamoDB Streams): der **Shard blockiert**, bis die Nachricht durchgeht oder abläuft (**Poison Pill!**) — Fix: `BisectBatchOnFunctionError`, `MaximumRetryAttempts` und DLQ.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-retries.html"
+  },
+  {
+    "seedKey": "saa-c03-card-109",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Serverless & Container-Resilienz",
+    "front": "ECS Fargate vs. EC2 Launch Type — Entscheidungskriterien?",
+    "back": "**Fargate**: kein Server-Management, Abrechnung **pro Task**, ideal bei schwankender/unvorhersehbarer Last. **EC2**: du verwaltest die Instances, dafür **günstiger bei konstanter Dauerlast** (Spot/Reserved/Savings Plans nutzbar) und volle Kontrolle (**GPU**, spezielle Instance-Typen, Daemon-Container). Signalwort „Overhead minimieren\" → Fargate. „Kosten bei 24/7-Last minimieren\" → EC2 + Spot/RI.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+  },
+  {
+    "seedKey": "saa-c03-card-110",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Serverless & Container-Resilienz",
+    "front": "ECS **Task Role** vs. **Task Execution Role** — wer bekommt welche?",
+    "back": "**Task Role** = Berechtigungen für **deinen Code im Container** (S3 lesen, DynamoDB schreiben, SQS pollen). **Task Execution Role** = Berechtigungen für den **ECS-Agenten** (Image aus **ECR** ziehen, Logs nach **CloudWatch** schreiben, Secrets injizieren). Verwechslung ist der Klassiker: „Container kann das Image nicht ziehen\" → **Execution** Role, nicht Task Role.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html"
+  },
+  {
+    "seedKey": "saa-c03-card-111",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Serverless & Container-Resilienz",
+    "front": "Ein Request wandert durch 6 Microservices und ist zu langsam. Womit findest du den Bremsklotz?",
+    "back": "**AWS X-Ray** — verteiltes **Tracing**: Es verfolgt einen Request **über Service-Grenzen hinweg** und zeigt in der Service Map, welcher Hop die Latenz oder den Fehler verursacht. CloudWatch zeigt Metriken **pro Service**, aber nicht den **Pfad eines einzelnen Requests** durch die Kette.",
+    "sourceRef": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html"
+  },
+  {
+    "seedKey": "saa-c03-card-112",
+    "cert": "SAA-C03",
+    "domain": "Design Resilient Architectures",
+    "topic": "Serverless & Container-Resilienz",
+    "front": "Auto Scaling: Cooldown vs. Health-Check-Grace-Period — was ist was, und welcher Default gilt?",
+    "back": "**Cooldown** (Default **300 s**): Pause **zwischen zwei Scaling-Aktionen** — verhindert Thrashing. Gilt nur für **Simple Scaling** (AWS empfiehlt heute Target Tracking / Step Scaling + `DefaultInstanceWarmup`). **Health-Check-Grace-Period** (Default **300 s**): Schonfrist für eine **neue Instanz**, bevor Health Checks sie töten dürfen — schützt Instanzen, die noch booten.",
+    "sourceRef": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+  }
+]

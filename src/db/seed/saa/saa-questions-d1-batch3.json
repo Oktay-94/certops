@@ -1,0 +1,791 @@
+[
+  {
+    "seedKey": "saa-c03-q-056",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Ein Subnet nutzt eine **Custom Network ACL**. Die Inbound-Regel erlaubt Port 443 von `0.0.0.0/0`, die Outbound-Regel erlaubt Port 443 zu `0.0.0.0/0`. Die Security Group der Instanz erlaubt Port 443.\n\nNutzer können die Seite trotzdem nicht laden. Warum?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Antworten gehen an den Ephemeral Port des Clients, nicht an Port 443."
+      },
+      {
+        "id": "B",
+        "text": "Die NACL benötigt eine Allow-Regel, die auf die Security Group der Instanz verweist."
+      },
+      {
+        "id": "C",
+        "text": "Custom-NACLs erlauben standardmäßig allen Traffic — die Regeln kollidieren."
+      },
+      {
+        "id": "D",
+        "text": "Die Inbound-Regel muss eine niedrigere Regelnummer haben als die Outbound-Regel."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**NACLs sind stateless** — genau darin liegt der Unterschied zur Security Group. Der Client öffnet einen **Ephemeral Port** und sendet an Port 443. Die **Antwort** geht von Port 443 zurück an den **Ephemeral Port des Clients**. Die Outbound-Regel muss deshalb den **Ephemeral-Port-Bereich** erlauben, nicht Port 443.\n\nDie Bereiche sind OS-abhängig: **Linux 32768–61000**, **Windows Server 2008+ 49152–65535**, **ELB/NAT Gateway/Lambda 1024–65535**. In der Praxis öffnet man 1024–65535 outbound.\n\nNACLs kennen **keine Security Groups** — nur CIDR-Blöcke. Das **Default**-NACL erlaubt allen Traffic, ein **Custom**-NACL verweigert alles bis Regeln existieren — genau umgekehrt. Und Inbound- und Outbound-Regeln haben **getrennte** Nummernkreise; eine Reihenfolge zwischen ihnen gibt es nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/custom-network-acl.html"
+  },
+  {
+    "seedKey": "saa-c03-q-057",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Eine Auto Scaling Group im App-Tier skaliert ständig hoch und runter — die privaten IPs der Instanzen wechseln laufend. Diese Instanzen müssen auf eine RDS-Datenbank zugreifen dürfen, **sonst niemand**.\n\nWie konfigurierst du die Security Group der Datenbank?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Den CIDR-Block des App-Subnets als Source auf Port 3306 erlauben."
+      },
+      {
+        "id": "B",
+        "text": "Die Security Group des App-Tiers als Source referenzieren."
+      },
+      {
+        "id": "C",
+        "text": "Eine Managed Prefix List mit den IPs pflegen und als Source verwenden."
+      },
+      {
+        "id": "D",
+        "text": "Eine Lambda, die bei jedem Scaling-Event die SG-Regeln der DB aktualisiert."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Eine Security Group kann **eine andere Security Group als Source referenzieren**. Damit sind automatisch **alle Mitglieder** dieser SG erlaubt — unabhängig von ihren IPs, ohne Pflege, ohne Automatik. Das ist das kanonische Tier-Pattern (Web-SG → App-SG → DB-SG). Die Regel zählt dabei als **eine** Regel, egal wie viele Instanzen dahinterstehen.\n\nDer CIDR-Ansatz **funktioniert**, ist aber gröber: Er erlaubt **jede** Ressource im Subnet — auch eine kompromittierte Nicht-App-Instanz. Die Prefix List ist statisch und veraltet bei jedem Scaling. Die Lambda-Automatik **funktioniert ebenfalls** — sie baut aber mit Code und Wartungsaufwand nach, was die SG-Referenz nativ und ohne jede Zeile Code kann.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html"
+  },
+  {
+    "seedKey": "saa-c03-q-058",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Ein Rechenzentrum ist per **Direct Connect** mit einer VPC verbunden. Von dort soll S3 **privat** erreicht werden — der Traffic darf das Internet nicht berühren. In der VPC existiert bereits ein **S3 Gateway Endpoint**, aber die on-prem Server erreichen S3 darüber nicht.\n\nWas ist die Ursache und die Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Die Route Table des Direct-Connect-Gateways braucht einen Eintrag für die S3-Prefix-List."
+      },
+      {
+        "id": "B",
+        "text": "Der Gateway Endpoint braucht eine Endpoint Policy, die die on-prem CIDR-Blöcke erlaubt."
+      },
+      {
+        "id": "C",
+        "text": "Gateway Endpoints sind von on-prem nicht nutzbar — ein Interface Endpoint ist nötig."
+      },
+      {
+        "id": "D",
+        "text": "Ein NAT Gateway muss den Traffic aus dem Direct Connect an den Endpoint weiterleiten."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**Gateway Endpoints funktionieren ausschließlich über Route-Table-Einträge innerhalb der VPC.** Traffic aus on-prem — egal ob über **Direct Connect, VPN, VPC Peering oder Transit Gateway** — kann sie **strukturell nicht nutzen**. Das ist keine Konfigurationsfrage, sondern eine Eigenschaft des Endpoint-Typs.\n\nDie Lösung ist ein **Interface Endpoint (PrivateLink)** für S3: Er ist eine **ENI mit privater IP** im Subnet und damit von on-prem über DX/VPN erreichbar. Er kostet allerdings pro Stunde und pro GB — der Gateway Endpoint ist kostenlos.\n\nDie beiden Routing-Distraktoren beschreiben plausible Maßnahmen, die das Problem nicht lösen können; eine Endpoint Policy regelt nur, **was** über den Endpoint erlaubt ist — nicht, **wer** ihn erreichen kann.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html"
+  },
+  {
+    "seedKey": "saa-c03-q-059",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Ein S3-Bucket soll **ausschließlich** über einen bestimmten VPC Endpoint erreichbar sein. Selbst ein Nutzer mit gültigen IAM-Credentials darf **nicht** über das Internet darauf zugreifen.\n\nWie erzwingst du das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Endpoint Policy am VPC Endpoint, die ausschließlich diesen Bucket erlaubt."
+      },
+      {
+        "id": "B",
+        "text": "Eine Security Group am Gateway Endpoint, die den eingehenden Traffic filtert."
+      },
+      {
+        "id": "C",
+        "text": "Eine NACL im Subnet, die alle S3-IP-Bereiche außer dem Endpoint blockiert."
+      },
+      {
+        "id": "D",
+        "text": "Eine Bucket-Policy mit `Deny`, wenn `aws:SourceVpce` nicht dem Endpoint entspricht."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Der Hebel ist die **Bucket-Policy**: ein `Deny` mit `StringNotEquals` auf **`aws:SourceVpce`** (Wert = die Endpoint-ID). Damit wird **jeder** Zugriff verweigert, der nicht über diesen Endpoint kommt — unabhängig von den Credentials. Das ist der einzige Ort, an dem sich das durchsetzen lässt, weil nur die Ressource selbst alle Zugriffswege sieht.\n\nDie **Endpoint Policy ist der stärkste Distraktor**: Sie regelt, **was über den Endpoint** erlaubt ist — sie kann aber **andere Zugriffswege nicht blockieren**. Ein Nutzer über das Internet ignoriert sie schlicht. **Gateway Endpoints haben keine Security Groups** (nur Interface Endpoints haben ENIs). Die NACL scheitert an dynamischen S3-IP-Bereichen.\n\n**Praxis-Warnung:** Diese Bucket-Policy sperrt auch den Zugriff über die **AWS-Konsole** aus.",
+    "sourceRef": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-bucket-policies-vpc-endpoint.html"
+  },
+  {
+    "seedKey": "saa-c03-q-060",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Zwei Unternehmen fusionieren. Beide VPCs nutzen den identischen CIDR-Block `10.0.0.0/16`. Eine **einzelne interne API** aus VPC A soll für Anwendungen in VPC B erreichbar werden. Ein Re-IP-Projekt ist nicht vertretbar.\n\nWelche Lösung funktioniert?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS PrivateLink — ein Endpoint Service vor der API, Interface Endpoint in VPC B."
+      },
+      {
+        "id": "B",
+        "text": "VPC Peering zwischen beiden VPCs mit spezifischen Routen für die API."
+      },
+      {
+        "id": "C",
+        "text": "Ein Transit Gateway, an das beide VPCs als Attachment angebunden werden."
+      },
+      {
+        "id": "D",
+        "text": "Ein Site-to-Site VPN zwischen den beiden VPCs mit NAT für die Überlappung."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**PrivateLink ist die einzige Option, die bei überlappenden CIDRs funktioniert.** AWS formuliert es explizit: *\"The consumer and service provider VPCs can have overlapping IP address ranges.\"* Der Grund: Es gibt **kein Routing zwischen den VPCs** — der Consumer bekommt eine **ENI mit einer IP aus seiner eigenen VPC**, und der Traffic fließt unidirektional zum Endpoint Service (NLB-basiert).\n\n**VPC Peering und Transit Gateway scheitern beide hart an der CIDR-Überlappung** — sie basieren auf Routing, und identische Adressbereiche sind nicht routbar. Beide sind völlig legitime Lösungen — nur eben nicht hier. Die VPN-Variante mit NAT ist ein Konstrukt, das AWS zwischen VPCs nicht nativ unterstützt.",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/aws-privatelink.html"
+  },
+  {
+    "seedKey": "saa-c03-q-061",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Administratoren müssen sich auf private EC2-Instanzen verbinden. Anforderungen: **kein Bastion Host**, **kein offener Inbound-Port**, **kein SSH-Client auf dem Admin-Laptop**, und **jede Sitzung vollständig protokolliert**.\n\nWelche Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein Bastion Host mit Elastic IP, SG auf die Büro-IP begrenzt, Keys rotiert."
+      },
+      {
+        "id": "B",
+        "text": "AWS Systems Manager Session Manager mit Session-Logging nach S3."
+      },
+      {
+        "id": "C",
+        "text": "Die Instanzen in ein öffentliches Subnet verschieben, SG auf die Büro-IP begrenzt."
+      },
+      {
+        "id": "D",
+        "text": "Ein Site-to-Site VPN vom Büro in die VPC, SSH über den privaten Pfad."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Session Manager** erfüllt alle vier Anforderungen: **kein Inbound-Port** (der SSM-Agent baut die Verbindung **ausgehend** auf), **kein Bastion**, **kein SSH-Client** (Browser oder CLI genügen), **kein SSH-Key**. Zugriffskontrolle läuft über **IAM**, jede Sitzung erscheint in **CloudTrail**, und das komplette Session-Protokoll lässt sich nach **S3 oder CloudWatch Logs** schreiben.\n\nVoraussetzung: SSM Agent auf der Instanz, eine Instance-Rolle und Konnektivität zu den SSM-Endpoints (NAT Gateway oder VPC Interface Endpoints).\n\nDas **VPN ist der stärkste Distraktor** — es beseitigt zwar die öffentliche Erreichbarkeit, aber die Instanzen brauchen weiterhin **offenen SSH-Port** und **SSH-Keys**, und ein Sitzungsprotokoll gibt es nicht. Bastion und öffentliches Subnet verletzen die Vorgaben direkt.",
+    "sourceRef": "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html"
+  },
+  {
+    "seedKey": "saa-c03-q-062",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "multiple",
+    "prompt": "Ein Team plant den Einsatz von VPC Endpoints.\n\nWelche **ZWEI** Aussagen sind korrekt? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Gateway Endpoints sind kostenlos und stehen nur für S3 und DynamoDB zur Verfügung."
+      },
+      {
+        "id": "B",
+        "text": "Interface Endpoints unterstützen Security Groups, Gateway Endpoints dagegen nicht."
+      },
+      {
+        "id": "C",
+        "text": "Gateway Endpoints sind über Direct Connect auch von on-premises erreichbar."
+      },
+      {
+        "id": "D",
+        "text": "Interface Endpoints werden über einen Eintrag in der Route Table angesprochen."
+      },
+      {
+        "id": "E",
+        "text": "Beide Endpoint-Typen sind kostenlos, sofern der Traffic in der Region bleibt."
+      }
+    ],
+    "correct": [
+      "A",
+      "B"
+    ],
+    "explanation": "**(A)** Gateway Endpoints gibt es ausschließlich für **S3 und DynamoDB** — und sie sind **kostenlos**. **(B)** Interface Endpoints sind **ENIs mit privater IP** und tragen daher **Security Groups**; Gateway Endpoints sind reine **Route-Table-Einträge** (Prefix List) und haben nichts, woran eine SG hängen könnte.\n\n**(C)** ist die zentrale Falle des Themas: Gateway Endpoints sind von on-prem, VPN, Peering und Transit Gateway **grundsätzlich nicht erreichbar**. **(D)** dreht die Mechanik um — der Route-Table-Eintrag ist gerade das Merkmal des **Gateway** Endpoints; Interface Endpoints funktionieren über **Private DNS** und die ENI. **(E)** ignoriert, dass Interface Endpoints **pro Stunde je ENI je AZ plus pro GB** kosten.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html"
+  },
+  {
+    "seedKey": "saa-c03-q-063",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Eine einzelne IP-Adresse führt anhaltende Angriffe durch. Sie soll für **alle Ressourcen eines Subnets** blockiert werden — auch für Instanzen, die erst später dort gestartet werden. Der Traffic ist **nicht ausschließlich HTTP**.\n\nWie blockierst du sie?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine Deny-Regel in den Security Groups aller betroffenen Instanzen anlegen."
+      },
+      {
+        "id": "B",
+        "text": "Eine AWS WAF Rule mit einem IP-Set am Application Load Balancer."
+      },
+      {
+        "id": "C",
+        "text": "Eine Deny-Regel in der Network ACL des Subnets."
+      },
+      {
+        "id": "D",
+        "text": "Die IP in eine Managed Prefix List aufnehmen und diese blockieren."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**Security Groups kennen keine Deny-Regeln — ausschließlich Allow.** Ein explizites Blockieren ist dort strukturell unmöglich. **NACLs** dagegen kennen **Allow und Deny**, wirken auf **Subnet-Ebene** (also automatisch für alle aktuellen und künftigen Instanzen) und arbeiten auf **Layer 3/4** — unabhängig vom Protokoll.\n\n**WAF ist der stärkste Distraktor**: Ein IP-Set blockiert die IP tatsächlich — aber **nur für HTTP-Traffic hinter ALB/CloudFront**. Die Aufgabe verlangt Schutz für **alle Ressourcen des Subnets** und **nicht nur HTTP**. Managed Prefix Lists **gruppieren** CIDRs zur Wiederverwendung in Regeln — sie blockieren selbst nichts.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html"
+  },
+  {
+    "seedKey": "saa-c03-q-064",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Ein Security-Team analysiert **VPC Flow Logs**, um zu prüfen, ob eine kompromittierte Instanz DNS-Anfragen an bösartige Domains stellt. In den Logs finden sich **keinerlei DNS-Einträge** — obwohl die Instanz nachweislich Namen auflöst.\n\nWarum?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Flow Logs erfassen ausschließlich TCP-Verbindungen, DNS läuft über UDP."
+      },
+      {
+        "id": "B",
+        "text": "Das Aggregation Interval ist auf 10 Minuten gesetzt und verwirft kurze Flows."
+      },
+      {
+        "id": "C",
+        "text": "DNS-Traffic erscheint nur, wenn CloudTrail Data Events aktiviert sind."
+      },
+      {
+        "id": "D",
+        "text": "Traffic zum Amazon-DNS-Server wird von Flow Logs grundsätzlich nicht erfasst."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**VPC Flow Logs haben eine dokumentierte Ausschlussliste.** Nicht erfasst werden unter anderem: Traffic zum **Amazon-DNS-Server**, **Windows-Lizenzaktivierung**, **`169.254.169.254`** (Instance Metadata), **`169.254.169.123`** (Time Sync), **DHCP** und Traffic zur reservierten VPC-Router-IP. Nutzt die Instanz einen **eigenen** DNS-Server, wird dieser Traffic sehr wohl geloggt.\n\nFür DNS-Analyse ist **Route 53 Resolver Query Logging** das richtige Werkzeug — oder **GuardDuty**, das DNS-Logs ohnehin auswertet, ohne dass man sie aktivieren muss.\n\nFlow Logs erfassen **UDP wie TCP**; das Aggregation Interval (1 oder 10 Minuten) **verwirft keine Flows**, sondern fasst sie nur zusammen; und CloudTrail Data Events haben mit Netzwerkverkehr nichts zu tun.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs-limitations.html"
+  },
+  {
+    "seedKey": "saa-c03-q-065",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Ein Incident-Response-Team benötigt den **vollständigen Paketinhalt** des Netzwerkverkehrs einer verdächtigen Instanz, um ihn gegen Malware-Signaturen zu prüfen.\n\nWelche Lösung liefert das?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "VPC Traffic Mirroring, das den Verkehr an ein Analyse-Ziel kopiert."
+      },
+      {
+        "id": "B",
+        "text": "VPC Flow Logs im Custom Format mit allen verfügbaren Feldern (v5)."
+      },
+      {
+        "id": "C",
+        "text": "GuardDuty Runtime Monitoring auf der betroffenen Instanz aktivieren."
+      },
+      {
+        "id": "D",
+        "text": "CloudTrail Data Events für die betroffene VPC einschalten."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**VPC Flow Logs enthalten nur Metadaten** — Source-/Destination-IP, Ports, Protokoll, Bytes, ACCEPT/REJECT. **Niemals den Paketinhalt.** Für Deep Packet Inspection gibt es **Traffic Mirroring**: Es kopiert den tatsächlichen Netzwerkverkehr einer ENI an ein Analyse-Ziel (Appliance, NLB, GWLB).\n\n**Das Custom Format ist der stärkste Distraktor**: Es fügt **zusätzliche Felder** hinzu (z. B. `flow-direction`, `traffic-path`, `pkt-src-aws-service`) — aber es macht aus Metadaten niemals Paketinhalt. Wer glaubt, mit genügend Feldern an den Payload zu kommen, liegt kategorial falsch.\n\nGuardDuty Runtime Monitoring beobachtet **Prozesse und Syscalls** auf dem Host, keine Pakete. CloudTrail protokolliert **API-Aufrufe**, keinen Netzwerkverkehr.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/mirroring/what-is-traffic-mirroring.html"
+  },
+  {
+    "seedKey": "saa-c03-q-066",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Private Instanzen brauchen ausgehenden Internet-Zugriff. Zusätzlich soll der NAT-Knoten **Port-Forwarding** für einen Legacy-Dienst leisten und eine **Security Group** tragen, um den Zugriff granular zu steuern.\n\nWas erfüllt beide Zusatzanforderungen?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Ein NAT Gateway in jeder Availability Zone, abgesichert über die Subnet-NACL."
+      },
+      {
+        "id": "B",
+        "text": "Eine NAT Instance auf Basis einer EC2-Instanz."
+      },
+      {
+        "id": "C",
+        "text": "Ein Internet Gateway mit einer Route in die privaten Subnets."
+      },
+      {
+        "id": "D",
+        "text": "Ein Egress-Only Internet Gateway für ausgehenden Traffic."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Ein **NAT Gateway ist ein Managed Service** — er unterstützt **kein Port-Forwarding** und trägt **keine Security Group** (nur die Subnet-NACL wirkt auf ihn). Beide Zusatzanforderungen kann er nicht erfüllen.\n\nEine **NAT Instance** ist eine normale EC2-Instanz: Sie **hat eine Security Group**, kann **Port-Forwarding** und sogar als **Bastion** dienen. Der Preis dafür ist real: Man muss sie selbst patchen, überwachen und für Hochverfügbarkeit sorgen — genau die Arbeit, die ein NAT Gateway abnimmt. Für den Normalfall bleibt das NAT Gateway die bessere Wahl.\n\nEin **Internet Gateway** in der Route eines privaten Subnets macht dieses per Definition zu einem **öffentlichen** Subnet. Ein **Egress-Only Internet Gateway** ist ausschließlich für **IPv6**.",
+    "sourceRef": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-comparison.html"
+  },
+  {
+    "seedKey": "saa-c03-q-067",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "VPC-Security",
+    "type": "single",
+    "prompt": "Ein Unternehmen betreibt **20 VPCs**, die alle untereinander kommunizieren müssen. Die CIDR-Blöcke überlappen nicht. Künftig kommen weitere VPCs hinzu.\n\nWelche Lösung hat den geringsten Verwaltungsaufwand?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "VPC Peering zwischen allen VPCs als vollständiges Mesh aufbauen."
+      },
+      {
+        "id": "B",
+        "text": "Ein zentrales Site-to-Site VPN, über das alle VPCs verbunden werden."
+      },
+      {
+        "id": "C",
+        "text": "Ein Transit Gateway als zentraler Hub mit einem Attachment je VPC."
+      },
+      {
+        "id": "D",
+        "text": "PrivateLink Endpoint Services zwischen allen VPC-Paaren einrichten."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**VPC Peering ist nicht transitiv** — jede VPC muss mit jeder anderen direkt gepeert werden. Bei 20 VPCs sind das **20 × 19 / 2 = 190 Peering-Verbindungen** plus die zugehörigen Route-Table-Einträge in jeder VPC. Jede neue VPC fügt 20 weitere hinzu. Das wächst **quadratisch** und wird unwartbar.\n\nDas **Transit Gateway** ist der von AWS vorgesehene Hub: **ein Attachment pro VPC**, **transitives Routing** über den Hub, eine zentrale Route Table. Eine neue VPC bedeutet **ein** Attachment.\n\nDas Peering-Mesh ist der stärkste Distraktor, weil es **technisch funktioniert** — die Frage zielt aber explizit auf den Verwaltungsaufwand. **PrivateLink** ist unidirektional und **service-basiert** — es teilt einen einzelnen Service, keine allgemeine VPC-zu-VPC-Konnektivität.",
+    "sourceRef": "https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/vpc-peering.html"
+  },
+  {
+    "seedKey": "saa-c03-q-068",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "type": "single",
+    "prompt": "Eine Anwendung läuft hinter einem **Network Load Balancer**. Das Security-Team fordert Schutz gegen **SQL-Injection** und schlägt vor, AWS WAF direkt am NLB anzuhängen.\n\nWie bewertest du den Vorschlag?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Der Vorschlag ist korrekt — WAF unterstützt NLB seit der Einführung von WAFv2."
+      },
+      {
+        "id": "B",
+        "text": "Shield Advanced am NLB aktivieren, dessen Layer-7-Schutz deckt SQL-Injection ab."
+      },
+      {
+        "id": "C",
+        "text": "Eine Network ACL konfigurieren, die typische SQL-Injection-Muster verwirft."
+      },
+      {
+        "id": "D",
+        "text": "WAF lässt sich nicht an einen NLB hängen — die App muss hinter ALB oder CloudFront."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**AWS WAF ist ein Layer-7-Dienst und lässt sich nicht an einen NLB anhängen.** Unterstützt werden: **CloudFront, Application Load Balancer, API Gateway (REST), AppSync, Cognito User Pool, App Runner, Amplify und Verified Access**. Der NLB arbeitet auf **Layer 4** — er sieht keine HTTP-Requests und kann daher keine WAF-Regeln auswerten.\n\nZwei Wege gibt es: Die Anwendung **hinter einen ALB oder CloudFront** stellen (dann WAF), oder **AWS Network Firewall** einsetzen (arbeitet VPC-weit auf L3–L7 mit Suricata-Regeln).\n\n**Shield Advanced schützt gegen DDoS**, nicht gegen SQL-Injection; sein WAF-Anteil gilt nur für WAF-**fähige** Ressourcen — ein NLB gehört nicht dazu. **NACLs arbeiten auf Layer 3/4** und sehen den HTTP-Payload überhaupt nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html"
+  },
+  {
+    "seedKey": "saa-c03-q-069",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "type": "single",
+    "prompt": "Bei einem DDoS-Angriff skalierte eine Auto Scaling Group massiv hoch — die Rechnung des Monats explodierte. Das Unternehmen will künftig gegen genau diese **Skalierungskosten während eines Angriffs** abgesichert sein und während eines Vorfalls **direkten Zugriff auf AWS-Spezialisten** haben.\n\nWelche Lösung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS Shield Advanced für die betroffenen Ressourcen abonnieren."
+      },
+      {
+        "id": "B",
+        "text": "AWS Shield Standard mit CloudWatch-Alarmen auf ungewöhnlichen Traffic kombinieren."
+      },
+      {
+        "id": "C",
+        "text": "AWS WAF mit Rate-Based Rules vor die Anwendung schalten."
+      },
+      {
+        "id": "D",
+        "text": "AWS Budgets mit Aktionen, die die ASG bei Kostenüberschreitung deckeln."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "Zwei Anforderungen zeigen eindeutig auf **Shield Advanced**: **Cost Protection** (Service-Credits für Skalierungskosten, die durch einen dokumentierten DDoS-Angriff entstanden sind) und der Zugriff auf das **Shield Response Team (SRT)**. Preis: **3.000 USD/Monat** mit **1-Jahres-Commitment** (setzt Business- oder Enterprise-Support voraus).\n\n**Shield Standard ist automatisch aktiv und kostenlos**, bietet aber **weder Cost Protection noch SRT-Zugang** — CloudWatch-Alarme ändern daran nichts. **WAF Rate-Based Rules** sind ein wirksames Werkzeug gegen Layer-7-Floods, enthalten aber **keinerlei Kostenabsicherung**. Der **Budgets-Distraktor** ist der raffinierteste: Er begrenzt zwar die Kosten — aber indem er die Anwendung **mitten im Angriff herunterskaliert**, also den Ausfall herbeiführt, den der Angreifer wollte.",
+    "sourceRef": "https://aws.amazon.com/shield/pricing/"
+  },
+  {
+    "seedKey": "saa-c03-q-070",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "type": "single",
+    "prompt": "Eine Login-Seite hinter einem ALB wird von Brute-Force-Versuchen bombardiert. Die Angreifer-IPs **wechseln laufend**, jede sendet hunderte Requests pro Minute.\n\nWas ist der wirksamste Schutz?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine IP-Set-Rule in AWS WAF, gepflegt mit den beobachteten Angreifer-IPs."
+      },
+      {
+        "id": "B",
+        "text": "Eine Rate-Based Rule in AWS WAF, die IPs oberhalb eines Schwellwerts blockiert."
+      },
+      {
+        "id": "C",
+        "text": "AWS Shield Advanced aktivieren, um den Angriff automatisch zu mitigieren."
+      },
+      {
+        "id": "D",
+        "text": "Die Managed Rule Group \"Core Rule Set\" (CRS) in der Web ACL aktivieren."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "**Rate-Based Rules** zählen Requests **pro IP** innerhalb eines Evaluation Window und blockieren automatisch alles oberhalb eines Schwellwerts — genau das Muster hier. Das Fenster ist konfigurierbar (**60, 120, 300 oder 600 Sekunden**, Default **300**); das **Minimum-Limit wurde im August 2024 von 100 auf 10 Requests gesenkt**, was auch feingranulare Login-Schutzregeln erlaubt.\n\nDas **IP-Set ist der stärkste Distraktor**: Es **funktioniert** — aber nur gegen **bekannte, statische** IPs. Bei wechselnden Adressen läuft man der Realität hinterher. **Shield Advanced** adressiert **DDoS auf Layer 3/4**, nicht Brute-Force auf Anwendungsebene. Das **Core Rule Set** schützt gegen **OWASP-Muster** (SQLi, XSS) — es kennt aber keine Requests **pro Zeit**. Für gezielten Credential-Stuffing-Schutz gibt es zusätzlich die Managed Rule Group **Account Takeover Prevention (ATP)**.",
+    "sourceRef": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-rate-based-high-level-settings.html"
+  },
+  {
+    "seedKey": "saa-c03-q-071",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "type": "multiple",
+    "prompt": "Ein Unternehmen will ausgehenden Traffic aus der VPC auf eine **Allowlist von Domains** beschränken (Schutz vor Data Exfiltration) und zugleich Intrusion Prevention betreiben. AWS Network Firewall steht zur Debatte.\n\nWelche **ZWEI** Aussagen über AWS Network Firewall sind korrekt? (Wähle ZWEI)",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Sie nutzt für Stateful Inspection Suricata-kompatible Regeln."
+      },
+      {
+        "id": "B",
+        "text": "Sie benötigt ein dediziertes Firewall-Subnet je Availability Zone."
+      },
+      {
+        "id": "C",
+        "text": "Sie wird wie eine Security Group direkt an einzelne EC2-Instanzen angehängt."
+      },
+      {
+        "id": "D",
+        "text": "Sie ersetzt AWS WAF beim Schutz von Web-Anwendungen auf Layer 7."
+      },
+      {
+        "id": "E",
+        "text": "Sie unterstützt asymmetrisches Routing zwischen den Availability Zones."
+      }
+    ],
+    "correct": [
+      "A",
+      "B"
+    ],
+    "explanation": "**(A)** Network Firewall verwendet für die Stateful Inspection **Suricata-kompatible Regeln** (seit November 2024 Suricata 7.0) — das erlaubt Domain-Allowlists, 5-Tuple-Regeln und IPS-Signaturen. **(B)** Das Deployment erfordert ein **eigenes Firewall-Subnet je AZ**, in dem der Firewall-Endpoint liegt; die Route Tables leiten den Traffic durch diesen Endpoint.\n\n**(C)** verwechselt die Ebene: Network Firewall arbeitet **VPC-weit über Routing**, nicht per Anbindung an eine ENI. **(D)** ist der inhaltlich gefährlichste Distraktor: WAF und Network Firewall sind **komplementär, nicht austauschbar** — WAF inspiziert **HTTP-Requests** an L7-Ressourcen, Network Firewall den **Netzwerkverkehr** der VPC. **(E)** ist explizit falsch: **asymmetrisches Routing wird nicht unterstützt**.",
+    "sourceRef": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html"
+  },
+  {
+    "seedKey": "saa-c03-q-072",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "type": "single",
+    "prompt": "Ein Unternehmen mit **50 AWS-Accounts** will sicherstellen, dass an **jedem** Application Load Balancer dieselbe WAF-Web-ACL hängt — auch an ALBs, die erst in Zukunft angelegt werden.\n\nWelche Lösung erfüllt das mit dem geringsten Aufwand?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Eine SCP, die das Anlegen von ALBs ohne zugeordnete Web ACL verweigert."
+      },
+      {
+        "id": "B",
+        "text": "Eine Config Rule mit automatischer Remediation via SSM-Automation."
+      },
+      {
+        "id": "C",
+        "text": "AWS Firewall Manager mit einer organisationsweiten WAF-Policy."
+      },
+      {
+        "id": "D",
+        "text": "Ein CloudFormation StackSet, das die Web ACL in allen Accounts ausrollt."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**AWS Firewall Manager** ist exakt dafür gebaut: Er verteilt **WAF-Regeln, Shield Advanced, Security Groups, Network Firewall und DNS Firewall** organisationsweit — und wendet sie **automatisch auf neu erstellte Ressourcen** an. Voraussetzung: **AWS Organizations mit All Features**, ein **Firewall Manager Administrator Account** und aktiviertes **AWS Config**.\n\n**Config Rule mit Remediation ist der stärkste Distraktor** — es **funktioniert tatsächlich**: Die Regel erkennt einen ALB ohne Web ACL und das SSM-Dokument hängt sie nach. Aber es ist **Nachrüstung statt Durchsetzung** (es existiert ein Zeitfenster ohne Schutz) und über 50 Accounts deutlich mehr Aufwand. Das **StackSet** rollt die Web ACL aus, **verknüpft sie aber nicht automatisch** mit neuen ALBs. Eine **SCP** kann \"ALB ohne WAF\" nicht erkennen — die Zuordnung ist ein **separater** API-Call.",
+    "sourceRef": "https://docs.aws.amazon.com/waf/latest/developerguide/fms-chapter.html"
+  },
+  {
+    "seedKey": "saa-c03-q-073",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Perimeter-Schutz",
+    "type": "single",
+    "prompt": "Drei Anforderungen liegen vor:\n\n1. **SQL-Injection-Schutz** für eine Web-App hinter CloudFront\n2. **DDoS-Absicherung inklusive Kostenschutz**\n3. **Egress-Filterung auf eine Domain-Allowlist** für die gesamte VPC\n\nWelche Zuordnung ist korrekt?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS Network Firewall deckt alle drei Anforderungen ab."
+      },
+      {
+        "id": "B",
+        "text": "WAF für (1) und (3), Shield Advanced für (2)."
+      },
+      {
+        "id": "C",
+        "text": "Shield Advanced für (1) und (2), Network Firewall für (3)."
+      },
+      {
+        "id": "D",
+        "text": "WAF für (1), Shield Advanced für (2), Network Firewall für (3)."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "Die drei Dienste haben klar getrennte Aufgaben:\n\n**AWS WAF** — Layer 7, inspiziert **HTTP-Requests** an CloudFront/ALB/API Gateway. Zuständig für SQLi, XSS, Bot Control, Rate Limiting → **(1)**.\n\n**AWS Shield Advanced** — **DDoS** auf Layer 3/4 (und L7 für geschützte Ressourcen), mit **Cost Protection** und **SRT-Zugang** → **(2)**.\n\n**AWS Network Firewall** — Layer 3–7 **innerhalb der VPC**, Suricata-Regeln, **Egress-Filterung**, IPS, Deep Packet Inspection → **(3)**.\n\nDie Distraktoren testen die häufigsten Verwechslungen: **WAF kann keine VPC-weite Egress-Filterung** (es sitzt an einzelnen L7-Ressourcen, nicht im Netzwerkpfad), und **Shield schützt nicht gegen SQL-Injection** (es ist ein DDoS-, kein Application-Firewall-Dienst).",
+    "sourceRef": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html"
+  },
+  {
+    "seedKey": "saa-c03-q-074",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Detection & Audit",
+    "type": "single",
+    "prompt": "Ein Startup will **so schnell wie möglich** Bedrohungserkennung für seine AWS-Umgebung. Es hat bislang **weder CloudTrail-Trails noch VPC Flow Logs** aktiviert. Der Betriebsaufwand soll minimal bleiben.\n\nWas ist der schnellste Weg?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Amazon GuardDuty aktivieren — es nutzt eigene Datenströme, kein Log-Setup nötig."
+      },
+      {
+        "id": "B",
+        "text": "Zuerst CloudTrail und VPC Flow Logs einrichten, danach GuardDuty aktivieren."
+      },
+      {
+        "id": "C",
+        "text": "AWS Config mit den Security-Managed-Rules aktivieren und Findings prüfen."
+      },
+      {
+        "id": "D",
+        "text": "Amazon Inspector für kontinuierliches Scanning der Workloads aktivieren."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**GuardDuty benötigt keine aktivierten Logs.** Es greift auf **unabhängige, duplizierte Datenströme** von CloudTrail Management Events, VPC Flow Logs und Route 53 Resolver DNS Query Logs zu — direkt aus der AWS-Infrastruktur. Ein Klick, keine Vorarbeit, keine Log-Kosten.\n\n**(B) ist die Antwort, die die meisten wählen** — sie klingt logisch, ist aber unnötig. Man **kann** die Logs aktivieren (für eigene Analysen sinnvoll), aber GuardDuty **braucht** sie nicht.\n\n**Config** prüft **Konfigurationszustände** gegen Regeln — keine Bedrohungen. **Inspector** findet **CVEs in Software**, keine aktiven Angriffe.\n\n**Wichtige Einschränkung:** GuardDuty analysiert **keine historischen Daten** — es beginnt erst mit der Aktivierung.",
+    "sourceRef": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_data-sources.html"
+  },
+  {
+    "seedKey": "saa-c03-q-075",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Detection & Audit",
+    "type": "single",
+    "prompt": "Eine Security Group wurde verändert und ein kritischer Port geöffnet. Zwei Fragen sind zu beantworten:\n\n1. **Wer** hat die Änderung durchgeführt?\n2. **Wie sah die Security Group vor der Änderung aus?**\n\nWelche Dienste liefern die Antworten?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "AWS CloudTrail beantwortet beide Fragen über die Event History."
+      },
+      {
+        "id": "B",
+        "text": "CloudTrail für Frage 1, AWS Config für Frage 2."
+      },
+      {
+        "id": "C",
+        "text": "AWS Config beantwortet beide Fragen über die Configuration Timeline."
+      },
+      {
+        "id": "D",
+        "text": "VPC Flow Logs für Frage 1, Amazon GuardDuty für Frage 2."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Die kanonische Abgrenzung: **CloudTrail = WER** (welche Identität hat wann von welcher IP welchen API-Call ausgeführt). **AWS Config = WAS** (wie sah eine Ressource zu einem beliebigen Zeitpunkt aus — die Configuration Timeline zeigt jeden Zustand als **Configuration Item**).\n\nBeide Einzel-Distraktoren sind je zur Hälfte richtig, und genau das macht sie stark: CloudTrail zeigt den `AuthorizeSecurityGroupIngress`-Call inklusive der **neuen** Regel — aber **nicht den vollständigen Vorzustand**. Config zeigt den Vorher-Zustand lückenlos — kennt aber **den Aufrufer nicht** (es speist sich zwar aus CloudTrail, führt die Identität aber nicht in der Timeline).\n\nFlow Logs sind Netzwerk-Metadaten, GuardDuty ist Threat Detection — beide beantworten keine der Fragen.",
+    "sourceRef": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html"
+  },
+  {
+    "seedKey": "saa-c03-q-076",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Detection & Audit",
+    "type": "single",
+    "prompt": "Vor einem Compliance-Audit muss ein Unternehmen nachweisen, **welche S3-Buckets personenbezogene Daten enthalten** (Kreditkartennummern, Ausweisnummern). Es gibt hunderte Buckets mit Millionen Objekten.\n\nWelcher Dienst?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Amazon Inspector mit den betroffenen S3-Buckets als Scan-Ziel."
+      },
+      {
+        "id": "B",
+        "text": "Amazon GuardDuty mit aktivierter S3 Protection."
+      },
+      {
+        "id": "C",
+        "text": "Amazon Macie mit einem Sensitive-Data-Discovery-Job."
+      },
+      {
+        "id": "D",
+        "text": "Eine AWS Config Rule mit einer Custom-Lambda, die Objekte auf Muster prüft."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**Macie ist S3-spezifisch und der einzige Dienst, der den Inhalt von Objekten auf sensible Daten untersucht** — per Machine Learning und Pattern Matching. Es bringt **Managed Data Identifiers** für gängige PII-Typen mit (Kreditkarten, Ausweis-/Sozialversicherungsnummern, Zugangsdaten) und erlaubt **Custom Data Identifiers** per Regex.\n\n**GuardDuty S3 Protection ist der stärkste Distraktor**: Es erkennt **verdächtige Zugriffe** auf S3 (ungewöhnliche API-Muster, Zugriffe aus Tor-Netzwerken) — aber es sieht **nie den Inhalt** eines Objekts. Der Unterschied ist **wer greift wie zu** versus **was steht drin**.\n\n**Inspector** scannt **Compute** (EC2, ECR, Lambda) auf CVEs — nicht S3-Inhalte. Die **Custom-Lambda** ließe sich bauen, wäre aber ein Eigenbau ohne ML für ein Problem, das ein Managed Service löst.",
+    "sourceRef": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html"
+  },
+  {
+    "seedKey": "saa-c03-q-077",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Detection & Audit",
+    "type": "single",
+    "prompt": "Ein Auditor fragt: *\"Welche EC2-Instanzen laufen mit **bekannten CVEs** in installierten Software-Paketen?\"*\n\nWelcher Dienst liefert diese Antwort?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Amazon GuardDuty mit aktiviertem Runtime Monitoring auf den Instanzen."
+      },
+      {
+        "id": "B",
+        "text": "Eine AWS Config Rule, die die Patch-Compliance der Instanzen auswertet."
+      },
+      {
+        "id": "C",
+        "text": "Amazon Detective mit einer Analyse der betroffenen Instanzen."
+      },
+      {
+        "id": "D",
+        "text": "Amazon Inspector mit aktiviertem EC2-Scanning."
+      },
+      {
+        "id": "E",
+        "text": "AWS Security Hub mit aktiviertem CIS-Benchmark-Standard."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "explanation": "**Amazon Inspector ist der Vulnerability-Management-Dienst**: Er scannt **EC2** (per SSM Agent oder agentless über EBS-Snapshots), **ECR-Container-Images** und **Lambda-Funktionen** kontinuierlich gegen **CVE-Datenbanken** und bewertet zusätzlich die **Network Reachability** — eine Schwachstelle in einem nicht erreichbaren Dienst ist weniger kritisch als dieselbe an einem offenen Port.\n\n**Die Config-Patch-Compliance-Regel ist der stärkste Distraktor** — sie prüft, ob **Patches fehlen** (im Sinne des Patch Managers), nicht, **welche CVEs** in den installierten Paketen stecken. Verwandt, aber eine andere Frage.\n\n**GuardDuty** erkennt **Bedrohungen und Verhalten**, nicht CVEs. **Detective** analysiert **existierende Findings**. **Security Hub** **aggregiert** Findings (auch die von Inspector) — es scannt selbst nicht.",
+    "sourceRef": "https://docs.aws.amazon.com/inspector/latest/user/scanning-resources.html"
+  },
+  {
+    "seedKey": "saa-c03-q-078",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Detection & Audit",
+    "type": "single",
+    "prompt": "GuardDuty meldet ein Finding: Eine EC2-Instanz kommuniziert mit einer bekannten Command-and-Control-Domain. Das Security-Team will nun herausfinden, **wie** die Instanz kompromittiert wurde und **welche weiteren Ressourcen** die betroffene Identität berührt hat.\n\nWelcher Dienst unterstützt diese Untersuchung?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Amazon Detective zur Auswertung des Verhaltensgraphen."
+      },
+      {
+        "id": "B",
+        "text": "Amazon Inspector mit einem gezielten Scan der betroffenen Instanz."
+      },
+      {
+        "id": "C",
+        "text": "Die AWS Config Timeline der betroffenen EC2-Instanz auswerten."
+      },
+      {
+        "id": "D",
+        "text": "CloudTrail Insights zur Erkennung ungewöhnlicher API-Aktivität aktivieren."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "explanation": "**Amazon Detective** ist der Root-Cause-Analyse-Dienst: Es baut aus **CloudTrail, VPC Flow Logs und GuardDuty-Findings** automatisch einen **Verhaltensgraphen** und beantwortet genau diese Fragen — welche API-Calls gingen voraus, welche Identität war beteiligt, welche anderen Ressourcen hat sie im relevanten Zeitfenster berührt.\n\n**Der entscheidende Punkt: Detective erkennt selbst nichts.** Es ist rein **reaktiv** und setzt ein existierendes Finding voraus — es ist der Dienst **nach** GuardDuty, nicht statt ihm.\n\n**CloudTrail Insights** ist der stärkste Distraktor: Es erkennt **ungewöhnliche API-Call-Raten** — aber es korreliert nichts und erklärt keine Zusammenhänge. Die **Config Timeline** zeigt Konfigurationsänderungen dieser **einen** Ressource, nicht das Beziehungsgeflecht. **Inspector** findet CVEs — möglicherweise sogar die ausgenutzte —, rekonstruiert aber keinen Angriffsverlauf.",
+    "sourceRef": "https://docs.aws.amazon.com/detective/latest/userguide/what-is-detective.html"
+  },
+  {
+    "seedKey": "saa-c03-q-079",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "type": "single",
+    "prompt": "Ein Secret liegt im Security-Account (A). Eine Lambda-Funktion im App-Account (B) muss es lesen. Das Secret wird aktuell mit dem **Standard-Key `aws/secretsmanager`** verschlüsselt.\n\nWas ist erforderlich?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Das Secret per Replikation nach Account B kopieren und dort lokal lesen."
+      },
+      {
+        "id": "B",
+        "text": "Resource-Policy am Secret, IAM-Policy in B — und ein Customer Managed KMS Key."
+      },
+      {
+        "id": "C",
+        "text": "Eine SCP an Account B, die `secretsmanager:GetSecretValue` auf das Secret erlaubt."
+      },
+      {
+        "id": "D",
+        "text": "Das Secret in Account B duplizieren und beide Kopien synchron halten."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "explanation": "Cross-Account-Zugriff auf ein Secret braucht **drei** Bausteine — und der dritte wird fast immer übersehen:\n\n1. **Resource-based Policy** am Secret in A, die den Principal aus B erlaubt\n2. **IAM-Policy** an der Lambda-Rolle in B mit `secretsmanager:GetSecretValue`\n3. **Ein Customer Managed KMS Key** — denn der Standard-Key **`aws/secretsmanager` ist ein AWS Managed Key**, dessen **Key Policy sich nicht ändern lässt**. Er kann daher **niemals** Cross-Account-Zugriff gewähren. Ohne CMK scheitert der Zugriff mit einem KMS-Fehler, obwohl beide Secrets-Manager-Policies korrekt sind.\n\nDie **Replikation** von Secrets Manager arbeitet **regionsübergreifend, nicht accountübergreifend**. **SCPs gewähren niemals Rechte**. Das manuelle Duplizieren schafft zwei Wahrheiten und untergräbt die Rotation.",
+    "sourceRef": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html"
+  },
+  {
+    "seedKey": "saa-c03-q-080",
+    "cert": "SAA-C03",
+    "domain": "Design Secure Architectures",
+    "topic": "Secrets & Zertifikate",
+    "type": "single",
+    "prompt": "Ein ACM-Zertifikat läuft in 30 Tagen ab. Es wurde seinerzeit per **E-Mail-Validierung** ausgestellt. Das Team will sicherstellen, dass sich das Zertifikat künftig **vollautomatisch** erneuert.\n\nWas ist zu tun?",
+    "choices": [
+      {
+        "id": "A",
+        "text": "Nichts — ACM erneuert von ihm ausgestellte Zertifikate grundsätzlich automatisch."
+      },
+      {
+        "id": "B",
+        "text": "Das Zertifikat extern erneuern und anschließend erneut in ACM importieren."
+      },
+      {
+        "id": "C",
+        "text": "Auf DNS-Validierung umstellen und den CNAME-Record dauerhaft im DNS belassen."
+      },
+      {
+        "id": "D",
+        "text": "Ein neues Zertifikat anfordern und die Mails automatisch bestätigen lassen."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "explanation": "**Nur die DNS-Validierung erlaubt vollautomatische Erneuerung.** Bei der **E-Mail-Validierung** verschickt AWS zu jeder Erneuerung eine Bestätigungsmail, die ein **Mensch anklicken muss** — das ist per Definition keine Automatik und scheitert regelmäßig an Postfächern, die niemand mehr liest.\n\nDrei Bedingungen müssen für Auto-Renewal erfüllt sein: **DNS-Validierung**, der **CNAME-Record bleibt dauerhaft** in der Zone, und das Zertifikat ist **an einem integrierten Service in Nutzung**.\n\n**(A) ist die verbreitetste Fehlannahme**: Der Merksatz \"ACM erneuert automatisch\" wird pauschal gelernt — die **Voraussetzungen** dafür lernt fast niemand. **(B)** beschreibt den Weg für **importierte** Zertifikate, die **nie** Auto-Renewal haben. **(D)** löst nichts: Die Mail-Bestätigung lässt sich nicht durch AWS automatisieren.",
+    "sourceRef": "https://docs.aws.amazon.com/acm/latest/userguide/managed-renewal.html"
+  }
+]

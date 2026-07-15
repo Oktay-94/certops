@@ -36,6 +36,11 @@ export async function runSeed(db: DB, sources: SeedSources): Promise<SeedResult>
         difficulty: sql`excluded.difficulty`,
         domain: sql`excluded.domain`,
         type: sql`excluded.type`,
+        // coalesce: sources without topic/sourceRef (CLF) must not wipe values
+        // that were backfilled manually. Trade-off: a deliberate reset to NULL
+        // via seed is impossible — accepted.
+        topic: sql`coalesce(excluded.topic, ${questions.topic})`,
+        sourceRef: sql`coalesce(excluded.source_ref, ${questions.sourceRef})`,
       },
     })
     .run();
@@ -52,6 +57,9 @@ export async function runSeed(db: DB, sources: SeedSources): Promise<SeedResult>
       set: {
         front: sql`excluded.front`,
         back: sql`excluded.back`,
+        // See questions: coalesce protects manual backfills.
+        topic: sql`coalesce(excluded.topic, ${flashcards.topic})`,
+        sourceRef: sql`coalesce(excluded.source_ref, ${flashcards.sourceRef})`,
       },
     })
     .run();
