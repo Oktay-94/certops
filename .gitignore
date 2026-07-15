@@ -50,4 +50,7 @@ handoff.md
 
 # local sqlite database
 /data/
+
+# local DB backups (Turso exports, never commit)
+/backups/
 CHAT-CONTEXT.md

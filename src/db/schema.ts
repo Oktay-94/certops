@@ -25,6 +25,10 @@ export const questions = sqliteTable(
     difficulty: integer("difficulty"),
     sourceRef: text("source_ref"),
 
+    // Fine-grained subject within a domain. Nullable; populated by the seed
+    // upsert (separate task), never derived at runtime.
+    topic: text("topic"),
+
     // Stable, content-independent upsert key (PR: seed_key foundation).
     // Distinct from source_ref, which is a non-unique citation field. Values
     // are fixed literals in the seed files (clf-c02-q-NNN), never derived at
@@ -107,6 +111,9 @@ export const flashcards = sqliteTable(
 
     difficulty: integer("difficulty"),
     sourceRef: text("source_ref"),
+
+    // Fine-grained subject within a domain. See questions.topic.
+    topic: text("topic"),
 
     // Stable, content-independent upsert key (PR: seed_key foundation).
     // See questions.seedKey. Values are fixed literals (clf-c02-card-NNN).
