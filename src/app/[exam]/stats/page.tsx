@@ -249,7 +249,9 @@ export default async function StatsPage({
       <div className="mb-4 mt-11 flex items-baseline gap-3">
         <h2 className="text-[17px] font-bold text-ink">Bereiche</h2>
         <span className="font-mono text-[10px] tracking-[0.1em] text-ink-faint">
-          QUIZ · KARTEN · DIENSTE · STATISTIK · SKRIPT · ÜBERSICHT
+          {exam === "saa"
+            ? "QUIZ · KARTEN · STATISTIK · SZENARIEN"
+            : "QUIZ · KARTEN · DIENSTE · STATISTIK · SKRIPT · ÜBERSICHT"}
         </span>
       </div>
       <AreaTiles exam={exam} />

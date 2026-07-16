@@ -19,7 +19,10 @@ export type ExamTileState =
   | { kind: "passed" }
   | { kind: "countdown"; daysLeft: number; progress: number; examDate: string }
   | { kind: "decision" }
-  | { kind: "reschedule" };
+  | { kind: "reschedule" }
+  // no exam_status row for this cert yet (e.g. SAA before the first edit) —
+  // the first save creates the row via the setExamDate upsert.
+  | { kind: "unscheduled" };
 
 function tomorrowIso(): string {
   return new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
@@ -171,11 +174,14 @@ export function ExamTile({ state, cert }: { state: ExamTileState; cert: Cert }) 
     );
   }
 
-  // reschedule (failed): pick a new date, countdown restarts
+  // reschedule (failed) and unscheduled (no row yet) share the date picker;
+  // only the copy differs. Saving upserts the row and starts the countdown.
   return (
     <div>
       <p className="text-[13px] leading-relaxed text-ink-soft">
-        Kopf hoch — neuer Anlauf. Wann ist der nächste Termin?
+        {state.kind === "unscheduled"
+          ? "Noch kein Prüfungstermin — Datum eintragen, dann startet der Countdown."
+          : "Kopf hoch — neuer Anlauf. Wann ist der nächste Termin?"}
       </p>
       <div className="mt-3.5 flex flex-wrap items-center gap-2">
         <input

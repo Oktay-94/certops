@@ -45,6 +45,42 @@ function AreaTile({
   );
 }
 
+// Non-clickable teaser (SAA "Szenarien"): same tile look, NEU pill instead of
+// GETEILT, no hover preview, no link — mockup .saa-only placeholder.
+function TeaserTile({
+  glyph,
+  title,
+  desc,
+}: {
+  glyph: string;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div
+      aria-disabled
+      className="relative block cursor-default rounded-xl border border-dashed border-line bg-surface p-[18px] opacity-80"
+    >
+      <span
+        className="absolute right-3.5 top-3.5 rounded-full border px-[7px] py-[2px] font-mono text-[8.5px] tracking-[0.12em]"
+        style={{
+          color: "var(--accent)",
+          borderColor: "color-mix(in srgb, var(--accent) 40%, transparent)",
+        }}
+      >
+        NEU
+      </span>
+      <h3 className="flex items-center gap-2.5 text-[14.5px] font-semibold text-ink">
+        <span className="text-[30px] leading-none" aria-hidden>
+          {glyph}
+        </span>
+        {title}
+      </h3>
+      <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">{desc}</p>
+    </div>
+  );
+}
+
 function QuizPreview() {
   return (
     <div aria-hidden className="space-y-1.5">
@@ -164,6 +200,40 @@ function SkriptPreview() {
 }
 
 export function AreaTiles({ exam }: { exam: ExamSlug }) {
+  if (exam === "saa") {
+    // SAA track: Quiz, Karten, Statistik plus the Szenarien teaser. Skript,
+    // Dienste and Übersicht are CLF-only and deliberately absent here.
+    return (
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+        <AreaTile
+          href="/saa/quiz"
+          glyph="🎯"
+          title="Szenario-Quiz"
+          desc="265 Fragen in Runden, schwächste zuerst."
+          preview={<QuizPreview />}
+        />
+        <AreaTile
+          href="/saa/cards"
+          glyph="🗂️"
+          title="Karteikarten"
+          desc="207 Karten im Blueprint-Schema, D1–D4."
+          preview={<CardPreview />}
+        />
+        <AreaTile
+          href="/saa/stats"
+          glyph="📊"
+          title="Statistik"
+          desc="Trends, Schwachstellen, Verlauf pro Runde."
+          preview={<StatistikPreview />}
+        />
+        <TeaserTile
+          glyph="🧩"
+          title="Szenarien"
+          desc="Interaktive Architektur-Diagramme mit Lücken-Slots."
+        />
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
       <AreaTile

@@ -56,21 +56,27 @@ export default async function Home({
   const readiness = avgLast3 === null ? null : Math.round(avgLast3 * 100);
 
   // Per-profile exam state machine (replaces the global CLF_RESULT const).
+  // The app-side fallback in resolveExamStatus encodes CLF history — SAA has
+  // no default: without a row the tile shows the "Datum eintragen" empty
+  // state, and the first save creates the row (setExamDate upsert).
+  const unscheduled = cert === "SAA-C03" && examRow === null;
   const status = resolveExamStatus(examRow, userId ?? "");
-  const passed = status.result === "passed";
+  const passed = !unscheduled && status.result === "passed";
   const daysLeft = daysUntil(status.examDate, now);
-  const examTileState: ExamTileState = passed
-    ? { kind: "passed" }
-    : status.result === "failed"
-      ? { kind: "reschedule" }
-      : isExpired(status.examDate, now)
-        ? { kind: "decision" }
-        : {
-            kind: "countdown",
-            daysLeft,
-            progress: countdownProgress(status.setAt, status.examDate, now),
-            examDate: status.examDate.toISOString().slice(0, 10),
-          };
+  const examTileState: ExamTileState = unscheduled
+    ? { kind: "unscheduled" }
+    : passed
+      ? { kind: "passed" }
+      : status.result === "failed"
+        ? { kind: "reschedule" }
+        : isExpired(status.examDate, now)
+          ? { kind: "decision" }
+          : {
+              kind: "countdown",
+              daysLeft,
+              progress: countdownProgress(status.setAt, status.examDate, now),
+              examDate: status.examDate.toISOString().slice(0, 10),
+            };
 
   return (
     <main className="relative mx-auto w-full max-w-[1120px] px-6 pb-20 pt-10">
@@ -140,7 +146,7 @@ export default async function Home({
                   }
             }
           >
-            {passed ? "BESTANDEN" : "CLF-C02"}
+            {passed ? "BESTANDEN" : cert}
           </span>
         </div>
         <h1 className="text-[clamp(26px,4vw,40px)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">
@@ -150,8 +156,10 @@ export default async function Home({
         </h1>
         <p className="mt-2.5 max-w-[56ch] text-[14.5px] leading-relaxed text-ink-soft">
           {passed
-            ? "CLF-C02 ist im Archiv-Modus — alles bleibt übbar, nichts geht verloren."
-            : `Noch ${daysLeft} Tage bis zur Prüfung. Readiness, Schwächen und Streak auf einen Blick.`}
+            ? `${cert} ist im Archiv-Modus — alles bleibt übbar, nichts geht verloren.`
+            : unscheduled
+              ? "Noch kein Prüfungstermin — trag ein Datum ein, dann startet der Countdown."
+              : `Noch ${daysLeft} Tage bis zur Prüfung. Readiness, Schwächen und Streak auf einen Blick.`}
         </p>
       </div>
 
@@ -227,7 +235,9 @@ export default async function Home({
       <div className="mb-4 mt-11 flex items-baseline gap-3">
         <h2 className="text-[17px] font-bold text-ink">Bereiche</h2>
         <span className="font-mono text-[10px] tracking-[0.1em] text-ink-faint">
-          QUIZ · KARTEN · DIENSTE · STATISTIK · SKRIPT · ÜBERSICHT
+          {exam === "saa"
+            ? "QUIZ · KARTEN · STATISTIK · SZENARIEN"
+            : "QUIZ · KARTEN · DIENSTE · STATISTIK · SKRIPT · ÜBERSICHT"}
         </span>
       </div>
       <AreaTiles exam={exam} />
