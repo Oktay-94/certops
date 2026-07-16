@@ -3,11 +3,13 @@
 /* ============================================================
    Design tokens — render source (TS mirror: src/lib/design-tokens.ts).
    Values 1:1 from design/mockups/certops-redesign-v2.html.
-   Two orthogonal axes on <html>:
-     data-theme (light default / dark) → surface/ink/heat ladders
-     data-exam  (clf / saa)            → accent identity
-   Canonical mockup combos: clf×light, saa×dark. The remaining two
-   combos derive --accent-soft via color-mix until they get a design.
+   Two orthogonal axes:
+     data-theme (light default / dark) on <html>          → surface/ink/heat ladders
+     data-exam  (clf / saa) on the [exam] layout wrapper  → accent identity;
+       saa×light additionally swaps the full surface ladder (Paper-Blueprint)
+   Mockup combos: clf×light (redesign-v2), saa×dark (statistik-v3 = the
+   global dark ladder), saa×light (diagramm-quiz body[data-theme="light"]).
+   clf×dark derives --accent-soft via color-mix (no dedicated design).
    Theme default is LIGHT with no prefers-color-scheme fallback until
    the re-skin (Phases 2–5) lands — see DESIGN.md.
    ============================================================ */
@@ -95,17 +97,49 @@
 /* Tailwind `dark:` variant driven by the data-theme axis (not media query). */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* Exam axis: accent identity only. Domain colors stay in domain-colors.ts. */
-:root[data-exam="clf"] {
+/* Exam axis. Attribute selectors (no :root prefix) so the axis works both on
+   <html> (legacy, until the [exam] route move) and on the [exam] layout
+   wrapper <div data-exam=…>. Domain colors stay in domain-colors.ts. */
+[data-exam="clf"] {
   --accent: #0891b2;
   --accent-soft: #e0f5fa; /* canonical clf×light */
 }
-:root[data-exam="clf"][data-theme="dark"] {
+[data-exam="clf"][data-theme="dark"],
+[data-theme="dark"] [data-exam="clf"] {
   --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
 }
-:root[data-exam="saa"] {
+/* saa×dark (Squid-Ink): surfaces come from the global dark ladder above —
+   they are the same statistik-v3 values. The exam only adds its accent. */
+[data-exam="saa"] {
   --accent: #7d93c9;
   --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+/* saa×light — "Paper-Blueprint", 1:1 diagramm-quiz body[data-theme="light"].
+   Scoped to the light theme; in dark the block above + root dark ladder win.
+   No heat ladder in the mockup block → inherits the root light greens
+   (documented deviation). --background/--foreground flip so legacy consumers
+   inside the wrapper match the canvas. */
+:root:not([data-theme="dark"]) [data-exam="saa"] {
+  color-scheme: light;
+  --canvas: #f6f8fc;
+  --surface: #ffffff;
+  --surface-2: #eef1f7;
+  --border: #e2e6ef;
+  --border-strong: #cfd5e3;
+  --ink: #151a26;
+  --ink-soft: #4d5872;
+  --ink-faint: #9aa4bd;
+  --accent: #3b4f9e;
+  --accent-soft: #e4e9f8;
+  --success: #0d9478;
+  --success-soft: #e2f4ef;
+  --danger: #d64545;
+  --danger-soft: #fbe9e9;
+  --grid-line: rgba(35, 47, 62, 0.06);
+  --glow-a: rgba(59, 79, 158, 0.1);
+  --glow-b: rgba(13, 148, 120, 0.08);
+  --background: var(--canvas);
+  --foreground: var(--ink);
 }
 @theme inline {
   --color-background: var(--background);

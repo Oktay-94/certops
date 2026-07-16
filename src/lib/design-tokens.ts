@@ -4,9 +4,10 @@
 //
 // Two orthogonal axes (the mockup couples them; the app decouples them):
 //   data-theme (light/dark)  → surface/ink/heat LADDERS
-//   data-exam  (clf/saa)     → ACCENT identity
-// Canonical, mockup-faithful combos: clf×light and saa×dark. The other two
-// combos derive --accent-soft via color-mix in globals.css until designed.
+//   data-exam  (clf/saa)     → ACCENT identity; saa×light swaps the full
+//                              surface ladder (SAA_LIGHT, "Paper-Blueprint")
+// Mockup-faithful combos: clf×light (redesign-v2), saa×dark (statistik-v3),
+// saa×light (diagramm-quiz). clf×dark derives --accent-soft via color-mix.
 
 /** Shared across all themes/exams (mockup :root). */
 export const SHARED = {
@@ -61,8 +62,30 @@ export const THEME_DARK = {
   ctaInk: "#1a1204",
 } as const;
 
+/** saa×light ladder — "Paper-Blueprint" (diagramm-quiz body[data-theme="light"]).
+    No heat ladder in the mockup block → saa×light inherits THEME_LIGHT.heat. */
+export const SAA_LIGHT = {
+  canvas: "#f6f8fc",
+  surface: "#ffffff",
+  surface2: "#eef1f7",
+  border: "#e2e6ef",
+  borderStrong: "#cfd5e3",
+  ink: "#151a26",
+  inkSoft: "#4d5872",
+  inkFaint: "#9aa4bd",
+  success: "#0d9478",
+  successSoft: "#e2f4ef",
+  gridLine: "rgba(35,47,62,.06)",
+  ctaInk: "#1a1204",
+} as const;
+
 /** data-exam accent identities. Domain colors stay in domain-colors.ts. */
 export const EXAM_ACCENTS = {
   clf: { accent: "#0891b2", accentSoftLight: "#e0f5fa" },
-  saa: { accent: "#7d93c9", accentSoftDark: "rgba(125,147,201,.14)" },
+  saa: {
+    accent: "#7d93c9", // saa×dark
+    accentSoftDark: "rgba(125,147,201,.14)",
+    accentLight: "#3b4f9e", // saa×light (Paper-Blueprint)
+    accentSoftLight: "#e4e9f8",
+  },
 } as const;

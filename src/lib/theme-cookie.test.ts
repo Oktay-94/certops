@@ -45,7 +45,9 @@ describe("SSG guard: root layout", () => {
   });
 
   it("keeps the static no-flash theme script", () => {
-    expect(layoutSource).toContain("certops_theme=dark");
+    // Cookie regex + path-based /saa default — both parts of the script.
+    expect(layoutSource).toContain("certops_theme=(dark|light)");
+    expect(layoutSource).toContain('"/saa"');
     expect(layoutSource).toContain("suppressHydrationWarning");
   });
 });

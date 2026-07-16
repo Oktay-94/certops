@@ -21,9 +21,10 @@ export const viewport: Viewport = {
 
 // No-flash theme init. MUST stay a static inline script (never cookies() from
 // next/headers here): a server-side cookie read in the root layout would flip
-// every SSG route to dynamic rendering. Light is the default; dark only via
-// explicit cookie (no prefers-color-scheme until the re-skin lands — DESIGN.md).
-const THEME_INIT_SCRIPT = `try{if(document.cookie.split("; ").includes("certops_theme=dark"))document.documentElement.dataset.theme="dark"}catch(e){}`;
+// every SSG route to dynamic rendering. The cookie wins in both directions;
+// WITHOUT a cookie the default is path-based: /saa/* boots dark (Squid-Ink is
+// the SAA identity), everything else light (no prefers-color-scheme — DESIGN.md).
+const THEME_INIT_SCRIPT = `try{var m=document.cookie.match(/(?:^|; )certops_theme=(dark|light)/);var t=m?m[1]:(location.pathname==="/saa"||location.pathname.indexOf("/saa/")===0?"dark":"light");if(t==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
 
 export default function RootLayout({
   children,
