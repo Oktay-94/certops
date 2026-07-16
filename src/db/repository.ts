@@ -8,6 +8,7 @@ import {
   flashcards,
   questionAttempts,
   questions,
+  scripts,
   type Choice,
   type ExamStatus,
   type Flashcard,
@@ -15,6 +16,7 @@ import {
   type NewQuestionAttempt,
   type Question,
   type QuestionAttempt,
+  type Script,
 } from "./schema";
 
 function parseJsonField<T>(value: unknown): T {
@@ -791,4 +793,43 @@ export async function getNeverSeenQuestions(
     domain: r.domain,
     prompt: r.prompt,
   }));
+}
+
+// --- SAA service scripts (Lernskript, DB-based track) ---
+
+export type ScriptListItem = Pick<
+  Script,
+  "slug" | "service" | "title" | "domains" | "batch" | "position"
+>;
+
+/** Overview list in reading order — no content column (137 markdown bodies). */
+export async function getScriptsByCert(
+  db: DB,
+  cert: Script["cert"],
+): Promise<ScriptListItem[]> {
+  return db
+    .select({
+      slug: scripts.slug,
+      service: scripts.service,
+      title: scripts.title,
+      domains: scripts.domains,
+      batch: scripts.batch,
+      position: scripts.position,
+    })
+    .from(scripts)
+    .where(eq(scripts.cert, cert))
+    .orderBy(asc(scripts.position))
+    .all();
+}
+
+export async function getScriptBySlug(
+  db: DB,
+  cert: Script["cert"],
+  slug: string,
+): Promise<Script | undefined> {
+  return db
+    .select()
+    .from(scripts)
+    .where(and(eq(scripts.cert, cert), eq(scripts.slug, slug)))
+    .get();
 }

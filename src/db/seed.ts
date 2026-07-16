@@ -5,6 +5,7 @@ import { clfC02QuestionsBatch2 } from "./seed/questions/index";
 import { clfC02QuestionsBatch3 } from "./seed/questions/index-batch3";
 import { clfC02Flashcards } from "./seed/cards/index";
 import { saaC03Questions, saaC03Flashcards } from "./seed/saa/index";
+import { loadSaaScripts } from "./seed/saa-scripts/index";
 import { assertWritableTarget } from "./prod-guard";
 import { runSeed } from "./seed-core";
 
@@ -34,9 +35,10 @@ async function seed() {
   const result = await runSeed(db, {
     questions: all,
     cards: [...clfC02Flashcards, ...saaC03Flashcards],
+    scripts: loadSaaScripts(),
   });
   console.log(
-    `Upserted ${result.questions} question(s), ${result.cards} flashcard(s).`,
+    `Upserted ${result.questions} question(s), ${result.cards} flashcard(s), ${result.scripts} script(s).`,
   );
 }
 

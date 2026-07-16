@@ -202,7 +202,7 @@ export default async function Home({
         <h2 className="text-[17px] font-bold text-ink">Bereiche</h2>
         <span className="font-mono text-[10px] tracking-[0.1em] text-ink-faint">
           {exam === "saa"
-            ? "QUIZ · KARTEN · STATISTIK · SZENARIEN"
+            ? "QUIZ · KARTEN · SKRIPT · STATISTIK · SZENARIEN"
             : "QUIZ · KARTEN · DIENSTE · STATISTIK · SKRIPT · ÜBERSICHT"}
         </span>
       </div>

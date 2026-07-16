@@ -201,7 +201,7 @@ function SkriptPreview() {
 
 export function AreaTiles({ exam }: { exam: ExamSlug }) {
   if (exam === "saa") {
-    // SAA track: Quiz, Karten, Statistik plus the Szenarien teaser. Skript,
+    // SAA track: Quiz, Karten, Skript, Statistik plus the Szenarien teaser.
     // Dienste and Übersicht are CLF-only and deliberately absent here.
     return (
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -218,6 +218,13 @@ export function AreaTiles({ exam }: { exam: ExamSlug }) {
           title="Karteikarten"
           desc="207 Karten im Blueprint-Schema, D1–D4."
           preview={<CardPreview />}
+        />
+        <AreaTile
+          href="/saa/skript"
+          glyph="📖"
+          title="Skript"
+          desc="137 Dienst-Skripte: Recap, Vertiefung, Knackpunkte."
+          preview={<SkriptPreview />}
         />
         <AreaTile
           href="/saa/stats"

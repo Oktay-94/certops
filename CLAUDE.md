@@ -37,7 +37,11 @@ Stack: Next.js 16 (App Router), React 19, Tailwind 4, SQLite via Drizzle ORM, Ty
 - Server Actions für DB-Schreibvorgänge, keine internen API Routes.
 - Cookies via `next/headers`.
 
+## Architektur-Entscheidungen (bewusst)
+- **Skript-Speichermodell-Split:** CLF-Skript bleibt dateibasiert (13 Kapitel, `src/content/skript/`, voll statisch); SAA-Skripte liegen als DB-Content in der `scripts`-Tabelle (137 Dienst-Skripte, geseedet aus `src/db/seed/saa-scripts/*.md` via seed_key-Upsert) — sie teilen Lifecycle/Tooling mit dem übrigen SAA-Seed-Content, nicht mit dem CLF-Kapitel-Buch.
+
 ## Bekannte Schuld (dokumentiert, niedrig-Prio)
+- SAA-Skripte ohne TTS (bewusst verschoben). Nachrüst-Skizze: `resolveSegmentMarkdown` um einen DB-Zweig für SAA-Slugs erweitern (Abuse-Guard bleibt „nur geseedeter Content erreichbar"), Cache-Pfad `tts/saa/{slug}/{section}-{hash}.mp3`, content-addressed Hash unverändert.
 - `source_ref`-Upsert statt TRUNCATE+INSERT (Stats-Reset bei Reseed).
 - Dashboard-Karteikarten-Untertitel „Compute & Storage" veraltet.
 - Stale Round-Cookie bei Reseed → notFound (akzeptabler Dev-Edge-Case).

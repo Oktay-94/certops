@@ -194,3 +194,63 @@ export const examStatus = sqliteTable(
 export type ExamStatus = typeof examStatus.$inferSelect;
 export type NewExamStatus = typeof examStatus.$inferInsert;
 export type ExamResult = ExamStatus["result"];
+
+// Service-level Lernskripte (SAA track). Deliberate storage split: the CLF
+// Skript stays file-based (13 chapter files in src/content/skript/), SAA
+// scripts live here because they share lifecycle and tooling (seed_key
+// upsert, batches, audit pipeline) with the other seeded SAA content.
+export const scripts = sqliteTable(
+  "scripts",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    cert: text("cert", { enum: ["CLF-C02", "SAA-C03"] }).notNull(),
+
+    // Stable upsert key (saa-c03-script-*). notNull from day one — this table
+    // has no pre-seed_key legacy rows, unlike questions/flashcards.
+    seedKey: text("seed_key").notNull(),
+
+    // Display name from the frontmatter ("Amazon S3"); title kept separate in
+    // case a script ever needs a heading differing from the service name.
+    service: text("service").notNull(),
+    title: text("title").notNull(),
+
+    // slugifyHeading(service) — the ONE shared slugger (see src/lib/skript.ts).
+    slug: text("slug").notNull(),
+
+    // Full domain names (as in domains.ts), frontmatter order preserved: the
+    // FIRST entry is the script's primary domain (grouping + accent colour).
+    domains: text("domains", { mode: "json" }).$type<string[]>().notNull(),
+
+    // Content-pipeline batch ("B1"…"B10") — provenance metadata, not didactic.
+    batch: text("batch").notNull(),
+
+    // Citation URLs. JSON array (frontmatter is a list), unlike the plain-text
+    // source_ref on questions/flashcards.
+    sourceRef: text("source_ref", { mode: "json" }).$type<string[]>(),
+
+    // Markdown body without frontmatter.
+    content: text("content").notNull(),
+
+    // Deterministic reading order (batch number * 1000 + alphabetic index
+    // within the batch, assigned by the seed loader). Plain `batch` sorts
+    // lexicographically wrong (B10 < B2), hence an explicit integer.
+    position: integer("position").notNull(),
+
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date())
+      .$onUpdateFn(() => new Date()),
+  },
+  (t) => [
+    uniqueIndex("idx_scripts_seed_key").on(t.seedKey),
+    uniqueIndex("idx_scripts_cert_slug").on(t.cert, t.slug),
+    index("idx_scripts_cert").on(t.cert),
+  ],
+);
+
+export type Script = typeof scripts.$inferSelect;
+export type NewScript = typeof scripts.$inferInsert;

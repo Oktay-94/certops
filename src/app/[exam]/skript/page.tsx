@@ -10,6 +10,7 @@ import {
 } from "@/lib/skript-content";
 import { SkriptMarkdown } from "@/components/skript/SkriptMarkdown";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
+import { SaaSkriptIndex } from "./SaaSkriptIndex";
 
 export const metadata = {
   title: "AWS-Lernskript — CertOps",
@@ -18,13 +19,17 @@ export const metadata = {
 const linkBtn =
   "inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong";
 
-// CLF-only: SAA hat (noch) keine Skript-Inhalte — /saa/skript ist ein 404.
+// Storage-model split per track: CLF renders the 13 file-based chapters
+// below (stays fully static); SAA branches into the DB-based service-script
+// overview (request-time render). Unknown exam slugs 404 via [exam]/layout.
 export default async function SkriptIndexPage({
   params,
 }: {
   params: Promise<{ exam: string }>;
 }) {
-  if ((await params).exam !== "clf") notFound();
+  const { exam } = await params;
+  if (exam === "saa") return <SaaSkriptIndex />;
+  if (exam !== "clf") notFound();
   const deckblatt = readDeckblattMarkdown();
 
   return (

@@ -128,13 +128,17 @@ describe("switcher path mapping (spec: entity segments → dashboard root)", () 
     expect(switchExamPath("/clf/quiz", "saa")).toBe("/saa/quiz");
     expect(switchExamPath("/saa/cards", "clf")).toBe("/clf/cards");
     expect(switchExamPath("/clf/stats", "saa")).toBe("/saa/stats");
+    // /skript exists on both tracks since the SAA script track (content
+    // differs, the static subpath maps 1:1).
+    expect(switchExamPath("/clf/skript", "saa")).toBe("/saa/skript");
+    expect(switchExamPath("/saa/skript", "clf")).toBe("/clf/skript");
   });
 
   it("sends entity, round-bound and clf-only paths to the target root", () => {
     expect(switchExamPath("/clf/quiz/689", "saa")).toBe("/saa");
     expect(switchExamPath("/clf/quiz/done", "saa")).toBe("/saa");
-    expect(switchExamPath("/clf/skript", "saa")).toBe("/saa");
     expect(switchExamPath("/clf/skript/03-storage", "saa")).toBe("/saa");
+    expect(switchExamPath("/saa/skript/amazon-s3", "clf")).toBe("/clf");
     expect(switchExamPath("/clf/services", "saa")).toBe("/saa");
     expect(switchExamPath("/clf/uebersicht", "saa")).toBe("/saa");
     expect(switchExamPath("/saa/quiz/1160", "clf")).toBe("/clf");

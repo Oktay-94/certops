@@ -16,19 +16,29 @@ import {
   TtsProvider,
   TtsSectionButton,
 } from "@/components/skript/TtsPlayer";
+import { SaaScriptDetail, fetchScript } from "./SaaScriptDetail";
 
+// Only the CLF chapters prerender (exam pinned to "clf"); SAA script slugs
+// resolve at request time from the DB, so dynamicParams must stay true.
 export function generateStaticParams() {
-  return SKRIPT_CHAPTERS.map((c) => ({ kapitel: c.slug }));
+  return SKRIPT_CHAPTERS.map((c) => ({ exam: "clf", kapitel: c.slug }));
 }
-
-export const dynamicParams = false;
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ kapitel: string }>;
+  params: Promise<{ exam: string; kapitel: string }>;
 }) {
-  const chapter = chapterBySlug((await params).kapitel);
+  const { exam, kapitel } = await params;
+  if (exam === "saa") {
+    const script = await fetchScript(kapitel);
+    return {
+      title: script
+        ? `${script.service} — SAA-Lernskript`
+        : "SAA-Lernskript",
+    };
+  }
+  const chapter = chapterBySlug(kapitel);
   return {
     title: chapter
       ? `Kapitel ${chapter.num}: ${chapter.title} — AWS-Lernskript`
@@ -41,14 +51,16 @@ function shortLabel(text: string): string {
   return text.replace(/^(Amazon|AWS)\s+/, "");
 }
 
-// CLF-only — see skript/page.tsx.
+// Storage-model split per track — see skript/page.tsx.
 export default async function SkriptChapterPage({
   params,
 }: {
   params: Promise<{ exam: string; kapitel: string }>;
 }) {
-  if ((await params).exam !== "clf") notFound();
-  const chapter = chapterBySlug((await params).kapitel);
+  const { exam, kapitel } = await params;
+  if (exam === "saa") return <SaaScriptDetail slug={kapitel} />;
+  if (exam !== "clf") notFound();
+  const chapter = chapterBySlug(kapitel);
   if (!chapter) notFound();
 
   const { intro, sections } = splitChapter(readChapterMarkdown(chapter));
