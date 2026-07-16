@@ -5,9 +5,7 @@ import { scoreColorClass } from "@/lib/scoreColor";
 import { getActiveProfileId } from "@/lib/profile-cookie";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
-import type { ExamSlug } from "@/lib/exam";
-
-const CERT = "CLF-C02" as const;
+import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
 
 function pct(correct: number, total: number): number {
   if (total === 0) return 0;
@@ -30,9 +28,10 @@ export default async function QuizDonePage({
   // "Diese Runde" filtert über die round_id der zuletzt gespielten Runde,
   // nicht über die letzten N Attempts — sonst zeigt sie bei wenigen
   // Gesamt-Attempts denselben Wert wie der Gesamt-Stand.
-  const round = userId ? await getLastRoundReview(db, userId, CERT) : null;
+  const cert = EXAM_CERT[exam];
+  const round = userId ? await getLastRoundReview(db, userId, cert) : null;
   const stats = userId
-    ? await getAttemptStats(db, userId)
+    ? await getAttemptStats(db, userId, cert)
     : { total: 0, correct: 0, byDomain: [] };
 
   const roundCorrect = round?.correctCount ?? 0;

@@ -7,7 +7,7 @@ import { seedFromString, shuffle } from "@/lib/shuffle";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { QuestionCard } from "../QuestionCard";
-import type { ExamSlug } from "@/lib/exam";
+import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
 
 const SESSION_COOKIE = "certops_session_id";
 const ROUND_COOKIE = "certops_round_id";
@@ -36,7 +36,7 @@ export default async function QuizQuestionPage({ params }: Props) {
   const id = Number.parseInt(idParam, 10);
   if (!Number.isInteger(id) || id <= 0) notFound();
 
-  const all = await getQuestionsByCert(db, "CLF-C02");
+  const all = await getQuestionsByCert(db, EXAM_CERT[exam]);
   const byId = new Map<number, Question>(all.map((q) => [q.id, q]));
 
   const cookieStore = await cookies();

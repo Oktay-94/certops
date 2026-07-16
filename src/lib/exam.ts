@@ -15,3 +15,7 @@ export const EXAM_CERT: Record<ExamSlug, Cert> = {
 export function isExamSlug(value: string): value is ExamSlug {
   return (EXAM_SLUGS as readonly string[]).includes(value);
 }
+
+export function isCert(value: string): value is Cert {
+  return value === "CLF-C02" || value === "SAA-C03";
+}

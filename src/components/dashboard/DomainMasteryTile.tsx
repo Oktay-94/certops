@@ -1,4 +1,5 @@
-import { CLF_C02_DOMAINS, CLF_C02_DOMAIN_WEIGHTS } from "@/lib/domains";
+import { DOMAINS_BY_CERT, DOMAIN_WEIGHTS_BY_CERT } from "@/lib/domains";
+import type { Cert } from "@/lib/exam";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { scoreColorClass } from "@/lib/scoreColor";
 import type { DomainOverview } from "@/db/repository";
@@ -7,9 +8,17 @@ import type { DomainOverview } from "@/db/repository";
 // weight, name + thin bar, right-aligned value. Weakest practiced domain gets
 // the orange "hot" bar (signal). Bars use --accent; values use performance
 // colors (strictly separate from domain colors).
-export function DomainMasteryTile({ stats }: { stats: DomainOverview[] }) {
+export function DomainMasteryTile({
+  cert,
+  stats,
+}: {
+  cert: Cert;
+  stats: DomainOverview[];
+}) {
+  const domains = DOMAINS_BY_CERT[cert];
+  const weights = DOMAIN_WEIGHTS_BY_CERT[cert];
   const byDomain = new Map(stats.map((s) => [s.domain, s]));
-  const rates = CLF_C02_DOMAINS.map(
+  const rates = domains.map(
     (d) => byDomain.get(d)?.avgCorrectRate ?? null,
   );
   const practiced = rates.filter((r): r is number => r !== null);
@@ -17,7 +26,7 @@ export function DomainMasteryTile({ stats }: { stats: DomainOverview[] }) {
 
   return (
     <div>
-      {CLF_C02_DOMAINS.map((domain, i) => {
+      {domains.map((domain, i) => {
         const rate = rates[i];
         const pct = rate === null ? 0 : Math.round(rate * 100);
         const hot = weakest !== null && rate === weakest;
@@ -33,7 +42,7 @@ export function DomainMasteryTile({ stats }: { stats: DomainOverview[] }) {
                 DOM-{String(i + 1).padStart(2, "0")}
               </div>
               <div className="font-mono text-[10px] text-ink-faint">
-                {CLF_C02_DOMAIN_WEIGHTS[domain]}%
+                {weights[domain]}%
               </div>
             </div>
             <div>

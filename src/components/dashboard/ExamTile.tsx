@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { setExamDate, setExamResult } from "@/app/exam-actions";
+import type { Cert } from "@/lib/exam";
 import { CertTile } from "./CertTile";
 import { MiniCalendar } from "./MiniCalendar";
 import { ReadinessRing } from "./ReadinessRing";
@@ -24,7 +25,7 @@ function tomorrowIso(): string {
   return new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
 }
 
-export function ExamTile({ state }: { state: ExamTileState }) {
+export function ExamTile({ state, cert }: { state: ExamTileState; cert: Cert }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [date, setDate] = useState("");
@@ -35,7 +36,7 @@ export function ExamTile({ state }: { state: ExamTileState }) {
     setError(null);
     startTransition(async () => {
       try {
-        await setExamResult(result);
+        await setExamResult(result, cert);
         router.refresh();
       } catch {
         setError("Speichern fehlgeschlagen — nochmal versuchen.");
@@ -47,7 +48,7 @@ export function ExamTile({ state }: { state: ExamTileState }) {
     setError(null);
     startTransition(async () => {
       try {
-        await setExamDate(date);
+        await setExamDate(date, cert);
         setEditing(false);
         setDate("");
         router.refresh();

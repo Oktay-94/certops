@@ -21,7 +21,7 @@ import { getProfileBranding } from "@/lib/profile-branding";
 import { ProfileSwitcher } from "@/components/profile/ProfileSwitcher";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { AreaTiles } from "@/components/dashboard/AreaTiles";
-import type { ExamSlug } from "@/lib/exam";
+import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
 import { ExamTile, type ExamTileState } from "@/components/dashboard/ExamTile";
 import { DomainMasteryTile } from "@/components/dashboard/DomainMasteryTile";
 import { ReadinessRing } from "@/components/dashboard/ReadinessRing";
@@ -36,18 +36,19 @@ export default async function Home({
   params: Promise<{ exam: ExamSlug }>;
 }) {
   const { exam } = await params;
+  const cert = EXAM_CERT[exam];
   const userId = await getActiveProfileId();
   const branding = getProfileBranding(userId);
   const now = new Date();
 
-  const cardsTotal = (await getFlashcards(db, "CLF-C02")).length;
+  const cardsTotal = (await getFlashcards(db, cert)).length;
   const [avgLast3, domainStats, timestamps, cardsSeen, examRow] = userId
     ? await Promise.all([
-        getOverallAvgLast3(db, userId, "CLF-C02"),
-        getDomainStats(db, userId, "CLF-C02"),
-        getAttemptTimestamps(db, userId, "CLF-C02"),
-        countSeenFlashcards(db, "CLF-C02", userId),
-        getExamStatus(db, userId, "CLF-C02"),
+        getOverallAvgLast3(db, userId, cert),
+        getDomainStats(db, userId, cert),
+        getAttemptTimestamps(db, userId, cert),
+        countSeenFlashcards(db, cert, userId),
+        getExamStatus(db, userId, cert),
       ])
     : [null, [], [], 0, null];
 
@@ -202,7 +203,7 @@ export default async function Home({
             glyph={examTileState.kind === "passed" ? "🎓" : "⏳"}
             className="h-full"
           >
-            <ExamTile state={examTileState} />
+            <ExamTile state={examTileState} cert={cert} />
           </Tile>
         </StaggerReveal>
         <StaggerReveal index={3} className="md:col-span-7">
@@ -212,7 +213,7 @@ export default async function Home({
             value="Gewichtung lt. Exam Guide"
             className="h-full"
           >
-            <DomainMasteryTile stats={domainStats} />
+            <DomainMasteryTile cert={cert} stats={domainStats} />
           </Tile>
         </StaggerReveal>
         <StaggerReveal index={4} className="md:col-span-5">

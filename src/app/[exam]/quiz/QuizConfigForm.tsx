@@ -12,12 +12,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import {
-  CLF_C02_DOMAINS,
+  DOMAINS_BY_CERT,
   QUIZ_COUNT_OPTIONS,
-  type ClfC02Domain,
+  type ExamDomain,
   type QuizCount,
   type QuizMode,
 } from "@/lib/domains";
+import { EXAM_CERT } from "@/lib/exam";
 import {
   getDomainColor,
   type FallbackIconName,
@@ -35,7 +36,7 @@ const COUNT_LABEL: Record<string, string> = {
   all: "Alle verfügbaren Fragen am Stück",
 };
 
-type DomainChoice = ClfC02Domain | "all";
+type DomainChoice = ExamDomain | "all";
 
 const DOMAIN_ICONS: Record<FallbackIconName, LucideIcon> = {
   Cloud,
@@ -43,16 +44,6 @@ const DOMAIN_ICONS: Record<FallbackIconName, LucideIcon> = {
   Server,
   DollarSign,
 };
-
-const SPECIFIC_DOMAINS: { value: ClfC02Domain; label: string }[] = [
-  { value: "Cloud Concepts", label: "Cloud Concepts" },
-  { value: "Security and Compliance", label: "Security and Compliance" },
-  { value: "Cloud Technology and Services", label: "Cloud Technology and Services" },
-  { value: "Billing, Pricing, and Support", label: "Billing, Pricing, and Support" },
-];
-
-// satisfy unused-import linter while keeping CLF_C02_DOMAINS as source of truth
-void CLF_C02_DOMAINS;
 
 function countChipLabel(c: QuizCount): string {
   return c === "all" ? "Alle" : String(c);
@@ -82,6 +73,8 @@ export function QuizConfigForm({
   exam: ExamSlug;
   questionCount: number;
 }) {
+  const cert = EXAM_CERT[exam];
+  const specificDomains = DOMAINS_BY_CERT[cert];
   const [count, setCount] = useState<QuizCount>(20);
   const [domain, setDomain] = useState<DomainChoice>("all");
   const [mode, setMode] = useState<QuizMode>("random");
@@ -142,7 +135,7 @@ export function QuizConfigForm({
             Quiz konfigurieren
           </h2>
           <p className="mt-1 text-sm text-ink-soft">
-            {questionCount} CLF-C02-Fragen verfügbar — Umfang und Fokus wählen
+            {questionCount} {cert}-Fragen verfügbar — Umfang und Fokus wählen
           </p>
         </div>
       </header>
@@ -190,7 +183,8 @@ export function QuizConfigForm({
               <span>Alle Bereiche</span>
             </button>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {SPECIFIC_DOMAINS.map(({ value, label }) => {
+              {specificDomains.map((value) => {
+                const label = value;
                 const color = getDomainColor(value);
                 const Icon = DOMAIN_ICONS[color.fallbackIconName];
                 return (

@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { getFlashcards } from "@/db/repository";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { FlashcardGrid } from "./FlashcardGrid";
-import type { ExamSlug } from "@/lib/exam";
+import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
 
 export default async function CardsPage({
   params,
@@ -11,7 +11,7 @@ export default async function CardsPage({
   params: Promise<{ exam: ExamSlug }>;
 }) {
   const { exam } = await params;
-  const cards = await getFlashcards(db, "CLF-C02");
+  const cards = await getFlashcards(db, EXAM_CERT[exam]);
 
   if (cards.length === 0) return <EmptyState exam={exam} />;
 
@@ -32,7 +32,7 @@ export default async function CardsPage({
       </p>
 
       <FlashcardGrid
-        homeHref={`/${exam}`}
+        exam={exam}
         cards={cards.map((c) => ({
           id: c.id,
           cert: c.cert,

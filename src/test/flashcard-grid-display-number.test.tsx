@@ -38,7 +38,7 @@ const cards: FlashcardItem[] = [
 
 describe("FlashcardGrid display numbers", () => {
   it("renders 1.–N. based on position in ASC-sorted cards prop, not DB id", () => {
-    render(<FlashcardGrid homeHref="/clf" cards={cards} domains={["Cloud Concepts"]} />);
+    render(<FlashcardGrid exam="clf" cards={cards} domains={["Cloud Concepts"]} />);
     // Redesign: the position number prefixes the domain pill as "N." (bold),
     // no longer a "#N" badge.
     expect(screen.getByText("1.")).toBeInTheDocument();
@@ -63,7 +63,7 @@ describe("FlashcardGrid markdown answer", () => {
       },
     ];
     const { container } = render(
-      <FlashcardGrid homeHref="/clf" cards={md} domains={["Cloud Concepts"]} />,
+      <FlashcardGrid exam="clf" cards={md} domains={["Cloud Concepts"]} />,
     );
     const cardBtn = container.querySelector<HTMLButtonElement>(
       '[data-testid="flashcard"]',
@@ -91,7 +91,7 @@ describe("FlashcardGrid markdown answer", () => {
       },
     ];
     const { container } = render(
-      <FlashcardGrid homeHref="/clf" cards={md} domains={["Cloud Concepts"]} />,
+      <FlashcardGrid exam="clf" cards={md} domains={["Cloud Concepts"]} />,
     );
     const cardBtn = container.querySelector<HTMLButtonElement>(
       '[data-testid="flashcard"]',

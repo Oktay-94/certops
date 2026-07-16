@@ -15,6 +15,7 @@ import ReactMarkdown from "react-markdown";
 import remarkFlexibleMarkers from "remark-flexible-markers";
 import { getDomainColor } from "@/lib/domain-colors";
 import { markFlashcardSeen, resetFlashcardViews } from "./actions";
+import type { ExamSlug } from "@/lib/exam";
 
 // Domain emoji = fallback when no topic keyword matches. 80/150 cards live in
 // "Cloud Technology and Services", so the domain emoji alone made almost every
@@ -115,7 +116,7 @@ export type FlashcardItem = {
 type Props = {
   cards: FlashcardItem[];
   domains: string[];
-  homeHref: string;
+  exam: ExamSlug;
 };
 
 function shuffleInPlace<T>(arr: T[]): T[] {
@@ -127,7 +128,8 @@ function shuffleInPlace<T>(arr: T[]): T[] {
   return out;
 }
 
-export function FlashcardGrid({ cards, domains, homeHref }: Props) {
+export function FlashcardGrid({ cards, domains, exam }: Props) {
+  const homeHref = `/${exam}`;
   const initialOrder = useMemo(() => cards.map((c) => c.id), [cards]);
   const byId = useMemo(() => {
     const m = new Map<number, FlashcardItem>();
@@ -183,7 +185,7 @@ export function FlashcardGrid({ cards, domains, homeHref }: Props) {
     setDomain("all");
     setFlipped(new Set());
     setOrder(initialOrder);
-    void resetFlashcardViews().catch(() => {});
+    void resetFlashcardViews(exam).catch(() => {});
   }
 
   function toggleCard(id: number) {

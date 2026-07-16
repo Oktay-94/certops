@@ -30,7 +30,7 @@ function cardButton(): HTMLElement {
 
 describe("FlashcardGrid flip (behaviour preserved through re-skin)", () => {
   it("click toggles the .flipped class and marks seen once on reveal", () => {
-    render(<FlashcardGrid homeHref="/clf" cards={cards} domains={["Cloud Concepts"]} />);
+    render(<FlashcardGrid exam="clf" cards={cards} domains={["Cloud Concepts"]} />);
     const inner = document.querySelector(".flip-inner")!;
     expect(inner.className).not.toContain("flipped");
 

@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { getQuestionsByCert } from "@/db/repository";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { QuizConfigForm } from "./QuizConfigForm";
-import type { ExamSlug } from "@/lib/exam";
+import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
 
 type Props = {
   params: Promise<{ exam: ExamSlug }>;
@@ -12,7 +12,7 @@ type Props = {
 
 export default async function QuizPage({ params, searchParams }: Props) {
   const { exam } = await params;
-  const questions = await getQuestionsByCert(db, "CLF-C02");
+  const questions = await getQuestionsByCert(db, EXAM_CERT[exam]);
   const { error } = await searchParams;
 
   if (questions.length === 0) {

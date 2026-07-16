@@ -29,7 +29,8 @@ import {
   scoreColorHex,
 } from "@/lib/scoreColor";
 import { getActiveProfileId } from "@/lib/profile-cookie";
-import type { ExamSlug } from "@/lib/exam";
+import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
+import { DOMAINS_BY_CERT } from "@/lib/domains";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { AreaTiles } from "@/components/dashboard/AreaTiles";
 import { MiniCalendar } from "@/components/dashboard/MiniCalendar";
@@ -40,15 +41,6 @@ import { PersistentWeaknesses } from "./PersistentWeaknesses";
 import { TrendCompactBars } from "./TrendCompactBars";
 import { TrendLineChart } from "./TrendLineChart";
 import { WeakestBox } from "./WeakestBox";
-
-const CERT = "CLF-C02" as const;
-
-const DOMAINS = [
-  "Cloud Concepts",
-  "Security and Compliance",
-  "Cloud Technology and Services",
-  "Billing, Pricing, and Support",
-] as const;
 
 const DOMAIN_ICONS: Record<FallbackIconName, LucideIcon> = {
   Cloud,
@@ -67,6 +59,8 @@ export default async function StatsPage({
   params: Promise<{ exam: ExamSlug }>;
 }) {
   const { exam } = await params;
+  const cert = EXAM_CERT[exam];
+  const domains = DOMAINS_BY_CERT[cert];
   const userId = await getActiveProfileId();
 
   if (!userId) return <EmptyState exam={exam} />;
@@ -83,15 +77,15 @@ export default async function StatsPage({
     persistent,
     timestamps,
   ] = await Promise.all([
-    getOverallAvgLast3(db, userId, CERT),
-    getQuestionsByCert(db, CERT),
-    countAnsweredQuestions(db, userId, CERT),
-    getDomainPerformance(db, userId, CERT),
-    getWeakestQuestions(db, userId, CERT, 10),
-    getRoundTrend(db, userId, CERT, 10),
-    getLastRoundReview(db, userId, CERT),
-    getPersistentWeakest(db, userId, CERT, 4),
-    getAttemptTimestamps(db, userId, CERT),
+    getOverallAvgLast3(db, userId, cert),
+    getQuestionsByCert(db, cert),
+    countAnsweredQuestions(db, userId, cert),
+    getDomainPerformance(db, userId, cert),
+    getWeakestQuestions(db, userId, cert, 10),
+    getRoundTrend(db, userId, cert, 10),
+    getLastRoundReview(db, userId, cert),
+    getPersistentWeakest(db, userId, cert, 4),
+    getAttemptTimestamps(db, userId, cert),
   ]);
   const totalQuestions = allQuestions.length;
 
@@ -158,7 +152,7 @@ export default async function StatsPage({
             {totalQuestions}
           </div>
           <p className="mt-2 text-[12.5px] text-ink-soft">
-            Im CLF-Pool · 4 Domains.
+            Im {cert}-Pool · 4 Domains.
           </p>
         </Tile>
 
@@ -182,7 +176,7 @@ export default async function StatsPage({
           className="md:col-span-5"
         >
           <div>
-            {DOMAINS.map((domain, i) => (
+            {domains.map((domain, i) => (
               <DomainBar
                 key={domain}
                 domain={domain}

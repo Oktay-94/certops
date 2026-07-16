@@ -151,6 +151,7 @@ export type AttemptStats = {
 export async function getAttemptStats(
   db: DB,
   userId: string,
+  cert: Question["cert"],
 ): Promise<AttemptStats> {
   const rows = await db
     .select({
@@ -162,7 +163,7 @@ export async function getAttemptStats(
     })
     .from(questionAttempts)
     .innerJoin(questions, eq(questionAttempts.questionId, questions.id))
-    .where(eq(questionAttempts.userId, userId))
+    .where(and(eq(questionAttempts.userId, userId), eq(questions.cert, cert)))
     .groupBy(questions.domain)
     .orderBy(asc(questions.domain))
     .all();

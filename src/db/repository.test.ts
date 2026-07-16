@@ -456,7 +456,7 @@ describe("getAttemptStats", () => {
   });
 
   it("returns zeroed stats for a session with no attempts", async () => {
-    expect(await getAttemptStats(db, "session-empty")).toEqual({
+    expect(await getAttemptStats(db, "session-empty", "CLF-C02")).toEqual({
       total: 0,
       correct: 0,
       byDomain: [],
@@ -490,7 +490,7 @@ describe("getAttemptStats", () => {
       sessionId: "s1",
     });
 
-    const stats = await getAttemptStats(db, "s1");
+    const stats = await getAttemptStats(db, "s1", "CLF-C02");
     expect(stats.total).toBe(3);
     expect(stats.correct).toBe(1);
 
@@ -526,7 +526,7 @@ describe("getAttemptStats", () => {
       sessionId: "s2",
     });
 
-    const stats = await getAttemptStats(db, "s1");
+    const stats = await getAttemptStats(db, "s1", "CLF-C02");
     expect(stats.total).toBe(1);
     expect(stats.correct).toBe(1);
   });
@@ -1451,7 +1451,7 @@ describe("read queries filter by user_id only, never session_id", () => {
 
   it("getAttemptStats / getLastNAttempts span both sessions of the user", async () => {
     await seedTwoDeviceUser();
-    const stats = await getAttemptStats(db, "oktay");
+    const stats = await getAttemptStats(db, "oktay", "CLF-C02");
     expect(stats.total).toBe(4); // not 2 — both devices counted
     expect(stats.correct).toBe(2);
     expect(await getLastNAttempts(db, "oktay", 10)).toHaveLength(4);
@@ -1491,7 +1491,7 @@ describe("read queries filter by user_id only, never session_id", () => {
 
   it("a different user_id sees none of oktay's two-session data", async () => {
     await seedTwoDeviceUser();
-    expect(await getAttemptStats(db, "merve")).toEqual({
+    expect(await getAttemptStats(db, "merve", "CLF-C02")).toEqual({
       total: 0,
       correct: 0,
       byDomain: [],

@@ -17,7 +17,7 @@ vi.mock("@/app/exam-actions", () => ({
 describe("ExamTile states", () => {
   it("countdown: shows days, date and progress ring", () => {
     render(
-      <ExamTile
+      <ExamTile cert="CLF-C02"
         state={{
           kind: "countdown",
           daysLeft: 42,
@@ -34,7 +34,7 @@ describe("ExamTile states", () => {
 
   it("countdown: pencil toggles the inline date editor", () => {
     render(
-      <ExamTile
+      <ExamTile cert="CLF-C02"
         state={{
           kind: "countdown",
           daysLeft: 42,
@@ -60,7 +60,7 @@ describe("ExamTile states", () => {
 
   it("countdown: mini calendar shows the current month label", () => {
     render(
-      <ExamTile
+      <ExamTile cert="CLF-C02"
         state={{
           kind: "countdown",
           daysLeft: 42,
@@ -79,7 +79,7 @@ describe("ExamTile states", () => {
   });
 
   it("decision: offers Bestanden / Nicht bestanden", () => {
-    render(<ExamTile state={{ kind: "decision" }} />);
+    render(<ExamTile cert="CLF-C02" state={{ kind: "decision" }} />);
     expect(
       screen.getByRole("button", { name: /bestanden 🎉/i }),
     ).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe("ExamTile states", () => {
   });
 
   it("reschedule: date input + start button (disabled until a date is set)", () => {
-    render(<ExamTile state={{ kind: "reschedule" }} />);
+    render(<ExamTile cert="CLF-C02" state={{ kind: "reschedule" }} />);
     expect(screen.getByLabelText("Neues Prüfungsdatum")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /countdown starten/i }),
@@ -97,14 +97,14 @@ describe("ExamTile states", () => {
   });
 
   it("passed: renders the certificate", () => {
-    render(<ExamTile state={{ kind: "passed" }} />);
+    render(<ExamTile cert="CLF-C02" state={{ kind: "passed" }} />);
     expect(
       screen.getByText("AWS Certified Cloud Practitioner"),
     ).toBeInTheDocument();
   });
 
   it("passed: pencil opens the date editor to plan a new exam (SAA)", () => {
-    render(<ExamTile state={{ kind: "passed" }} />);
+    render(<ExamTile cert="CLF-C02" state={{ kind: "passed" }} />);
     expect(screen.queryByLabelText("Neues Prüfungsdatum")).toBeNull();
 
     fireEvent.click(
