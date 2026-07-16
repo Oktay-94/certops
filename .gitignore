@@ -53,4 +53,3 @@ handoff.md
 
 # local DB backups (Turso exports, never commit)
 /backups/
-CHAT-CONTEXT.md
