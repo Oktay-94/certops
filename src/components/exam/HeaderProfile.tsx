@@ -64,10 +64,12 @@ export function HeaderProfile() {
       disabled={pending || !other}
       onClick={() => other && choose(other.id)}
       title={other ? `Zu ${other.name} wechseln` : undefined}
-      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-2 py-1 pl-2 pr-2.5 text-xs font-medium text-ink transition-colors hover:border-line-strong disabled:opacity-50"
+      aria-label={active ? `Profil: ${active.name}` : "Profil"}
+      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-2 py-1 pl-2 pr-2 text-xs font-medium text-ink transition-colors hover:border-line-strong disabled:opacity-50 sm:pr-2.5"
     >
       <ProfileAvatar profileId={profileId} />
-      <span>{active?.name ?? "Profil"}</span>
+      {/* Name is the <sm space saver: avatar-only pill on phones. */}
+      <span className="hidden sm:inline">{active?.name ?? "Profil"}</span>
     </button>
   );
 }

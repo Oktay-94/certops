@@ -19,8 +19,8 @@ export function ExamHeader({ exam }: { exam: ExamSlug }) {
       className="sticky top-0 z-40 border-b border-line backdrop-blur-[14px]"
       style={{ background: "color-mix(in srgb, var(--canvas) 82%, transparent)" }}
     >
-      <div className="mx-auto flex max-w-[1120px] items-center gap-3.5 px-6 py-3">
-        <span className="flex items-center gap-2 text-base font-bold tracking-[-0.02em] text-ink">
+      <div className="mx-auto flex max-w-[1120px] items-center gap-3 px-4 py-3 sm:gap-3.5 sm:px-6">
+        <span className="flex shrink-0 items-center gap-2 text-base font-bold tracking-[-0.02em] text-ink">
           <span
             className="h-2 w-2 rounded-full"
             style={{ background: "var(--orange-bright)" }}
@@ -31,7 +31,7 @@ export function ExamHeader({ exam }: { exam: ExamSlug }) {
         <span className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint sm:inline">
           {crumb.code} · <b className="font-medium text-ink-soft">{crumb.label}</b>
         </span>
-        <div className="ml-auto flex items-center gap-2.5">
+        <div className="ml-auto flex items-center gap-2 sm:gap-2.5">
           <HeaderProfile />
           <ExamSwitcher exam={exam} />
           <ThemeToggle />
