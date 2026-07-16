@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { EXAM_SLUGS, isExamSlug } from "@/lib/exam";
+import { ExamHeader } from "@/components/exam/ExamHeader";
 
 // Both exams are statically known; anything else (e.g. /foo/quiz) 404s via
 // the isExamSlug guard below. No dynamicParams=false here — the segment
@@ -24,6 +25,7 @@ export default async function ExamLayout({
 
   return (
     <div data-exam={exam} className="flex min-h-full flex-1 flex-col">
+      <ExamHeader exam={exam} />
       {children}
     </div>
   );
