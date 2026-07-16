@@ -1,8 +1,8 @@
-# CHAT-CONTEXT — CertOps SAA-C03 (Stand 16.07.2026, abends — nach SAA-Skript-Session + Mobile-Header-Fix)
+# CHAT-CONTEXT — CertOps SAA-C03 (Stand 17.07.2026 — nach Session 16.07. spätabends: strukturierte Karten-Rückseiten)
 
 > **Zweck:** Diese Datei macht jeden neuen Chat sofort arbeitsfähig, ohne den alten Verlauf. Sie ist die **Single Source of Truth** für den Projektstand.
 > **Zielort:** Project Knowledge **und** Repo-Root auf Oktays Mac (`~/Projekte/certops/`).
-> **Letzte große Änderung:** **SAA-Skript-Track komplett** — neue DB-Content-Art `scripts` (Migration 0012), 137 Dienst-Skripte lokal + live geseedet, Kategorie-Kapitel-Navigation (Schema B) mit gestapeltem Reader. Damit sind **alle drei SAA-Content-Stränge lokal UND live komplett** (§3). Dazu ein responsiver Header-Fix für schmale Viewports. Commits `db30c21`, `a07f745`, `8aaee7d`, `6cb5ed4`, `592e815` auf main (verifiziert via `git log --oneline -8`, origin synchron).
+> **Letzte große Änderung:** **Strukturierte Karten-Rückseiten (`back_structured`)** — Migration 0013 lokal + remote, Sektions-Boxen-UI mit finaler v4-Palette, Backfill-Tooling, Batch 1 (30/207) lokal + live (§3b). Sieben Commits `252d17e`…`692b830` auf main (verifiziert via `git log --oneline -10`, origin synchron). Davor: SAA-Skript-Track komplett (Migration 0012, 137 Skripte, Schema-B-Navigation) — alle drei SAA-Content-Stränge lokal UND live komplett (§3).
 
 ---
 
@@ -30,11 +30,27 @@
 
 **Alle drei Stränge damit lokal UND live komplett.**
 
-**Live-Turso-Stand (verifiziert 16.07. abends, 10 read-only-Checks alle grün):** questions **529** (264 `clf-c02-q-*` + 265 `saa-c03-q-*`), flashcards **357** (150 `clf-c02-card-*` + 207 `saa-c03-card-*`), **scripts 137** (alle `saa-c03-script-*`, 137 distinkte Slugs + Positionen), 0 NULL-/Fremd-Keys überall. `__drizzle_migrations` 13 Einträge, hash-synchron zur lokalen DB. question_attempts **651**, flashcard_views **10** — nur durch Lernen gewachsen, kein Datenverlust. CLF-`topic` weiterhin bewusst NULL (optionaler Backfill-Task).
+**Live-Turso-Stand (re-verifiziert 17.07. read-only):** questions **529** (264 `clf-c02-q-*` + 265 `saa-c03-q-*`), flashcards **357** (150 `clf-c02-card-*` + 207 `saa-c03-card-*`), **scripts 137**, 0 NULL-/Fremd-Keys. `__drizzle_migrations` **14** Einträge (inkl. 0013). question_attempts **658**, flashcard_views **18** — nur durch Lernen gewachsen, kein Datenverlust. **back_structured: 207/207 komplett** (alle `saa-c03-card-*`, 0 CLF — §3b; Batches 2–7 remote am 17.07. von Oktay gefahren, 177 Updates). CLF-`topic` weiterhin bewusst NULL (optionaler Backfill-Task).
+
+---
+
+## 3b. Strukturierte Karten-Rückseiten (`back_structured`) — komplett 207/207 ✅
+
+- **Spalte:** additiv `back_structured` (TEXT/JSON, nullable) auf `flashcards` via Migration **0013** (`0013_elite_lake.sql`), lokal + remote angewendet. CLF bleibt NULL, UI-Fallback auf flaches `back`.
+- **Format:** Keys `summary` / `why` / `example` / `examTrap` / `mnemonic` / `keywords` (Typ `FlashcardBackStructured` in `src/lib/flashcard-back.ts`, Runtime-Guard `isFlashcardBackStructured`; null-Felder werden VOR dem Shape-Guard gestrippt — `example` ist optional). **Verbindliche Content-Regel: konsequentes `**bold**` in ALLEN Sektionen** (Service-Namen, Limits, Entscheidungsbegriffe, `**Merke:**`-Präfix).
+- **Backfill-Tooling:** `src/db/back-structured-backfill.ts` — all-or-nothing-Validierung (seedKey-Pflicht, Duplikat-Check, Shape-Guard), raw UPDATE nur auf die eine Spalte (kein `updated_at`-Bump), kein INSERT (unbekannte seedKeys → `missing`, Exit 2). CLI: `pnpm db:backfill-back-structured` / `:remote` (Dual-Gate `ALLOW_PROD_SEED=1` + `--confirm`; `--dry-run` read-only). **Idempotent — Re-Runs überschreiben sauber** (so kam der Bolding-Pass nach: gleiche Datei editiert, erneut backfillen).
+- **Batch-Ablage:** `src/db/seed/saa-card-backs/batchN.json`, Format `{seedKey, backStructured}`. **Alle 7 Batches (batch1–7 = card-001–207, batch7 = 27 Einträge) lokal + remote durch:** Batch 1 am 16.07. (inkl. Bolding-Pass, PITR-Anker erster Remote-Lauf: `2026-07-16T20:21:20Z`), Batches 2–7 am 17.07. — lokal je dry-run + apply (30/30/30/30/30/27), Remote-Lauf Oktay (177 Updates). Verifiziert: lokal `count(back_structured IS NOT NULL)` = 207, 0 CLF, 0 SAA-Lücken; remote 207/207. Smoke card-121/181/207: 6 Sektionen mit Bolding, kein H-Scroll.
+- **Karten-UI:** `StructuredBack` in `FlashcardGrid.tsx` rendert 6 Sektions-Boxen mit lucide-Icons; **finale Palette (v4):** Kurz gesagt = Accent-Tint 10 % + Accent-Border (`/70`) · Warum so? = Emerald-Tint + Emerald-Border (`/60`) · Beispiel = ink 8 %, Body mono · Knackpunkt = randlose Amber-Fläche 15 % · Merksatz = Rosé-Tint + roter Border (rose-500, dark rose-400) · Stichworte = dashed ink-faint-Border + Pills. Kontrast per computed style **WCAG-AA-verifiziert** in light/dark/beiden Exam-Themes (Body bleibt überall `text-ink-soft`); Palette ist **dokumentierte Ausnahme der No-Rainbow-Regel** (Code-Kommentar am Block). `break-words` auf Sektions-Absätzen gegen H-Scroll (langer Token hatte den Karten-Scroller gesprengt).
+- **Suche** im Karten-Grid matcht auch die strukturierten Sektionen, nicht nur `back`.
+- **Commits (verifiziert via `git log --oneline -10`):** `252d17e` (Migration 0013 + Sektions-UI mit Fallback) · `01cd01c` (Batch 1 + Backfill-Tooling) · `8bc42f7` (Sektions-Boxen tinted/iconed) · `0436233` (distinct tints v2) · `4422bc7` (v3-Palette) · `59246f3` (v4-Borders) · `692b830` (Bolding-Pass Batch 1).
 
 ---
 
 ## 4. ERLEDIGT
+
+### Sessions 16.07. spätabends + 17.07. — strukturierte Karten-Rückseiten (komplett, 207/207)
+
+Vollständig in **§3b** dokumentiert (Migration 0013, Format + Content-Regel, Backfill-Tooling, v4-Palette, 7 Commits `252d17e`…`692b830` + Content-Commit Batches 2–7). Remote-Schritte (migrate 0013, Backfill Batch 1 mit Backup + PITR `2026-07-16T20:21:20Z`, Batches 2–7 mit 177 Updates am 17.07.) waren Oktays manuelle Läufe.
 
 ### Session 16.07. nachmittags/abends — SAA-Skript-Track (komplett)
 
@@ -73,11 +89,11 @@ Restpunkt „Cross-Exam-Round-Cookie → 404" besteht weiter (§5); ReadinessRin
 
 ---
 
-## 5. OFFENE TASKS (Stand 16.07. abends)
+## 5. OFFENE TASKS (Stand 17.07.)
 
 > **Skript-Integration ist NICHT mehr offen** — komplett erledigt (§4). Ebenso erledigt: ReadinessRing-Hydration.
 
-1. **Deploy:** Der Live-Stand auf Vercel ist noch ohne die fünf Session-Commits (Skript-Track + Header-Fix) — main pushen ist geschehen, Vercel-Deploy prüfen/auslösen. Die Remote-DB ist bereits migriert + geseedet, also gilt die Reihenfolge-Regel (§7) als erfüllt — Deploy kann jederzeit.
+1. **Deploy:** Der Live-Stand auf Vercel ist noch ohne die Commits seit `db30c21` (Skript-Track, Header-Fix, strukturierte Rückseiten) — main ist gepusht, Vercel-Deploy prüfen/auslösen. Die Remote-DB ist vollständig vorbereitet (Migrationen 0012 + 0013, Seeds, back_structured-Backfill), Reihenfolge-Regel (§7) erfüllt — Deploy kann jederzeit.
 2. **SAA-TTS = dokumentierte Schuld** (bewusst verschoben; Nachrüst-Skizze in CLAUDE.md: Resolver-DB-Zweig, Cache-Pfad `tts/saa/{slug}/{section}-{hash}.mp3`, Abuse-Guard-Semantik unverändert).
 3. **CLF-topic-Backfill** weiter optional (live überall NULL, coalesce-Upsert schützt Backfills).
 4. **Header-Pill Tap-Höhe:** Pills im Sticky-Header sind 27–28px hoch (bewusst = Desktop-Höhe, Komponente geteilt). Optionaler Folge-Task: unsichtbarer Hit-Slop (z. B. `before:-inset-y-2`) für echte ≥40px-Tap-Ziele mobil.
@@ -148,4 +164,4 @@ Restpunkt „Cross-Exam-Round-Cookie → 404" besteht weiter (§5); ReadinessRin
 
 ---
 
-*Ende CHAT-CONTEXT. Ein neuer Chat startet mit: alle drei SAA-Content-Stränge lokal + live komplett (529 Fragen / 357 Karten / 137 Skripte), nächste Schritte = Vercel-Deploy prüfen, dann Kür (Szenarien, TTS-Schuld, topic-Backfill).*
+*Ende CHAT-CONTEXT. Ein neuer Chat startet mit: alle drei SAA-Content-Stränge lokal + live komplett (529 Fragen / 357 Karten / 137 Skripte), strukturierte Karten-Rückseiten **207/207 lokal + remote komplett** (§3b). Nächste Schritte = Vercel-Deploy prüfen, dann Kür (Szenarien, TTS-Schuld, topic-Backfill).*
