@@ -27,6 +27,7 @@ Stack: Next.js 16 (App Router), React 19, Tailwind 4, SQLite via Drizzle ORM, Ty
   - Security and Compliance → rose
   - Cloud Technology and Services → violet
   - Billing, Pricing, and Support → amber
+- **SAA-Skript-Kategorie-Palette (Mockup, freigegeben):** zentral in `src/lib/saa-script-categories.ts` (accent/bg-Hex verbatim). compute #7c3aed · storage #059669 · db #4f46e5 · net #2563eb · sec #dc2626 · int #db2777 · ana #0d9488 · mgmt #d97706 · mig #0891b2 · cost #65a30d.
 - **Kein** Glassmorphism / Bento / OLED / Premium-Refactor.
 - lucide-react für Icons, sparsam. Tastatur-Navigation muss erhalten bleiben.
 
@@ -39,6 +40,7 @@ Stack: Next.js 16 (App Router), React 19, Tailwind 4, SQLite via Drizzle ORM, Ty
 
 ## Architektur-Entscheidungen (bewusst)
 - **Skript-Speichermodell-Split:** CLF-Skript bleibt dateibasiert (13 Kapitel, `src/content/skript/`, voll statisch); SAA-Skripte liegen als DB-Content in der `scripts`-Tabelle (137 Dienst-Skripte, geseedet aus `src/db/seed/saa-scripts/*.md` via seed_key-Upsert) — sie teilen Lifecycle/Tooling mit dem übrigen SAA-Seed-Content, nicht mit dem CLF-Kapitel-Buch.
+- **SAA-Skript-Navigation = Kategorie-Kapitel (Schema B, freigegeben 2026-07-16):** bewusste Abkehr von der Blueprint-Notiz „CLF-Kategorienstruktur nicht kopieren". 10 Kategorien als Navigation (`/saa/skript` Grid → `/saa/skript/kategorie/<catKey>`), Prüfungs-Domänen D1–D4 bleiben als Chips AM Dienst. Mapping + Kategorie-Metadaten statisch in `src/lib/saa-script-categories.ts` (kein DB-Column — YAGNI, solange DB-seitig nicht gefiltert wird); Partition guard-getestet.
 
 ## Bekannte Schuld (dokumentiert, niedrig-Prio)
 - SAA-Skripte ohne TTS (bewusst verschoben). Nachrüst-Skizze: `resolveSegmentMarkdown` um einen DB-Zweig für SAA-Slugs erweitern (Abuse-Guard bleibt „nur geseedeter Content erreichbar"), Cache-Pfad `tts/saa/{slug}/{section}-{hash}.mp3`, content-addressed Hash unverändert.

@@ -17,12 +17,23 @@ import {
   TtsSectionButton,
 } from "@/components/skript/TtsPlayer";
 import { SaaScriptDetail, fetchScript } from "./SaaScriptDetail";
+import { SCRIPT_SLUGS_BY_CATEGORY } from "@/lib/saa-script-categories";
 
-// Only the CLF chapters prerender (exam pinned to "clf"); SAA script slugs
-// resolve at request time from the DB, so dynamicParams must stay true.
+// CLF chapters prerender; the SAA slugs are enumerated from the STATIC
+// category mapping (no build-time DB) — their build render bails out via
+// connection() and Next registers them as request-time dynamic. Slugs not
+// listed here 404 via dynamicParams=false, so production never attempts
+// on-demand static generation (which would 500 on connection()).
 export function generateStaticParams() {
-  return SKRIPT_CHAPTERS.map((c) => ({ exam: "clf", kapitel: c.slug }));
+  return [
+    ...SKRIPT_CHAPTERS.map((c) => ({ exam: "clf", kapitel: c.slug })),
+    ...Object.values(SCRIPT_SLUGS_BY_CATEGORY)
+      .flat()
+      .map((slug) => ({ exam: "saa", kapitel: slug })),
+  ];
 }
+
+export const dynamicParams = false;
 
 export async function generateMetadata({
   params,

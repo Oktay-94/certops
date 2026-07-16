@@ -17,6 +17,10 @@ export function ringDashOffset(value: number): number {
 
 type Tick = { x1: number; y1: number; x2: number; y2: number; long: boolean };
 
+// 2 decimals: raw cos/sin floats serialize differently between SSR and client
+// hydration (dev-only warning); the rounding is visually invisible (<0.01px).
+const round2 = (n: number) => Number(n.toFixed(2));
+
 function buildTicks(): Tick[] {
   return Array.from({ length: TICKS }, (_, i) => {
     const a = (i / TICKS) * 2 * Math.PI - Math.PI / 2;
@@ -24,10 +28,10 @@ function buildTicks(): Tick[] {
     const r1 = R + 6;
     const r2 = R + (long ? 12 : 9);
     return {
-      x1: C + r1 * Math.cos(a),
-      y1: C + r1 * Math.sin(a),
-      x2: C + r2 * Math.cos(a),
-      y2: C + r2 * Math.sin(a),
+      x1: round2(C + r1 * Math.cos(a)),
+      y1: round2(C + r1 * Math.sin(a)),
+      x2: round2(C + r2 * Math.cos(a)),
+      y2: round2(C + r2 * Math.sin(a)),
       long,
     };
   });

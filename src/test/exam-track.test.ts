@@ -139,6 +139,7 @@ describe("switcher path mapping (spec: entity segments → dashboard root)", () 
     expect(switchExamPath("/clf/quiz/done", "saa")).toBe("/saa");
     expect(switchExamPath("/clf/skript/03-storage", "saa")).toBe("/saa");
     expect(switchExamPath("/saa/skript/amazon-s3", "clf")).toBe("/clf");
+    expect(switchExamPath("/saa/skript/kategorie/net", "clf")).toBe("/clf");
     expect(switchExamPath("/clf/services", "saa")).toBe("/saa");
     expect(switchExamPath("/clf/uebersicht", "saa")).toBe("/saa");
     expect(switchExamPath("/saa/quiz/1160", "clf")).toBe("/clf");

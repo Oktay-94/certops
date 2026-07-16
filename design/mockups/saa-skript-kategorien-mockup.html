@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — SAA-Skript-Kategorien</title>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root{
+    --bg:#f5f6f8; --grid:rgba(20,26,36,.045);
+    --card:#ffffff; --border:#e6e8ec; --border-strong:#d6d9df;
+    --ink:#141a24; --muted:#5b6472; --faint:#8a93a3;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:28px 28px;min-height:100vh;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 24px 80px}
+  .note{
+    font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--muted);
+    background:#fff;border:1px dashed var(--border-strong);border-radius:10px;
+    padding:12px 14px;margin-bottom:26px;
+  }
+  .note b{color:var(--ink)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .dot{width:9px;height:9px;border-radius:50%;background:#f59e0b}
+  .brand .name{font-weight:700;font-size:18px;letter-spacing:-.01em}
+  .brand .sub{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em}
+  .pills{display:flex;gap:6px;align-items:center}
+  .pill{font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--border-strong);background:#fff;color:var(--muted)}
+  .pill.on{border-color:var(--ink);color:var(--ink)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-left:4px solid var(--accent);
+    border-radius:14px;padding:18px 18px 16px;cursor:pointer;
+    transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(20,26,36,.08);border-color:var(--border-strong)}
+  .card.active{box-shadow:0 8px 24px rgba(20,26,36,.10)}
+  .chead{display:flex;align-items:flex-start;gap:13px}
+  .icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;flex:none;background:var(--accent-bg);color:var(--accent)}
+  .icon svg{width:22px;height:22px}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:3px}
+  .title{font-size:17px;font-weight:650;letter-spacing:-.01em;line-height:1.2}
+  .summary{color:var(--muted);font-size:13px;line-height:1.5;margin:9px 0 12px}
+  .count{display:inline-block;font-family:var(--mono);font-size:11.5px;color:var(--muted);background:var(--accent-bg);padding:4px 10px;border-radius:999px}
+  /* level 2 demo panel */
+  .panel{margin-top:22px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:6px 6px;display:none}
+  .panel.show{display:block}
+  .panel-head{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--faint);padding:12px 14px 6px}
+  .srow{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px}
+  .srow:hover{background:#f7f8fa}
+  .srow .svc{font-size:14px}
+  .chips{display:flex;gap:5px}
+  .chip{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:6px}
+  .d1{background:#e0f2fe;color:#0369a1}.d2{background:#d1fae5;color:#047857}
+  .d3{background:#fae8ff;color:#a21caf}.d4{background:#fef3c7;color:#b45309}
+  .legend{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="note">
+    MOCKUP — Vorschlag „Kategorie-Kapitel wie CLF". <b>Ebene 1</b> = Kategorie-Karten (unten), <b>Ebene 2</b> = Dienstliste je Kategorie (Karte klicken zum Antesten). Domänen bleiben als <b>Chips am Dienst</b> (D1–D4 = Prüfungsgewicht), Kategorie = Navigation. — Zahlen &amp; Kategorie-Farben sind illustrativ; finale Counts kommen aus dem Service→Kategorie-Mapping, Farben per Review (wie damals die Domain-Farben).
+  </div>
+
+  <div class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="name">CertOps</span>
+      <span class="sub">SAA-C03 · SOLUTIONS ARCHITECT</span>
+    </div>
+    <div class="pills">
+      <span class="pill">CLF-C02 ✓</span>
+      <span class="pill on">SAA-C03</span>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="panel" id="panel">
+    <div class="panel-head" id="panelHead"></div>
+    <div id="panelBody"></div>
+  </div>
+
+  <div class="legend">Ebene-2-Demo: Klick auf eine Karte zeigt eine Beispiel-Dienstliste mit Domain-Chips. Alphabetisch, Chips = alle Domänen des Dienstes.</div>
+</div>
+
+<script>
+const cats = [
+  {key:"compute", eyebrow:"KATEGORIE", title:"Compute, Container & Edge", icon:"cpu",
+   accent:"#7c3aed", bg:"#f3effe", count:18,
+   summary:"EC2, Lambda, ECS/EKS/Fargate, Auto Scaling, Batch",
+   sample:[["Amazon EC2 (inkl. Kaufoptionen & Placement)",["d2","d3","d4"]],["AWS Lambda",["d2","d3"]],["Amazon ECS (+ ECS Anywhere)",["d2","d3"]],["Amazon EKS",["d2","d3","d4"]],["AWS Fargate",["d2","d4"]]]},
+  {key:"storage", eyebrow:"KATEGORIE", title:"Storage", icon:"hard-drive",
+   accent:"#059669", bg:"#e7f6f0", count:10,
+   summary:"S3, EBS, EFS, FSx, Storage Gateway",
+   sample:[["Amazon S3",["d3","d4"]],["Amazon EBS",["d3","d4"]],["Amazon EFS",["d2","d3"]],["Amazon FSx",["d3"]],["AWS Storage Gateway",["d2"]]]},
+  {key:"db", eyebrow:"KATEGORIE", title:"Datenbanken", icon:"database",
+   accent:"#4f46e5", bg:"#ecebfb", count:14,
+   summary:"RDS, Aurora, DynamoDB, ElastiCache, Redshift",
+   sample:[["Amazon Aurora",["d2","d3"]],["Amazon DynamoDB",["d3","d4"]],["Amazon ElastiCache",["d3"]],["Amazon RDS",["d2","d3","d4"]],["Amazon Redshift",["d3","d4"]]]},
+  {key:"net", eyebrow:"KATEGORIE", title:"Netzwerk & Content Delivery", icon:"network",
+   accent:"#2563eb", bg:"#e6effd", count:16,
+   summary:"VPC, Route 53, CloudFront, Global Accelerator, Direct Connect",
+   sample:[["Amazon CloudFront",["d2","d3","d4"]],["AWS Global Accelerator",["d2","d3"]],["Amazon Route 53",["d2","d3"]],["Amazon VPC",["d1","d2","d3"]],["AWS PrivateLink",["d1","d3"]]]},
+  {key:"sec", eyebrow:"KATEGORIE", title:"Sicherheit, Identität & Compliance", icon:"shield",
+   accent:"#dc2626", bg:"#fdeaea", count:30,
+   summary:"IAM, KMS, Cognito, GuardDuty, WAF, Shield, Macie",
+   sample:[["AWS IAM (+ Identity Center, STS)",["d1"]],["Amazon Cognito",["d1"]],["Amazon GuardDuty",["d1"]],["AWS KMS",["d1"]],["AWS WAF",["d1","d3"]]]},
+  {key:"int", eyebrow:"KATEGORIE", title:"Integration & Entkopplung", icon:"git-branch",
+   accent:"#db2777", bg:"#fce8f1", count:14,
+   summary:"SQS, SNS, EventBridge, Step Functions, API Gateway, MQ",
+   sample:[["Amazon API Gateway",["d1","d2","d3"]],["Amazon EventBridge",["d2"]],["Amazon MQ",["d2"]],["Amazon SNS",["d2"]],["Amazon SQS",["d2","d4"]]]},
+  {key:"ana", eyebrow:"KATEGORIE", title:"Analytik", icon:"bar-chart-3",
+   accent:"#0d9488", bg:"#e4f4f2", count:12,
+   summary:"Athena, Glue, Kinesis, EMR, OpenSearch, MSK",
+   sample:[["Amazon Athena",["d3"]],["AWS Glue",["d3"]],["Amazon Kinesis Data Streams",["d3"]],["Amazon MSK",["d3"]],["Amazon OpenSearch",["d3"]]]},
+  {key:"mgmt", eyebrow:"KATEGORIE", title:"Management & Governance", icon:"sliders-horizontal",
+   accent:"#d97706", bg:"#fdf0e0", count:12,
+   summary:"CloudFormation, CloudWatch, Config, Organizations, Systems Manager",
+   sample:[["AWS CloudFormation",["d2","d4"]],["Amazon CloudWatch",["d2","d3"]],["AWS Config",["d1"]],["AWS Organizations",["d1","d4"]],["AWS Systems Manager",["d1","d3"]]]},
+  {key:"mig", eyebrow:"KATEGORIE", title:"Migration & Transfer", icon:"truck",
+   accent:"#0891b2", bg:"#e3f3f8", count:6,
+   summary:"DMS, DataSync, Snow Family, Transfer Family",
+   sample:[["AWS DataSync",["d2","d3"]],["AWS DMS",["d2","d3"]],["AWS Snow Family",["d3"]],["AWS Transfer Family",["d1","d3"]]]},
+  {key:"cost", eyebrow:"KATEGORIE", title:"Kosten-Management", icon:"piggy-bank",
+   accent:"#65a30d", bg:"#eef6e2", count:5,
+   summary:"Budgets, Cost Explorer, Cost and Usage Report, Savings Plans",
+   sample:[["AWS Budgets",["d4"]],["AWS Cost Explorer",["d4"]],["AWS Cost and Usage Report",["d4"]],["Savings Plans",["d4"]]]},
+];
+
+const grid = document.getElementById('grid');
+const panel = document.getElementById('panel');
+const panelHead = document.getElementById('panelHead');
+const panelBody = document.getElementById('panelBody');
+let activeKey = null;
+
+cats.forEach(c=>{
+  const el = document.createElement('div');
+  el.className='card';
+  el.style.setProperty('--accent',c.accent);
+  el.style.setProperty('--accent-bg',c.bg);
+  el.innerHTML=`
+    <div class="chead">
+      <div class="icon"><i data-lucide="${c.icon}"></i></div>
+      <div>
+        <div class="eyebrow">${c.eyebrow}</div>
+        <div class="title">${c.title}</div>
+      </div>
+    </div>
+    <div class="summary">${c.summary}</div>
+    <span class="count">${c.count} Skripte</span>`;
+  el.addEventListener('click',()=>toggle(c,el));
+  grid.appendChild(el);
+});
+
+function toggle(c,el){
+  document.querySelectorAll('.card').forEach(x=>x.classList.remove('active'));
+  if(activeKey===c.key){ panel.classList.remove('show'); activeKey=null; return; }
+  activeKey=c.key; el.classList.add('active');
+  panelHead.textContent = c.title.toUpperCase()+'  ·  '+c.count+' SKRIPTE  ·  ALPHABETISCH';
+  panelBody.innerHTML = c.sample.map(([svc,ds])=>`
+    <div class="srow">
+      <span class="svc">${svc}</span>
+      <span class="chips">${ds.map(d=>`<span class="chip ${d}">${d.toUpperCase()}</span>`).join('')}</span>
+    </div>`).join('') + `<div class="srow"><span class="svc" style="color:var(--faint)">… weitere ${Math.max(0,c.count-c.sample.length)} Dienste</span></div>`;
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+lucide.createIcons();
+</script>
+</body>
+</html>
