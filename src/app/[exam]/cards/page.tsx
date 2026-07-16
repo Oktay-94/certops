@@ -4,6 +4,7 @@ import { getFlashcards } from "@/db/repository";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { FlashcardGrid } from "./FlashcardGrid";
 import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
+import { isFlashcardBackStructured } from "@/lib/flashcard-back";
 
 export default async function CardsPage({
   params,
@@ -39,6 +40,11 @@ export default async function CardsPage({
           domain: c.domain,
           front: c.front,
           back: c.back,
+          // Shape-guarded here so the client component only ever sees a
+          // valid object or null (malformed rows fall back to `back`).
+          backStructured: isFlashcardBackStructured(c.backStructured)
+            ? c.backStructured
+            : null,
           iconSlugs: c.iconSlugs ?? null,
         }))}
         domains={domains}

@@ -5,6 +5,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
+import type { FlashcardBackStructured } from "../lib/flashcard-back";
 
 export type Choice = { id: string; text: string };
 
@@ -120,6 +121,12 @@ export const flashcards = sqliteTable(
     seedKey: text("seed_key"),
 
     iconSlugs: text("icon_slugs", { mode: "json" }).$type<string[]>(),
+
+    // Structured back sections (SAA enrichment), nullable — CLF stays NULL,
+    // plain `back` is the render fallback. See src/lib/flashcard-back.ts.
+    backStructured: text("back_structured", {
+      mode: "json",
+    }).$type<FlashcardBackStructured>(),
 
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()

@@ -1,0 +1,1 @@
+ALTER TABLE `flashcards` ADD `back_structured` text;

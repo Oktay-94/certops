@@ -17,6 +17,7 @@ import remarkFlexibleMarkers from "remark-flexible-markers";
 import { getDomainColor } from "@/lib/domain-colors";
 import { markFlashcardSeen, resetFlashcardViews } from "./actions";
 import type { ExamSlug } from "@/lib/exam";
+import type { FlashcardBackStructured } from "@/lib/flashcard-back";
 
 // Domain emoji = fallback when no topic keyword matches. 80/150 cards live in
 // "Cloud Technology and Services", so the domain emoji alone made almost every
@@ -111,8 +112,79 @@ export type FlashcardItem = {
   domain: string;
   front: string;
   back: string;
+  // Shape-guarded server-side (page.tsx); null → plain `back` fallback.
+  backStructured: FlashcardBackStructured | null;
   iconSlugs: string[] | null;
 };
+
+// Fixed section order on the structured back; missing/empty sections are
+// simply skipped. Labels are the product wording (see flashcard-back.ts).
+const BACK_SECTIONS: Array<{
+  key: keyof Omit<FlashcardBackStructured, "keywords">;
+  label: string;
+}> = [
+  { key: "summary", label: "Kurz gesagt" },
+  { key: "why", label: "Warum so?" },
+  { key: "example", label: "Beispiel" },
+  { key: "examTrap", label: "⚠ Prüfungs-Knackpunkt" },
+  { key: "mnemonic", label: "Merksatz" },
+];
+
+function StructuredBack({ data }: { data: FlashcardBackStructured }) {
+  const keywords = (data.keywords ?? []).filter((k) => k.trim() !== "");
+  return (
+    <div className="space-y-3.5">
+      {BACK_SECTIONS.map(({ key, label }) => {
+        const text = data[key];
+        if (!text || text.trim() === "") return null;
+        return (
+          <section key={key}>
+            <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
+              {label}
+            </h4>
+            <p className="mt-1 whitespace-pre-wrap text-ink-soft">
+              {renderInline(text)}
+            </p>
+          </section>
+        );
+      })}
+      {keywords.length > 0 && (
+        <section>
+          <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
+            Stichworte
+          </h4>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {keywords.map((k) => (
+              <span
+                key={k}
+                className="rounded-full border border-line bg-surface-2 px-2.5 py-0.5 text-[11px] font-medium text-ink-soft"
+              >
+                {k}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+// Search must also hit the structured sections, not just the legacy back.
+function backSearchText(c: FlashcardItem): string {
+  if (!c.backStructured) return c.back;
+  const s = c.backStructured;
+  return [
+    c.back,
+    s.summary,
+    s.why,
+    s.example,
+    s.examTrap,
+    s.mnemonic,
+    ...(s.keywords ?? []),
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
 
 type Props = {
   cards: FlashcardItem[];
@@ -155,7 +227,9 @@ export function FlashcardGrid({ cards, domains, exam }: Props) {
       .filter((c): c is FlashcardItem => !!c)
       .filter((c) => (domain === "all" ? true : c.domain === domain))
       .filter((c) =>
-        q === "" ? true : (c.front + " " + c.back).toLowerCase().includes(q),
+        q === ""
+          ? true
+          : (c.front + " " + backSearchText(c)).toLowerCase().includes(q),
       );
   }, [order, byId, domain, query]);
 
@@ -369,14 +443,18 @@ export function FlashcardGrid({ cards, domains, exam }: Props) {
                       </div>
                       <div className="mx-5 shrink-0 border-t border-line" />
                       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 pr-4 text-sm leading-relaxed text-ink-soft">
-                        <ReactMarkdown
-                          remarkPlugins={REMARK_PLUGINS}
-                          allowedElements={MARKDOWN_ALLOWED}
-                          unwrapDisallowed
-                          components={MARKDOWN_COMPONENTS}
-                        >
-                          {c.back}
-                        </ReactMarkdown>
+                        {c.backStructured ? (
+                          <StructuredBack data={c.backStructured} />
+                        ) : (
+                          <ReactMarkdown
+                            remarkPlugins={REMARK_PLUGINS}
+                            allowedElements={MARKDOWN_ALLOWED}
+                            unwrapDisallowed
+                            components={MARKDOWN_COMPONENTS}
+                          >
+                            {c.back}
+                          </ReactMarkdown>
+                        )}
                       </div>
                       <div className="flex shrink-0 items-center justify-center gap-1 py-4 text-[11px] text-ink-faint">
                         <RefreshCw className="h-3.5 w-3.5" aria-hidden />

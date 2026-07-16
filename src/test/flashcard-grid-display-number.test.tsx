@@ -16,6 +16,7 @@ const cards: FlashcardItem[] = [
     domain: "Cloud Concepts",
     front: "F1",
     back: "B1",
+    backStructured: null,
     iconSlugs: null,
   },
   {
@@ -24,6 +25,7 @@ const cards: FlashcardItem[] = [
     domain: "Cloud Concepts",
     front: "F2",
     back: "B2",
+    backStructured: null,
     iconSlugs: null,
   },
   {
@@ -32,6 +34,7 @@ const cards: FlashcardItem[] = [
     domain: "Cloud Concepts",
     front: "F3",
     back: "B3",
+    backStructured: null,
     iconSlugs: null,
   },
 ];
@@ -59,6 +62,7 @@ describe("FlashcardGrid markdown answer", () => {
         domain: "Cloud Concepts",
         front: "Q",
         back: "**EC2:** virtuelle Server.",
+        backStructured: null,
         iconSlugs: null,
       },
     ];
@@ -87,6 +91,7 @@ describe("FlashcardGrid markdown answer", () => {
         domain: "Cloud Concepts",
         front: "Q",
         back: "==EC2== ist Compute.",
+        backStructured: null,
         iconSlugs: null,
       },
     ];

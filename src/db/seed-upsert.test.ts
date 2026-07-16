@@ -127,6 +127,40 @@ describe("idempotent seed (upsert on seed_key)", () => {
     expect(views[0]!.cardId).toBe(card!.id);
   });
 
+  it("4b. coalesce on back_structured — reseed without it keeps a backfilled value, seed with it wins", async () => {
+    await seedAll(db);
+    const key = allCards[0]!.seedKey!;
+
+    // Manual backfill (sources carry no back_structured — CLF stays NULL).
+    const backfilled = { summary: "Backfilled durch Hand-Edit." };
+    await db
+      .update(flashcards)
+      .set({ backStructured: backfilled })
+      .where(eq(flashcards.seedKey, key))
+      .run();
+
+    await seedAll(db); // incoming NULL must not wipe the backfill
+    const afterReseed = await db
+      .select({ backStructured: flashcards.backStructured })
+      .from(flashcards)
+      .where(eq(flashcards.seedKey, key))
+      .get();
+    expect(afterReseed!.backStructured).toEqual(backfilled);
+
+    // A source that DOES carry back_structured updates the row.
+    const fromSeed = { summary: "Aus dem Seed.", keywords: ["S3"] };
+    const edited = allCards.map((c) =>
+      c.seedKey === key ? { ...c, backStructured: fromSeed } : c,
+    );
+    await seedAll(db, edited);
+    const afterEdit = await db
+      .select({ backStructured: flashcards.backStructured })
+      .from(flashcards)
+      .where(eq(flashcards.seedKey, key))
+      .get();
+    expect(afterEdit!.backStructured).toEqual(fromSeed);
+  });
+
   it("5. NULL invariant — no content row has seed_key IS NULL after seeding", async () => {
     await seedAll(db);
     const qNulls = await db

@@ -20,6 +20,7 @@ const cards: FlashcardItem[] = [
     domain: "Cloud Concepts",
     front: "Was ist S3?",
     back: "Objektspeicher.",
+    backStructured: null,
     iconSlugs: null,
   },
 ];

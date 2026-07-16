@@ -61,6 +61,7 @@ export async function runSeed(db: DB, sources: SeedSources): Promise<SeedResult>
         // See questions: coalesce protects manual backfills.
         topic: sql`coalesce(excluded.topic, ${flashcards.topic})`,
         sourceRef: sql`coalesce(excluded.source_ref, ${flashcards.sourceRef})`,
+        backStructured: sql`coalesce(excluded.back_structured, ${flashcards.backStructured})`,
       },
     })
     .run();
