@@ -1,8 +1,8 @@
-# CHAT-CONTEXT — CertOps SAA-C03 (Stand 16.07.2026, abends — nach SAA-Skript-Session)
+# CHAT-CONTEXT — CertOps SAA-C03 (Stand 16.07.2026, abends — nach SAA-Skript-Session + Mobile-Header-Fix)
 
 > **Zweck:** Diese Datei macht jeden neuen Chat sofort arbeitsfähig, ohne den alten Verlauf. Sie ist die **Single Source of Truth** für den Projektstand.
 > **Zielort:** Project Knowledge **und** Repo-Root auf Oktays Mac (`~/Projekte/certops/`).
-> **Letzte große Änderung:** **SAA-Skript-Track komplett** — neue DB-Content-Art `scripts` (Migration 0012), 137 Dienst-Skripte lokal + live geseedet, Kategorie-Kapitel-Navigation (Schema B) mit gestapeltem Reader. Damit sind **alle drei SAA-Content-Stränge lokal UND live komplett** (§3). Commits `db30c21`, `a07f745`, `8aaee7d`, `6cb5ed4` auf main (verifiziert via `git log`, origin synchron).
+> **Letzte große Änderung:** **SAA-Skript-Track komplett** — neue DB-Content-Art `scripts` (Migration 0012), 137 Dienst-Skripte lokal + live geseedet, Kategorie-Kapitel-Navigation (Schema B) mit gestapeltem Reader. Damit sind **alle drei SAA-Content-Stränge lokal UND live komplett** (§3). Dazu ein responsiver Header-Fix für schmale Viewports. Commits `db30c21`, `a07f745`, `8aaee7d`, `6cb5ed4`, `592e815` auf main (verifiziert via `git log --oneline -8`, origin synchron).
 
 ---
 
@@ -38,12 +38,13 @@
 
 ### Session 16.07. nachmittags/abends — SAA-Skript-Track (komplett)
 
-**Vier Commits, alle auf main (FF, origin synchron): `db30c21`, `a07f745`, `8aaee7d`, `6cb5ed4`.**
+**Fünf Commits, alle auf main (FF, origin synchron): `db30c21`, `a07f745`, `8aaee7d`, `6cb5ed4`, `592e815`.**
 
 - **DB-Content-Art `scripts`** (`db30c21`): neue Tabelle via Drizzle-Migration **0012** (`seed_key` notNull UNIQUE, `(cert, slug)` UNIQUE, `domains` json, `position` für Lesereihenfolge = BatchNr×1000+Alpha-Index). 137 md-Quellen (Haupt-ZIP + 8 KORRIGIERT-Overrides, SHA-verifiziert; kein `b10-organizations` — b5 ist die eine legitime Organizations-Datei) nach `src/db/seed/saa-scripts/`. Loader mit gray-matter (echtes YAML, devDependency), Slug = bestehendes `slugifyHeading()` (EIN Slugger). Upsert in seed-core mit coalesce auf `sourceRef`. Guard-Tests: 137, seedKey-Kollisionsfreiheit über ALLE Content-Arten, Slug-Eindeutigkeit, genau 1× Organizations (B5), Idempotenz gegen `:memory:`. `/skript` als geteilter Switcher-Subpfad, Skript-Tile im SAA-Dashboard aktiviert.
 - **Kategorie-Kapitel-Navigation, Schema B** (`a07f745`): `/saa/skript` = Grid mit **10 Kategorien** (Mapping statisch in `src/lib/saa-script-categories.ts`, KEIN DB-Column — Partition guard-getestet: jeder der 137 Slugs in genau einer Kategorie). Domänen D1–D4 bleiben Chips AM Dienst. **Prod-Fix im selben Commit:** `[kapitel]`-generateStaticParams enumeriert die 137 SAA-Slugs aus dem statischen Mapping + `dynamicParams=false` — vorher lieferten SAA-Detailseiten unter `next start` 500 (`DYNAMIC_SERVER_USAGE` bei on-demand-Static-Attempt auf `connection()`; Dev kaschiert das!). CLF-Kapitel bleiben ● SSG, SAA-Seiten ƒ request-dynamisch (Header-verifiziert: `no-store` vs. `prerender HIT`). Außerdem: ReadinessRing-Tick-Koordinaten auf 2 Dezimalen gerundet → **Hydration-Warnung behoben** (§5-Restpunkt erledigt).
 - **Dark-Fix** (`8aaee7d`): Kategorie-Karten von Mockup-Pastell auf theme-reaktiv (solid-Accent-Kachel + weißes Icon, Count-Pill via color-mix — CLF-Kapitelkarten-Rezept, keine hartkodierten Hellwerte).
 - **Gestapelter Kategorie-Reader** (`6cb5ed4`): `/saa/skript/kategorie/<catKey>` = CLF-Kapitel-artige Leseseite — alle Skripte der Kategorie voll gerendert (SkriptMarkdown wiederverwendet), alphabetisch, TOC mit D-Chips → In-Page-Anker. **Anchor-Uniqueness:** Sektion-IDs unter dem Dienst-Slug genamespaced via `stackedAnchorId()` in `skript.ts` (`<dienst>--<sektion>`, reine Verkettung, kein zweiter Slugger; `--` kann in Einzel-Slugs nie entstehen), guard-getestet pro Kategorie. **Detailseiten `/saa/skript/<slug>` bleiben additiv erhalten** (Deep-Links + dynamicParams-Fix) — bewusste, reversible Zwei-Oberflächen-Entscheidung (CLAUDE.md).
+- **Responsiver Header-Fix mobil** (`592e815`): Sticky-Header (ExamHeader/HeaderProfile aus `94d9ba2`) lief bei ~360px über (Theme-Toggle abgeschnitten, Seite horizontal pannbar). Root-Fix statt Kaschieren: unter `sm` Avatar-only-Profil-Pill, Kurzlabels `CLF ✓`/`SAA` im Switcher, engere Paddings/Gaps, `whitespace-nowrap` gegen Pill-Umbruch; ab `sm` exakt die bisherigen Klassen → **Desktop pixel-identisch** (Kontrollbreiten 78/87/73/56px vorher = nachher). Smoke bei echtem 360px-Fenster + 1440px, je /clf und /saa: kein body-overflow-x, Toggle sichtbar + tappbar (Dark-Toggle-Roundtrip), Switcher-Navigation funktioniert.
 - **Remote-Write 16.07. abends:** Backup `backups/certops-pre-scripts-20260716.db` (self-verified: integrity_check ok, 529/357), **PITR-Anker `2026-07-16T15:18:41.560Z`**. Danach `db:migrate:remote` + `db:seed:remote` (Oktays manuelle Schritte), abschließend 10 read-only-Verifikations-Checks — alle grün (§3).
 - Validierung Code-Seite: 350/350 Tests, tsc strict, Build-SSG-Abnahme, Browser-Smokes dark+light gegen Wegwerf-DB (Production-Server; Dev-Lock von Next 16 erlaubt nur einen Dev-Server pro Projekt-Dir).
 
@@ -76,10 +77,12 @@ Restpunkt „Cross-Exam-Round-Cookie → 404" besteht weiter (§5); ReadinessRin
 
 > **Skript-Integration ist NICHT mehr offen** — komplett erledigt (§4). Ebenso erledigt: ReadinessRing-Hydration.
 
-1. **Deploy:** Der Live-Stand auf Vercel ist noch ohne die vier Skript-Commits — main pushen ist geschehen, Vercel-Deploy prüfen/auslösen. Die Remote-DB ist bereits migriert + geseedet, also gilt die Reihenfolge-Regel (§7) als erfüllt — Deploy kann jederzeit.
+1. **Deploy:** Der Live-Stand auf Vercel ist noch ohne die fünf Session-Commits (Skript-Track + Header-Fix) — main pushen ist geschehen, Vercel-Deploy prüfen/auslösen. Die Remote-DB ist bereits migriert + geseedet, also gilt die Reihenfolge-Regel (§7) als erfüllt — Deploy kann jederzeit.
 2. **SAA-TTS = dokumentierte Schuld** (bewusst verschoben; Nachrüst-Skizze in CLAUDE.md: Resolver-DB-Zweig, Cache-Pfad `tts/saa/{slug}/{section}-{hash}.mp3`, Abuse-Guard-Semantik unverändert).
 3. **CLF-topic-Backfill** weiter optional (live überall NULL, coalesce-Upsert schützt Backfills).
-4. **Klein/bei Gelegenheit:** Szenarien-Feature (Teaser-Tile lebt im SAA-Dashboard); Redirect statt 404 bei Cross-Exam-Round-Cookie; die zwei read-only-Ops-Skripte (§7) aus dem Session-Scratchpad ins Repo übernehmen (`scripts/`), sonst sind sie nach Session-Ende weg.
+4. **Header-Pill Tap-Höhe:** Pills im Sticky-Header sind 27–28px hoch (bewusst = Desktop-Höhe, Komponente geteilt). Optionaler Folge-Task: unsichtbarer Hit-Slop (z. B. `before:-inset-y-2`) für echte ≥40px-Tap-Ziele mobil.
+5. **Vorbestehende Console-Exception beim Exam-Switch:** `InvalidStateError: Transition was aborted` aus `document.startViewTransition` (Switcher-Logik, nicht vom Header-Fix; Navigation funktioniert). Bei Gelegenheit abfangen/untersuchen.
+6. **Klein/bei Gelegenheit:** Szenarien-Feature (Teaser-Tile lebt im SAA-Dashboard); Redirect statt 404 bei Cross-Exam-Round-Cookie; die zwei read-only-Ops-Skripte (§7) aus dem Session-Scratchpad ins Repo übernehmen (`scripts/`), sonst sind sie nach Session-Ende weg.
 
 ---
 
