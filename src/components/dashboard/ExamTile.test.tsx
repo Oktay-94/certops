@@ -15,6 +15,18 @@ vi.mock("@/app/exam-actions", () => ({
 }));
 
 describe("ExamTile states", () => {
+  it("unscheduled: empty state with date picker, no countdown", () => {
+    render(<ExamTile cert="SAA-C03" state={{ kind: "unscheduled" }} />);
+    expect(
+      screen.getByText(/Noch kein Prüfungstermin — Datum eintragen/),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Neues Prüfungsdatum")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Countdown starten/ }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/bis zur Prüfung/)).not.toBeInTheDocument();
+  });
+
   it("countdown: shows days, date and progress ring", () => {
     render(
       <ExamTile cert="CLF-C02"
