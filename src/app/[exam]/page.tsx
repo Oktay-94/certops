@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { db } from "@/db";
 import {
   countSeenFlashcards,
@@ -17,8 +16,8 @@ import {
   resolveExamStatus,
 } from "@/lib/exam-status";
 import { getActiveProfileId } from "@/lib/profile-cookie";
-import { getProfileBranding } from "@/lib/profile-branding";
 import { ProfileSwitcher } from "@/components/profile/ProfileSwitcher";
+import { ProfileDisplaySync } from "@/components/profile/ProfileDisplaySync";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { AreaTiles } from "@/components/dashboard/AreaTiles";
 import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
@@ -38,7 +37,6 @@ export default async function Home({
   const { exam } = await params;
   const cert = EXAM_CERT[exam];
   const userId = await getActiveProfileId();
-  const branding = getProfileBranding(userId);
   const now = new Date();
 
   const cardsTotal = (await getFlashcards(db, cert)).length;
@@ -82,46 +80,14 @@ export default async function Home({
     <main className="relative mx-auto w-full max-w-[1120px] px-6 pb-20 pt-10">
       <ScrollBackground />
 
-      {/* Header: logo/profile row (unchanged behaviour) */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          {branding ? (
-            <>
-              {/* Light: profile logo PNG. Dark: mockup wordmark (the PNGs are
-                  light-baked; the mockups use a text wordmark anyway). */}
-              <Image
-                src={branding.logoSrc}
-                alt="CertOps"
-                width={1200}
-                height={428}
-                priority
-                className="h-auto w-full max-w-[200px] dark:hidden sm:max-w-[260px]"
-              />
-              <div className="hidden items-center gap-2 text-base font-bold tracking-[-0.02em] text-ink dark:flex">
-                <span
-                  className="h-2 w-2 rounded-full"
-                  style={{ background: "var(--orange-bright)" }}
-                  aria-hidden
-                />
-                CertOps
-                <span className="ml-1 font-mono text-[9.5px] font-normal uppercase tracking-[0.14em] text-ink-faint">
-                  {branding.profileName}
-                </span>
-              </div>
-            </>
-          ) : (
-            <h1 className="text-3xl font-semibold tracking-tight text-ink">
-              CertOps
-            </h1>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {userId && <ProfileSwitcher activeProfileId={userId} />}
-        </div>
-      </div>
-
-      {!userId && (
-        <div className="mt-8">
+      {/* Logo/profile row removed (approved 2026-07-16): the sticky
+          ExamHeader owns wordmark + profile pill now — no more wordmark
+          doubling, the light-mode profile logo PNG is retired with it.
+          Only the first-visit chooser stays page-level. */}
+      {userId ? (
+        <ProfileDisplaySync profileId={userId} />
+      ) : (
+        <div className="mt-2">
           <ProfileSwitcher activeProfileId={null} />
         </div>
       )}

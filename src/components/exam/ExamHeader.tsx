@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import type { ExamSlug } from "@/lib/exam";
 import { ExamSwitcher } from "./ExamSwitcher";
+import { HeaderProfile } from "./HeaderProfile";
 
 // Crumb text per mockup (statistik-v3 #exam-name).
 const CRUMB: Record<ExamSlug, { code: string; label: string }> = {
@@ -31,6 +32,7 @@ export function ExamHeader({ exam }: { exam: ExamSlug }) {
           {crumb.code} · <b className="font-medium text-ink-soft">{crumb.label}</b>
         </span>
         <div className="ml-auto flex items-center gap-2.5">
+          <HeaderProfile />
           <ExamSwitcher exam={exam} />
           <ThemeToggle />
         </div>

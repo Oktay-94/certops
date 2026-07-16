@@ -12,6 +12,13 @@ export const PROFILES: readonly Profile[] = [
 
 export const PROFILE_IDS: readonly string[] = PROFILES.map((p) => p.id);
 
+// Non-httpOnly DISPLAY mirror of the identity cookie — read client-side by
+// the header profile pill only. The authoritative certops_profile cookie
+// stays httpOnly; the server never reads this one. Lives here (not in
+// profile-cookie.ts) because that module imports next/headers and cannot be
+// pulled into client components.
+export const PROFILE_DISPLAY_COOKIE = "certops_profile_display";
+
 export function getProfileById(id: string | undefined | null): Profile | undefined {
   if (!id) return undefined;
   return PROFILES.find((p) => p.id === id);

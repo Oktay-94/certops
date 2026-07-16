@@ -9,7 +9,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { DB } from "@/db/index";
 import * as schema from "@/db/schema";
-import { questionAttempts, questions } from "@/db/schema";
+import { questionAttempts } from "@/db/schema";
 import {
   getAttemptStats,
   getExamStatus,
