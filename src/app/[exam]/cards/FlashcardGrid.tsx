@@ -122,18 +122,21 @@ export type FlashcardItem = {
   iconSlugs: string[] | null;
 };
 
-// Section boxes on the structured back. Tints are token-derived (count-pill
-// recipe: color-mix over var(--ink)/var(--accent)) so they track theme AND
-// exam accent. The three "neutral" boxes are deliberately distinguishable but
-// stay in the 4–8 % range on just two token hues (accent + ink) — no rainbow:
-//   Kurz gesagt  → accent 6 % (lighter than Merksatz's 10 %)
-//   Warum so?    → ink 4 %
-//   Beispiel     → ink 8 % (stronger panel = the code/surface-2 character)
-// Warn reuses the established amber idiom (ServiceCardGrid/BattleQuiz), a
-// notch stronger. Merksatz adds an amber border on its accent tint; the
-// Knackpunkt box stays borderless amber FILL, so the two read differently.
+// Section boxes on the structured back (v3 palette, explicitly approved —
+// deliberate exception to the "no rainbow" default). Recipes:
+//   Kurz gesagt  → accent 10 % tint + accent border (token-derived, tracks
+//                  theme AND exam accent via color-mix/var(--accent))
+//   Warum so?    → translucent emerald tint + border (Tailwind literals; the
+//                  amber-warn idiom transposed — /10 fills read on both themes,
+//                  labels use the 700-light/300-dark shade pair)
+//   Beispiel     → ink 8 % (code/surface-2 character, unchanged)
+//   Knackpunkt   → borderless amber FILL (unchanged)
+//   Merksatz     → soft rose tint + saturated amber border with a ring glow
+//                  (damped in dark so it doesn't burn on the dark canvas)
+//   Stichworte   → ink 4 % + dashed line border (unchanged)
+// Body copy stays text-ink-soft everywhere — tints are capped low enough
+// (≤15 %) that they never carry the contrast burden.
 const TINT = {
-  accentSoft: "color-mix(in srgb, var(--accent) 6%, transparent)",
   ink: "color-mix(in srgb, var(--ink) 4%, transparent)",
   inkStrong: "color-mix(in srgb, var(--ink) 8%, transparent)",
   accent: "color-mix(in srgb, var(--accent) 10%, transparent)",
@@ -157,15 +160,16 @@ const BACK_SECTIONS: Array<{
     key: "summary",
     label: "Kurz gesagt",
     Icon: Zap,
-    bg: TINT.accentSoft,
-    labelClass: LABEL_NEUTRAL,
+    bg: TINT.accent,
+    boxClass: "border border-accent/50",
+    labelClass: "text-accent",
   },
   {
     key: "why",
     label: "Warum so?",
     Icon: HelpCircle,
-    bg: TINT.ink,
-    labelClass: LABEL_NEUTRAL,
+    boxClass: "border border-emerald-500/40 bg-emerald-500/10",
+    labelClass: "text-emerald-700 dark:text-emerald-300",
   },
   {
     key: "example",
@@ -186,9 +190,9 @@ const BACK_SECTIONS: Array<{
     key: "mnemonic",
     label: "Merksatz",
     Icon: Lightbulb,
-    bg: TINT.accent,
-    boxClass: "border border-amber-500/60",
-    labelClass: "text-accent",
+    boxClass:
+      "border border-amber-400 bg-rose-500/10 ring-2 ring-amber-400/30 dark:border-amber-300 dark:ring-amber-300/15",
+    labelClass: "text-rose-700 dark:text-rose-300",
   },
 ];
 
