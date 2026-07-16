@@ -87,6 +87,62 @@ const MAP: Record<string, DomainColor> = {
     fallbackIconName: "DollarSign",
     solid: "#d97706", // amber-600
   },
+  // SAA-C03 — no domain colors in the mockups (statistik-v3 carries only the
+  // CLF set); palette approved 2026-07-16: sky/emerald/fuchsia/amber, same
+  // -600 ladder convention as CLF. Cost deliberately reuses the CLF billing
+  // amber (same money semantics; the tracks never share a view).
+  "Design Secure Architectures": {
+    tag: "bg-sky-100 text-sky-800 border-sky-200",
+    borderAccent: "border-l-sky-600",
+    textAccent: "text-sky-600",
+    iconBg: "bg-sky-600",
+    bgSoft: "bg-sky-50",
+    barTrack: "bg-sky-100",
+    barFill: "bg-sky-600",
+    textStrong: "text-sky-900",
+    textMuted: "text-sky-700",
+    fallbackIconName: "Shield",
+    solid: "#0284c7", // sky-600
+  },
+  "Design Resilient Architectures": {
+    tag: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    borderAccent: "border-l-emerald-600",
+    textAccent: "text-emerald-600",
+    iconBg: "bg-emerald-600",
+    bgSoft: "bg-emerald-50",
+    barTrack: "bg-emerald-100",
+    barFill: "bg-emerald-600",
+    textStrong: "text-emerald-900",
+    textMuted: "text-emerald-700",
+    fallbackIconName: "Cloud",
+    solid: "#059669", // emerald-600
+  },
+  "Design High-Performing Architectures": {
+    tag: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
+    borderAccent: "border-l-fuchsia-600",
+    textAccent: "text-fuchsia-600",
+    iconBg: "bg-fuchsia-600",
+    bgSoft: "bg-fuchsia-50",
+    barTrack: "bg-fuchsia-100",
+    barFill: "bg-fuchsia-600",
+    textStrong: "text-fuchsia-900",
+    textMuted: "text-fuchsia-700",
+    fallbackIconName: "Server",
+    solid: "#c026d3", // fuchsia-600
+  },
+  "Design Cost-Optimized Architectures": {
+    tag: "bg-amber-100 text-amber-900 border-amber-200",
+    borderAccent: "border-l-amber-600",
+    textAccent: "text-amber-600",
+    iconBg: "bg-amber-600",
+    bgSoft: "bg-amber-50",
+    barTrack: "bg-amber-100",
+    barFill: "bg-amber-600",
+    textStrong: "text-amber-900",
+    textMuted: "text-amber-700",
+    fallbackIconName: "DollarSign",
+    solid: "#d97706", // amber-600
+  },
 };
 
 export function getDomainColor(domain: string): DomainColor {
