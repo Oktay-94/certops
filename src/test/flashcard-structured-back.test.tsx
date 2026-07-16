@@ -51,7 +51,7 @@ describe("FlashcardGrid structured back", () => {
       "Kurz gesagt",
       "Warum so?",
       "Beispiel",
-      "⚠ Prüfungs-Knackpunkt",
+      "Prüfungs-Knackpunkt",
       "Merksatz",
       "Stichworte",
     ]) {

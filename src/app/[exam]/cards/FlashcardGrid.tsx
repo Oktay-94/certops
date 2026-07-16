@@ -4,13 +4,18 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { renderInline } from "@/lib/inline-markup";
 import {
+  AlertTriangle,
   ArrowLeft,
+  HelpCircle,
   Lightbulb,
   MousePointerClick,
   RefreshCw,
   RotateCcw,
   Search,
   Shuffle,
+  Tag,
+  Terminal,
+  Zap,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkFlexibleMarkers from "remark-flexible-markers";
@@ -117,43 +122,105 @@ export type FlashcardItem = {
   iconSlugs: string[] | null;
 };
 
+// Section boxes on the structured back. Tints are token-derived (count-pill
+// recipe: color-mix over var(--ink)/var(--accent)) so they track theme AND
+// exam accent; the warn box reuses the established amber idiom
+// (ServiceCardGrid/BattleQuiz) and is deliberately a notch stronger.
+type SectionVariant = "neutral" | "warn" | "accent";
+
+const SECTION_BOX: Record<SectionVariant, string> = {
+  neutral: "color-mix(in srgb, var(--ink) 4%, transparent)",
+  warn: "", // Tailwind amber classes below (literal, purge-safe)
+  accent: "color-mix(in srgb, var(--accent) 10%, transparent)",
+};
+
+const SECTION_LABEL: Record<SectionVariant, string> = {
+  neutral: "text-ink-faint",
+  warn: "text-amber-700 dark:text-amber-300",
+  accent: "text-accent",
+};
+
 // Fixed section order on the structured back; missing/empty sections are
 // simply skipped. Labels are the product wording (see flashcard-back.ts).
 const BACK_SECTIONS: Array<{
   key: keyof Omit<FlashcardBackStructured, "keywords">;
   label: string;
+  Icon: typeof Zap;
+  variant: SectionVariant;
+  mono?: boolean;
 }> = [
-  { key: "summary", label: "Kurz gesagt" },
-  { key: "why", label: "Warum so?" },
-  { key: "example", label: "Beispiel" },
-  { key: "examTrap", label: "⚠ Prüfungs-Knackpunkt" },
-  { key: "mnemonic", label: "Merksatz" },
+  { key: "summary", label: "Kurz gesagt", Icon: Zap, variant: "neutral" },
+  { key: "why", label: "Warum so?", Icon: HelpCircle, variant: "neutral" },
+  {
+    key: "example",
+    label: "Beispiel",
+    Icon: Terminal,
+    variant: "neutral",
+    mono: true,
+  },
+  {
+    key: "examTrap",
+    label: "Prüfungs-Knackpunkt",
+    Icon: AlertTriangle,
+    variant: "warn",
+  },
+  { key: "mnemonic", label: "Merksatz", Icon: Lightbulb, variant: "accent" },
 ];
+
+function SectionLabel({
+  Icon,
+  label,
+  variant,
+}: {
+  Icon: typeof Zap;
+  label: string;
+  variant: SectionVariant;
+}) {
+  return (
+    <h4
+      className={`flex items-center gap-1.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] ${SECTION_LABEL[variant]}`}
+    >
+      <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+      {label}
+    </h4>
+  );
+}
 
 function StructuredBack({ data }: { data: FlashcardBackStructured }) {
   const keywords = (data.keywords ?? []).filter((k) => k.trim() !== "");
   return (
-    <div className="space-y-3.5">
-      {BACK_SECTIONS.map(({ key, label }) => {
+    <div className="space-y-2.5">
+      {BACK_SECTIONS.map(({ key, label, Icon, variant, mono }) => {
         const text = data[key];
         if (!text || text.trim() === "") return null;
         return (
-          <section key={key}>
-            <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
-              {label}
-            </h4>
-            <p className="mt-1 whitespace-pre-wrap break-words text-ink-soft">
+          <section
+            key={key}
+            className={`rounded-lg p-3 ${variant === "warn" ? "bg-amber-500/15" : ""}`}
+            style={
+              variant === "warn"
+                ? undefined
+                : { background: SECTION_BOX[variant] }
+            }
+          >
+            <SectionLabel Icon={Icon} label={label} variant={variant} />
+            <p
+              className={`mt-1.5 whitespace-pre-wrap break-words text-ink-soft ${
+                mono ? "font-mono text-[12.5px] leading-relaxed" : ""
+              }`}
+            >
               {renderInline(text)}
             </p>
           </section>
         );
       })}
       {keywords.length > 0 && (
-        <section>
-          <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
-            Stichworte
-          </h4>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
+        <section
+          className="rounded-lg p-3"
+          style={{ background: SECTION_BOX.neutral }}
+        >
+          <SectionLabel Icon={Tag} label="Stichworte" variant="neutral" />
+          <div className="mt-2 flex flex-wrap gap-1.5">
             {keywords.map((k) => (
               <span
                 key={k}
