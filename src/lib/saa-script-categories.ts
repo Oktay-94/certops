@@ -10,8 +10,10 @@
 // category) is enforced by saa-script-categories.test.ts.
 //
 // Colours = approved mockup palette (design/mockups/saa-skript-kategorien-
-// mockup.html), accent/bg verbatim. Icons reuse the CLF chapter icons; new:
-// Integration=GitBranch, Migration=Truck, Kosten=PiggyBank.
+// mockup.html), accents verbatim; the pastel bg tints were dropped for
+// theme-reactive color-mix tints (dark-mode contrast fix). Icons reuse the
+// CLF chapter icons; new: Integration=GitBranch, Migration=Truck,
+// Kosten=PiggyBank.
 import {
   BarChart3,
   Cpu,
@@ -44,9 +46,8 @@ export type SaaScriptCategory = {
   /** One-line service teaser on the category card (mockup copy). */
   summary: string;
   Icon: LucideIcon;
-  /** Mockup palette, verbatim. */
+  /** Mockup accent hex, verbatim (bg tints derive via color-mix at draw time). */
   accent: string;
-  bg: string;
 };
 
 export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
@@ -56,7 +57,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "EC2, Lambda, ECS/EKS/Fargate, Auto Scaling, Batch",
     Icon: Cpu,
     accent: "#7c3aed",
-    bg: "#f3effe",
   },
   {
     key: "storage",
@@ -64,7 +64,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "S3, EBS, EFS, FSx, Storage Gateway",
     Icon: HardDrive,
     accent: "#059669",
-    bg: "#e7f6f0",
   },
   {
     key: "db",
@@ -72,7 +71,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "RDS, Aurora, DynamoDB, ElastiCache, Redshift",
     Icon: Database,
     accent: "#4f46e5",
-    bg: "#ecebfb",
   },
   {
     key: "net",
@@ -80,7 +78,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "VPC, Route 53, CloudFront, Global Accelerator, Direct Connect",
     Icon: Network,
     accent: "#2563eb",
-    bg: "#e6effd",
   },
   {
     key: "sec",
@@ -88,7 +85,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "IAM, KMS, Cognito, GuardDuty, WAF, Shield, Macie",
     Icon: ShieldCheck,
     accent: "#dc2626",
-    bg: "#fdeaea",
   },
   {
     key: "int",
@@ -96,7 +92,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "SQS, SNS, EventBridge, Step Functions, API Gateway, MQ",
     Icon: GitBranch,
     accent: "#db2777",
-    bg: "#fce8f1",
   },
   {
     key: "ana",
@@ -104,7 +99,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "Athena, Glue, Kinesis, EMR, OpenSearch, MSK",
     Icon: BarChart3,
     accent: "#0d9488",
-    bg: "#e4f4f2",
   },
   {
     key: "mgmt",
@@ -112,7 +106,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "CloudFormation, CloudWatch, Config, Organizations, Systems Manager",
     Icon: Gauge,
     accent: "#d97706",
-    bg: "#fdf0e0",
   },
   {
     key: "mig",
@@ -120,7 +113,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "DMS, DataSync, Snow Family, Transfer Family",
     Icon: Truck,
     accent: "#0891b2",
-    bg: "#e3f3f8",
   },
   {
     key: "cost",
@@ -128,7 +120,6 @@ export const SAA_SCRIPT_CATEGORIES: SaaScriptCategory[] = [
     summary: "Budgets, Cost Explorer, Kaufoptionen, Compute Optimizer",
     Icon: PiggyBank,
     accent: "#65a30d",
-    bg: "#eef6e2",
   },
 ];
 

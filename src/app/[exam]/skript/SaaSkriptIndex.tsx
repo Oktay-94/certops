@@ -64,12 +64,15 @@ export async function SaaSkriptIndex() {
               className="rounded-[14px] border border-line border-l-4 bg-surface p-[18px] pb-4 transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_8px_24px_rgba(20,26,36,0.08)] dark:hover:shadow-none"
             >
               <div className="flex items-start gap-[13px]">
+                {/* Solid accent tile + white icon — same theme-agnostic recipe
+                    as the CLF chapter cards; the mockup's pastel tiles washed
+                    out on the dark canvas. */}
                 <span
                   className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-[11px]"
-                  style={{ backgroundColor: cat.bg, color: cat.accent }}
+                  style={{ backgroundColor: cat.accent }}
                   aria-hidden
                 >
-                  <cat.Icon className="h-[22px] w-[22px]" />
+                  <cat.Icon className="h-[22px] w-[22px] text-white" />
                 </span>
                 <div>
                   <div
@@ -86,11 +89,14 @@ export async function SaaSkriptIndex() {
               <p className="mb-3 mt-[9px] text-[13px] leading-normal text-ink-soft">
                 {cat.summary}
               </p>
-              {/* Fixed mockup ink on the fixed light tint — theme tokens would
-                  go light-on-light in dark mode. */}
+              {/* Translucent accent mix reads on both themes (CLF pill recipe) —
+                  no hard-coded light values. */}
               <span
-                className="inline-block rounded-full px-2.5 py-1 font-mono text-[11.5px]"
-                style={{ backgroundColor: cat.bg, color: "#5b6472" }}
+                className="inline-block rounded-full px-2.5 py-1 font-mono text-[11.5px] font-medium"
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${cat.accent} 14%, transparent)`,
+                  color: cat.accent,
+                }}
               >
                 {count} Skripte
               </span>
