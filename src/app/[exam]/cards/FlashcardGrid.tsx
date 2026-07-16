@@ -131,9 +131,9 @@ export type FlashcardItem = {
 //                  labels use the 700-light/300-dark shade pair)
 //   Beispiel     → ink 8 % (code/surface-2 character, unchanged)
 //   Knackpunkt   → borderless amber FILL (unchanged)
-//   Merksatz     → soft rose tint + saturated amber border with a ring glow
-//                  (damped in dark so it doesn't burn on the dark canvas)
-//   Stichworte   → ink 4 % + dashed line border (unchanged)
+//   Merksatz     → soft rose tint + saturated rose border (lighter shade in
+//                  dark), matching the fill hue
+//   Stichworte   → ink 4 % + dashed ink-faint border
 // Body copy stays text-ink-soft everywhere — tints are capped low enough
 // (≤15 %) that they never carry the contrast burden.
 const TINT = {
@@ -161,14 +161,14 @@ const BACK_SECTIONS: Array<{
     label: "Kurz gesagt",
     Icon: Zap,
     bg: TINT.accent,
-    boxClass: "border border-accent/50",
+    boxClass: "border border-accent/70",
     labelClass: "text-accent",
   },
   {
     key: "why",
     label: "Warum so?",
     Icon: HelpCircle,
-    boxClass: "border border-emerald-500/40 bg-emerald-500/10",
+    boxClass: "border border-emerald-500/60 bg-emerald-500/10",
     labelClass: "text-emerald-700 dark:text-emerald-300",
   },
   {
@@ -190,8 +190,7 @@ const BACK_SECTIONS: Array<{
     key: "mnemonic",
     label: "Merksatz",
     Icon: Lightbulb,
-    boxClass:
-      "border border-amber-400 bg-rose-500/10 ring-2 ring-amber-400/30 dark:border-amber-300 dark:ring-amber-300/15",
+    boxClass: "border border-rose-500 bg-rose-500/10 dark:border-rose-400",
     labelClass: "text-rose-700 dark:text-rose-300",
   },
 ];
@@ -241,7 +240,7 @@ function StructuredBack({ data }: { data: FlashcardBackStructured }) {
       })}
       {keywords.length > 0 && (
         <section
-          className="rounded-lg border border-dashed border-line-strong p-3"
+          className="rounded-lg border border-dashed border-ink-faint p-3"
           style={{ background: TINT.ink }}
         >
           <SectionLabel Icon={Tag} label="Stichworte" labelClass={LABEL_NEUTRAL} />
