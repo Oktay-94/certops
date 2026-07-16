@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ArrowLeft, Layers } from "lucide-react";
 import { SKRIPT_CHAPTERS } from "@/lib/skript";
 import { chapterColor, chapterColorVars } from "@/lib/skript-chapter-colors";
@@ -17,7 +18,13 @@ export const metadata = {
 const linkBtn =
   "inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong";
 
-export default function SkriptIndexPage() {
+// CLF-only: SAA hat (noch) keine Skript-Inhalte — /saa/skript ist ein 404.
+export default async function SkriptIndexPage({
+  params,
+}: {
+  params: Promise<{ exam: string }>;
+}) {
+  if ((await params).exam !== "clf") notFound();
   const deckblatt = readDeckblattMarkdown();
 
   return (
@@ -37,11 +44,11 @@ export default function SkriptIndexPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/uebersicht" className={linkBtn}>
+          <Link href="/clf/uebersicht" className={linkBtn}>
             <Layers className="h-4 w-4 text-ink-faint" aria-hidden />
             Übersicht
           </Link>
-          <Link href="/" className={linkBtn}>
+          <Link href="/clf" className={linkBtn}>
             <ArrowLeft className="h-4 w-4 text-ink-faint" aria-hidden />
             Zum Dashboard
           </Link>
@@ -56,7 +63,7 @@ export default function SkriptIndexPage() {
           return (
             <Link
               key={chapter.num}
-              href={`/skript/${chapter.slug}`}
+              href={`/clf/skript/${chapter.slug}`}
               className="flex overflow-hidden rounded-xl border border-line bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.04),0_10px_24px_-14px_rgba(0,0,0,0.10)] transition hover:-translate-y-px hover:border-line-strong dark:shadow-none"
             >
               <div

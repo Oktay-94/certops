@@ -8,10 +8,10 @@ export function middleware(req: NextRequest) {
   const existingSession = req.cookies.get(SESSION_COOKIE)?.value;
   const existingRound = req.cookies.get(ROUND_COOKIE)?.value;
 
-  // /quiz is the "start a round" entry point — always rotate the round id here.
-  // Any other matched path (e.g. /quiz/[id], /quiz/done) keeps the existing
-  // round id so reloads and back/forward stay on the same shuffled order.
-  const isRoundEntry = req.nextUrl.pathname === "/quiz";
+  // /:exam/quiz is the "start a round" entry point — always rotate the round
+  // id here. Any other matched path (e.g. /:exam/quiz/[id], …/done) keeps the
+  // existing round id so reloads and back/forward stay on the same order.
+  const isRoundEntry = /^\/(clf|saa)\/quiz$/.test(req.nextUrl.pathname);
 
   const needsSession = !existingSession;
   const needsRound = !existingRound || isRoundEntry;
@@ -56,5 +56,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/quiz/:path*"],
+  matcher: ["/clf/quiz/:path*", "/saa/quiz/:path*", "/clf/quiz", "/saa/quiz"],
 };

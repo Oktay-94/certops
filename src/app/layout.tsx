@@ -34,7 +34,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-exam="clf"
       suppressHydrationWarning
       className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >

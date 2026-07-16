@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { FlashcardGrid, type FlashcardItem } from "@/app/cards/FlashcardGrid";
+import { FlashcardGrid, type FlashcardItem } from "@/app/[exam]/cards/FlashcardGrid";
 
 const markFlashcardSeen = vi.fn().mockResolvedValue(undefined);
-vi.mock("@/app/cards/actions", () => ({
+vi.mock("@/app/[exam]/cards/actions", () => ({
   markFlashcardSeen: (id: number) => markFlashcardSeen(id),
   resetFlashcardViews: vi.fn().mockResolvedValue(undefined),
 }));
@@ -30,7 +30,7 @@ function cardButton(): HTMLElement {
 
 describe("FlashcardGrid flip (behaviour preserved through re-skin)", () => {
   it("click toggles the .flipped class and marks seen once on reveal", () => {
-    render(<FlashcardGrid cards={cards} domains={["Cloud Concepts"]} />);
+    render(<FlashcardGrid homeHref="/clf" cards={cards} domains={["Cloud Concepts"]} />);
     const inner = document.querySelector(".flip-inner")!;
     expect(inner.className).not.toContain("flipped");
 

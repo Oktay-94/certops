@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { ExamSlug } from "@/lib/exam";
 
 // Six area tiles (mockup .areas, extended from 4 to 6 — decision 2026-07-12).
 // Since the 2b polish ALL six carry a CSS-only hover mini-preview with STATIC
@@ -162,25 +163,25 @@ function SkriptPreview() {
   );
 }
 
-export function AreaTiles() {
+export function AreaTiles({ exam }: { exam: ExamSlug }) {
   return (
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
       <AreaTile
-        href="/quiz"
+        href={`/${exam}/quiz`}
         glyph="🎯"
         title="Szenario-Quiz"
         desc="264 Fragen in Runden, schwächste zuerst."
         preview={<QuizPreview />}
       />
       <AreaTile
-        href="/cards"
+        href={`/${exam}/cards`}
         glyph="🗂️"
         title="Karteikarten"
         desc="150 Karten mit Eselsbrücken und Icons."
         preview={<CardPreview />}
       />
       <AreaTile
-        href="/skript"
+        href={`/${exam}/skript`}
         glyph="📖"
         title="Skript"
         desc="13 Kapitel, vorlesbar, mit Deep-Links."
@@ -188,21 +189,21 @@ export function AreaTiles() {
         preview={<SkriptPreview />}
       />
       <AreaTile
-        href="/services"
+        href={`/${exam}/services`}
         glyph="🧩"
         title="Dienste"
         desc="172 AWS-Dienste frei üben: Flip, Battle, Puzzle."
         preview={<DienstePreview />}
       />
       <AreaTile
-        href="/stats"
+        href={`/${exam}/stats`}
         glyph="📊"
         title="Statistik"
         desc="Trends, Schwachstellen, Verlauf pro Runde."
         preview={<StatistikPreview />}
       />
       <AreaTile
-        href="/uebersicht"
+        href={`/${exam}/uebersicht`}
         glyph="🔍"
         title="Übersicht"
         desc="Alle Dienste alphabetisch, mit Suche."

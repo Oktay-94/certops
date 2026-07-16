@@ -14,18 +14,25 @@ import {
 } from "@/lib/domains";
 import { seedFromString } from "@/lib/shuffle";
 import { getActiveProfileId } from "@/lib/profile-cookie";
+import { isExamSlug, type ExamSlug } from "@/lib/exam";
 
 const SESSION_COOKIE = "certops_session_id";
 const ROUND_COOKIE = "certops_round_id";
 const ROUND_QUESTIONS_COOKIE = "certops_round_questions";
 
 export type StartRoundInput = {
+  exam: ExamSlug;
   count: QuizCount;
   domain: ClfC02Domain | "all";
   mode: QuizMode;
 };
 
 export async function startRound(input: StartRoundInput): Promise<void> {
+  // Actions cannot read route params — the exam arrives from the client and
+  // is whitelist-validated here (identity still comes from the cookie only).
+  if (!isExamSlug(input.exam)) {
+    throw new Error("Invalid exam");
+  }
   if (!QUIZ_COUNT_OPTIONS.includes(input.count)) {
     throw new Error("Invalid count");
   }
@@ -37,7 +44,7 @@ export async function startRound(input: StartRoundInput): Promise<void> {
   }
 
   const userId = await getActiveProfileId();
-  if (!userId) redirect("/?error=no-profile");
+  if (!userId) redirect(`/${input.exam}?error=no-profile`);
 
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? "";
@@ -56,7 +63,7 @@ export async function startRound(input: StartRoundInput): Promise<void> {
   });
 
   if (ids.length === 0) {
-    redirect("/quiz?error=empty");
+    redirect(`/${input.exam}/quiz?error=empty`);
   }
 
   cookieStore.set({
@@ -68,5 +75,5 @@ export async function startRound(input: StartRoundInput): Promise<void> {
     path: "/",
   });
 
-  redirect(`/quiz/${ids[0]}`);
+  redirect(`/${input.exam}/quiz/${ids[0]}`);
 }

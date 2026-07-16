@@ -26,16 +26,16 @@ describe("nodeState", () => {
 
 describe("AreaTiles", () => {
   it("renders all six areas with correct targets", () => {
-    render(<AreaTiles />);
+    render(<AreaTiles exam="clf" />);
     const links = screen.getAllByRole("link");
     const hrefs = links.map((l) => l.getAttribute("href"));
     expect(hrefs).toEqual([
-      "/quiz",
-      "/cards",
-      "/skript",
-      "/services",
-      "/stats",
-      "/uebersicht",
+      "/clf/quiz",
+      "/clf/cards",
+      "/clf/skript",
+      "/clf/services",
+      "/clf/stats",
+      "/clf/uebersicht",
     ]);
     // Shared areas carry the GETEILT pill (Skript + Übersicht).
     expect(screen.getAllByText("GETEILT")).toHaveLength(2);

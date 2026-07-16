@@ -3,11 +3,17 @@ import { db } from "@/db";
 import { getFlashcards } from "@/db/repository";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { FlashcardGrid } from "./FlashcardGrid";
+import type { ExamSlug } from "@/lib/exam";
 
-export default async function CardsPage() {
+export default async function CardsPage({
+  params,
+}: {
+  params: Promise<{ exam: ExamSlug }>;
+}) {
+  const { exam } = await params;
   const cards = await getFlashcards(db, "CLF-C02");
 
-  if (cards.length === 0) return <EmptyState />;
+  if (cards.length === 0) return <EmptyState exam={exam} />;
 
   const domains = Array.from(new Set(cards.map((c) => c.domain))).sort();
 
@@ -26,6 +32,7 @@ export default async function CardsPage() {
       </p>
 
       <FlashcardGrid
+        homeHref={`/${exam}`}
         cards={cards.map((c) => ({
           id: c.id,
           cert: c.cert,
@@ -40,7 +47,7 @@ export default async function CardsPage() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ exam }: { exam: ExamSlug }) {
   return (
     <main className="relative mx-auto max-w-2xl px-6 py-12 sm:py-16">
       <ScrollBackground />
@@ -50,7 +57,7 @@ function EmptyState() {
       <p className="mt-3 text-ink-soft">Noch keine Karten in der Datenbank.</p>
 
       <Link
-        href="/"
+        href={`/${exam}`}
         className="mt-10 inline-block rounded-lg border border-line-strong px-6 py-3 text-center text-[13px] font-semibold text-ink transition-colors hover:border-ink-faint"
       >
         Zurück zum Dashboard

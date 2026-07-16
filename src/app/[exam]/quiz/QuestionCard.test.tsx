@@ -31,7 +31,8 @@ const question: QuestionDisplay = {
 
 describe("QuestionCard (behaviour preserved through re-skin)", () => {
   it("check button is disabled until an option is selected", () => {
-    render(<QuestionCard question={question} nextHref="/quiz/2" isLast={false} />);
+    render(<QuestionCard question={question} nextHref="/quiz/2"
+          homeHref="/clf" isLast={false} />);
     expect(screen.getByRole("button", { name: /antwort prüfen/i })).toBeDisabled();
 
     const optionA = screen.getByRole("button", { name: /Auto-scaling/ });
@@ -48,7 +49,8 @@ describe("QuestionCard (behaviour preserved through re-skin)", () => {
       explanation: "Elastizität = Skalieren mit der Last.",
       correctIds: ["A"],
     });
-    render(<QuestionCard question={question} nextHref="/quiz/2" isLast={false} />);
+    render(<QuestionCard question={question} nextHref="/quiz/2"
+          homeHref="/clf" isLast={false} />);
 
     // Pick the WRONG option B, then check.
     fireEvent.click(screen.getByRole("button", { name: /Datenhaltbarkeit/ }));

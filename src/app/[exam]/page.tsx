@@ -21,6 +21,7 @@ import { getProfileBranding } from "@/lib/profile-branding";
 import { ProfileSwitcher } from "@/components/profile/ProfileSwitcher";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { AreaTiles } from "@/components/dashboard/AreaTiles";
+import type { ExamSlug } from "@/lib/exam";
 import { ExamTile, type ExamTileState } from "@/components/dashboard/ExamTile";
 import { DomainMasteryTile } from "@/components/dashboard/DomainMasteryTile";
 import { ReadinessRing } from "@/components/dashboard/ReadinessRing";
@@ -29,7 +30,12 @@ import { StaggerReveal } from "@/components/dashboard/StaggerReveal";
 import { CardsSeenTile } from "@/components/dashboard/CardsSeenTile";
 import { Tile } from "@/components/dashboard/Tile";
 
-export default async function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ exam: ExamSlug }>;
+}) {
+  const { exam } = await params;
   const userId = await getActiveProfileId();
   const branding = getProfileBranding(userId);
   const now = new Date();
@@ -223,7 +229,7 @@ export default async function Home() {
           QUIZ · KARTEN · DIENSTE · STATISTIK · SKRIPT · ÜBERSICHT
         </span>
       </div>
-      <AreaTiles />
+      <AreaTiles exam={exam} />
     </main>
   );
 }

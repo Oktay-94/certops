@@ -115,6 +115,7 @@ export type FlashcardItem = {
 type Props = {
   cards: FlashcardItem[];
   domains: string[];
+  homeHref: string;
 };
 
 function shuffleInPlace<T>(arr: T[]): T[] {
@@ -126,7 +127,7 @@ function shuffleInPlace<T>(arr: T[]): T[] {
   return out;
 }
 
-export function FlashcardGrid({ cards, domains }: Props) {
+export function FlashcardGrid({ cards, domains, homeHref }: Props) {
   const initialOrder = useMemo(() => cards.map((c) => c.id), [cards]);
   const byId = useMemo(() => {
     const m = new Map<number, FlashcardItem>();
@@ -245,7 +246,7 @@ export function FlashcardGrid({ cards, domains }: Props) {
           <RotateCcw className="h-4 w-4 text-ink-faint" aria-hidden />
           Reset
         </button>
-        <Link href="/" className={btn}>
+        <Link href={homeHref} className={btn}>
           <ArrowLeft className="h-4 w-4 text-ink-faint" aria-hidden />
           Zum Dashboard
         </Link>

@@ -2,12 +2,12 @@ import { act } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 
-vi.mock("@/app/cards/actions", () => ({
+vi.mock("@/app/[exam]/cards/actions", () => ({
   markFlashcardSeen: vi.fn(() => Promise.resolve()),
   resetFlashcardViews: vi.fn(() => Promise.resolve()),
 }));
 
-import { FlashcardGrid, type FlashcardItem } from "@/app/cards/FlashcardGrid";
+import { FlashcardGrid, type FlashcardItem } from "@/app/[exam]/cards/FlashcardGrid";
 
 const cards: FlashcardItem[] = [
   {
@@ -38,7 +38,7 @@ const cards: FlashcardItem[] = [
 
 describe("FlashcardGrid display numbers", () => {
   it("renders 1.–N. based on position in ASC-sorted cards prop, not DB id", () => {
-    render(<FlashcardGrid cards={cards} domains={["Cloud Concepts"]} />);
+    render(<FlashcardGrid homeHref="/clf" cards={cards} domains={["Cloud Concepts"]} />);
     // Redesign: the position number prefixes the domain pill as "N." (bold),
     // no longer a "#N" badge.
     expect(screen.getByText("1.")).toBeInTheDocument();
@@ -63,7 +63,7 @@ describe("FlashcardGrid markdown answer", () => {
       },
     ];
     const { container } = render(
-      <FlashcardGrid cards={md} domains={["Cloud Concepts"]} />,
+      <FlashcardGrid homeHref="/clf" cards={md} domains={["Cloud Concepts"]} />,
     );
     const cardBtn = container.querySelector<HTMLButtonElement>(
       '[data-testid="flashcard"]',
@@ -91,7 +91,7 @@ describe("FlashcardGrid markdown answer", () => {
       },
     ];
     const { container } = render(
-      <FlashcardGrid cards={md} domains={["Cloud Concepts"]} />,
+      <FlashcardGrid homeHref="/clf" cards={md} domains={["Cloud Concepts"]} />,
     );
     const cardBtn = container.querySelector<HTMLButtonElement>(
       '[data-testid="flashcard"]',

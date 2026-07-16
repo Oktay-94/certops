@@ -41,11 +41,13 @@ function shortLabel(text: string): string {
   return text.replace(/^(Amazon|AWS)\s+/, "");
 }
 
+// CLF-only — see skript/page.tsx.
 export default async function SkriptChapterPage({
   params,
 }: {
-  params: Promise<{ kapitel: string }>;
+  params: Promise<{ exam: string; kapitel: string }>;
 }) {
+  if ((await params).exam !== "clf") notFound();
   const chapter = chapterBySlug((await params).kapitel);
   if (!chapter) notFound();
 
@@ -73,7 +75,7 @@ export default async function SkriptChapterPage({
             className="h-[7px] w-[7px] shrink-0 rounded-full bg-[color:var(--accent)]"
             aria-hidden
           />
-          <Link href="/skript" className="transition hover:text-[color:var(--accent)]">
+          <Link href="/clf/skript" className="transition hover:text-[color:var(--accent)]">
             Lernskript
           </Link>
           <span aria-hidden>›</span>
@@ -157,7 +159,7 @@ export default async function SkriptChapterPage({
         <div className="mt-11 flex gap-3.5">
           {prev ? (
             <Link
-              href={`/skript/${prev.slug}`}
+              href={`/clf/skript/${prev.slug}`}
               className="flex-1 rounded-2xl border border-line bg-surface px-[18px] py-4 transition hover:border-[color:var(--accent)]"
             >
               <div className="text-[12px] uppercase tracking-[0.04em] text-ink-faint">
@@ -172,7 +174,7 @@ export default async function SkriptChapterPage({
           )}
           {next ? (
             <Link
-              href={`/skript/${next.slug}`}
+              href={`/clf/skript/${next.slug}`}
               className="flex-1 rounded-2xl border border-line bg-surface px-[18px] py-4 text-right transition hover:border-[color:var(--accent)]"
             >
               <div className="text-[12px] uppercase tracking-[0.04em] text-ink-faint">

@@ -7,13 +7,14 @@ import { seedFromString, shuffle } from "@/lib/shuffle";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { QuestionCard } from "../QuestionCard";
+import type { ExamSlug } from "@/lib/exam";
 
 const SESSION_COOKIE = "certops_session_id";
 const ROUND_COOKIE = "certops_round_id";
 const ROUND_QUESTIONS_COOKIE = "certops_round_questions";
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ exam: ExamSlug; id: string }>;
 };
 
 function parseRoundIds(raw: string | undefined): number[] | null {
@@ -31,7 +32,7 @@ function parseRoundIds(raw: string | undefined): number[] | null {
 }
 
 export default async function QuizQuestionPage({ params }: Props) {
-  const { id: idParam } = await params;
+  const { exam, id: idParam } = await params;
   const id = Number.parseInt(idParam, 10);
   if (!Number.isInteger(id) || id <= 0) notFound();
 
@@ -69,7 +70,9 @@ export default async function QuizQuestionPage({ params }: Props) {
   };
 
   const isLast = idx + 1 >= ordered.length;
-  const nextHref = isLast ? "/quiz/done" : `/quiz/${ordered[idx + 1].id}`;
+  const nextHref = isLast
+    ? `/${exam}/quiz/done`
+    : `/${exam}/quiz/${ordered[idx + 1].id}`;
 
   const position = idx + 1;
   const total = ordered.length;
@@ -101,6 +104,7 @@ export default async function QuizQuestionPage({ params }: Props) {
           <QuestionCard
             question={question}
             nextHref={nextHref}
+            homeHref={`/${exam}`}
             isLast={isLast}
           />
         </div>

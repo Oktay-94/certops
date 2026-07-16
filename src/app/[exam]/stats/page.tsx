@@ -29,6 +29,7 @@ import {
   scoreColorHex,
 } from "@/lib/scoreColor";
 import { getActiveProfileId } from "@/lib/profile-cookie";
+import type { ExamSlug } from "@/lib/exam";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 import { AreaTiles } from "@/components/dashboard/AreaTiles";
 import { MiniCalendar } from "@/components/dashboard/MiniCalendar";
@@ -60,10 +61,15 @@ function pct(rate: number): string {
   return `${Math.round(rate * 100)}%`;
 }
 
-export default async function StatsPage() {
+export default async function StatsPage({
+  params,
+}: {
+  params: Promise<{ exam: ExamSlug }>;
+}) {
+  const { exam } = await params;
   const userId = await getActiveProfileId();
 
-  if (!userId) return <EmptyState />;
+  if (!userId) return <EmptyState exam={exam} />;
 
   const now = new Date();
   const [
@@ -89,7 +95,7 @@ export default async function StatsPage() {
   ]);
   const totalQuestions = allQuestions.length;
 
-  if (answered === 0) return <EmptyState />;
+  if (answered === 0) return <EmptyState exam={exam} />;
 
   const perfByDomain = new Map(perf.map((p) => [p.domain, p]));
   const buckets = bucketByDay(timestamps);
@@ -119,7 +125,7 @@ export default async function StatsPage() {
           </p>
         </div>
         <Link
-          href="/"
+          href={`/${exam}`}
           className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
@@ -252,7 +258,7 @@ export default async function StatsPage() {
           QUIZ · KARTEN · DIENSTE · STATISTIK · SKRIPT · ÜBERSICHT
         </span>
       </div>
-      <AreaTiles />
+      <AreaTiles exam={exam} />
     </main>
   );
 }
@@ -376,7 +382,7 @@ function DomainBar({
   );
 }
 
-function EmptyState() {
+function EmptyState({ exam }: { exam: ExamSlug }) {
   return (
     <main className="relative mx-auto w-full max-w-[1120px] px-6 pb-20 pt-10">
       <ScrollBackground />
@@ -393,14 +399,14 @@ function EmptyState() {
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
-          href="/quiz"
+          href={`/${exam}/quiz`}
           className="inline-block rounded-lg px-5 py-2.5 text-center text-[13px] font-semibold text-white transition-transform hover:-translate-y-px"
           style={{ background: "var(--ink)", color: "var(--canvas)" }}
         >
           Quiz starten
         </Link>
         <Link
-          href="/"
+          href={`/${exam}`}
           className="inline-block rounded-lg border border-line-strong px-5 py-2.5 text-center text-[13px] font-semibold text-ink transition-transform hover:-translate-y-px"
         >
           Zurück zum Dashboard

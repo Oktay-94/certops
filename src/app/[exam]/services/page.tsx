@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen, Layers } from "lucide-react";
 import { SERVICES } from "@/lib/services-data";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
@@ -11,7 +12,13 @@ import { PuzzleGame } from "@/components/services/PuzzleGame";
 const navBtn =
   "inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong";
 
-export default function ServicesPage() {
+// CLF-only: der Dienste-Übungsbereich gehört zum CLF-Track — /saa/services 404t.
+export default async function ServicesPage({
+  params,
+}: {
+  params: Promise<{ exam: string }>;
+}) {
+  if ((await params).exam !== "clf") notFound();
   return (
     <main className="relative mx-auto w-full max-w-7xl px-6 py-10 sm:py-12">
       <ScrollBackground />
@@ -30,15 +37,15 @@ export default function ServicesPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/skript" className={navBtn}>
+          <Link href="/clf/skript" className={navBtn}>
             <BookOpen className="h-4 w-4 text-ink-faint" aria-hidden />
             Lernskript
           </Link>
-          <Link href="/uebersicht" className={navBtn}>
+          <Link href="/clf/uebersicht" className={navBtn}>
             <Layers className="h-4 w-4 text-ink-faint" aria-hidden />
             Übersicht
           </Link>
-          <Link href="/" className={navBtn}>
+          <Link href="/clf" className={navBtn}>
             <ArrowLeft className="h-4 w-4 text-ink-faint" aria-hidden />
             Zum Dashboard
           </Link>

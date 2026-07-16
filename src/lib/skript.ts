@@ -205,9 +205,12 @@ export function normalizeName(s: string): string {
     .trim();
 }
 
-/** URL for a skriptRef — chapter page, plus anchor when the ref has one. */
+/** URL for a skriptRef — chapter page, plus anchor when the ref has one.
+    The Skript lives only in the CLF track, hence the fixed /clf prefix. */
 export function skriptUrl(ref: SkriptRef): string {
   const chapter = chapterByNum(ref.chapter);
-  if (!chapter) return "/skript";
-  return ref.anchor ? `/skript/${chapter.slug}#${ref.anchor}` : `/skript/${chapter.slug}`;
+  if (!chapter) return "/clf/skript";
+  return ref.anchor
+    ? `/clf/skript/${chapter.slug}#${ref.anchor}`
+    : `/clf/skript/${chapter.slug}`;
 }

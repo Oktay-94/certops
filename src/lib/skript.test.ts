@@ -83,17 +83,17 @@ describe("SKRIPT_CHAPTERS manifest", () => {
 describe("skriptUrl", () => {
   it("builds chapter + anchor URLs", () => {
     expect(skriptUrl({ chapter: 7, anchor: "amazon-athena" })).toBe(
-      "/skript/07-analytik#amazon-athena",
+      "/clf/skript/07-analytik#amazon-athena",
     );
   });
 
   it("builds chapter-level fallback URLs without anchor", () => {
     expect(skriptUrl({ chapter: 11 })).toBe(
-      "/skript/11-migration-disaster-recovery",
+      "/clf/skript/11-migration-disaster-recovery",
     );
   });
 
   it("falls back to the index for unknown chapters", () => {
-    expect(skriptUrl({ chapter: 99, anchor: "x" })).toBe("/skript");
+    expect(skriptUrl({ chapter: 99, anchor: "x" })).toBe("/clf/skript");
   });
 });

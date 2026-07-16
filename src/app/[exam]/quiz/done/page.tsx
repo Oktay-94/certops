@@ -5,6 +5,7 @@ import { scoreColorClass } from "@/lib/scoreColor";
 import { getActiveProfileId } from "@/lib/profile-cookie";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
+import type { ExamSlug } from "@/lib/exam";
 
 const CERT = "CLF-C02" as const;
 
@@ -18,7 +19,12 @@ function domainToneClass(correct: number, total: number): string {
   return scoreColorClass(correct / total);
 }
 
-export default async function QuizDonePage() {
+export default async function QuizDonePage({
+  params,
+}: {
+  params: Promise<{ exam: ExamSlug }>;
+}) {
+  const { exam } = await params;
   const userId = await getActiveProfileId();
 
   // "Diese Runde" filtert über die round_id der zuletzt gespielten Runde,
@@ -91,14 +97,14 @@ export default async function QuizDonePage() {
 
       <div className="mt-10 flex flex-col gap-3 sm:flex-row">
         <Link
-          href="/quiz"
+          href={`/${exam}/quiz`}
           className="inline-block rounded-lg px-6 py-3 text-center text-[13px] font-semibold transition-transform hover:-translate-y-px"
           style={{ background: BRAND_ORANGE, color: "var(--cta-ink)" }}
         >
           Übungsrunde neu starten
         </Link>
         <Link
-          href="/"
+          href={`/${exam}`}
           className="inline-block rounded-lg border border-line-strong px-6 py-3 text-center text-[13px] font-semibold text-ink transition-colors hover:border-ink-faint"
         >
           Zurück zum Dashboard

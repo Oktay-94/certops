@@ -32,7 +32,7 @@ export async function setExamResult(result: "passed" | "failed"): Promise<void> 
     examDate: status.examDate,
     result,
   });
-  revalidatePath("/");
+  revalidatePath("/", "layout");
 }
 
 // Set a new exam date (after a failed attempt or to adjust the countdown).
@@ -55,5 +55,5 @@ export async function setExamDate(isoDate: string): Promise<void> {
     examDate,
     result: "pending",
   });
-  revalidatePath("/");
+  revalidatePath("/", "layout");
 }

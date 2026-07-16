@@ -24,6 +24,7 @@ import {
 } from "@/lib/domain-colors";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { startRound } from "./actions";
+import type { ExamSlug } from "@/lib/exam";
 
 const COUNT_LABEL: Record<string, string> = {
   "10": "Schneller Durchlauf",
@@ -74,7 +75,13 @@ function selectionAccentHex(domain: DomainChoice): string {
   return getDomainColor(domain).solid;
 }
 
-export function QuizConfigForm({ questionCount }: { questionCount: number }) {
+export function QuizConfigForm({
+  exam,
+  questionCount,
+}: {
+  exam: ExamSlug;
+  questionCount: number;
+}) {
   const [count, setCount] = useState<QuizCount>(20);
   const [domain, setDomain] = useState<DomainChoice>("all");
   const [mode, setMode] = useState<QuizMode>("random");
@@ -92,7 +99,7 @@ export function QuizConfigForm({ questionCount }: { questionCount: number }) {
     setError(null);
     startTransition(async () => {
       try {
-        await startRound({ count, domain, mode });
+        await startRound({ exam, count, domain, mode });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unbekannter Fehler");
       }

@@ -3,12 +3,15 @@ import { db } from "@/db";
 import { getQuestionsByCert } from "@/db/repository";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { QuizConfigForm } from "./QuizConfigForm";
+import type { ExamSlug } from "@/lib/exam";
 
 type Props = {
+  params: Promise<{ exam: ExamSlug }>;
   searchParams: Promise<{ error?: string }>;
 };
 
-export default async function QuizPage({ searchParams }: Props) {
+export default async function QuizPage({ params, searchParams }: Props) {
+  const { exam } = await params;
   const questions = await getQuestionsByCert(db, "CLF-C02");
   const { error } = await searchParams;
 
@@ -34,7 +37,7 @@ export default async function QuizPage({ searchParams }: Props) {
     <main className="relative mx-auto max-w-4xl px-6 py-8 sm:py-10">
       <ScrollBackground />
       <Link
-        href="/"
+        href={`/${exam}`}
         className="inline-flex items-center gap-2 rounded-lg border border-line px-4 py-2 text-sm text-ink transition-colors hover:border-line-strong"
       >
         ← Zurück zum Dashboard
@@ -54,7 +57,7 @@ export default async function QuizPage({ searchParams }: Props) {
         </p>
       )}
 
-      <QuizConfigForm questionCount={questions.length} />
+      <QuizConfigForm exam={exam} questionCount={questions.length} />
     </main>
   );
 }

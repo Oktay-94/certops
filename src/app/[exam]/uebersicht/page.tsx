@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { readUebersichtServices } from "@/lib/uebersicht-content";
 import { resolveServiceRef, serviceEmoji } from "@/lib/uebersicht";
@@ -15,7 +16,13 @@ export const metadata = {
   title: "AWS-Dienste — Schnellübersicht — CertOps",
 };
 
-export default function UebersichtPage() {
+// CLF-only: die Dienste-Übersicht gehört zum CLF-Track — /saa/uebersicht 404t.
+export default async function UebersichtPage({
+  params,
+}: {
+  params: Promise<{ exam: string }>;
+}) {
+  if ((await params).exam !== "clf") notFound();
   // Build-time data: sort, then resolve emoji / deep-link / accent per service.
   // The client component only filters this array.
   const rows: UebersichtRow[] = readUebersichtServices()
@@ -48,7 +55,7 @@ export default function UebersichtPage() {
             style={{ background: "var(--orange-bright)" }}
             aria-hidden
           />
-          <Link href="/" className="transition-colors hover:text-ink">
+          <Link href="/clf" className="transition-colors hover:text-ink">
             Dashboard
           </Link>
           <span aria-hidden>›</span>
@@ -73,7 +80,7 @@ export default function UebersichtPage() {
             </p>
           </div>
           <Link
-            href="/"
+            href="/clf"
             className="inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-line-strong"
           >
             <ArrowLeft className="h-4 w-4 text-ink-faint" aria-hidden />

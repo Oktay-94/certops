@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { BRAND_ORANGE } from "@/lib/brand";
 import type { DomainOverview } from "@/db/repository";
+import type { ExamSlug } from "@/lib/exam";
 
 // "Next up" CTA tile: points at the weakest practiced domain (or generic
 // start). Orange strictly as signal on the single CTA (mockup .btn-cta).
-export function NextUpTile({ stats }: { stats: DomainOverview[] }) {
+export function NextUpTile({
+  exam,
+  stats,
+}: {
+  exam: ExamSlug;
+  stats: DomainOverview[];
+}) {
   const practiced = stats.filter((s) => s.avgCorrectRate !== null);
   const weakest =
     practiced.length > 0
@@ -27,7 +34,7 @@ export function NextUpTile({ stats }: { stats: DomainOverview[] }) {
       </p>
       <div>
         <Link
-          href="/quiz"
+          href={`/${exam}/quiz`}
           className="inline-block rounded-lg px-4 py-2.5 text-[13px] font-semibold transition-transform hover:-translate-y-px"
           style={{ background: BRAND_ORANGE, color: "var(--cta-ink)" }}
         >

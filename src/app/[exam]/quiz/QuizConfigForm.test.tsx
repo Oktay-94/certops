@@ -14,7 +14,7 @@ afterEach(() => {
 
 describe("QuizConfigForm (behaviour preserved through re-skin)", () => {
   it("count chip reflects selection via aria-pressed", () => {
-    render(<QuizConfigForm questionCount={264} />);
+    render(<QuizConfigForm exam="clf" questionCount={264} />);
     const chip10 = screen.getByRole("button", { name: "10" });
     expect(chip10).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(chip10);
@@ -22,7 +22,7 @@ describe("QuizConfigForm (behaviour preserved through re-skin)", () => {
   });
 
   it("picking a specific domain forces count to 'Alle'", () => {
-    render(<QuizConfigForm questionCount={264} />);
+    render(<QuizConfigForm exam="clf" questionCount={264} />);
     // Default count is 20 → chip "20" pressed, "Alle" not.
     expect(screen.getByRole("button", { name: "Alle" })).toHaveAttribute(
       "aria-pressed",
@@ -38,12 +38,13 @@ describe("QuizConfigForm (behaviour preserved through re-skin)", () => {
   });
 
   it("submit calls startRound with the chosen config", () => {
-    render(<QuizConfigForm questionCount={264} />);
+    render(<QuizConfigForm exam="clf" questionCount={264} />);
     fireEvent.click(screen.getByRole("button", { name: "50" }));
     fireEvent.click(screen.getByRole("button", { name: /schwache zuerst/i }));
     fireEvent.click(screen.getByRole("button", { name: /quiz starten/i }));
 
     expect(startRound).toHaveBeenCalledWith({
+      exam: "clf",
       count: 50,
       domain: "all",
       mode: "weakest-first",

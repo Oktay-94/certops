@@ -10,6 +10,7 @@ import { submitAnswer } from "./[id]/actions";
 type Props = {
   question: QuestionDisplay;
   nextHref: string;
+  homeHref: string;
   isLast: boolean;
 };
 
@@ -19,7 +20,7 @@ type Verdict = {
   correctIds: Set<string>;
 };
 
-export function QuestionCard({ question, nextHref, isLast }: Props) {
+export function QuestionCard({ question, nextHref, homeHref, isLast }: Props) {
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
@@ -205,7 +206,7 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
             {isPending ? "Prüfe …" : "Antwort prüfen"}
           </button>
           <Link
-            href="/"
+            href={homeHref}
             className="inline-block rounded-lg border border-line-strong px-4 py-2 text-sm text-ink transition-colors hover:border-ink-faint"
           >
             Quiz beenden
@@ -252,7 +253,7 @@ export function QuestionCard({ question, nextHref, isLast }: Props) {
             </Link>
             {!isLast && (
               <Link
-                href="/"
+                href={homeHref}
                 className="inline-block rounded-lg border border-line-strong px-4 py-2 text-sm text-ink transition-colors hover:border-ink-faint"
               >
                 Quiz beenden
