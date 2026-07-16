@@ -20,6 +20,8 @@
     "db:seed": "mkdir -p data && DATABASE_URL=file:./data/certops.db tsx src/db/seed.ts",
     "db:backfill-seed-key": "tsx src/db/backfill-seed-key.ts",
     "db:backfill-seed-key:remote": "tsx src/db/backfill-seed-key-remote.ts",
+    "db:backfill-back-structured": "tsx src/db/backfill-back-structured.ts",
+    "db:backfill-back-structured:remote": "tsx src/db/backfill-back-structured-remote.ts",
     "db:migrate:remote": "drizzle-kit migrate --config=drizzle.config.turso.ts",
     "db:seed:remote": "tsx src/db/seed.ts"
   },

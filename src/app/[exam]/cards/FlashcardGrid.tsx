@@ -142,7 +142,7 @@ function StructuredBack({ data }: { data: FlashcardBackStructured }) {
             <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
               {label}
             </h4>
-            <p className="mt-1 whitespace-pre-wrap text-ink-soft">
+            <p className="mt-1 whitespace-pre-wrap break-words text-ink-soft">
               {renderInline(text)}
             </p>
           </section>

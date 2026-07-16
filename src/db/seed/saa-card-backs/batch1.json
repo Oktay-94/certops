@@ -1,0 +1,483 @@
+[
+  {
+    "seedKey": "saa-c03-card-001",
+    "backStructured": {
+      "summary": "Zugriff verweigert. Ein **explizites Deny gewinnt immer** — es kann von keinem Allow überschrieben werden. Auswertungsreihenfolge: explicit Deny → explicit Allow → implicit Deny (Default).",
+      "why": "Die Policy-Evaluation sammelt ALLE anwendbaren Policies (Identity, Resource, SCP, Boundary, Session). Ein einziges explizites Deny in irgendeiner davon beendet die Auswertung negativ — genau deshalb ist Deny das Werkzeug für harte Guardrails, die niemand versehentlich aushebeln kann.",
+      "example": "User mit `Allow s3:*` ruft `s3:GetObject` auf. Bucket-Policy: `{ \"Effect\": \"Deny\", \"Principal\": { \"AWS\": \"arn:aws:iam::111122223333:user/max\" }, \"Action\": \"s3:*\" }` → AccessDenied, trotz vollem Allow in der Identity-Policy.",
+      "examTrap": "SAA testet das gern über Policy-Typen hinweg: ein Deny in der Bucket-Policy schlägt ein Allow in der Identity-Policy — und umgekehrt. Jede Antwortoption, die ein explizites Deny per Allow „übersteuert“, ist falsch.",
+      "mnemonic": "Merke: Ein explizites Deny schlägt jedes Allow — immer und überall.",
+      "keywords": [
+        "IAM",
+        "Policy Evaluation",
+        "Explicit Deny",
+        "Bucket-Policy"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-002",
+    "backStructured": {
+      "summary": "Auf nichts. IAM ist **deny-by-default** (implicit Deny). Ein Allow muss aktiv erteilt werden — die Abwesenheit einer Policy ist bereits ein Deny.",
+      "why": "IAM startet jede Auswertung beim implicit Deny; nur ein explizites Allow hebt ihn auf. Least Privilege ist damit der Ausgangszustand, nicht das Ziel — Rechte wachsen nur durch bewusste Vergabe.",
+      "example": "Der frische User meldet sich in der Konsole an und ruft `s3:ListAllMyBuckets` auf → AccessDenied, obwohl nirgendwo ein Deny formuliert ist.",
+      "examTrap": "Distraktoren behaupten gern, ein neuer User „erbe Default-Rechte“ oder könne „zumindest lesen“. Falsch — ohne Allow existiert kein Zugriff, auch nicht lesend.",
+      "mnemonic": "Merke: Keine Policy = kein Zugriff — implicit Deny ist der Default.",
+      "keywords": [
+        "IAM",
+        "Implicit Deny",
+        "Deny-by-Default",
+        "Least Privilege"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-003",
+    "backStructured": {
+      "summary": "Nichts von beidem. Effektive Rechte = **Schnittmenge** aus Identity-Policy UND Boundary. Die Boundary **gewährt nie** Rechte, sie deckelt sie nur. Hier ist die Schnittmenge leer.",
+      "why": "Die Boundary definiert die Obergrenze, die Identity-Policy die tatsächlich vergebenen Rechte — wirksam ist nur der Schnitt. Typischer Einsatz: Delegierte Admins dürfen selbst Rollen und User anlegen, aber nie mit mehr Rechten, als die Boundary zulässt.",
+      "example": "Boundary erlaubt `s3:*`, Identity-Policy erlaubt `s3:GetObject` → effektiv nur `s3:GetObject`. Erlaubt die Identity-Policy stattdessen `ec2:*`, ist der Schnitt leer → gar nichts.",
+      "examTrap": "Antwortoptionen wie „der User darf s3:*, weil die Boundary es erlaubt“ sind immer falsch — eine Boundary allein gewährt niemals Zugriff.",
+      "mnemonic": "Merke: Die Boundary deckelt, gewährt aber nie — es zählt die Schnittmenge.",
+      "keywords": [
+        "Permissions Boundary",
+        "IAM",
+        "Schnittmenge",
+        "Delegation"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-004",
+    "backStructured": {
+      "summary": "**IAM Role via Instance Profile.** Sie liefert über IMDS automatisch rotierte, temporäre Credentials. Statische Keys rotieren nicht, landen in AMIs/Backups/Git und sind bei Kompromittierung unbefristet gültig.",
+      "why": "Rollen-Credentials sind kurzlebig und werden vom SDK automatisch über den Instance-Metadata-Service (IMDS) bezogen — kein Secret liegt je im Code, im AMI oder im User-Data. IMDSv2 härtet den Abruf zusätzlich session-basiert gegen SSRF-Angriffe.",
+      "example": "`aws s3 ls` funktioniert auf der Instance ohne jegliche konfigurierten Keys — das SDK zieht die temporären Credentials der attachten Rolle selbstständig von IMDS.",
+      "examTrap": "„Access Keys ins User-Data-Script legen“ oder „Keys ins AMI einbacken“ sind Dauerbrenner-Distraktoren — die richtige Antwort ist praktisch immer Role + Instance Profile.",
+      "mnemonic": "Merke: EC2 spricht mit AWS über Rollen, nie über statische Keys.",
+      "keywords": [
+        "IAM Role",
+        "Instance Profile",
+        "IMDS",
+        "EC2",
+        "Temporäre Credentials"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-005",
+    "backStructured": {
+      "summary": "Nein. Bei Cross-Account müssen **beide Seiten** erlauben: die Resource-based Policy (Bucket-Policy) im Ziel-Account UND die Identity-Policy des Principals im Quell-Account. Innerhalb **eines** Accounts reicht dagegen eine der beiden.",
+      "why": "Es gibt zwei Vertrauensgrenzen: Der Ziel-Account öffnet seine Ressource (Bucket-Policy), der Quell-Account muss seinem eigenen Principal die Aktion zusätzlich erlauben (Identity-Policy). Innerhalb eines Accounts existiert nur eine Grenze — dort genügt ein Allow auf einer Seite.",
+      "example": "Bucket-Policy in Account B erlaubt `arn:aws:iam::111122223333:role/app` das `s3:GetObject`. Zusätzlich braucht die Rolle in Account A eine Identity-Policy mit `s3:GetObject` auf den Bucket-ARN — erst dann klappt der Zugriff.",
+      "examTrap": "„Die Bucket-Policy reicht“ stimmt nur same-account — bei Cross-Account ist sie die halbe Miete. Dieser Unterschied ist einer der häufigsten D1-Distraktoren.",
+      "mnemonic": "Merke: Cross-Account heißt, beide Seiten müssen Ja sagen.",
+      "keywords": [
+        "Cross-Account",
+        "Bucket-Policy",
+        "Identity-Policy",
+        "S3"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-006",
+    "backStructured": {
+      "summary": "Nein. Als Principal in einer Resource-based Policy sind nur **Users, Roles, AWS-Accounts und Services** zulässig — **niemals Groups**. Groups sind reine Verwaltungshilfen für Identity-Policies.",
+      "why": "Eine Group ist keine Identität — ihr können weder STS noch ein Service etwas ausstellen, sie kann nichts „tun“. Sie ist nur ein Verteilmechanismus, um Identity-Policies an mehrere Users gleichzeitig zu hängen.",
+      "example": null,
+      "examTrap": "Der Distraktor `\"Principal\": { \"AWS\": \"arn:aws:iam::…:group/devs\" }` sieht syntaktisch plausibel aus, ist aber ungültig — die Policy lässt sich so gar nicht speichern.",
+      "mnemonic": "Merke: Groups verteilen Policies, sind aber nie Principal.",
+      "keywords": [
+        "IAM Group",
+        "Principal",
+        "Resource-based Policy"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-007",
+    "backStructured": {
+      "summary": "Über **Condition Keys** einschränken — z. B. `aws:RequestedRegion`, `aws:ResourceTag/...`, `aws:PrincipalOrgID`, `aws:SourceIp`. Der Resource-Wildcard bleibt, die Bedingung schneidet die Rechte zu.",
+      "why": "Wo die Resource-Ebene nicht greift, bleibt die Bedingungsebene: Conditions werten den Request-Kontext aus (Region, Tags, Organization, Quell-IP, VPC Endpoint) und verengen so den Geltungsbereich, ohne die Action zu verlieren.",
+      "example": "`\"Condition\": { \"StringEquals\": { \"aws:RequestedRegion\": \"eu-central-1\" } }` — Describe-Calls funktionieren nur noch in Frankfurt, obwohl `Resource: \"*\"` bestehen bleibt.",
+      "examTrap": "SAA fragt „Least Privilege trotz Resource: *“ — die richtige Antwort sind Condition Keys, nicht das Weglassen der Action oder ein erfundener Resource-ARN.",
+      "mnemonic": "Merke: Wo Resource-ARNs nicht greifen, schneiden Conditions zu.",
+      "keywords": [
+        "Condition Keys",
+        "Least Privilege",
+        "IAM Policy",
+        "Request-Kontext"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-008",
+    "backStructured": {
+      "summary": "U. a. Account schließen, Support-Plan ändern, Root-Kontaktdaten ändern, IAM-Zugriff auf Billing freischalten, eine kaputte S3-Bucket-Policy reparieren. Relevanz: Root wird **weder von SCPs noch von RCPs eingeschränkt** → Hardware-MFA, keine Access Keys, nie im Alltag benutzen.",
+      "why": "Root steht außerhalb des IAM-Systems — er ist die letzte Instanz, die selbst dann handeln kann, wenn Policies alles aussperren (etwa eine Deny-all-Bucket-Policy). Genau deshalb greifen auch die Org-Guardrails nicht: Was das System repariert, darf das System nicht blocken können.",
+      "example": null,
+      "examTrap": "„Root per SCP einschränken“ ist ein Dauerbrenner-Distraktor — geht nicht. Die einzige Härtung ist präventiv: MFA, keine Access Keys, Alarme auf Root-Logins.",
+      "mnemonic": "Merke: Root kann, was sonst niemand kann — und niemand kann Root einschränken.",
+      "keywords": [
+        "Root-User",
+        "SCP",
+        "MFA",
+        "Account-Management"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-009",
+    "backStructured": {
+      "summary": "Er findet **Ressourcen, die außerhalb deiner Zone of Trust erreichbar sind** (S3, IAM-Roles, KMS, Lambda, SQS, Secrets…) und validiert Policies. Er ist **keine** Threat Detection — laufende Angriffe sieht GuardDuty, nicht Access Analyzer.",
+      "why": "Access Analyzer analysiert Policies statisch (Automated Reasoning) — er zeigt, welcher externe Zugriff KONFIGURIERT ist, nicht welcher gerade stattfindet. Konfigurationsanalyse und Bedrohungserkennung sind zwei getrennte Disziplinen mit zwei getrennten Services.",
+      "example": "Finding: „S3-Bucket `reports` erlaubt über seine Bucket-Policy Zugriff für alle Principals“ — der Bucket ist öffentlich erreichbar, ob ihn schon jemand missbraucht, sagt das Finding nicht.",
+      "examTrap": "Abgrenzung ist der Prüfungsklassiker: Access Analyzer (externe Erreichbarkeit / Policy-Analyse) vs. GuardDuty (Threat Detection) vs. Macie (sensible Daten in S3). Signalwörter im Szenario entscheiden.",
+      "mnemonic": "Merke: Access Analyzer findet offene Türen, GuardDuty findet Einbrecher.",
+      "keywords": [
+        "IAM Access Analyzer",
+        "Zone of Trust",
+        "GuardDuty",
+        "Policy-Analyse"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-010",
+    "backStructured": {
+      "summary": "**Minimum 900 s (15 min), Default 3600 s (1 h), Maximum = `MaxSessionDuration` der Rolle**, die zwischen 1 h und **12 h** liegen kann. Ein höherer Wert als das Rollen-Setting lässt den Call fehlschlagen.",
+      "why": "Kurzlebigkeit ist das Sicherheitsversprechen von STS: Gestohlene Session-Credentials verfallen von selbst. `MaxSessionDuration` ist bewusst ein Attribut der Rolle — der Rollen-Besitzer bestimmt die Obergrenze, nicht der Aufrufer.",
+      "example": "`aws sts assume-role --duration-seconds 43200 …` funktioniert nur, wenn die Rolle `MaxSessionDuration = 43200` (12 h) gesetzt hat — bei Default-Rolle (1 h) schlägt derselbe Call fehl.",
+      "examTrap": "Zahlen-Falle: 15 min Minimum, 1 h Default, bis 12 h per Rollen-Setting. Und: Role Chaining bleibt trotzdem hart bei 1 h (eigene Karte).",
+      "mnemonic": "Merke: STS-Sessions laufen 15 Minuten bis 12 Stunden, Standard ist 1 Stunde.",
+      "keywords": [
+        "STS",
+        "AssumeRole",
+        "Session Duration",
+        "MaxSessionDuration"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-011",
+    "backStructured": {
+      "summary": "**Role Chaining ist hart auf 1 Stunde gedeckelt.** `DurationSeconds > 3600` schlägt fehl, egal was `MaxSessionDuration` erlaubt. Ausnahme: Anwendungen, die über ein **EC2 Instance Profile** laufen, sind davon nicht betroffen.",
+      "why": "Verkettete Rollen-Sessions verlängern die Vertrauenskette — je länger die Kette, desto schwerer nachvollziehbar. AWS begrenzt das Risiko mit einem harten 1-h-Deckel, der bewusst einen Fehler wirft statt still zu kürzen: Man soll das Chaining bemerken.",
+      "example": "Rolle A → `assume-role` auf Rolle B mit `--duration-seconds 14400` → ValidationError, obwohl Rolle B `MaxSessionDuration = 12 h` hätte.",
+      "examTrap": "Zwei Fallen in einer: (1) Das 1-h-Limit übersteuert `MaxSessionDuration`. (2) Workloads mit Instance Profile zählen NICHT als Chaining — dieser Ausnahmefall taucht als Distraktor auf.",
+      "mnemonic": "Merke: Rolle-auf-Rolle heißt maximal eine Stunde — kein Setting hebt das auf.",
+      "keywords": [
+        "Role Chaining",
+        "STS",
+        "Session Duration",
+        "Instance Profile"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-012",
+    "backStructured": {
+      "summary": "Sie verhindert das **Confused-Deputy-Problem**: Ohne ExternalId könnte der Vendor mit demselben Role-ARN-Muster versehentlich (oder böswillig) auf die Accounts *anderer* Kunden zugreifen. Die ExternalId ist ein Geheimnis, das nur ihr beide kennt.",
+      "why": "Der Vendor agiert als „Deputy“ für viele Kunden gleichzeitig. Die ExternalId bindet jeden AssumeRole-Call an genau EINEN Kunden: Deine Trust Policy verlangt sie per Condition, der Vendor übergibt sie pro Kunde — ein verwechselter oder erratener Role-ARN allein reicht nicht mehr.",
+      "example": "Trust Policy der Rolle: `\"Condition\": { \"StringEquals\": { \"sts:ExternalId\": \"kunde-4711\" } }` — der Vendor muss `kunde-4711` bei jedem AssumeRole mitschicken.",
+      "examTrap": "Signalwortkette „Third-Party/SaaS + AssumeRole + Sicherheit“ → ExternalId. MFA-Conditions oder IP-Restriktionen sind hier die klassischen Distraktoren.",
+      "mnemonic": "Merke: SaaS-Zugriff auf deine Rolle immer mit ExternalId gegen den Confused Deputy.",
+      "keywords": [
+        "ExternalId",
+        "Confused Deputy",
+        "AssumeRole",
+        "Trust Policy"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-013",
+    "backStructured": {
+      "summary": "Sie **verengt** die Session weiter: Effektive Rechte = Schnittmenge aus Role-Policy UND Session-Policy. Eine Session Policy kann Rechte **niemals erweitern** — nur einschränken. Typischer Use-Case: eine generische Rolle pro Mandant zuschneiden.",
+      "why": "Statt für jeden Mandanten oder Job eine eigene Rolle zu pflegen (Rollen-Wildwuchs), gibt es EINE breite Rolle — und jeder Aufruf schneidet sie per Session Policy auf genau den benötigten Ausschnitt zu. Das Prinzip bleibt dasselbe wie bei Boundaries: Es zählt die Schnittmenge.",
+      "example": "AssumeRole auf die Rolle `tenant-access` mit einer Session Policy, die `s3:GetObject` nur auf `arn:aws:s3:::data/tenant-42/*` erlaubt — die Session sieht nur den Prefix dieses Mandanten.",
+      "examTrap": "Jede Option, die „zusätzliche Rechte per Session Policy“ verspricht, ist falsch — Session Policies erweitern nie über die Rollen-Policies hinaus.",
+      "mnemonic": "Merke: Die Session Policy schneidet zu, niemals auf.",
+      "keywords": [
+        "Session Policy",
+        "STS",
+        "Schnittmenge",
+        "Multi-Tenant"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-014",
+    "backStructured": {
+      "summary": "Wenn der Nutzer über einen **externen Web-IdP** (Google, Apple, Facebook, beliebiger OIDC-Provider) authentifiziert wurde und temporäre AWS-Credentials braucht — **ohne IAM-User**. In der Praxis meist über einen **Cognito Identity Pool** gekapselt.",
+      "why": "Das signierte OIDC-Token des IdP wird direkt gegen kurzlebige AWS-Credentials getauscht — keine Langzeit-Keys, kein User-Sync. Cognito Identity Pools kapseln genau diesen Flow und ergänzen Guest-Access sowie Rollen-Mapping pro Nutzergruppe.",
+      "example": "Mobile-App: Google-Login liefert ein ID-Token → `AssumeRoleWithWebIdentity` → temporäre Credentials → `s3:PutObject` in den nutzer-eigenen Prefix.",
+      "examTrap": "Abgrenzung nach IdP-Typ: Enterprise-IdP mit SAML → `AssumeRoleWithSAML`; Social/OIDC → `AssumeRoleWithWebIdentity` bzw. Cognito. Das Signalwort ist der Provider-Typ im Szenario.",
+      "mnemonic": "Merke: Social-Login zu AWS-Credentials = AssumeRoleWithWebIdentity, meist via Cognito.",
+      "keywords": [
+        "OIDC",
+        "AssumeRoleWithWebIdentity",
+        "Cognito Identity Pool",
+        "Federation"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-015",
+    "backStructured": {
+      "summary": "**Resource-based Policy**: einfacher Direktzugriff, der Principal behält seine eigene Identität (gut für S3/SQS/KMS). **AssumeRole**: der Principal *wechselt* die Identität, bekommt temporäre Credentials, ist besser auditierbar (Session-Name, Source Identity) und funktioniert bei Services **ohne** Resource-based Policy.",
+      "why": "Bei der Resource-Policy bleibt der Caller er selbst — einfach, aber die Aktionen laufen unter fremder Account-Identität. AssumeRole erzeugt eine Session IM Ziel-Account: CloudTrail dort zeigt Rolle + Session-Name, und das Muster funktioniert universell, auch bei Services ohne Resource-Policies (z. B. EC2).",
+      "example": "Anforderung „alle Aktionen sollen im Ziel-Account unter einer dedizierten Rolle auditierbar sein“ → AssumeRole. Anforderung „Account B soll nur Objekte aus einem Bucket lesen“ → Bucket-Policy reicht.",
+      "examTrap": "Wenn das Szenario einen Service ohne Resource-based Policy nennt oder Auditierbarkeit im Ziel-Account fordert, führt kein Weg an AssumeRole vorbei — die Resource-Policy-Option ist dann der Distraktor.",
+      "mnemonic": "Merke: Identität behalten = Resource-Policy, Identität wechseln = AssumeRole.",
+      "keywords": [
+        "Cross-Account",
+        "Resource-based Policy",
+        "AssumeRole",
+        "Auditing"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-016",
+    "backStructured": {
+      "summary": "Nein. **SCPs gewähren niemals Rechte** — sie deckeln nur die maximal möglichen. Effektiv = Schnittmenge aus SCP UND IAM-Policy. Ohne IAM-Allow bleibt es beim implicit Deny.",
+      "why": "SCPs sind Guardrails auf Organizations-Ebene: Sie definieren das MAXIMUM dessen, was in einem Account überhaupt möglich ist. Tatsächliche Rechte entstehen ausschließlich aus IAM- und Resource-Policies innerhalb dieses Rahmens.",
+      "example": "SCP erlaubt `s3:*`, der User hat keine Policy → AccessDenied. Erst eine Identity-Policy mit `s3:GetObject` schaltet den Zugriff frei — und auch nur den.",
+      "examTrap": "Auch die Default-SCP `FullAWSAccess` gewährt nichts — sie hält nur das Maximum offen. Optionen wie „die SCP gibt dem User Zugriff“ sind immer falsch.",
+      "mnemonic": "Merke: SCPs deckeln, IAM gewährt.",
+      "keywords": [
+        "SCP",
+        "Organizations",
+        "Guardrail",
+        "Schnittmenge"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-017",
+    "backStructured": {
+      "summary": "**SCPs (und RCPs) wirken nicht auf Users/Roles im Management Account** — ausschließlich auf Member Accounts. Genau deshalb: **keine Workloads im Management Account** betreiben.",
+      "why": "Das Management Account verwaltet die Guardrails selbst — würde es von ihnen erfasst, könnte eine fehlerhafte SCP die gesamte Organization aussperren, inklusive der Möglichkeit, den Fehler zu korrigieren. Der Preis dieser Ausnahme: Das Konto ist ungeschützt und gehört deshalb leergeräumt.",
+      "example": null,
+      "examTrap": "„Eine SCP an der Root-OU schützt auch das Management Account“ — beliebter Distraktor, falsch. Weitere SCP-Lücken: Service-Linked Roles und der Root-User in Member Accounts bei bestimmten Root-only-Tasks.",
+      "mnemonic": "Merke: SCPs zähmen Member Accounts, nie das Management Account.",
+      "keywords": [
+        "SCP",
+        "Management Account",
+        "Organizations",
+        "Best Practice"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-018",
+    "backStructured": {
+      "summary": "**SCP = principal-centric**: „Was dürfen *meine* Identities tun?“ **RCP = resource-centric**: „Wer darf auf *meine* Ressourcen zugreifen?“ Nur die RCP kann einen **externen** Principal blocken, dem eine Bucket-Policy Zugriff gewährt — das konnte eine SCP nie.",
+      "why": "Eine SCP hängt am Principal und greift daher nur bei Identities der eigenen Organization. Externe Principals, die per Resource-Policy eingeladen wurden, laufen an ihr vorbei — die RCP setzt stattdessen an der Ressource an und erfasst damit JEDEN Zugriff, egal woher.",
+      "example": "Ein Entwickler öffnet eine Bucket-Policy für einen fremden Account. Eine RCP mit Bedingung `aws:PrincipalOrgID = o-xxxx` blockt den externen Zugriff trotzdem org-weit.",
+      "examTrap": "Signalwort „externen Zugriff organisationsweit verhindern“ → RCP. Jede Option, die das per SCP lösen will, ist falsch — SCPs erreichen externe Principals strukturell nicht.",
+      "mnemonic": "Merke: SCP zügelt meine Identities, RCP schützt meine Ressourcen.",
+      "keywords": [
+        "RCP",
+        "SCP",
+        "Data Perimeter",
+        "Organizations"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-019",
+    "backStructured": {
+      "summary": "Bei Einführung (Nov 2024): **S3, STS, KMS, SQS, Secrets Manager**. Typische Anwendung: **Data Perimeter** — „Kein Principal außerhalb meiner Organization ID darf je auf meine S3-Buckets zugreifen“, selbst wenn ein Entwickler die Bucket-Policy öffnet.",
+      "why": "RCPs erzwingen org-weit eine Obergrenze für Resource-Policies — zentral und unabhängig davon, was einzelne Teams in ihren Bucket- oder Queue-Policies erlauben. Damit wird der Data Perimeter zur Governance-Entscheidung statt zur Team-Disziplin.",
+      "example": "RCP: Deny `s3:*`, wenn `aws:PrincipalOrgID` ≠ `o-xxxx` → selbst eine versehentlich geöffnete Bucket-Policy lässt keinen externen Zugriff mehr durch.",
+      "examTrap": "Die Service-Liste ist prüfbar: S3, STS, KMS, SQS, Secrets Manager. EC2 oder DynamoDB als RCP-Ziel sind Distraktoren.",
+      "mnemonic": "Merke: RCP = zentraler Data Perimeter für S3, STS, KMS, SQS und Secrets Manager.",
+      "keywords": [
+        "RCP",
+        "Data Perimeter",
+        "aws:PrincipalOrgID",
+        "Organizations"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-020",
+    "backStructured": {
+      "summary": "**SCP** wirkt auf **Organizations-Ebene** (Account/OU) für *alle* Principals darin. **Permissions Boundary** wirkt auf **IAM-Ebene** für *eine einzelne* Identity. Sind beide gesetzt, muss die Aktion von **SCP UND Boundary UND Identity-Policy** erlaubt sein.",
+      "why": "Es sind Obergrenzen auf verschiedenen Ebenen: die SCP als organisationsweiter Rahmen pro Account/OU, die Boundary als individueller Deckel pro User oder Rolle. Kombiniert gilt der Dreifach-Schnitt — ein Deny oder ein fehlendes Allow auf irgendeiner Ebene reicht zum Blocken.",
+      "example": "Delegierte Entwickler dürfen selbst Rollen anlegen — aber nur, wenn sie die vorgegebene Boundary anhängen (erzwungen per `iam:PermissionsBoundary`-Condition in ihrer Policy).",
+      "examTrap": "Die Ebene ist das Signalwort: „einzelnen Entwickler/eine Rolle deckeln“ → Boundary; „ganzen Account/ganze OU deckeln“ → SCP.",
+      "mnemonic": "Merke: SCP deckelt Accounts, Boundary deckelt einzelne Identities.",
+      "keywords": [
+        "SCP",
+        "Permissions Boundary",
+        "Guardrail",
+        "IAM"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-021",
+    "backStructured": {
+      "summary": "Eine vorkonfigurierte **Landing Zone**: Account Factory (standardisiertes Account-Provisioning), Guardrails (preventive via SCP, detective via Config), zentrales **Log-Archive-** und **Audit-Account**, plus **Drift Detection**.",
+      "why": "Organizations liefert die Mechanik (Accounts, OUs, SCPs) — Control Tower baut darauf die Best-Practice-Fabrik: Statt Landing Zone, Logging-Konten und Guardrails wochenlang selbst zu bauen, steht das Grundgerüst in Stunden und bleibt per Drift Detection konsistent.",
+      "example": "Ein neues Team-Konto über die Account Factory anlegen: Es landet automatisch in der richtigen OU, mit zentralem Logging und allen aktiven Guardrails — ohne manuelles Nacharbeiten.",
+      "examTrap": "Signalwörter „Landing Zone“, „standardisiertes Account-Provisioning“, „Guardrails out-of-the-box“ → Control Tower. Reines Organizations ist dann der Distraktor.",
+      "mnemonic": "Merke: Organizations ist der Baukasten, Control Tower das Fertighaus.",
+      "keywords": [
+        "Control Tower",
+        "Landing Zone",
+        "Account Factory",
+        "Guardrails"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-022",
+    "backStructured": {
+      "summary": "**AWS RAM (Resource Access Manager)** — er *teilt* Ressourcen (Subnets, Transit Gateway, Route 53 Resolver Rules, License Configurations) accountübergreifend, statt sie zu duplizieren. Falle: **RAM teilt Ressourcen, IAM/STS gibt Zugriff auf APIs.** Das ist nicht dasselbe.",
+      "why": "RAM macht die Ressource selbst in fremden Accounts nativ nutzbar — geteilte Subnets erscheinen dort, als gehörten sie dazu, und Instanzen mehrerer Accounts laufen im selben Netz. Kein Rollen-Hopping, keine Kopien, ein zentral verwaltetes Netzwerk.",
+      "example": "Ein zentrales Netzwerk-Konto teilt seine VPC-Subnets via RAM mit den App-Accounts — jedes Team startet EC2-Instanzen direkt in die geteilten Subnets.",
+      "examTrap": "Distraktoren bieten VPC Peering oder Cross-Account-Rollen an, wenn eigentlich „dieselben Subnets gemeinsam nutzen“ gefragt ist — das kann nur RAM.",
+      "mnemonic": "Merke: Gemeinsame Subnets über Accounts hinweg heißt RAM.",
+      "keywords": [
+        "AWS RAM",
+        "Shared VPC",
+        "Subnets",
+        "Multi-Account"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-023",
+    "backStructured": {
+      "summary": "**User Pool** = Authentifizierung + User-Directory → liefert JWT-Tokens. **Identity Pool** = tauscht diese Tokens via STS gegen **temporäre AWS-Credentials**. Falle: Für den direkten S3-Zugriff brauchst du den **Identity Pool** — der User Pool allein reicht nicht.",
+      "why": "Zwei getrennte Aufgaben: Authentifizierung (wer bist du → JWT) und Autorisierung gegen AWS (was darfst du → STS-Credentials). S3 versteht keine JWTs — für direkte AWS-API-Calls braucht der Client echte AWS-Credentials, und die liefert nur der Identity Pool.",
+      "example": "Login über den User Pool → ID-Token → Identity Pool tauscht es gegen Credentials der Rolle `app-user` → `s3:PutObject` in den nutzer-eigenen Prefix, direkt vom Gerät.",
+      "examTrap": "„Der User Pool reicht für den S3-Zugriff“ ist DER Cognito-Distraktor. Merkregel für die Zuordnung: Authentication → User Pool, AWS-Authorization → Identity Pool.",
+      "mnemonic": "Merke: User Pool sagt, wer du bist (JWT) — Identity Pool sagt, was du in AWS darfst (STS).",
+      "keywords": [
+        "Cognito",
+        "User Pool",
+        "Identity Pool",
+        "STS",
+        "S3"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-024",
+    "backStructured": {
+      "summary": "**IAM Identity Center** (ex AWS SSO): **Workforce** — deine Mitarbeiter, Zugriff auf mehrere AWS-Accounts + SaaS-Apps über Permission Sets. **Cognito**: **Customer** — Endnutzer *deiner Anwendung*. Signalwort: „Mitarbeiter, mehrere Accounts“ → Identity Center. „App-Nutzer, Sign-up/Sign-in“ → Cognito.",
+      "why": "Zwei Zielgruppen, zwei Produkte: Identity Center orchestriert Mitarbeiter-SSO über die AWS-Organization (Permission Sets statt Rollen-Sprawl pro Konto), Cognito liefert Customer Identity für die eigene App — Sign-up, MFA, Social Login, Token-Ausgabe.",
+      "example": null,
+      "examTrap": "Die Prüfung mischt beide gern in den Optionen. Entscheide strikt nach Zielgruppe im Szenario — „Angestellte/Konsole/mehrere Accounts“ vs. „App-Endnutzer/Registrierung“.",
+      "mnemonic": "Merke: Mitarbeiter gehen zu Identity Center, App-Kunden zu Cognito.",
+      "keywords": [
+        "IAM Identity Center",
+        "Cognito",
+        "Workforce",
+        "Customer Identity"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-025",
+    "backStructured": {
+      "summary": "**Managed Microsoft AD**: echter AD in AWS, unterstützt **Trusts** zu on-prem, Objekte liegen in AWS. **AD Connector**: reiner **Proxy** zum bestehenden on-prem AD — **keine Daten in AWS**, kein eigener Directory-Store. **Simple AD**: günstiger Samba-Standalone, **keine Trusts**, kein MFA — nur für einfache Fälle.",
+      "why": "Die Entscheidungsmatrix: Trusts, RDS SQL Server oder große Umgebungen → Managed Microsoft AD. Bestehendes on-prem AD weiterverwenden, ohne Daten in die Cloud zu replizieren → AD Connector (MFA via RADIUS möglich). Kleines Standalone-Verzeichnis ohne AD-Advanced-Features → Simple AD.",
+      "example": "Anforderung: „On-prem AD soll für AWS-SSO genutzt werden, Verzeichnisdaten dürfen nicht in der Cloud liegen“ → AD Connector — er leitet Anmeldungen nur weiter.",
+      "examTrap": "Simple AD fällt bei Trust-, MFA- oder RDS-SQL-Anforderungen IMMER raus — und nimmt ab 30.07.2026 keine neuen Kunden mehr an. Als „günstige“ Option in solchen Szenarien ist es der Distraktor.",
+      "mnemonic": "Merke: Trust braucht Managed AD, Proxy heißt AD Connector, Simple bleibt simpel.",
+      "keywords": [
+        "Directory Service",
+        "Managed Microsoft AD",
+        "AD Connector",
+        "Simple AD"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-026",
+    "backStructured": {
+      "summary": "Der IdP liefert eine **SAML-Assertion**; die App/Konsole ruft damit **`sts:AssumeRoleWithSAML`** auf und erhält **temporäre Credentials** für eine vorab definierte IAM-Role. Es entsteht **kein IAM-User** — die Identität bleibt beim IdP.",
+      "why": "AWS vertraut der signierten Assertion des als SAML-Provider registrierten IdP und stellt kurzlebige Credentials aus — kein User-Sync, keine Passwörter in AWS, zentrales On-/Offboarding beim IdP. Attribute der Assertion können als Session Tags für ABAC durchgereicht werden.",
+      "example": "ADFS-Login → SAML-Assertion → `AssumeRoleWithSAML` → einstündige Konsolen-Session unter der Rolle `Developer`.",
+      "examTrap": "Abgrenzung nach IdP-Typ: SAML = Enterprise/Workforce-IdP; Social-Login läuft über OIDC (`AssumeRoleWithWebIdentity`/Cognito). Optionen, die IAM-User für föderierte Nutzer anlegen, sind falsch.",
+      "mnemonic": "Merke: SAML-Assertion plus AssumeRoleWithSAML ergibt föderierten Zugriff ohne IAM-User.",
+      "keywords": [
+        "SAML 2.0",
+        "AssumeRoleWithSAML",
+        "Federation",
+        "STS"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-027",
+    "backStructured": {
+      "summary": "Root hat **unbeschränkte** Rechte und lässt sich weder per SCP noch per RCP einschränken. Ein virtuelles MFA lebt auf einem Endgerät, das kompromittiert werden kann; ein Hardware-Token ist an physischen Besitz gebunden. Bei Root ist der Blast Radius der gesamte Account.",
+      "why": "Root ist der einzige Principal ohne übergeordneten Guardrail — die Verteidigung muss deshalb am Faktor selbst ansetzen. Ein Hardware-Key (FIDO2) ist phishing-resistent und nicht per Malware kopierbar; eine TOTP-App auf einem kompromittierten Smartphone ist es nicht.",
+      "example": null,
+      "examTrap": "Die volle Root-Härtung im Szenario: Hardware-MFA + KEINE Access Keys für Root + Alarme auf Root-Logins (CloudTrail/EventBridge). „Root per Policy einschränken“ bleibt in jeder Variante falsch.",
+      "mnemonic": "Merke: Root härtet man mit Hardware-MFA, nicht mit Policies.",
+      "keywords": [
+        "Root-User",
+        "Hardware-MFA",
+        "FIDO2",
+        "Account-Härtung"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-028",
+    "backStructured": {
+      "summary": "Der **Cognito User Pool** — er kann beides: eigenes User-Directory (E-Mail/Passwort) **und** Federation (Social/SAML/OIDC), plus MFA und Advanced Security (Erkennung kompromittierter Credentials). Ein Identity Pool ist erst nötig, wenn direkte AWS-Ressourcen-Zugriffe dazukommen.",
+      "why": "Der User Pool vereint Directory, Federation und MFA hinter einem Endpunkt: Die App spricht immer nur mit Cognito und bekommt unabhängig vom Login-Weg dasselbe JWT-Format — kein eigener Auth-Code für jeden Provider.",
+      "example": "Die Cognito Hosted UI zeigt „Sign in with Google“ und E-Mail/Passwort nebeneinander — beide Wege enden in denselben ID-/Access-Tokens für die App.",
+      "examTrap": "Ein Identity Pool taucht als Distraktor auf, obwohl das Szenario nur App-Login verlangt — er wird erst gebraucht, wenn der Client direkt AWS-Ressourcen anspricht.",
+      "mnemonic": "Merke: Ein User Pool, viele Login-Wege, ein Token-Format.",
+      "keywords": [
+        "Cognito User Pool",
+        "Federation",
+        "MFA",
+        "Hosted UI"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-029",
+    "backStructured": {
+      "summary": "**Maximal 4 KB.** Alles darüber läuft über **Envelope Encryption**: `GenerateDataKey` liefert einen Data Key, mit dem du **lokal** verschlüsselst; KMS verschlüsselt nur den Data Key.",
+      "why": "KMS ist als Key-Verwaltung gebaut, nicht als Bulk-Crypto-Service — die 4-KB-Grenze (4.096 Bytes) erzwingt das Envelope-Muster, bei dem nur kleine Data Keys durch KMS laufen und der Master Key den Service nie verlässt.",
+      "example": "`GenerateDataKey` → der Plaintext-Data-Key verschlüsselt eine 5-GB-Datei lokal (AES-256); gespeichert werden Datei + verschlüsselter Data Key, der Plaintext-Key wird verworfen.",
+      "examTrap": "Zahlen-Falle 4 KB — und jede Option, die große Objekte direkt mit `kms:Encrypt` verschlüsseln will, ist falsch. Richtig ist `GenerateDataKey` + lokale Verschlüsselung.",
+      "mnemonic": "Merke: kms:Encrypt bis 4 KB — darüber Envelope Encryption mit GenerateDataKey.",
+      "keywords": [
+        "KMS",
+        "Envelope Encryption",
+        "GenerateDataKey",
+        "4 KB"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-030",
+    "backStructured": {
+      "summary": "Drei Gründe: **keine 4-KB-Grenze**, **drastisch weniger KMS-API-Calls** (Kosten + Throttling) und **Performance** (die eigentliche Verschlüsselung passiert lokal). Der verschlüsselte Data Key wird neben den Daten abgelegt.",
+      "why": "Data Keys entkoppeln die Datenmenge von KMS: Die Nutzdaten werden lokal mit schnellem symmetrischem AES verschlüsselt, KMS sieht nur den kleinen Data Key — der Master Key verlässt den Service nie, und die API-Last bleibt konstant klein, egal wie groß die Daten sind.",
+      "example": "S3 SSE-KMS nutzt genau dieses Muster — und mit S3 Bucket Keys sinken die KMS-Calls nochmals um bis zu 99 %, weil ein Bucket-level Key die Objekt-Data-Keys lokal ableitet.",
+      "examTrap": "Der KMS Key verschlüsselt NIE die Nutzdaten selbst, nur den Data Key — Distraktoren behaupten gern das Gegenteil. Zweite Falle: Envelope Encryption ist kein „Verzicht auf KMS“, der Data Key hängt weiter am KMS Key.",
+      "mnemonic": "Merke: KMS schützt den Schlüssel, der Data Key schützt die Daten.",
+      "keywords": [
+        "Envelope Encryption",
+        "Data Key",
+        "KMS",
+        "S3 Bucket Keys"
+      ]
+    }
+  }
+]
