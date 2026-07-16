@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { renderInline } from "@/lib/inline-markup";
 
 type Props = {
   prompt: string;
@@ -29,7 +30,7 @@ export function CollapsibleQuestion({
         aria-expanded={open}
       >
         {leading && <span className="mt-0.5 shrink-0">{leading}</span>}
-        <span className={`flex-1 text-sm ${promptColorClass}`}>{prompt}</span>
+        <span className={`flex-1 text-sm ${promptColorClass}`}>{renderInline(prompt)}</span>
         {trailing && <span className="shrink-0">{trailing}</span>}
         <ChevronRight
           className={`mt-0.5 h-4 w-4 shrink-0 text-ink-faint transition-transform ${

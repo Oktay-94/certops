@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { renderInline } from "@/lib/inline-markup";
 import type { QuestionDisplay } from "@/db/schema";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { submitAnswer } from "./[id]/actions";
@@ -173,7 +174,7 @@ export function QuestionCard({ question, nextHref, homeHref, isLast }: Props) {
       </div>
 
       <h1 className="mt-6 text-xl font-semibold leading-relaxed tracking-[-0.01em] text-ink sm:text-2xl">
-        {question.prompt}
+        {renderInline(question.prompt)}
       </h1>
 
       <div className="mt-8 flex flex-col gap-[9px]">
@@ -188,7 +189,7 @@ export function QuestionCard({ question, nextHref, homeHref, isLast }: Props) {
           >
             <span className={keyClass(choice.id)}>{choice.id}</span>
             <span className="pt-0.5 text-[13.5px] leading-relaxed text-ink">
-              {choice.text}
+              {renderInline(choice.text)}
             </span>
           </button>
         ))}
@@ -239,7 +240,7 @@ export function QuestionCard({ question, nextHref, homeHref, isLast }: Props) {
               {verdict.correct ? "Richtig" : "Falsch"}
             </header>
             <p className="mt-3 leading-relaxed text-ink-soft">
-              {verdict.explanation}
+              {renderInline(verdict.explanation)}
             </p>
           </section>
 

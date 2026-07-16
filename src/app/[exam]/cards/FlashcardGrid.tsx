@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { renderInline } from "@/lib/inline-markup";
 import {
   ArrowLeft,
   Lightbulb,
@@ -337,7 +338,7 @@ export function FlashcardGrid({ cards, domains, exam }: Props) {
                           {emoji}
                         </span>
                         <p className="whitespace-pre-wrap text-center text-[15px] font-semibold leading-relaxed text-ink">
-                          {c.front}
+                          {renderInline(c.front)}
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center justify-center gap-1 py-4 text-[11px] text-ink-faint">

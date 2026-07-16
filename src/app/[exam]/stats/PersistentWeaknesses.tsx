@@ -1,4 +1,5 @@
 import type { PersistentWeakness } from "@/db/repository";
+import { renderInline } from "@/lib/inline-markup";
 
 // "Hartnäckigste Schwachstellen" bars (mockup .weak): wrong-rate per question,
 // danger-colored bars. Distinct from "Schwächste Fragen" (absolute count).
@@ -26,7 +27,7 @@ export function PersistentWeaknesses({
         return (
           <div key={q.id} className="flex items-center gap-3">
             <span className="w-2/5 shrink-0 text-[12.5px] font-medium leading-tight text-ink">
-              {clip(q.prompt)}
+              {renderInline(clip(q.prompt))}
             </span>
             <div className="h-1.5 flex-1 overflow-hidden rounded-[3px] bg-surface-2">
               <span
