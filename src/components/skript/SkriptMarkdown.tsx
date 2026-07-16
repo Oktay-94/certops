@@ -12,7 +12,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { slugifyHeading } from "@/lib/skript";
+import { slugifyHeading, stackedAnchorId } from "@/lib/skript";
 import { emojiForHeadingText, isMerksatzText } from "@/lib/skript-emoji";
 
 const REMARK_PLUGINS = [remarkGfm];
@@ -58,18 +58,21 @@ function flagFromAnnotation(annotation: string): string {
   return (dash === -1 ? cleaned : cleaned.slice(0, dash)).trim();
 }
 
-const COMPONENTS = {
-  // The chapter page renders its own header — drop the markdown h1.
-  h1: () => null,
-  h2: ({ children }: ComponentProps<"h2">) => {
+// h2 renderer, parameterised only in its id: stacked pages (SAA category
+// reader) namespace the anchor under the service slug so repeated section
+// headings stay unique. Slug computation itself is unchanged → CLF anchors
+// frozen.
+const makeH2 = (anchorPrefix?: string) =>
+  function SkriptH2({ children }: ComponentProps<"h2">) {
     const full = flattenText(children); // identical input to before
     const [titlePart, ...rest] = full.split("🛑");
     const title = titlePart.trim();
     const flag = rest.length > 0 ? flagFromAnnotation(rest.join("🛑")) : null;
     const emoji = emojiForHeadingText(title);
+    const slug = slugifyHeading(full);
     return (
       <h2
-        id={slugifyHeading(full)} // slug computation unchanged → anchors frozen
+        id={anchorPrefix ? stackedAnchorId(anchorPrefix, slug) : slug}
         className="svc-head mt-0 flex scroll-mt-[72px] items-center gap-[15px]"
       >
         {emoji && (
@@ -90,7 +93,12 @@ const COMPONENTS = {
         </span>
       </h2>
     );
-  },
+  };
+
+const COMPONENTS = {
+  // The chapter page renders its own header — drop the markdown h1.
+  h1: () => null,
+  h2: makeH2(),
   h3: (props: ComponentProps<"h3">) => (
     <h3
       className="mt-6 text-lg font-semibold text-ink [overflow-wrap:anywhere]"
@@ -195,10 +203,20 @@ const COMPONENTS = {
   ),
 };
 
-export function SkriptMarkdown({ markdown }: { markdown: string }) {
+export function SkriptMarkdown({
+  markdown,
+  anchorPrefix,
+}: {
+  markdown: string;
+  /** Namespace h2 anchor ids under this slug (stacked category reader). */
+  anchorPrefix?: string;
+}) {
+  const components = anchorPrefix
+    ? { ...COMPONENTS, h2: makeH2(anchorPrefix) }
+    : COMPONENTS;
   return (
     <div className="text-[15px]">
-      <ReactMarkdown remarkPlugins={REMARK_PLUGINS} components={COMPONENTS}>
+      <ReactMarkdown remarkPlugins={REMARK_PLUGINS} components={components}>
         {markdown}
       </ReactMarkdown>
     </div>

@@ -187,6 +187,21 @@ export function slugifyHeading(heading: string): string {
 }
 
 /**
+ * Anchor id for a section on a STACKED page (SAA category reader): the same
+ * `##` headings repeat across the stacked scripts (CLF-Recap, Knackpunkte …),
+ * so each section id is namespaced under its service slug. Not a second
+ * slugger — both inputs come from slugifyHeading(); this only joins them.
+ * The `--` separator cannot appear in a single slug (runs of non-alphanumerics
+ * collapse to one "-"), so ids stay collision-free by construction.
+ */
+export function stackedAnchorId(
+  serviceSlug: string,
+  headingSlug: string,
+): string {
+  return `${serviceSlug}--${headingSlug}`;
+}
+
+/**
  * Normalise a service name / heading for NAME matching (not slugging): cut at
  * the first 🛑 annotation, lowercase, drop parentheticals ("(Elastic Compute
  * Cloud)", "(Die „Schnellstraße")"), strip a leading Amazon/AWS prefix and

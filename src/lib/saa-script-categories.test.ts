@@ -4,12 +4,15 @@
 // upstream script changes and mapping typos.
 import { describe, expect, it } from "vitest";
 import { loadSaaScripts } from "../db/seed/saa-scripts/index";
+import { stackedAnchorId } from "./skript";
+import { parseHeadings } from "./skript-content";
 import {
   SAA_SCRIPT_CATEGORIES,
   SCRIPT_SLUGS_BY_CATEGORY,
 } from "./saa-script-categories";
 
-const scriptSlugs = new Set(loadSaaScripts().map((s) => s.slug));
+const allScripts = loadSaaScripts();
+const scriptSlugs = new Set(allScripts.map((s) => s.slug));
 const mappedSlugs = Object.values(SCRIPT_SLUGS_BY_CATEGORY).flat();
 
 describe("SAA script category mapping", () => {
@@ -42,5 +45,23 @@ describe("SAA script category mapping", () => {
 
   it("no service slug collides with the literal route segment 'kategorie'", () => {
     expect(scriptSlugs.has("kategorie")).toBe(false);
+  });
+
+  // Phase-5 invariant on the STACKED category reader: the service article ids
+  // (plain service slug) plus every namespaced section id must be unique per
+  // page — repeated ## headings across stacked scripts would otherwise
+  // collide. Mirrors exactly what kategorie/[cat]/page.tsx renders.
+  it("stacked page anchor ids are unique within every category", () => {
+    const bySlug = new Map(allScripts.map((s) => [s.slug, s]));
+    for (const [key, slugs] of Object.entries(SCRIPT_SLUGS_BY_CATEGORY)) {
+      const ids: string[] = [];
+      for (const slug of slugs) {
+        ids.push(slug);
+        for (const h of parseHeadings(bySlug.get(slug)!.content)) {
+          ids.push(stackedAnchorId(slug, h.slug));
+        }
+      }
+      expect(new Set(ids).size, `category ${key}`).toBe(ids.length);
+    }
   });
 });

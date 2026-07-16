@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import type { DB } from "./index";
 import { shuffle } from "@/lib/shuffle";
 import type { QuizMode } from "@/lib/domains";
@@ -832,4 +832,18 @@ export async function getScriptBySlug(
     .from(scripts)
     .where(and(eq(scripts.cert, cert), eq(scripts.slug, slug)))
     .get();
+}
+
+/** Full rows (incl. content) for a slug set — the stacked category reader. */
+export async function getScriptsBySlugs(
+  db: DB,
+  cert: Script["cert"],
+  slugs: readonly string[],
+): Promise<Script[]> {
+  if (slugs.length === 0) return [];
+  return db
+    .select()
+    .from(scripts)
+    .where(and(eq(scripts.cert, cert), inArray(scripts.slug, [...slugs])))
+    .all();
 }
