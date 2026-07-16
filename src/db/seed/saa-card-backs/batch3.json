@@ -1,0 +1,483 @@
+[
+  {
+    "seedKey": "saa-c03-card-061",
+    "backStructured": {
+      "summary": "Weil eine Queue jede Nachricht an **genau einen** Consumer liefert — die drei würden sich die Bestellungen aufteilen. Lösung: **SNS-Topic → je eine SQS-Queue pro System** (Fan-out). Jedes System bekommt so seinen eigenen Puffer und Retry.",
+      "why": "SQS ist **Punkt-zu-Punkt** (Work Queue), SNS ist **Pub/Sub**: Das Topic vervielfältigt jede Nachricht an alle Subscriptions. Die nachgeschalteten Queues geben jedem System **unabhängige** Verarbeitung — fällt Analytics aus, laufen Rechnung und Versand ungestört weiter.",
+      "example": "Bestellung → **SNS-Topic** → drei Subscriptions auf **drei SQS-Queues** (Rechnung, Versand, Analytics) — jedes System liest sein eigenes Exemplar in seinem Tempo.",
+      "examTrap": "Distraktor **„eine Queue, drei Consumer“** ist Lastverteilung, kein Broadcast. Und **SNS direkt an die Systeme** (ohne Queues) verliert den Puffer — bei Consumer-Ausfall sind Nachrichten nach den SNS-Retries weg.",
+      "mnemonic": "**Merke:** Jeder soll alles bekommen = **SNS-Fan-out auf SQS-Queues**, nie eine geteilte Queue.",
+      "keywords": [
+        "SNS",
+        "SQS",
+        "Fan-out",
+        "Pub/Sub"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-062",
+    "backStructured": {
+      "summary": "**Seit August 2025: 1 MiB** (Standard + FIFO); der alte, in vielen Prüfungsfragen noch erwartete Wert war **256 KB**. Für größere Payloads: **SQS Extended Client Library** — Payload nach **S3**, in die Queue geht nur ein Pointer (bis **2 GB**).",
+      "why": "Queues sind für **Steuerungsnachrichten** gebaut, nicht für Blob-Transport — deshalb das harte Limit und das Extended-Client-Muster: Der Verweis wandert durch die Queue, die Masse liegt in S3. Das **Konzept bleibt identisch**, nur die Grenze ist von 256 KB auf 1 MiB gewandert.",
+      "example": "5-MB-Auftragsdokument: Der Producer legt es via **Extended Client** in S3, die Queue transportiert den **S3-Pointer**, der Consumer lädt das Objekt nach.",
+      "examTrap": "**„Payload aufteilen/komprimieren“** ist fast immer der Distraktor — die richtige Antwort ist der **Extended Client**. Zahlen-Doppelfalle: neuer Wert **1 MiB** (Aug 2025), alter Prüfungswert **256 KB** — beide kennen.",
+      "mnemonic": "**Merke:** Übergroße SQS-Payloads gehören per **Extended Client nach S3** — die Queue trägt nur den Pointer.",
+      "keywords": [
+        "SQS",
+        "1 MiB",
+        "Extended Client Library",
+        "S3-Pointer"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-063",
+    "backStructured": {
+      "summary": "Der **Visibility Timeout** (Default **30 Sekunden**, max **12 Stunden**) ist abgelaufen, bevor der Consumer fertig war → die Nachricht wurde wieder sichtbar und ein zweiter Consumer hat sie gezogen. Fix: Timeout hochsetzen **oder** per `ChangeMessageVisibility` verlängern (Heartbeat).",
+      "why": "SQS löscht Nachrichten **nie selbst** beim Abholen — der Consumer muss nach erfolgreicher Arbeit explizit `DeleteMessage` rufen. Der Visibility Timeout ist nur die **Leihfrist**: Läuft sie ab, geht SQS von einem toten Consumer aus und gibt die Nachricht wieder frei.",
+      "example": "Verarbeitung dauert bis zu 5 Minuten → **Visibility Timeout auf ~6× der erwarteten Dauer** setzen oder im Consumer alle 60 s per **`ChangeMessageVisibility`** verlängern.",
+      "examTrap": "Doppelverarbeitung im Szenario = fast immer **Timeout zu kurz**. Zweite Ebene: SQS Standard ist ohnehin **at-least-once** — Consumer müssen **idempotent** sein, der Timeout minimiert Duplikate nur.",
+      "mnemonic": "**Merke:** Visibility Timeout ist die **Leihfrist** — läuft sie vor dem Delete ab, arbeitet ein Zweiter dieselbe Nachricht.",
+      "keywords": [
+        "SQS",
+        "Visibility Timeout",
+        "30 Sekunden",
+        "Idempotenz"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-064",
+    "backStructured": {
+      "summary": "**Default 4 Tage**, konfigurierbar von **60 Sekunden bis 14 Tage**. Danach wird sie gelöscht — bei einem 10 Tage offline Consumer und Default-Retention sind die Daten weg.",
+      "why": "Die Retention ist eine **Haltbarkeits-, keine Verarbeitungsgarantie**: SQS ist ein Durchlaufpuffer, kein Archiv. Wer längere Aufbewahrung oder Re-Processing braucht, ist bei **Kinesis (bis 365 Tage)** oder einem S3-basierten Muster richtig.",
+      "example": "Wartungsfenster von 12 Tagen geplant → Retention der Queue vorab auf **14 Tage** stellen, sonst verfallen Nachrichten ab Tag 5 (Default 4).",
+      "examTrap": "Zahlen-Falle: **4 Tage Default, 60 s–14 Tage Spanne**. Szenarien mit langen Consumer-Ausfällen testen genau, ob du weißt, dass Nachrichten **still verfallen**.",
+      "mnemonic": "**Merke:** SQS hält Nachrichten **4 Tage** (max 14) — eine Queue ist ein Puffer, kein Archiv.",
+      "keywords": [
+        "SQS",
+        "Message Retention",
+        "4 Tage",
+        "14 Tage"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-065",
+    "backStructured": {
+      "summary": "**Standard**: nahezu unbegrenzter Durchsatz, **at-least-once**, Best-Effort-Reihenfolge. **FIFO**: strikte Reihenfolge + **exactly-once processing**, gedeckelt auf **300 msg/s** (ohne Batching), **3.000 msg/s** (mit Batching), bis **70.000 msg/s** im High-Throughput-Mode. Ordnung kostet Durchsatz.",
+      "why": "FIFO erkauft die Garantien mit Koordination: Deduplication (5-Minuten-Fenster) und **Message Groups** — Ordnung gilt **pro `MessageGroupId`**, und mehr parallele Gruppen bedeuten mehr Durchsatz. Standard verzichtet auf beides und skaliert praktisch grenzenlos.",
+      "example": "Kontobewegungen je Kunde strikt geordnet: **FIFO** mit `MessageGroupId = kundenId` — Ordnung pro Kunde, Parallelität über Kunden hinweg.",
+      "examTrap": "Signalwörter **„strikte Reihenfolge“ / „keine Duplikate“** → FIFO. Vorsicht beim 70.000er-Wert: **High Throughput ist regionsabhängig** (u. a. us-east-1, us-west-2, eu-west-1) — nicht als globalen Wert annehmen.",
+      "mnemonic": "**Merke:** FIFO kauft **Ordnung und Exactly-once** für gedeckelten Durchsatz — 300, 3000, 70000 msg/s.",
+      "keywords": [
+        "SQS FIFO",
+        "Exactly-once",
+        "MessageGroupId",
+        "300/3000 msg/s"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-066",
+    "backStructured": {
+      "summary": "Eine **Dead-Letter Queue (DLQ)** mit **`maxReceiveCount`**: Nach n gescheiterten Zustellversuchen wandert die Nachricht in die DLQ und die Queue läuft weiter. Detail: Die **DLQ einer FIFO-Queue muss selbst FIFO** sein.",
+      "why": "Ohne DLQ blockiert die Poison Pill den Consumer in einer Endlosschleife (empfangen → scheitern → wieder sichtbar). Die DLQ ist das **Quarantäne-Postfach**: Der Fehlerfall wird isoliert und bleibt für Analyse und **Redrive** (Rückführung nach dem Fix) erhalten.",
+      "example": "Redrive Policy: **`maxReceiveCount: 3`** → nach dem dritten Fehlversuch landet die Nachricht in der DLQ, ein CloudWatch-Alarm auf `ApproximateNumberOfMessagesVisible` der DLQ meldet den Vorfall.",
+      "examTrap": "Zwei Detailfallen: **FIFO-DLQ muss FIFO sein**, und die DLQ ist **kein automatischer Retry-Mechanismus** — Nachrichten liegen dort, bis jemand sie per Redrive zurückschiebt.",
+      "mnemonic": "**Merke:** Poison Pills fängt die **DLQ mit maxReceiveCount** — Quarantäne statt Endlosschleife.",
+      "keywords": [
+        "DLQ",
+        "maxReceiveCount",
+        "Poison Pill",
+        "Redrive"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-067",
+    "backStructured": {
+      "summary": "**Short Polling** (Default): Jeder `ReceiveMessage`-Call kostet, auch wenn er leer zurückkommt — bei leerer Queue pollt der Consumer permanent ins Nichts. Fix: **Long Polling** über **`ReceiveMessageWaitTimeSeconds`** (bis **20 Sekunden**).",
+      "why": "Beim Long Polling hält SQS die Verbindung offen, bis eine Nachricht eintrifft oder die Wartezeit abläuft — **drastisch weniger leere API-Calls** und schnellere Zustellung, weil zudem alle Server der verteilten Queue abgefragt werden statt einer Teilmenge.",
+      "example": "Queue-Attribut **`ReceiveMessageWaitTimeSeconds: 20`** setzen (oder pro Call) — die Leer-Requests fallen um Größenordnungen.",
+      "examTrap": "Szenario **„hohe SQS-Kosten trotz wenig Traffic“** → immer Long Polling. Der Wert ist prüfbar: **maximal 20 Sekunden**.",
+      "mnemonic": "**Merke:** Leere Polls kosten — **Long Polling (bis 20 s)** ist fast immer die richtige Einstellung.",
+      "keywords": [
+        "SQS",
+        "Long Polling",
+        "20 Sekunden",
+        "Kosten"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-068",
+    "backStructured": {
+      "summary": "**`ApproximateNumberOfMessagesVisible`** — besser noch als **Backlog pro Instance** (Queue-Tiefe ÷ laufende Instances) als Custom Metric mit **Target Tracking**. CPU-Scaling ist hier falsch: Ein wartender Consumer hat kaum CPU-Last, obwohl die Queue explodiert.",
+      "why": "Die Queue-Tiefe ist das **direkte Maß der unerledigten Arbeit** — CPU misst nur, wie beschäftigt die vorhandenen Instanzen sind. Backlog-pro-Instance normalisiert zusätzlich auf die Flottengröße, sodass Target Tracking auf einen Zielwert (z. B. akzeptable Nachrichten je Worker) regeln kann.",
+      "example": "Custom Metric = `ApproximateNumberOfMessagesVisible / GroupInServiceInstances`, **Target Tracking** auf z. B. 100 Nachrichten pro Instanz — die Flotte atmet mit der Queue.",
+      "examTrap": "**CPU-basiertes Scaling** ist der Standard-Distraktor bei Queue-Workern. Und „Approximate“ im Metriknamen ist normal — SQS ist verteilt, die Zahl ist gut genug zum Skalieren.",
+      "mnemonic": "**Merke:** Queue-Worker skalieren auf **Queue-Tiefe (Backlog pro Instance)**, nie auf CPU.",
+      "keywords": [
+        "Auto Scaling",
+        "ApproximateNumberOfMessagesVisible",
+        "Target Tracking",
+        "Backlog"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-069",
+    "backStructured": {
+      "summary": "**Delay Queue**: verzögert die **erste** Sichtbarkeit einer **neuen** Nachricht (max **15 Minuten**). **Visibility Timeout**: versteckt eine bereits **abgerufene** Nachricht während der Verarbeitung. Ersteres wirkt beim Einliefern, Letzteres beim Abholen.",
+      "why": "Zwei Mechanismen, zwei Lebensphasen: Der Delay (per Queue-Default oder `DelaySeconds` pro Nachricht) schiebt den **Start** der Zustellung auf; der Visibility Timeout schützt eine **laufende Verarbeitung** vor Doppel-Zugriff.",
+      "example": "Bestellbestätigung soll erst nach 10 Minuten Kulanzfrist verarbeitet werden (Storno-Fenster) → **`DelaySeconds: 600`** beim Senden.",
+      "examTrap": "Zahlen auseinanderhalten: **Delay max 15 Minuten**, Visibility Timeout **max 12 Stunden**. Wer „Nachricht später verarbeiten“ mit dem Visibility Timeout löst, verwechselt die Phase.",
+      "mnemonic": "**Merke:** **Delay** wirkt beim **Einliefern** (max 15 min), **Visibility Timeout** beim **Abholen** (max 12 h).",
+      "keywords": [
+        "Delay Queue",
+        "Visibility Timeout",
+        "DelaySeconds",
+        "15 Minuten"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-070",
+    "backStructured": {
+      "summary": "Weil die Queue **puffert und wiederholt**. Fällt ein Consumer aus oder wird gedrosselt, liegen die Nachrichten sicher in seiner Queue (mit DLQ). Bei SNS→Lambda direkt gibt es nur begrenzte Retries — danach ist die Nachricht weg. **Der Puffer ist der Punkt der Entkopplung.**",
+      "why": "SNS ist **Push ohne Gedächtnis**: Zustellversuche, dann Ende. Die zwischengeschaltete Queue verwandelt Push in **Pull im eigenen Tempo** — Lambda-Throttling, Deployments oder Ausfälle kosten keine Nachrichten mehr, und die DLQ fängt den Rest.",
+      "example": "SNS-Topic → SQS-Queue (mit DLQ) → **Lambda mit Event Source Mapping** — bei Throttling wächst die Queue, statt dass Events verloren gehen.",
+      "examTrap": "Signalwörter **„darf keine Nachricht verlieren“ / „Consumer zeitweise offline“** → Queue dazwischen. SNS→Lambda direkt ist nur für verzichtbare Benachrichtigungen die richtige Wahl.",
+      "mnemonic": "**Merke:** Zwischen SNS und Verarbeitung gehört eine **Queue** — der Puffer ist die Entkopplung.",
+      "keywords": [
+        "SNS",
+        "SQS",
+        "Lambda",
+        "Pufferung",
+        "DLQ"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-071",
+    "backStructured": {
+      "summary": "Nein — **SNS Message Filtering**: Jede Subscription bekommt eine **Filter Policy** auf die Message Attributes. Ein Topic, gefilterte Zustellung.",
+      "why": "Die Filterung verlagert die Routing-Logik **in die Infrastruktur**: SNS wertet die Policy pro Subscription aus und stellt nur passende Nachrichten zu — kein Nachrichten-Müll bei den Consumern, keine parallele Topic-Landschaft zu pflegen.",
+      "example": "Ein `orders`-Topic; die Versand-Queue abonniert mit Filter Policy **`{ \"eventType\": [\"shipment\"] }`**, Billing mit `{ \"eventType\": [\"invoice\"] }` — jeder sieht nur seins.",
+      "examTrap": "Die Distraktoren sind immer **„ein Topic pro Typ“** (Wildwuchs) oder **„Consumer filtert selbst“** (verschwendete Zustellungen + Kopplung). Filter Policies können auch auf den **Message Body** angewendet werden — Attributes sind der Standardweg.",
+      "mnemonic": "**Merke:** Ein Topic, viele Sichten — **Filter Policies** an der Subscription statt Topic-Zoo.",
+      "keywords": [
+        "SNS",
+        "Message Filtering",
+        "Filter Policy",
+        "Message Attributes"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-072",
+    "backStructured": {
+      "summary": "**SNS**: simples, hochdurchsatziges **Fan-out** an bekannte Subscriber (Pub/Sub). **EventBridge**: **content-based Routing** per Rules, 200+ AWS-Service-Events und SaaS-Partner als Quelle, Schema Registry, **Archive & Replay**. Signalwörter für EventBridge: „auf AWS-Events reagieren“, „Events archivieren/wiederholen“, „nach Inhalt routen“.",
+      "why": "SNS verteilt, EventBridge **versteht**: Rules matchen auf den **Inhalt** des Events (JSON-Pattern) und routen an unterschiedliche Ziele; dazu kommen die native AWS-/SaaS-Event-Integration und Replay aus dem Archiv. SNS bleibt die Wahl für rohes, massives Fan-out mit minimaler Latenz.",
+      "example": "„Wenn eine EC2-Instance in den Zustand `stopped` wechselt, starte eine Lambda“ → **EventBridge Rule** auf das EC2-State-Change-Event — dafür ist kein einziger eigener Publisher nötig.",
+      "examTrap": "**EventBridge puffert nicht** — braucht das Szenario einen Buffer, gehört SQS hinter die Rule. Und für simples Fan-out an Millionen Endpunkte bleibt **SNS** die richtige (und günstigere) Antwort.",
+      "mnemonic": "**Merke:** **SNS verteilt**, **EventBridge routet nach Inhalt** — und puffern tut keiner von beiden.",
+      "keywords": [
+        "EventBridge",
+        "SNS",
+        "Content-based Routing",
+        "Archive & Replay"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-073",
+    "backStructured": {
+      "summary": "**EventBridge**: diskrete Events an Ziele **routen** (kein Ordering-/Shard-Modell). **Kinesis**: **geordneter, replaybarer Stream** mit Retention (**24 h Default, bis 365 Tage**), aus dem **mehrere Consumer unabhängig** dieselben Daten lesen. Signalwörter für Kinesis: „Reihenfolge“, „erneut abspielen“, „hoher kontinuierlicher Durchsatz“.",
+      "why": "Es sind zwei Datenmodelle: EventBridge behandelt jedes Event **einzeln** und liefert es an die matchenden Ziele; Kinesis ist ein **Log** — Ordnung pro Shard, Position per Iterator, jeder Consumer liest den Strom in seinem eigenen Tempo und beliebig erneut.",
+      "example": "Clickstream-Analytik: Producer schreiben in **Kinesis Data Streams**, ein Flink-Job und ein Archiv-Consumer lesen **denselben Stream unabhängig** — und können nach einem Bug ab gestern **replayen**.",
+      "examTrap": "**„Reihenfolge + Replay + mehrere unabhängige Leser“** = Kinesis, nicht EventBridge. Umgekehrt ist Kinesis für einfaches „reagiere auf dieses AWS-Event“ Overkill — dort gewinnt EventBridge.",
+      "mnemonic": "**Merke:** EventBridge **routet Events**, Kinesis ist der **geordnete, replaybare Strom**.",
+      "keywords": [
+        "Kinesis Data Streams",
+        "EventBridge",
+        "Retention 365 Tage",
+        "Replay"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-074",
+    "backStructured": {
+      "summary": "**Standard**: bis **1 Jahr** Laufzeit · **exactly-once** · volle Execution History (90 Tage) · unterstützt `.waitForTaskToken` und `.sync`. **Express**: bis **5 Minuten** · **at-least-once** (async) · nur CloudWatch Logs · **kein `.waitForTaskToken`/`.sync`**, dafür massiv günstiger bei hohem Volumen.",
+      "why": "Standard bezahlt pro **State Transition** und ist für langlebige, auditierbare Geschäftsprozesse gebaut (Callbacks, Human Approval). Express rechnet nach **Dauer und Speicher** ab — ideal für kurze, massenhafte Event-Verarbeitung, bei der Idempotenz die at-least-once-Semantik abfängt.",
+      "example": "Genehmigungs-Workflow, der tagelang auf einen Menschen wartet → **Standard mit `.waitForTaskToken`**. IoT-Ingest mit Millionen kurzer Ausführungen → **Express**.",
+      "examTrap": "Die vier Achsen sind der Prüfstoff: **1 Jahr vs. 5 Minuten**, **exactly-once vs. at-least-once**, History vs. nur Logs, Callback-Support vs. keiner. „Langer Workflow mit menschlicher Freigabe auf Express“ ist immer falsch.",
+      "mnemonic": "**Merke:** **Standard** = lang, exactly-once, Callbacks — **Express** = kurz, billig, at-least-once.",
+      "keywords": [
+        "Step Functions",
+        "Standard vs Express",
+        "waitForTaskToken",
+        "Exactly-once"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-075",
+    "backStructured": {
+      "summary": "**Nur bei Migration.** Amazon MQ ist managed **ActiveMQ/RabbitMQ** und spricht Standard-Protokolle (**JMS, AMQP, MQTT, STOMP, OpenWire**). Signalwort: „bestehende Anwendung nutzt JMS/AMQP und soll **ohne Code-Umbau** in die Cloud“. Für alles Neue: **SQS/SNS**.",
+      "why": "MQ existiert, damit **Protokoll-Kompatibilität** die Migration trägt — der Broker wandert, der Code bleibt. Der Preis: Broker-Denken statt Serverless (Instanzgrößen, Wartungsfenster, begrenzte Skalierung). Neue Architekturen bauen deshalb auf SQS/SNS.",
+      "example": "On-prem-ERP spricht **JMS gegen ActiveMQ** und soll unverändert in AWS laufen → **Amazon MQ** — jede SQS-Antwort hieße Code-Umbau.",
+      "examTrap": "Das Entscheidungswort ist das **Protokoll**: Nennt die Frage JMS/AMQP/MQTT + „keine Code-Änderung“, ist MQ richtig. Fehlt der Legacy-Bezug, ist MQ der teure Distraktor gegen SQS/SNS.",
+      "mnemonic": "**Merke:** **Protokoll-Erbe (JMS/AMQP) heißt Amazon MQ** — alles Neue baut auf SQS/SNS.",
+      "keywords": [
+        "Amazon MQ",
+        "JMS",
+        "AMQP",
+        "Migration"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-076",
+    "backStructured": {
+      "summary": "**Replikation**: Multi-AZ **synchron**, Read Replica **asynchron**. **Lesbarkeit**: Multi-AZ-Standby **nicht lesbar**, Read Replica schon. **Failover**: Multi-AZ **automatisch**, Read Replica **manuell** (Promotion). Kernaussage: **Multi-AZ ist HA — kein Read-Scaling.**",
+      "why": "Zwei Werkzeuge für zwei Probleme: Multi-AZ beantwortet **„was passiert bei AZ-Ausfall?“** (synchroner Standby, automatischer Schwenk), Read Replicas beantworten **„wie skaliere ich Leselast?“** (asynchrone Kopien, bis 15 Stück, auch cross-region, promotable).",
+      "example": "Reporting bremst die Produktions-DB → **Read Replica** und die Reports dorthin — der Multi-AZ-Standby hilft hier **nicht**, er ist nicht lesbar.",
+      "examTrap": "Das ist laut Faktenbasis **die #1-RDS-Falle**: Optionen, die den **Multi-AZ-Standby zum Lesen** anbieten, sind beim klassischen Deployment immer falsch. (Ausnahme heißt Multi-AZ **DB Cluster** — eigene Karte.)",
+      "mnemonic": "**Merke:** **Multi-AZ = Verfügbarkeit, Read Replica = Leselast** — der klassische Standby liest nie.",
+      "keywords": [
+        "RDS",
+        "Multi-AZ",
+        "Read Replica",
+        "HA vs Skalierung"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-077",
+    "backStructured": {
+      "summary": "**Nein.** RDS schwenkt den **DNS-CNAME des Endpoints** auf die Standby-Instance — der Endpoint-Name bleibt identisch. Die App muss lediglich **reconnecten**. Die Dauer liegt typisch im Bereich von **etwa einer bis zwei Minuten** — AWS nennt je nach Quelle unterschiedliche Werte.",
+      "why": "Das Failover ist ein **DNS-Schwenk, kein IP-Wechsel im Client**: Der Standby wird zum Primary, der Endpoint zeigt auf ihn. Damit das schnell greift, muss der Client **DNS-TTLs respektieren** (kein ewiger Connection-/DNS-Cache) und Verbindungsabbrüche mit Reconnect-Logik beantworten.",
+      "example": "JVM-Anwendungen: `networkaddress.cache.ttl` begrenzen — ein Client, der die alte IP cached, läuft nach dem Schwenk **minutenlang ins Leere**, obwohl RDS längst fertig ist.",
+      "examTrap": "Die exakte Failover-Zeit ist **nicht sauber testbar** (AWS-Quellen widersprechen sich: 60 s, 60–120 s, 1–2 min) — merke sie **relativ**: klassisches Multi-AZ ist **deutlich langsamer als der Multi-AZ DB Cluster (unter 35 s)**.",
+      "mnemonic": "**Merke:** Failover = **DNS-Schwenk auf denselben Endpoint** — die App braucht nur Reconnect und kurze DNS-TTL.",
+      "keywords": [
+        "RDS Multi-AZ",
+        "Failover",
+        "DNS-CNAME",
+        "TTL"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-078",
+    "backStructured": {
+      "summary": "**Multi-AZ DB Cluster**: 1 Writer + **2 lesbare Standbys** in **3 AZs**. Vorteile gegenüber der klassischen Multi-AZ-Instance: Standbys sind **lesbar** (Reader-Endpoint) und der **Failover ist deutlich schneller** — offiziell *typically under 35 seconds*.",
+      "why": "Der Cluster ersetzt den passiven Standby durch **arbeitende Reader** mit semi-synchroner Replikation (mindestens ein Standby bestätigt jeden Commit) — deshalb entfällt beim Failover der Crash-Recovery-Schritt und der Schwenk ist schnell.",
+      "example": "Anforderung „HA **und** Leselast abfangen, ohne separate Read Replicas“ → **Multi-AZ DB Cluster** mit Reader-Endpoint.",
+      "examTrap": "Zwei Prüfpunkte: **nur MySQL und PostgreSQL** (kein Oracle/SQL Server), und die Zahl heißt **„under 35 seconds“**. Er bricht die alte Regel „Standby ist nie lesbar“ — Fragen testen gern, ob du beide Deployments auseinanderhältst.",
+      "mnemonic": "**Merke:** Der **Multi-AZ DB Cluster** hat 2 **lesbare** Standbys und failovert **unter 35 s** — nur MySQL/PostgreSQL.",
+      "keywords": [
+        "Multi-AZ DB Cluster",
+        "35 Sekunden",
+        "Lesbare Standbys",
+        "MySQL/PostgreSQL"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-079",
+    "backStructured": {
+      "summary": "Weil der **Storage** entkoppelt ist: Aurora hält **6 Kopien über 3 AZs**. Ein Write braucht ein **4/6-Quorum**, ein Read **3/6** — der Storage ist selbstheilend. Die Compute-Instanz ist ersetzbar, die Daten überleben den Verlust einer kompletten AZ.",
+      "why": "Aurora trennt **Compute und Storage**: Die Datenschicht ist ein verteiltes, quorum-basiertes System (2 Kopien je AZ), das laut AWS sogar einen **„AZ+1“-Ausfall** ohne Datenverlust übersteht und defekte Segmente selbst repariert. Stirbt die Instanz, startet eine neue gegen denselben Storage.",
+      "example": "Single-Instance-Aurora in AZ-a; AZ-a fällt aus → die Instanz wird in AZ-b **neu erstellt** und findet ihre Daten vollständig vor — ohne Replica dauert das laut AWS *typically less than 10 minutes*.",
+      "examTrap": "Haltbarkeit ≠ Verfügbarkeit: Ohne Replica sind die **Daten** sicher, aber die **RTO** ist der Neustart. Für schnellen Failover braucht es **Aurora Replicas mit Priority-Tiers** — die Quorum-Zahlen (6/3, 4/6, 3/6) sind direkt prüfbar.",
+      "mnemonic": "**Merke:** Aurora-Storage = **6 Kopien, 3 AZs, Quorum 4/6 schreiben, 3/6 lesen** — die Daten überleben, Compute ist Verbrauchsmaterial.",
+      "keywords": [
+        "Aurora",
+        "6 Kopien / 3 AZs",
+        "Quorum 4/6",
+        "Storage-Entkopplung"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-080",
+    "backStructured": {
+      "summary": "Aurora Replicas (**bis 15**) lesen vom **gemeinsamen Storage-Layer** — es werden keine Daten kopiert. Ergebnis: Replikations-Lag typisch im **Millisekunden**-Bereich, und jede Replica kann per **Failover-Priority (Tier 0–15)** automatisch zum Writer werden. RDS Read Replicas replizieren physisch → größerer Lag, manuelle Promotion.",
+      "why": "Der Unterschied ist architektonisch: RDS-Replicas **kopieren Daten** über Engine-Replikation (asynchron, Lag wächst mit Last); Aurora-Replicas sind **weitere Leseköpfe auf denselben 6 Storage-Kopien** — es gibt schlicht nichts zu replizieren, und genau deshalb taugen sie als eingebaute Failover-Ziele.",
+      "example": "Cluster mit Writer + 2 Replicas (Tier 0 und Tier 1): Beim Writer-Ausfall promotet Aurora **automatisch die Tier-0-Replica**; der **Cluster-Endpoint** zeigt danach auf den neuen Writer.",
+      "examTrap": "Prüfbare Marker: **bis 15 Replicas**, Lag **unter ~10 ms** (shared storage), **Priority-Tiers 0–15**, Cluster-Endpoint bleibt konstant. Bonus: **RDS Proxy senkt die Aurora-Failover-Zeit um bis zu 66 %** (umgeht DNS-Caching).",
+      "mnemonic": "**Merke:** Aurora-Replicas **teilen den Storage** — Millisekunden-Lag und eingebautes automatisches Failover.",
+      "keywords": [
+        "Aurora Replicas",
+        "Shared Storage",
+        "Failover-Tiers",
+        "15 Replicas"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-081",
+    "backStructured": {
+      "summary": "**RPO typisch unter 1 Sekunde, RTO unter 1 Minute**, Cross-Region-Replikationslatenz *typically under a second*, bis zu **10 Secondary Regions**. Beim geplanten **Switchover ist der RPO 0** — es gehen keine Daten verloren.",
+      "why": "Die Replikation läuft auf der **Storage-Ebene** (nicht per Engine), deshalb die Sub-Sekunden-Latenz ohne Last auf dem Writer. Switchover synchronisiert vorab vollständig (geplante Wartung/Regionswechsel); der ungeplante **Failover (Detach-and-Promote)** verliert dagegen den Replikations-Lag — **RPO ≠ 0**.",
+      "example": "Geplanter Umzug von us-east-1 nach eu-central-1 → **managed Switchover**: null Datenverlust. Regionsausfall → **Failover** einer Secondary: RTO unter 1 Minute, RPO im Sekundenbereich.",
+      "examTrap": "Die Unterscheidung **Switchover (RPO 0) vs. Failover (RPO ≠ 0)** ist der neuere Prüfungshebel. Und: Global Database hat **genau EINEN Writer** — Multi-Region-Schreiben ist die nächste Karte.",
+      "mnemonic": "**Merke:** Aurora Global = **RPO < 1 s, RTO < 1 min** — geplant per **Switchover sogar RPO 0**.",
+      "keywords": [
+        "Aurora Global Database",
+        "RPO/RTO",
+        "Switchover",
+        "10 Regionen"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-082",
+    "backStructured": {
+      "summary": "**DynamoDB Global Tables** — sie sind **multi-writer / active-active** (Konfliktauflösung: last-writer-wins). **Aurora Global Database** hat **genau eine Writer-Region**; Secondaries sind read-only, bis eine promoted wird.",
+      "why": "Global Tables replizieren jede Region an jede (typisch Sub-Sekunde) und lösen Schreibkonflikte automatisch per **Last-Writer-Wins** — dafür nur eventual consistency zwischen Regionen. Aurora hält relationale Konsistenz, indem es Schreiben zentralisiert: ein Writer, viele Leser.",
+      "example": "Globale App, Nutzer schreiben in **ihrer** Region mit lokaler Latenz → **Global Tables**. Relationale Kern-DB mit DR-Anforderung → **Aurora Global** (Schreiben in der Primary-Region).",
+      "examTrap": "Signalwort **„gleichzeitig in mehreren Regionen schreiben“** → Global Tables, immer. Zweite Falle: Global Tables sind **KEIN Backup** — sie replizieren auch logische Fehler brav in alle Regionen; dafür gibt es PITR.",
+      "mnemonic": "**Merke:** **Multi-Region-Schreiben heißt DynamoDB Global Tables** — Aurora Global hat genau einen Writer.",
+      "keywords": [
+        "DynamoDB Global Tables",
+        "Active-Active",
+        "Last-Writer-Wins",
+        "Aurora Global"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-083",
+    "backStructured": {
+      "summary": "**RDS Proxy** davorschalten: **Connection Pooling** (viele Lambda-Instanzen teilen wenige DB-Verbindungen), **kürzerer Failover** (der Proxy hält die Client-Verbindung und schwenkt intern um) sowie **IAM-Auth + Secrets-Manager-Integration**.",
+      "why": "Jede Lambda-Instanz öffnet naiv eine eigene DB-Verbindung — bei hoher Concurrency laufen die Connection-Limits der Engine voll, obwohl kaum Queries fließen. Der Proxy **multiplext** tausende Client-Verbindungen auf einen kleinen Pool und entkoppelt Verbindungs-Lebenszyklen vom Lambda-Lebenszyklus.",
+      "example": "500 parallele Lambdas → Proxy hält z. B. 50 gepoolte Verbindungen zur RDS-Instanz; beim Failover bleiben die Client-Verbindungen am Proxy stehen (bei Aurora **bis zu 66 % schnellerer** Schwenk).",
+      "examTrap": "**„Größere DB-Instanz“** ist der teure Symptom-Distraktor. Merke außerdem: RDS Proxy und **Aurora Serverless v2 Scale-to-Zero** vertragen sich nicht — der Proxy hält die DB wach.",
+      "mnemonic": "**Merke:** Lambda erschöpft DB-Verbindungen → **RDS Proxy pooled**, nicht die Instanz vergrößern.",
+      "keywords": [
+        "RDS Proxy",
+        "Connection Pooling",
+        "Lambda",
+        "Failover"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-084",
+    "backStructured": {
+      "summary": "Weil nach dem AZ-Verlust nur **eine** Instance übrig ist — die halbe Kapazität. HA heißt **den AZ-Ausfall überleben, ohne unter den Bedarf zu fallen**. Faustregel: bei **2 AZs je AZ die volle Bedarfskapazität (2×)**, bei **3 AZs je AZ die Hälfte (1,5×)**.",
+      "why": "Statische Stabilität rechnet mit **N−1 AZs**: Die verbleibenden Zonen müssen die Ziellast allein tragen, ohne auf rettendes Scale-out zu warten (das im Regionsereignis auch noch mit allen anderen konkurriert). Drei AZs sind deshalb der Sweet Spot — der Puffer kostet nur 50 % statt 100 %.",
+      "example": "Bedarf = 2 Instanzen: **2 AZs → 2+2 = 4 Instanzen (100 % Overhead)**, **3 AZs → 1+1+1... aufgerundet 3×1 reicht nicht — 3×1 = 3 trägt nach Ausfall nur 2 → passt (50 % Overhead)**.",
+      "examTrap": "Distraktor ist die nackte Mindestzahl („min=2 über 2 AZs ist HA“) — die Prüfung will die **Kapazitätsrechnung nach AZ-Verlust** sehen, nicht nur Multi-AZ-Häkchen.",
+      "mnemonic": "**Merke:** HA-Kapazität plant man für **N−1 AZs** — drei Zonen machen den Puffer bezahlbar.",
+      "keywords": [
+        "Auto Scaling",
+        "AZ-Ausfall",
+        "Statische Stabilität",
+        "Kapazitätsplanung"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-085",
+    "backStructured": {
+      "summary": "Nach einem erreichten **Service Quota** — sie gelten **pro Account und Region** und sind oft **soft** (erhöhbar). Klassiker: Lambda-Concurrency, EC2-vCPU-Limit, API-Throttling, Elastic-IP-Limit. **Mehr Compute hilft nicht, wenn die Wand ein Quota ist.**",
+      "why": "Quotas sind die **unsichtbare Decke** der Architektur: Alles skaliert korrekt — bis ein Limit greift und Requests mit **Throttling-Fehlern** abgewiesen werden, obwohl Instanzen und Budget da wären. Deshalb gehören **Quota-Monitoring** und rechtzeitige Erhöhungsanträge zur Resilienz-Planung.",
+      "example": "Lastspitze → Lambda wirft `TooManyRequestsException` bei erreichter **Account-Concurrency** — der Fix ist ein **Quota-Erhöhungsantrag** (und ggf. Reserved Concurrency für kritische Funktionen), nicht mehr Memory.",
+      "examTrap": "Signalmuster: **„skaliert, ist gesund, fällt trotzdem aus“** → Quota prüfen (Service Quotas Console / Trusted Advisor). Distraktoren bieten größere Instanzen oder mehr ASG-Kapazität an.",
+      "mnemonic": "**Merke:** Wenn alles gesund ist und trotzdem drosselt — **ein Service Quota ist die Wand**.",
+      "keywords": [
+        "Service Quotas",
+        "Throttling",
+        "Lambda Concurrency",
+        "Soft Limits"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-086",
+    "backStructured": {
+      "summary": "**RPO = Recovery Point Objective = DATEN**: tolerierbarer Datenverlust (Zeitfenster *rückwärts* vom Vorfall). **RTO = Recovery Time Objective = ZEIT**: maximale Wiederherstellungsdauer (*vorwärts*). Eselsbrücke: **RP**O = **P**unkt in den Daten, **RT**O = **T**ime bis zurück.",
+      "why": "Die beiden Ziele sind **unabhängig** und treiben unterschiedliche Maßnahmen: RPO bestimmt die **Replikations-/Backup-Frequenz**, RTO die **Bereitschaft der Infrastruktur**. Niedriger RPO mit hohem RTO ist völlig legitim — genau das ist Pilot Light (Daten aktuell, Compute aus).",
+      "example": "„Maximal 5 Minuten Datenverlust, Wiederanlauf darf 4 Stunden dauern“ → **RPO 5 min** (kontinuierliche Replikation nötig), **RTO 4 h** (Backup & Restore/Pilot Light reicht).",
+      "examTrap": "Die Prüfung testet die Zuordnung und die **Unabhängigkeit**: Optionen, die RPO mit Wiederanlaufzeit oder RTO mit Datenverlust vermengen, sind die Distraktoren.",
+      "mnemonic": "**Merke:** **RPO = verlorene Daten (rückwärts), RTO = verlorene Zeit (vorwärts)** — und beide sind unabhängig.",
+      "keywords": [
+        "RPO",
+        "RTO",
+        "Disaster Recovery",
+        "Unabhängig"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-087",
+    "backStructured": {
+      "summary": "**1. Backup & Restore → 2. Pilot Light → 3. Warm Standby → 4. Multi-Site Active/Active.** Von links nach rechts sinken RPO und RTO, Kosten und Komplexität steigen. Jede DR-Frage fragt im Kern: **Wo auf dieser Achse liegt das Szenario?**",
+      "why": "Die vier Strategien (Well-Architected Reliability Pillar) sind eine **Kosten-Bereitschafts-Achse**: je mehr in der DR-Region bereits läuft, desto schneller die Übernahme und desto höher die Dauerkosten. Die Anforderungen (RPO/RTO/Budget) im Szenario zeigen direkt auf die Stufe.",
+      "example": "Grobe Marker: **B&R** RPO/RTO Stunden · **Pilot Light** RPO Minuten, RTO *tens of minutes* · **Warm Standby** RPO Sekunden, RTO Minuten · **Multi-Site** beides ~0.",
+      "examTrap": "Vorsicht mit dem klassischen Distraktor-Muster: **Alle vier funktionieren** — gefragt ist die **günstigste Strategie, die die RPO/RTO-Vorgabe noch erfüllt**, nicht die beste absolut.",
+      "mnemonic": "**Merke:** Die DR-Leiter heißt **Backup & Restore → Pilot Light → Warm Standby → Multi-Site** — Bereitschaft kaufen kostet.",
+      "keywords": [
+        "DR-Strategien",
+        "Pilot Light",
+        "Warm Standby",
+        "Multi-Site"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-088",
+    "backStructured": {
+      "summary": "**RPO: Stunden. RTO: Stunden.** In der DR-Region läuft **nichts** — nur Backups, AMIs und Snapshots liegen dort. Im Ernstfall wird die gesamte Umgebung neu aufgebaut. **Günstigste Option**, akzeptabel nur bei unkritischen Workloads.",
+      "why": "Man bezahlt nur **Speicher** — dafür besteht die Wiederherstellung aus dem kompletten Neuaufbau (Infrastruktur provisionieren, Daten zurückspielen). Mit kontinuierlichen Backups/PITR lässt sich der **RPO auf ~5 Minuten** drücken; der RTO bleibt trotzdem Stunden.",
+      "example": "Nächtliche Snapshots + AMIs **cross-region kopiert** (AWS Backup mit Copy-Job); **IaC-Templates** liegen bereit → im DR-Fall Stack ausrollen und Restore fahren.",
+      "examTrap": "Kombi-Falle: **guter RPO ≠ guter RTO** — auch mit PITR bleibt Backup & Restore langsam im Wiederanlauf. Und ohne **IaC/Runbooks** wird aus „Stunden“ schnell ein Tag.",
+      "mnemonic": "**Merke:** Backup & Restore = **nur Speicher in der DR-Region** — billig, aber der Wiederanlauf dauert Stunden.",
+      "keywords": [
+        "Backup & Restore",
+        "RPO Stunden",
+        "AWS Backup",
+        "IaC"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-089",
+    "backStructured": {
+      "summary": "**Die Daten werden kontinuierlich repliziert** (DB läuft in der DR-Region), aber die **Compute-Schicht ist AUS** (AMIs/Templates bereit). RPO: Minuten, RTO: *tens of minutes*. AWS wörtlich: Pilot Light kann **ohne zusätzliche Aktion keine Requests verarbeiten** — daran erkennst du es.",
+      "why": "Das Muster trennt Daten von Compute: Die **Zündflamme** (replizierte DB, Kern-Services) brennt dauerhaft, der Rest wird erst im Ernstfall hochgefahren — deshalb niedriger RPO bei kleinen Dauerkosten, aber ein RTO, der vom Hochfahren dominiert wird.",
+      "example": "Aurora Cross-Region Read Replica läuft ständig; die App-Schicht existiert nur als **ASG mit Desired = 0** + AMIs — laut AWS-Blog ist genau das (*zero instances deployed*) Pilot Light.",
+      "examTrap": "Der Marker ist wörtlich prüfbar: **„kann ohne zusätzliche Aktion keinen Traffic verarbeiten“** = Pilot Light. Eine **ASG mit Desired = 0 ist Pilot Light, nicht Warm Standby** — beliebte Verwechslung.",
+      "mnemonic": "**Merke:** Pilot Light = **Daten heiß, Compute aus** — ohne Hochfahren fließt kein Request.",
+      "keywords": [
+        "Pilot Light",
+        "Desired = 0",
+        "Datenreplikation",
+        "RTO tens of minutes"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-090",
+    "backStructured": {
+      "summary": "Beim Warm Standby läuft eine **verkleinerte, aber vollständig funktionsfähige Kopie** — sie kann **sofort Traffic annehmen**, nur mit reduzierter Kapazität; im Ernstfall wird hochskaliert. RPO: Sekunden, RTO: Minuten. **Die Frage ist genau: Läuft der Compute? Pilot Light nein, Warm Standby ja.**",
+      "why": "AWS definiert die Grenze wörtlich: *pilot light cannot process requests without additional action …, while warm standby can handle traffic (at reduced capacity) immediately* — Warm Standby muss nur noch **skalieren**, Pilot Light muss erst **einschalten**. Die Steigerung ist Hot Standby: volle Kapazität idle, kein Scale-up-Schritt mehr.",
+      "example": "Anforderung „DR-Umgebung muss **sofort** Traffic übernehmen können, reduzierte Kapazität anfangs okay“ → **Warm Standby** (kleine, laufende Kopie hinter Route-53-Failover).",
+      "examTrap": "Der Ein-Satz-Test der Prüfung: **verarbeitet die DR-Umgebung JETZT Requests?** Ja (reduziert) = Warm Standby · Nein (erst starten) = Pilot Light. Alles andere an den beiden ist Beiwerk.",
+      "mnemonic": "**Merke:** **Warm Standby läuft schon** (klein), Pilot Light muss erst gestartet werden.",
+      "keywords": [
+        "Warm Standby",
+        "Pilot Light",
+        "Reduzierte Kapazität",
+        "RTO Minuten"
+      ]
+    }
+  }
+]

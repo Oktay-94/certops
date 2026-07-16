@@ -1,0 +1,484 @@
+[
+  {
+    "seedKey": "saa-c03-card-031",
+    "backStructured": {
+      "summary": "**Default 365 Tage.** Seit April 2024 frei konfigurierbar zwischen **90 und 2560 Tagen** (~7 Jahre). Gilt nur für **symmetrische Customer Managed Keys mit KMS-generiertem Material**. **AWS managed keys** rotieren fix jährlich.",
+      "why": "Die Rotation erzeugt **neues Backing-Material unter derselben Key-ID** — deshalb kann AWS die Spanne freigeben, ohne dass Anwendungen etwas merken. Automatisch rotieren können nur Keys, deren Material **KMS selbst erzeugt hat**: importiertes Material, asymmetrische und HMAC-Keys sind ausgenommen.",
+      "example": "Compliance verlangt 90-Tage-Rotation → beim CMK **`rotation-period-in-days: 90`** setzen — fertig, keine App-Änderung.",
+      "examTrap": "Zahlen-Falle: **365 Default, 90–2560 konfigurierbar** (seit 12.04.2024). Und: Optionen, die **asymmetrische oder importierte Keys** automatisch rotieren lassen, sind immer falsch.",
+      "mnemonic": "**Merke:** 365 Tage Default, 90–2560 wählbar — nur **symmetrische** Keys mit **KMS-eigenem Material** rotieren automatisch.",
+      "keywords": [
+        "KMS",
+        "Key Rotation",
+        "90–2560 Tage",
+        "Customer Managed Key"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-032",
+    "backStructured": {
+      "summary": "**Nein.** Key-ID, ARN und Alias bleiben identisch; **KMS behält das alte Key-Material** zum Entschlüsseln vor. Neue Verschlüsselungen nutzen automatisch das neue Material. **Kein Re-Encrypt, keine App-Änderung.**",
+      "why": "KMS speichert **alle Materialversionen** eines Keys und wählt beim Entschlüsseln automatisch die passende. Weil die **Key-Identität (ID/ARN/Alias) stabil bleibt**, ist die Rotation für Anwendungen vollständig transparent.",
+      "example": "Ein 2023 mit dem CMK verschlüsseltes S3-Objekt bleibt nach drei Rotationen 2026 **ohne jede Aktion lesbar** — KMS entschlüsselt mit dem damaligen Material.",
+      "examTrap": "Distraktoren behaupten, nach der Rotation müssten **alle Daten neu verschlüsselt** werden oder es entstehe ein **neuer ARN** — beides falsch.",
+      "mnemonic": "**Merke:** Rotation tauscht das Material, nie die Key-Identität — **kein Re-Encrypt** nötig.",
+      "keywords": [
+        "KMS",
+        "Key Rotation",
+        "Key-Material",
+        "Kein Re-Encrypt"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-033",
+    "backStructured": {
+      "summary": "Es gibt eine **Waiting Period von 7 bis 30 Tagen** (Default 30), die du abbrechen kannst. Danach ist die Löschung **unumkehrbar** — alle damit verschlüsselten Daten sind verloren. Sichere Alternative: den Key **disablen** statt löschen.",
+      "why": "Key-Löschung ist die **destruktivste Aktion in KMS** — ohne Key sind sämtliche damit verschlüsselten Daten für immer weg. Die Warteperiode ist das Sicherheitsnetz: Der Key steht auf **Pending Deletion**, ist nicht nutzbar, und die Löschung lässt sich jederzeit stornieren.",
+      "example": "Best Practice: **CloudWatch-Alarm auf Nutzungsversuche** eines Keys in Pending Deletion — meldet sich eine vergessene App, Löschung abbrechen.",
+      "examTrap": "Es gibt **kein sofortiges Löschen** — Optionen mit „delete immediately“ sind falsch. Und wer nur „stilllegen“ will, **disabled** den Key (jederzeit reversibel).",
+      "mnemonic": "**Merke:** Erst **disablen**, löschen nur mit **7–30 Tagen** Reue-Frist.",
+      "keywords": [
+        "KMS",
+        "Key Deletion",
+        "Waiting Period",
+        "Disable"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-034",
+    "backStructured": {
+      "summary": "Wenn gefordert ist, dass **AWS keinerlei Zugriff auf das Key-Material** hat (single-tenant, du allein verwaltest Keys und HSM-User) oder wenn **native Crypto-APIs** (PKCS#11, JCE, CNG) gebraucht werden. Sonst gewinnt **KMS**: managed, integriert, günstiger.",
+      "why": "CloudHSM ist **dedizierte Single-Tenant-Hardware** unter alleiniger Kundenkontrolle — AWS verwaltet nur die Appliance, nie die Keys. KMS ist multi-tenant und managed; seit **Februar 2025 ebenfalls FIPS 140-3 Level 3**, womit „FIPS“ allein kein CloudHSM-Argument mehr ist.",
+      "example": "Regulatorik verlangt **alleinige Key-Hoheit + PKCS#11-Schnittstelle** für eine Legacy-App → **CloudHSM** (auf Wunsch als **KMS Custom Key Store** an KMS angebunden).",
+      "examTrap": "Signalwörter für CloudHSM: **„single-tenant“**, **„eigene HSM-Verwaltung“**, **„PKCS#11/JCE/CNG“**. Reines „FIPS-konform“ reicht nicht — das erfüllt KMS inzwischen auch.",
+      "mnemonic": "**Merke:** Volle Key-Hoheit und **PKCS#11** heißen **CloudHSM** — sonst immer KMS.",
+      "keywords": [
+        "CloudHSM",
+        "KMS",
+        "Single-Tenant",
+        "PKCS#11",
+        "FIPS 140-3"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-035",
+    "backStructured": {
+      "summary": "Ein **KMS-Key ist regional**. Für regionsübergreifendes Ent-/Verschlüsseln ohne Cross-Region-Call brauchst du einen **Multi-Region Key (MRK)** — gleiches Key-Material, eigenständige Replikate in mehreren Regions.",
+      "why": "MRK-Replikate teilen **Key-Material und Key-ID-Suffix**, sind aber eigenständige Keys mit eigener Key Policy — Daten, die in Region A **client-seitig** verschlüsselt wurden, lassen sich in Region B **lokal** entschlüsseln (Disaster Recovery, globale Apps, Signaturen).",
+      "example": "Client-seitig verschlüsselte Daten (Encryption SDK) werden nach eu-central-1 UND us-east-1 repliziert → MRK-Replikat in beiden Regions entschlüsselt **ohne Cross-Region-KMS-Call**.",
+      "examTrap": "Die eigentliche Falle steckt im Szenario selbst: **Bei S3 Cross-Region Replication bringt ein MRK KEINEN Vorteil** — S3 behandelt MRKs wie normale Keys und **re-encrypted im Ziel immer** mit dem dortigen Key. MRK-Nutzen liegt bei **client-seitiger** Verschlüsselung, nicht bei S3-CRR.",
+      "mnemonic": "**Merke:** KMS ist regional — **MRK** hilft client-seitig über Regionsgrenzen, bei **S3 CRR bringt er nichts**.",
+      "keywords": [
+        "KMS",
+        "Multi-Region Key",
+        "S3 CRR",
+        "Client-Side Encryption"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-036",
+    "backStructured": {
+      "summary": "**SSE-S3**: AWS verwaltet den Key, AES-256, kostenlos, **kein Key-Audit-Trail**. **SSE-KMS**: eigener CMK → **Key-Policy-Kontrolle + CloudTrail-Audit**, aber KMS-Request-Limits/-Kosten. **DSSE-KMS**: doppelte Verschlüsselung für strenge Compliance. **SSE-C**: **du** lieferst den Key bei jedem Request.",
+      "why": "Die Entscheidungsachsen sind **Kontrolle, Audit und Kosten**: SSE-S3 ist der bequeme Default ohne Nachweisbarkeit; SSE-KMS kauft mit KMS-Kosten die Frage „**wer hat wann welchen Key genutzt**“ (CloudTrail) plus Zugriffssteuerung über die Key Policy; SSE-C verlagert die gesamte Key-Verwaltung zum Kunden.",
+      "example": "Anforderung „Nachweis, welcher Principal wann auf den Verschlüsselungskey zugriff“ → **SSE-KMS** — nur dort landet jede Key-Nutzung in **CloudTrail**.",
+      "examTrap": "**S3 Bucket Keys sind nicht mit DSSE-KMS kombinierbar**, und **SSE-C funktioniert nur über HTTPS** (Key im Header). „Kostenlos + Audit-Trail“ gibt es nicht — das ist der klassische Options-Widerspruch.",
+      "mnemonic": "**Merke:** Audit und Key-Kontrolle heißen **SSE-KMS** — SSE-S3 ist nur der stille Default.",
+      "keywords": [
+        "SSE-KMS",
+        "SSE-S3",
+        "SSE-C",
+        "DSSE-KMS",
+        "CloudTrail"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-037",
+    "backStructured": {
+      "summary": "**Keine.** Seit Januar 2023 verschlüsselt **S3 alle neuen Objekte automatisch mit SSE-S3** — ohne Konfiguration, ohne Zusatzkosten. Solche Fragen zielen deshalb fast immer auf die *nächste* Ebene: **Key-Kontrolle, Audit-Trail oder Compliance** (→ SSE-KMS).",
+      "why": "Die Default-Verschlüsselung hat die Frage „**ob** verschlüsselt wird“ beantwortet — prüfungsrelevant bleibt „**mit wessen Key und mit welchem Nachweis**“. Ein Szenario, das nur „at rest verschlüsselt“ fordert, ist seit 2023 trivially erfüllt.",
+      "example": null,
+      "examTrap": "Achtung bei Alt-Beständen: Die Default-Verschlüsselung gilt für **neue Objekte** — vor 2023 hochgeladene, unverschlüsselte Objekte bleiben unverschlüsselt, bis sie neu geschrieben werden.",
+      "mnemonic": "**Merke:** Seit **Januar 2023** ist S3-Verschlüsselung Default — geprüft wird nur noch die **Key-Frage**.",
+      "keywords": [
+        "S3",
+        "SSE-S3",
+        "Default Encryption",
+        "Januar 2023"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-038",
+    "backStructured": {
+      "summary": "**S3 Bucket Keys aktivieren.** Ein bucket-level Key ersetzt die KMS-Calls pro Objekt → **bis zu ~99 % weniger KMS-Requests**. Senkt gleichzeitig die KMS-Kosten deutlich.",
+      "why": "Ohne Bucket Key fordert **jedes Objekt** einen eigenen Data Key bei KMS an — bei Millionen kleiner Objekte läuft das Request-Limit voll. Der Bucket Key wird **einmal** von KMS geholt und leitet die Objekt-Data-Keys **lokal in S3** ab.",
+      "example": "Bucket-Setting **`BucketKeyEnabled: true`** (oder per Objekt-Header) — wirkt auf neue Objekte, bestehende bleiben unverändert.",
+      "examTrap": "Der Reflex **„KMS-Quota-Erhöhung beantragen“** ist die schlechtere Antwort — er behebt Kosten und Ursache nicht. Zweite Falle: Bucket Keys funktionieren **nicht mit DSSE-KMS**.",
+      "mnemonic": "**Merke:** KMS-Throttling bei S3 heißt **Bucket Keys**, nicht Quota-Ticket.",
+      "keywords": [
+        "S3 Bucket Keys",
+        "KMS",
+        "Throttling",
+        "99 % weniger Calls"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-039",
+    "backStructured": {
+      "summary": "**Nicht in-place.** Weg: **Snapshot** erstellen → **verschlüsselte Kopie** des Snapshots (`--encrypted`) → neues Volume daraus → an die Instance hängen. Vorbeugend: **„EBS encryption by default“** aktivieren.",
+      "why": "EBS legt die Verschlüsselung **bei der Erstellung** eines Volumes fest — nachträglich umschalten geht nicht. Der Snapshot-Umweg erzeugt ein neues, verschlüsseltes Volume mit identischen Daten; die Default-Encryption-Einstellung erzwingt das künftig **pro Region** automatisch.",
+      "example": "**`aws ec2 copy-snapshot --source-snapshot-id snap-… --encrypted --kms-key-id <cmk>`** → aus der Kopie das **neue Volume** erstellen und umhängen.",
+      "examTrap": "**„Encrypt in place“** existiert nicht — jede Option, die das Volume direkt verschlüsselt, ist falsch. Und: **encryption by default** gilt nur für **neue** Volumes und ist eine **Regions-Einstellung**.",
+      "mnemonic": "**Merke:** EBS verschlüsselt man über den **Snapshot-Umweg**, nie in-place.",
+      "keywords": [
+        "EBS",
+        "Snapshot",
+        "Encryption by Default",
+        "KMS"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-040",
+    "backStructured": {
+      "summary": "**Automatische Rotation.** **Secrets Manager** rotiert Credentials per Lambda automatisch (nativ für RDS/Redshift/DocumentDB) und kann cross-region replizieren — kostet pro Secret. **Parameter Store (Standard)** ist **kostenlos**, kann aber **nicht** von selbst rotieren.",
+      "why": "Secrets Manager ist ein **Lifecycle-Dienst für Geheimnisse** (Rotation, Replikation, feingranulare Resource-Policies); Parameter Store ist ein **Konfigurations-Store** (Standard: 10.000 Parameter à 4 KB, gratis). Das Signalwort im Szenario entscheidet.",
+      "example": "Anforderung „DB-Passwort alle 30 Tage automatisch rotieren, ohne Code-Änderung“ → **Secrets Manager managed rotation** für RDS.",
+      "examTrap": "Signalwort **„automatische Rotation“** → Secrets Manager, immer. Umgekehrt: braucht das Szenario nur **kostenlose Konfig-Werte oder Lizenzen-Strings**, ist Secrets Manager Overkill — Parameter Store Standard reicht.",
+      "mnemonic": "**Merke:** **Rotation** heißt Secrets Manager, **Konfiguration** heißt Parameter Store.",
+      "keywords": [
+        "Secrets Manager",
+        "Parameter Store",
+        "Rotation",
+        "RDS"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-041",
+    "backStructured": {
+      "summary": "Ein Rotation-**Lambda** ändert das Passwort **in RDS und im Secret** (Multi-User-Strategie: zwei alternierende DB-User). Die App holt das Secret **bei jedem Verbindungsaufbau frisch** — kein hartkodiertes Passwort, kein Wartungsfenster.",
+      "why": "Bei **Alternating Users** wechseln sich zwei DB-User ab: Während User B das neue Passwort bekommt, laufen bestehende Verbindungen unter User A weiter — es gibt **nie einen Moment mit ungültigen Credentials**. Voraussetzung: Die App liest das Secret **pro Connect**, nicht einmalig beim Start.",
+      "example": "Das Rotation-Lambda pflegt **`app_user_a` / `app_user_b`** im Wechsel; das Secret zeigt immer auf den **aktuell gültigen** — die App merkt vom Wechsel nichts.",
+      "examTrap": "**RDS Proxy unterstützt die Alternating-Users-Rotation nicht** — mit Proxy bleibt nur die Single-User-Strategie (kurzes Umschalt-Fenster). Zweite Falle: Apps, die das Secret **cachen**, fallen bei der Rotation um.",
+      "mnemonic": "**Merke:** **Alternating Users** rotiert ohne Downtime — die App liest das Secret **pro Connect** frisch.",
+      "keywords": [
+        "Secrets Manager",
+        "Alternating Users",
+        "RDS",
+        "Zero-Downtime"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-042",
+    "backStructured": {
+      "summary": "**Klassische Antwort: Geht nicht** — Standard-Public-Zertifikate aus ACM sind an integrierte Services gebunden (CloudFront, ALB/NLB, API Gateway…), dafür **kostenlos und auto-renewing**. **Seit Juni 2025** gibt es **exportierbare Public-Zertifikate** — kostenpflichtig und **nur mit `Export=ENABLED` bei der Erstellung**. Für EC2/on-prem sonst: **ACM Private CA** oder Import.",
+      "why": "Der Private Key klassischer ACM-Zertifikate **verlässt den Service nie** — genau das ermöglicht Gratis-Ausstellung und automatische Erneuerung. Die exportierbare Variante ist ein bewusst separates, kostenpflichtiges Produkt (15 $/FQDN, 149 $/Wildcard, 395 Tage) und muss **bei der Erstellung** gewählt werden.",
+      "example": null,
+      "examTrap": "Die Prüfung erwartet meist noch die klassische Antwort **„nicht exportierbar“**. Nachträgliches Umschalten auf exportierbar geht **nicht** — ältere Zertifikate bleiben gebunden. Für EC2 ohne Export-Kosten: **Private CA** oder eigenes Zertifikat importieren.",
+      "mnemonic": "**Merke:** Klassisches ACM bleibt im Haus — **Export** ist die neue, kostenpflichtige Sonderform mit `Export=ENABLED` ab Erstellung.",
+      "keywords": [
+        "ACM",
+        "Exportierbare Zertifikate",
+        "Private CA",
+        "Juni 2025"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-043",
+    "backStructured": {
+      "summary": "**Zwingend `us-east-1` (N. Virginia)**, unabhängig davon, wo Origin und Nutzer sitzen. Für **ALB/NLB** gilt das Gegenteil: Zertifikat in **derselben Region wie der Load Balancer**.",
+      "why": "CloudFront ist ein **globaler Dienst** mit Steuerungsebene in us-east-1 — dort muss das Zertifikat liegen, damit es an alle Edge Locations verteilt werden kann. Regionale Load Balancer terminieren TLS lokal und brauchen deshalb ein **regionales** Zertifikat.",
+      "example": "Origin in eu-central-1, Nutzer in Europa — das CloudFront-Zertifikat kommt **trotzdem aus us-east-1**; das ALB-Zertifikat desselben Setups aus eu-central-1.",
+      "examTrap": "Beide Richtungen werden getestet: **CloudFront → us-east-1**, **ALB/NLB → LB-Region**. Optionen mit „Zertifikat in der Origin-Region für CloudFront“ sind falsch.",
+      "mnemonic": "**Merke:** CloudFront-Zertifikate wohnen in **us-east-1**, LB-Zertifikate in **ihrer** Region.",
+      "keywords": [
+        "ACM",
+        "CloudFront",
+        "us-east-1",
+        "ALB"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-044",
+    "backStructured": {
+      "summary": "**Bucket-Policy mit `Deny`** und der Condition **`\"Bool\": {\"aws:SecureTransport\": \"false\"}`** — damit werden alle unverschlüsselten HTTP-Requests abgelehnt.",
+      "why": "**Encryption in transit** (TLS auf dem Weg) ist von **Encryption at rest** (SSE im Speicher) unabhängig — die SecureTransport-Condition ist der Standard-Hebel für den Transportweg. Als **explizites Deny** übersteuert sie jede Allow-Regel.",
+      "example": "In der Bucket-Policy: `{ \"Effect\": \"Deny\", \"Principal\": \"*\", \"Action\": \"s3:*\", \"Condition\": { \"Bool\": { \"aws:SecureTransport\": \"false\" } } }` — blockt **jeden HTTP-Request**.",
+      "examTrap": "Distraktoren bieten **SSE-Optionen** an — die verschlüsseln at rest und erzwingen **kein HTTPS**. Signalwort „nur verschlüsselte Verbindungen“ → SecureTransport-Deny.",
+      "mnemonic": "**Merke:** HTTPS-Zwang auf S3 = **Deny bei `aws:SecureTransport: false`**.",
+      "keywords": [
+        "S3",
+        "aws:SecureTransport",
+        "Bucket-Policy",
+        "In-Transit"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-045",
+    "backStructured": {
+      "summary": "**SG**: stateful · wirkt an der **ENI/Instance** · **nur Allow** · alle Regeln werden gemeinsam ausgewertet. **NACL**: stateless · wirkt am **Subnet** · **Allow UND Deny** · Regeln **nach Nummer der Reihe nach**, die **erste Übereinstimmung gewinnt**.",
+      "why": "Die vier Achsen — **Zustand, Ebene, Deny-Fähigkeit, Auswertung** — bestimmen die Werkzeugwahl: Eine bestimmte IP **blocken** kann nur die NACL (SGs kennen kein Deny); Tier-zu-Tier-Regeln modelliert man an der Instance-Ebene per SG.",
+      "example": "„Blockiere die Angreifer-IP 203.0.113.7“ → **NACL-Deny-Regel** mit niedriger Nummer — eine Security Group kann das strukturell nicht.",
+      "examTrap": "Klassiker: **„Security Group mit Deny-Regel“** existiert nicht. Und bei NACLs zählt die **Regelnummer** (1–32766) — eine Deny-Regel NACH einer passenden Allow-Regel greift nie.",
+      "mnemonic": "**Merke:** SG **stateful an der Instance** (nur Allow), NACL **stateless am Subnet** (mit Deny, Nummern-Reihenfolge).",
+      "keywords": [
+        "Security Group",
+        "NACL",
+        "Stateful",
+        "Deny"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-046",
+    "backStructured": {
+      "summary": "NACLs sind **stateless** — die Rückantwort braucht eine **eigene Outbound-Regel** für die **ephemeral Ports (1024–65535)**. Bei Security Groups passiert das automatisch, weil sie stateful sind.",
+      "why": "Ein stateless Filter kennt keine Verbindungen: Der Client öffnet den Request von einem zufälligen **hohen Quellport**, und genau dorthin muss die Antwort zurück — ohne Outbound-Freigabe dieser Portspanne bleibt die Antwort in der NACL hängen.",
+      "example": "Inbound 443 erlaubt, Outbound **1024–65535** zu den Client-IPs erlaubt — erst dann ist der HTTPS-Roundtrip komplett.",
+      "examTrap": "Die Spannen sind prüfbar: **ELB/NAT Gateway/Lambda 1024–65535**, ältere Linux-Kernel 32768–61000, Windows ab 2008 49152–65535. Im Zweifel die breite Spanne **1024–65535** freigeben.",
+      "mnemonic": "**Merke:** Stateless heißt **Rückweg selbst erlauben** — ephemeral Ports outbound öffnen.",
+      "keywords": [
+        "NACL",
+        "Ephemeral Ports",
+        "Stateless",
+        "1024–65535"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-047",
+    "backStructured": {
+      "summary": "**Security-Group-Referenz**: In der App-Tier-SG steht als Source die **SG-ID des Web-Tiers**, nicht eine CIDR. Neue Instances der ASG erben die SG und sind sofort berechtigt — **keine IP-Pflege**, kein CIDR-Drift.",
+      "why": "Die Referenz macht die Regel zur **Mitgliedschaftsfrage statt Adressfrage**: Berechtigt ist, wer die Web-Tier-SG trägt — egal welche IP die Auto-Scaling-Instanz gerade hat. Genau so modelliert man Tier-Architekturen (Web → App → DB).",
+      "example": "App-Tier-SG Inbound: Port 8080, **Source `sg-0web…`** — jede neue Web-Instanz der ASG darf sofort, jede fremde Quelle nicht.",
+      "examTrap": "Distraktoren pflegen **CIDR-Listen oder Elastic IPs** — bei wechselnden ASG-Instanzen immer die schlechtere Antwort. SG-Referenzen funktionieren auch **cross-account via VPC Peering** innerhalb einer Region.",
+      "mnemonic": "**Merke:** Tier-zu-Tier per **SG-Referenz**, nie per IP-Liste.",
+      "keywords": [
+        "Security Group",
+        "SG-Referenz",
+        "Auto Scaling",
+        "Tier-Architektur"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-048",
+    "backStructured": {
+      "summary": "**Default SG**: erlaubt Inbound-Traffic von **sich selbst** (alle Mitglieder dürfen untereinander kommunizieren). **Neue SG**: **kein einziger Inbound-Eintrag** (alles blockiert). Outbound ist bei beiden per Default „allow all“.",
+      "why": "Die **Selbst-Referenz der Default SG** ist ein Bequemlichkeits-Erbe — Instanzen darin reden sofort miteinander, was in Prüfungsszenarien unerwartete Kommunikation erklärt. Neue SGs starten nach **Least Privilege**: inbound dicht, outbound offen.",
+      "example": null,
+      "examTrap": "Zwei Detail-Fallen: Warum können frische Instanzen in der **Default SG** sich erreichen (Selbst-Referenz)? Und warum erreicht eine Instanz mit **neuer, leerer SG** nichts eingehend, kann aber selbst raus (Outbound-Default)?",
+      "mnemonic": "**Merke:** Die **Default-SG redet mit sich selbst**, neue SGs schweigen inbound.",
+      "keywords": [
+        "Security Group",
+        "Default SG",
+        "Selbst-Referenz",
+        "Least Privilege"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-049",
+    "backStructured": {
+      "summary": "**Gateway Endpoint**: nur **S3 und DynamoDB** · Anbindung per **Route-Table-Eintrag** · **kostenlos**. **Interface Endpoint (PrivateLink)**: fast alle Services + eigene/Partner-Services · **ENI mit privater IP** im Subnet · kostet pro Stunde + GB.",
+      "why": "Der Gateway Endpoint ist ein **Routing-Konstrukt** (Prefix-List in der Route Table) — deshalb gratis, aber **nur aus der eigenen VPC** nutzbar. Der Interface Endpoint ist eine **echte ENI** mit privater IP und DNS-Namen — dadurch teurer, aber von überall erreichbar, wo die IP routbar ist.",
+      "example": "On-prem-Systeme sollen S3 **privat über Direct Connect** erreichen → **Interface Endpoint** — der Gateway Endpoint ist von on-prem/VPN/DX/TGW **strukturell nicht erreichbar**.",
+      "examTrap": "Drei Prüfungshebel: Gateway = **nur S3/DynamoDB + kostenlos + nicht von on-prem erreichbar**; Interface Endpoints haben **Security Groups**, Gateway Endpoints **nicht**.",
+      "mnemonic": "**Merke:** **Gateway** ist gratis für S3/DynamoDB im VPC — **Interface** kann fast alles, auch von on-prem.",
+      "keywords": [
+        "Gateway Endpoint",
+        "Interface Endpoint",
+        "PrivateLink",
+        "Direct Connect"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-050",
+    "backStructured": {
+      "summary": "Drei Gründe: Traffic verlässt **nie das AWS-Netz** (Compliance „kein Internet“), Zugriff lässt sich per **Endpoint Policy** einschränken, und der **Gateway Endpoint ist kostenlos** — er spart die **NAT-Datenverarbeitungsgebühr pro GB**.",
+      "why": "S3-Traffic über ein NAT Gateway zahlt **pro verarbeitetem GB** — bei datenintensiven Workloads schnell der größte Netzwerk-Posten. Der Gateway Endpoint routet denselben Traffic **kostenlos und privat**; die Endpoint Policy begrenzt zusätzlich, **welche Buckets/Aktionen** erreichbar sind.",
+      "example": "Um umgekehrt zu erzwingen, dass ein Bucket **nur über den Endpoint** erreichbar ist: Condition **`aws:SourceVpce`** — und zwar in der **Bucket-Policy**, nicht in der Endpoint Policy.",
+      "examTrap": "**`aws:SourceVpce` gehört in die Bucket-Policy** (die Endpoint Policy begrenzt nur, was DURCH den Endpoint geht). Achtung: Diese Bedingung sperrt auch die **AWS-Konsole** aus.",
+      "mnemonic": "**Merke:** S3 hinter dem **Gateway Endpoint** spart NAT-Gebühren und bleibt im AWS-Netz.",
+      "keywords": [
+        "Gateway Endpoint",
+        "NAT Gateway",
+        "Endpoint Policy",
+        "aws:SourceVpce"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-051",
+    "backStructured": {
+      "summary": "**Nein.** Flow Logs enthalten nur **Metadaten** (IPs, Ports, Protokoll, Bytes, ACCEPT/REJECT) — **keinen Paket-Inhalt**. Für Payload brauchst du **VPC Traffic Mirroring**.",
+      "why": "Flow Logs sind ein **Buchhaltungsjournal des Verkehrs**, kein Mitschnitt — sie beantworten „wer sprach mit wem, wie viel, erlaubt oder geblockt“. Traffic Mirroring spiegelt dagegen die **echten Pakete** einer ENI an ein Analyse-Ziel (IDS, Wireshark-Appliance).",
+      "example": "Forensik nach Vorfall: Traffic der verdächtigen ENI **spiegeln** und im IDS inspizieren — Flow Logs liefern parallel die Verbindungs-Chronik.",
+      "examTrap": "Flow Logs erfassen zudem **nicht alles**: kein Amazon-DNS-Traffic, keine Instance-Metadata (**169.254.169.254**), kein DHCP. Wer „Pakete inspizieren“ liest und Flow Logs wählt, tappt in die Klassiker-Falle.",
+      "mnemonic": "**Merke:** Flow Logs sehen **Umschläge**, Traffic Mirroring liest **Briefe**.",
+      "keywords": [
+        "VPC Flow Logs",
+        "Traffic Mirroring",
+        "Metadaten",
+        "Forensik"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-052",
+    "backStructured": {
+      "summary": "**Nein — VPC Peering ist nicht transitiv.** Jede Verbindung muss explizit aufgebaut werden; bei n VPCs sind das **n·(n−1)/2** Peerings. Ab ca. 5+ VPCs → **Transit Gateway** (zentraler Hub, transitiv, Route-Tables zur Segmentierung).",
+      "why": "Peering verbindet **genau zwei** VPCs — Pakete werden nie für Dritte weitergeleitet, auch nicht über eine gemeinsame Mitte. Das Transit Gateway ist der **Hub**, der genau dieses Full-Mesh-Problem löst und per TGW-Route-Tables segmentiert (Prod ↔ Dev trennen).",
+      "example": "**10 VPCs** voll vermascht = **45 Peerings** und 45-fache Routenpflege — mit Transit Gateway: **10 Attachments** an einen Hub.",
+      "examTrap": "Signalwort **„viele VPCs / volle Konnektivität / on-prem dazu“** → Transit Gateway. Optionen, die Traffic „über die mittlere VPC routen“, sind bei Peering immer falsch.",
+      "mnemonic": "**Merke:** Peering ist **nie transitiv** — viele VPCs heißt **Transit Gateway**.",
+      "keywords": [
+        "VPC Peering",
+        "Transit Gateway",
+        "Nicht transitiv",
+        "Full Mesh"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-053",
+    "backStructured": {
+      "summary": "**Das Peering lässt sich gar nicht erst anlegen** — **überlappende CIDR-Blöcke sind hart verboten** (Routing wäre nicht eindeutig). Gilt genauso für Transit Gateway.",
+      "why": "Bei identischen Adressräumen kann der Router nicht entscheiden, ob `10.0.1.5` lokal oder drüben liegt — deshalb blockt AWS die Verbindung schon beim Anlegen. **PrivateLink umgeht das Problem strukturell**: Es exponiert einen Service als ENI mit **lokaler** IP, die Adressräume berühren sich nie.",
+      "example": "Zwei Firmen nach einer Übernahme, beide `10.0.0.0/16`: Der geteilte Service wird hinter einen **NLB + PrivateLink Endpoint Service** gestellt — Konsum trotz identischer CIDRs.",
+      "examTrap": "**PrivateLink funktioniert bei überlappenden CIDRs — Peering und Transit Gateway nicht.** Genau diese Abgrenzung ist die Prüfungsfrage; „VPC neu adressieren“ ist die teure Distraktor-Alternative.",
+      "mnemonic": "**Merke:** Gleiche CIDRs peeren **nie** — **PrivateLink** kennt das Problem nicht.",
+      "keywords": [
+        "VPC Peering",
+        "Überlappende CIDRs",
+        "PrivateLink",
+        "Transit Gateway"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-054",
+    "backStructured": {
+      "summary": "**Ja**: CloudFront, **ALB**, API Gateway, AppSync, Cognito User Pool, App Runner, Verified Access. **Nein**: **NLB** — der arbeitet auf **Layer 4**, WAF ist ein **Layer-7**-Filter.",
+      "why": "WAF inspiziert **HTTP-Anfragen** (Header, Body, URI, Rate) — dafür muss der Unterbau Layer 7 terminieren. Der NLB reicht TCP/UDP durch, ohne HTTP zu verstehen; es gibt schlicht nichts, woran WAF-Regeln greifen könnten.",
+      "example": "Web-App hinter NLB soll gegen SQL-Injection geschützt werden → Architektur ändern: **ALB oder CloudFront davor**, daran den WAF.",
+      "examTrap": "**„NLB mit WAF schützen“ ist immer falsch.** Braucht das Szenario L7-Schutz vor einem NLB-Workload, ist die richtige Antwort ein vorgeschalteter **CloudFront/ALB** mit WAF.",
+      "mnemonic": "**Merke:** WAF filtert **Layer 7** — am NLB hat er nichts verloren.",
+      "keywords": [
+        "WAF",
+        "NLB",
+        "Layer 7",
+        "ALB"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-055",
+    "backStructured": {
+      "summary": "**Standard**: automatisch, **kostenlos**, für alle AWS-Kunden, deckt gängige **L3/L4-DDoS-Angriffe** ab. **Advanced**: kostenpflichtig — **24/7 Shield Response Team (SRT)**, erweiterte L7-Mitigation, WAF für geschützte Ressourcen inklusive und **Cost Protection**.",
+      "why": "Standard ist die stille Grundabsicherung des AWS-Netzes. Advanced kauft drei Dinge, die Standard nicht hat: **Menschen** (SRT im Angriff), **Layer-7-Tiefe** und **Geld zurück** — die Cost Protection erstattet Scaling-Kosten, die ein Angriff verursacht hat.",
+      "example": "Szenario „DDoS-Angriff ließ die Auto-Scaling-Rechnung explodieren, das darf nicht wieder passieren“ → **Shield Advanced** wegen **Cost Protection**.",
+      "examTrap": "Signalwörter für Advanced: **„Response Team“**, **„Kostenerstattung nach Angriff“**, **„L7-DDoS“**. Für simples „Schutz vor gängigen DDoS-Angriffen“ reicht **Standard — kostenlos und schon aktiv**.",
+      "mnemonic": "**Merke:** Shield **Standard** ist der gratis Grundschutz — **Advanced** kauft Team und Kostenschutz.",
+      "keywords": [
+        "Shield Standard",
+        "Shield Advanced",
+        "SRT",
+        "Cost Protection"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-056",
+    "backStructured": {
+      "summary": "**AWS Network Firewall.** SGs und NACLs kennen nur **IPs, Ports und Protokolle** — sie können **keine Domains oder Inhalte** filtern. Network Firewall ist eine stateful Managed-Firewall/IPS am VPC-Rand mit **Domain-Filtering, Deep Packet Inspection und Suricata-Regeln**.",
+      "why": "Egress-Kontrolle nach **Domain-Namen** braucht Inspektion oberhalb von Port/IP (SNI/Host-Header) — genau die Lücke zwischen SG/NACL und einem vollwertigen IPS füllt Network Firewall, deployt in eigene Firewall-Subnets am VPC-Rand.",
+      "example": "Suricata-**Allowlist**: nur `*.example.com` und `*.amazonaws.com` ausgehend erlaubt — **alles andere wird geblockt** und geloggt.",
+      "examTrap": "Signalwörter: **„nur bestimmte Domains erlauben“**, **„Egress-Filterung“**, **„IPS/Deep Packet Inspection“**. Jede SG/NACL-Option scheitert strukturell — sie kennen keine Domains.",
+      "mnemonic": "**Merke:** **Domain-Filter am VPC-Rand** heißt Network Firewall.",
+      "keywords": [
+        "Network Firewall",
+        "Egress-Filterung",
+        "Suricata",
+        "Deep Packet Inspection"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-057",
+    "backStructured": {
+      "summary": "**AWS Firewall Manager** (setzt **AWS Organizations** voraus). Er rollt WAF-Rules, Shield-Advanced-Schutz, SG-Regeln und Network-Firewall-Policies **org-weit** aus und wendet sie **automatisch auf neu erstellte Ressourcen** an.",
+      "why": "Firewall Manager ist die **Governance-Schicht über den Schutz-Diensten**: Eine zentrale Policy statt 50-mal manuell anhängen — und weil er auf Ressourcen-Ereignisse reagiert, bekommt auch der ALB von morgen automatisch die WAF-Regel von heute.",
+      "example": "Security-Team definiert eine WAF-Policy auf Org-Ebene → jeder neue ALB in jedem Member Account ist **ab Sekunde eins** geschützt, ohne Team-Zutun.",
+      "examTrap": "Signalwörter: **„viele Accounts“**, **„zentral verwalten“**, **„auch künftige Ressourcen“**. Manuelles WAF-Anhängen oder StackSets-Bastellösungen sind die Distraktoren; Voraussetzung Organizations (+ Config) gehört zur richtigen Antwort.",
+      "mnemonic": "**Merke:** **Org-weite Firewall-Policies** rollt der Firewall Manager aus — automatisch auch auf Neues.",
+      "keywords": [
+        "Firewall Manager",
+        "Organizations",
+        "WAF",
+        "Multi-Account"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-058",
+    "backStructured": {
+      "summary": "**GuardDuty**: Threat Detection aus Logs (CloudTrail, VPC Flow Logs, DNS) — *„passiert gerade etwas Böses?“* **Inspector**: Vulnerability-Scan von EC2, ECR-Images, Lambda — *„habe ich eine bekannte CVE?“* **Macie**: findet **sensible Daten (PII) in S3**. **Detective**: **Root-Cause-Analyse** zu vorhandenen Findings.",
+      "why": "Vier Dienste, vier Fragen: **Bedrohung jetzt** (GuardDuty, agentenlos aus Logs) · **Schwachstelle latent** (Inspector, scannt Workloads) · **Datenklassifizierung** (Macie, ML auf S3) · **Ermittlung danach** (Detective, verknüpft und visualisiert). Die Prüfung testet fast nur die Zuordnung per Signalwort.",
+      "example": null,
+      "examTrap": "Verwechsler-Paare: GuardDuty (Angriff) vs. Inspector (CVE) · Macie (PII in S3) vs. Inspector (Software-Schwachstelle) · Detective **erzeugt keine Findings**, er untersucht sie.",
+      "mnemonic": "**Merke:** GuardDuty **erkennt**, Inspector **scannt**, Macie **findet PII**, Detective **ermittelt**.",
+      "keywords": [
+        "GuardDuty",
+        "Inspector",
+        "Macie",
+        "Detective"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-059",
+    "backStructured": {
+      "summary": "Frage 1 → **CloudTrail** (WER hat WANN WELCHEN API-Call gemacht = **Aktivität**). Frage 2 → **AWS Config** (WIE ist/war eine Ressource konfiguriert + Compliance-Rules = **Zustand**). **Security Hub** aggregiert die Findings aus beiden plus GuardDuty/Inspector/Macie.",
+      "why": "CloudTrail ist das **Ereignisjournal** (Vergangenheit, API-genau), Config die **Zustandsdatenbank mit Zeitmaschine** (Konfigurations-Historie + Regeln wie „kein 0.0.0.0/0 auf Port 22“). Zusammen beantworten sie Audit-Fragen vollständig; Security Hub macht daraus die Gesamtsicht.",
+      "example": "Config-Managed-Rule **`restricted-ssh`** markiert jede SG mit offenem Port 22 als NON_COMPLIANT — CloudTrail verrät zusätzlich, **wer** die Regel gerissen hat.",
+      "examTrap": "Die Wortwahl entscheidet: **„wer/wann/welcher Call“** → CloudTrail · **„wie konfiguriert / ist compliant / Historie der Einstellung“** → Config. Optionen, die das vertauschen, sind die Standard-Distraktoren.",
+      "mnemonic": "**Merke:** CloudTrail beantwortet **Wer-wann**, Config beantwortet **Wie-ist**.",
+      "keywords": [
+        "CloudTrail",
+        "AWS Config",
+        "Security Hub",
+        "Compliance"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-060",
+    "backStructured": {
+      "summary": "**Data Events sind standardmäßig deaktiviert.** CloudTrail loggt per Default nur **Management Events** (Control Plane). S3-Objektzugriffe und Lambda-Invokes sind **Data Events** — explizit aktivieren, **kosten extra**. Für alle Accounts/Regions: **Organization Trail**.",
+      "why": "Die Trennung ist ein **Volumen-Schutz**: Management Events (Ressourcen anlegen/ändern) sind überschaubar, Data Events (jedes GetObject, jeder Invoke) explodieren schnell in Milliarden Einträge — deshalb opt-in und kostenpflichtig, gern auf einzelne Buckets/Funktionen begrenzt.",
+      "example": "Trail-Konfiguration: Data Events **nur für `s3://audit-relevante-bucket/*`** aktivieren statt account-weit — Nachweis ohne Kostenexplosion.",
+      "examTrap": "Szenario „CloudTrail läuft, aber Objektzugriffe fehlen“ → **Data Events nicht aktiviert**, nicht „CloudTrail kaputt“. Und org-weite Lückenlosigkeit heißt **Organization Trail**, nicht 50 Einzel-Trails.",
+      "mnemonic": "**Merke:** **Objektzugriffe** sieht nur, wer **Data Events** einschaltet — Default loggt nur die Control Plane.",
+      "keywords": [
+        "CloudTrail",
+        "Data Events",
+        "Management Events",
+        "Organization Trail"
+      ]
+    }
+  }
+]

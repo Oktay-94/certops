@@ -1,0 +1,482 @@
+[
+  {
+    "seedKey": "saa-c03-card-121",
+    "backStructured": {
+      "summary": "**Single PUT max 5 GB.** Multipart **ab 100 MB empfohlen, ab 5 GB Pflicht** — **10.000 Teile**, Teilgröße 5 MB–5 GB. Objektgröße: Der **Prüfungswert ist 5 TB**; die aktuelle Doku nennt per Multipart inzwischen bis 50 TB — im Zweifel **5 TB** wählen.",
+      "why": "Multipart zerlegt den Upload in **parallele, unabhängig wiederholbare Teile** — schneller (Parallelität) und robuster (nur der fehlgeschlagene Part wird neu geladen, nicht die ganze Datei). Ab 5 GB ist es keine Option mehr, sondern die einzige Möglichkeit.",
+      "example": "80-GB-Backup: **Multipart mit 16 Teilen à 5 GB parallel** — bricht Teil 12 ab, wird nur Teil 12 wiederholt. Wichtig: **AbortIncompleteMultipartUpload**-Lifecycle-Regel setzen, sonst kosten verwaiste Parts unsichtbar weiter.",
+      "examTrap": "Zahlen-Set: **5 GB Single-PUT · 100 MB Empfehlung · 10.000 Parts · 5 TB Prüfungs-Maximum**. Aktualitätsfalle: 50 TB steht in neuer Doku, die Prüfung erwartet 5 TB.",
+      "mnemonic": "**Merke:** Ab **100 MB Multipart, ab 5 GB Pflicht** — Prüfungs-Objektmaximum bleibt **5 TB**.",
+      "keywords": [
+        "Multipart Upload",
+        "5 GB",
+        "5 TB",
+        "10.000 Parts"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-122",
+    "backStructured": {
+      "summary": "**S3 Transfer Acceleration**: Der Upload geht an die **nächste CloudFront-Edge-Location** und von dort über den **AWS-Backbone** zum Bucket. Kombinierbar mit **Multipart Upload** (Parallelität). **CloudFront ist hier die falsche Antwort** — das ist ein Download-CDN.",
+      "why": "Der langsame Teil ist die **lange Strecke über das öffentliche Internet** — Transfer Acceleration verkürzt sie auf den Hop zur nächsten Edge und übergibt dann ans optimierte AWS-Netz. Deshalb wirkt es umso stärker, je weiter Client und Bucket auseinanderliegen.",
+      "example": "Sydney → eu-central-1: Endpoint **`bucket.s3-accelerate.amazonaws.com`** nutzen; das Speed-Comparison-Tool von AWS zeigt vorab, ob sich die Gebühr für die Route lohnt.",
+      "examTrap": "Richtungs-Falle: **Upload-Beschleunigung = Transfer Acceleration, Download-Verteilung = CloudFront.** Wer CloudFront für Uploads wählt, verwechselt die Verkehrsrichtung.",
+      "mnemonic": "**Merke:** Weite **Uploads** beschleunigt **Transfer Acceleration** über die Edge — CloudFront verteilt Downloads.",
+      "keywords": [
+        "Transfer Acceleration",
+        "Edge Location",
+        "AWS-Backbone",
+        "Upload"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-123",
+    "backStructured": {
+      "summary": "**Throughput Modes**: **Bursting** (Default, 50 MiB/s pro TiB Baseline), **Provisioned** (fest, größenunabhängig), **Elastic** (skaliert automatisch — heutige Standardempfehlung). **Performance Modes**: General Purpose (niedrigste Latenz) und **Max I/O — „previous generation“**, AWS rät aktiv ab.",
+      "why": "**Elastic Throughput** hat das **Sizing-Problem gelöst**: kein Credit-Rechnen (Bursting), kein Überprovisionieren (Provisioned) — EFS folgt der Last. Max I/O stammt aus der Zeit vor skalierbarem General Purpose und kauft Parallelität mit **höherer Latenz**; heute gibt es dafür keinen Grund mehr.",
+      "example": "Unvorhersehbare Workload-Spitzen auf EFS → **Elastic Throughput** wählen; die Kombination mit General Purpose ist der Default-Pfad.",
+      "examTrap": "Aktualitätsfalle: **Max I/O ist „previous generation“** und mit **One Zone und Elastic Throughput gar nicht kombinierbar** — alte Kurse empfehlen es noch für „hohe Parallelität“, heute ist es der Distraktor.",
+      "mnemonic": "**Merke:** EFS heute = **Elastic Throughput + General Purpose** — Max I/O ist Vergangenheit.",
+      "keywords": [
+        "EFS",
+        "Elastic Throughput",
+        "Max I/O previous generation",
+        "Bursting"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-124",
+    "backStructured": {
+      "summary": "**FSx for Lustre** — sub-ms Latenz, hunderte GB/s, über eine **Data Repository Association (DRA)** direkt an **S3** angebunden (Lazy Loading). **Scratch** = keine Replikation, temporär, billiger. **Persistent** = repliziert in der AZ. EFS wäre zu langsam, EBS nicht shared, Instance Store weder shared noch persistent.",
+      "why": "Lustre ist das parallele HPC-Dateisystem: Durchsatz skaliert mit der Kapazität über viele Server, und die S3-Anbindung macht den Bucket zum Daten-Repository — Dateien erscheinen als Metadaten und werden **beim ersten Zugriff nachgeladen**, Ergebnisse lassen sich nach S3 zurückexportieren.",
+      "example": "ML-Training: Trainingsdaten liegen in S3 → **Scratch-FSx-for-Lustre mit DRA** aufs Bucket, 500 Nodes lesen parallel mit hunderten GB/s; nach dem Job wird das Filesystem gelöscht, die Daten bleiben in S3.",
+      "examTrap": "Zuordnung per Ausschluss ist der Prüfungsweg: **„hunderte GB/s + shared + S3-Integration“** erfüllt nur Lustre. Scratch vs. Persistent: temporäre Compute-Läufe → Scratch, langlebige Arbeitsdaten → Persistent.",
+      "mnemonic": "**Merke:** **HPC-Durchsatz plus S3-Anbindung heißt FSx for Lustre** — Scratch für Jobs, Persistent für Dauer.",
+      "keywords": [
+        "FSx for Lustre",
+        "DRA",
+        "S3 Lazy Loading",
+        "HPC"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-125",
+    "backStructured": {
+      "summary": "**1 RCU** = 1 **strongly consistent** Read/s bis **4 KB** — oder **2 eventually consistent** Reads/s. **1 WCU** = 1 Write/s bis **1 KB**. **Transaktionen kosten das Doppelte.** Es wird **immer aufgerundet**: ein 5-KB-Item kostet **2 RCU**.",
+      "why": "Die Einheiten koppeln Durchsatz an Item-Größe und Konsistenz: eventually consistent halbiert den Lesepreis, Transaktionen verdoppeln beides. Und weil pro 4-KB-/1-KB-Block gerundet wird, sind **viele kleine Items effizienter als wenige große**.",
+      "example": "Item mit 6 KB, 100 strongly consistent Reads/s → 6 KB ⇒ **2 Blöcke** × 100 = **200 RCU**; als eventually consistent nur **100 RCU**.",
+      "examTrap": "Rechen-Fallen: **aufrunden, nie anteilig** (1,25 gibt es nicht) · eventually = **halber** Preis · transactional = **doppelter** Preis. Die 4-KB/1-KB-Basis wird direkt abgefragt.",
+      "mnemonic": "**Merke:** **RCU = 4 KB strongly (×2 eventually), WCU = 1 KB** — gerundet wird immer nach oben.",
+      "keywords": [
+        "RCU/WCU",
+        "4 KB / 1 KB",
+        "Eventually Consistent",
+        "Transaktionen"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-126",
+    "backStructured": {
+      "summary": "**400 KB** — inklusive **Attributnamen UND Attributwerten**. Für größere Payloads: Objekt in **S3** ablegen und nur den **Pointer** im Item speichern — dasselbe Muster wie bei der SQS Extended Client Library.",
+      "why": "DynamoDB ist auf kleine, schnelle Items optimiert — das **400-KB-Limit ist hart** und schließt Blob-Speicherung by design aus. Das **S3-Pointer-Muster** trennt sauber: Metadaten und Zugriffspfade in DynamoDB, die Masse in S3.",
+      "example": "Dokumenten-App: PDF nach **S3**, im DynamoDB-Item nur `{docId, s3Key, size, owner}` — Queries bleiben schnell, das Limit ist nie ein Thema.",
+      "examTrap": "Das Detail **„Attributnamen zählen mit“** ist die Feinfalle — lange Namen kosten Platz. Und 400 KB ist eine der Zahlen, die die Prüfung wörtlich abfragt.",
+      "mnemonic": "**Merke:** DynamoDB-Items enden bei **400 KB (Namen + Werte)** — Großes wandert als S3-Pointer.",
+      "keywords": [
+        "DynamoDB",
+        "400 KB",
+        "S3-Pointer",
+        "Item-Limit"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-127",
+    "backStructured": {
+      "summary": "**Hot Partition.** Eine einzelne Partition liefert maximal **3.000 RCU bzw. 1.000 WCU** und hält ~**10 GB** — unabhängig von der Tabellenkapazität. Zieht ein Partition Key den Großteil des Traffics, bringt **mehr Tabellenkapazität nichts**. Fix: Key mit **hoher Kardinalität**, ggf. **Write Sharding**.",
+      "why": "Provisionierte Kapazität verteilt sich über die Partitionen — die Tabelle kann 10.000 RCU haben, aber kein einzelner Key kommt über sein Partitions-Maximum hinaus. Throttling trotz freier Gesamtkapazität ist deshalb fast immer ein **Key-Design-Problem**, kein Kapazitätsproblem.",
+      "example": "IoT-Tabelle mit `deviceType` als Partition Key (3 Werte) → ein Typ dominiert → Throttling. Fix: **`deviceId`** als Key (Millionen Werte) oder Write Sharding via Suffix (`orderDate#7`).",
+      "examTrap": "Die Zahlen **3.000 RCU / 1.000 WCU / ~10 GB pro Partition** sind prüfbar. Distraktor ist immer **„mehr Kapazität provisionieren“** — genau das hilft bei Hot Partitions nicht.",
+      "mnemonic": "**Merke:** Throttling trotz freier Kapazität = **Hot Partition** — der Fix heißt Key-Design, nicht mehr RCUs.",
+      "keywords": [
+        "Hot Partition",
+        "3.000 RCU / 1.000 WCU",
+        "Partition Key",
+        "Write Sharding"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-128",
+    "backStructured": {
+      "summary": "**Nur teilweise.** Adaptive Capacity verschiebt ungenutzte Kapazität zu heißen Partitionen (bis zum **harten Partitions-Maximum** 3.000 RCU / 1.000 WCU) und isoliert Hot Items. Aber: Es wirkt **über Minuten** — gegen einen **plötzlichen Spike** hilft es nicht.",
+      "why": "Adaptive Capacity ist ein Ausgleichs-, kein Wundermechanismus: Es glättet **anhaltende Schieflagen**, kann aber weder das physische Partitionslimit anheben noch in Sekunden reagieren. Das Fundament bleibt ein Partition Key, der die Last von vornherein verteilt.",
+      "example": "Black-Friday-Countdown: Ein einzelner „Deal“-Key wird um Punkt 10 Uhr gestürmt → Adaptive Capacity kommt zu spät. Vorher **Write Sharding** über Suffixe verteilen, Reads per **DAX** abfedern.",
+      "examTrap": "Prüfungs-Nuance: Adaptive Capacity **existiert und hilft** (isolated hot items) — Optionen, die es als vollständige Lösung verkaufen, sind trotzdem falsch. Hartes Limit + Minuten-Latenz sind die zwei Gegenargumente.",
+      "mnemonic": "**Merke:** Adaptive Capacity **glättet, rettet aber nicht** — Spikes und Partitionslimits schlägt nur gutes Key-Design.",
+      "keywords": [
+        "Adaptive Capacity",
+        "Hot Partition",
+        "Partitions-Maximum",
+        "Key-Design"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-129",
+    "backStructured": {
+      "summary": "**Query** nutzt den Partition Key und liest **nur die passenden Items**. **Scan** liest die **gesamte Tabelle** und filtert danach — bezahlt wird für **alle gelesenen** Items, nicht die zurückgegebenen. Beide liefern max. **1 MB pro Aufruf** (Pagination). Bietet eine Frage „Scan“ an, ist meist ein **GSI** richtig.",
+      "why": "Ein FilterExpression spart **kein Geld und keine Zeit** — er wird NACH dem Lesen angewendet. Ein Scan über 10 GB kostet 10 GB an RCUs, auch wenn drei Items zurückkommen. Fehlt der passende Zugriffs-Key, ist die Antwort ein **Index**, nicht ein Scan.",
+      "example": "„Alle Bestellungen mit Status `open` finden“ auf einer Tabelle mit `orderId`-Key → **GSI mit Partition Key `status`** und Query darauf — statt täglichem Voll-Scan.",
+      "examTrap": "Kern-Missverständnis, das die Prüfung testet: **Filter ≠ Ersparnis** — gefiltert wird nach dem (bezahlten) Lesen. Und die 1-MB-Grenze pro Call gilt für Query UND Scan.",
+      "mnemonic": "**Merke:** **Scan bezahlt die ganze Tabelle** — wer filtern muss, braucht einen GSI, keinen Scan.",
+      "keywords": [
+        "Query vs Scan",
+        "FilterExpression",
+        "GSI",
+        "1 MB Pagination"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-130",
+    "backStructured": {
+      "summary": "**GSI**: **anderer** Partition Key möglich · **jederzeit** anlegbar · nur **eventually consistent** · **eigene** RCU/WCU · max **20**. **LSI**: gleicher Partition Key + anderer Sort Key · **nur bei Tabellenerstellung** · **strong consistency möglich** · teilt Tabellenkapazität · max **5** (+ 10-GB-Limit pro Item Collection).",
+      "why": "Der GSI ist praktisch eine **eigene Tabelle mit eigenem Key-Schema** (daher eigene Kapazität, daher nur eventual consistency); der LSI ist eine **alternative Sortierung derselben Partition** (daher strong consistency möglich, daher an die Erstellung und die 10-GB-Collection gebunden).",
+      "example": "Bestell-Tabelle (`customerId`/`orderDate`): Zugriff nach **`productId`** → **GSI** (anderer Partition Key). Zugriff nach `customerId`/**`status`** mit strong reads → **LSI** (gleiche Partition, anderer Sort Key).",
+      "examTrap": "Zwei Entscheidungs-Trigger: **„anderer Partition Key“ oder „nachträglich“ → GSI** · **„strongly consistent“ → LSI**. Zahlen-Set 20/5 und das 10-GB-Collection-Limit des LSI sind prüfbar.",
+      "mnemonic": "**Merke:** **GSI = neue Sicht, jederzeit, eventual — LSI = gleiche Partition, ab Start, strong.**",
+      "keywords": [
+        "GSI",
+        "LSI",
+        "Strong Consistency",
+        "20 vs 5"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-131",
+    "backStructured": {
+      "summary": "Weil **DAX strongly consistent Reads NICHT cached** — sie werden direkt an DynamoDB **durchgereicht**. DAX liefert **Mikrosekunden** nur für **eventually consistent** Reads (read-through/write-through). Ungeeignet bei write-intensiven Workloads oder Strong-Consistency-Pflicht.",
+      "why": "Ein Cache kann per Definition keine strenge Konsistenz garantieren — er könnte veraltete Daten liefern. DAX löst das ehrlich: Strong Reads umgehen den Cache komplett. Der Nutzen entsteht also nur, wenn der Workload **read-heavy und eventual-tolerant** ist und dieselben Items wiederholt liest.",
+      "example": "Produktkatalog (viele Reads, seltene Writes, Aktualität in Sekunden reicht) → **DAX** drückt die Leselatenz von Millisekunden auf Mikrosekunden — ohne eine Zeile Cache-Logik.",
+      "examTrap": "Die Kombination im Szenario entscheidet: **„strongly consistent“ + DAX = wirkungslos** — diese Option ist eine Falle. Ebenso wenig hilft DAX bei write-lastigen Tabellen.",
+      "mnemonic": "**Merke:** **DAX cached nur eventually consistent** — Strong Reads gehen am Cache vorbei.",
+      "keywords": [
+        "DAX",
+        "Strongly Consistent",
+        "Mikrosekunden",
+        "Read-through"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-132",
+    "backStructured": {
+      "summary": "**DAX**: nur für **DynamoDB**, aber **API-kompatibel** → keine Code-Änderung. **ElastiCache**: für **jede** Datenquelle (RDS, Aurora, berechnete Ergebnisse), dafür schreibst du die Cache-Logik **selbst** (Lazy Loading / Write-Through). „DynamoDB + Mikrosekunden + **ohne Code-Umbau**“ → **DAX**.",
+      "why": "DAX ist ein **Drop-in**: Der DynamoDB-Client zeigt auf den DAX-Endpoint, fertig. ElastiCache ist ein **Werkzeugkasten**: universell einsetzbar (Sessions, Leaderboards, Query-Ergebnisse), aber die Anwendung muss Cache-Befüllung, Invalidierung und TTLs **selbst orchestrieren**.",
+      "example": "RDS-Read-Last mit teuren Aggregat-Queries → **ElastiCache mit Lazy Loading** (Cache-Miss ⇒ Query ⇒ Cache-Set mit TTL). Reine DynamoDB-Leselast → **DAX**, Endpoint tauschen, fertig.",
+      "examTrap": "Das Entscheidungswort ist die **Datenquelle plus Code-Frage**: DynamoDB ohne Umbau = DAX; alles andere (oder Session-Store, Pub/Sub, Datenstrukturen) = ElastiCache. Beide gleichzeitig anzubieten ist ein beliebtes Options-Paar.",
+      "mnemonic": "**Merke:** **DAX ist der DynamoDB-Drop-in, ElastiCache der Universal-Cache mit Eigenbau-Logik.**",
+      "keywords": [
+        "DAX",
+        "ElastiCache",
+        "Lazy Loading",
+        "API-kompatibel"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-133",
+    "backStructured": {
+      "summary": "**RDS: bis 15 Read Replicas** für MySQL/MariaDB/PostgreSQL (seit Okt 2022 — ältere Kurse nennen 5; SQL Server: 5). **Aurora: bis 15 Replicas.** Wichtiger als die Zahl: **Aurora-Replicas lesen vom gemeinsamen Storage** (Millisekunden-Lag, automatisches Failover per Tier); **RDS-Replicas kopieren physisch** (größerer Lag, manuelle Promotion).",
+      "why": "Gleiche Zahl, **verschiedene Physik**: RDS repliziert per Engine über das Netz — jede Replica ist eine **vollständige Kopie** mit wachsendem Lag unter Last. Aurora hängt weitere Leseköpfe an dieselben sechs Storage-Kopien — es gibt **keinen Kopiervorgang**, der hinterherhinken könnte.",
+      "example": "Latenz-kritisches Read-Scaling mit Failover-Anforderung → **Aurora** (Reader-Endpoint + Priority-Tiers). Gelegentliches Reporting auf RDS PostgreSQL → **RDS Read Replica** reicht.",
+      "examTrap": "Aktualitätsfalle: **„RDS kann nur 5 Replicas“ ist veraltet** (15 seit Okt 2022, außer SQL Server). Die Architektur-Frage (shared storage vs. physische Kopie) ist der eigentliche Prüfungshebel.",
+      "mnemonic": "**Merke:** Beide können **15** — aber Aurora **teilt den Storage**, RDS **kopiert** ihn.",
+      "keywords": [
+        "Read Replicas",
+        "15",
+        "Shared Storage",
+        "Replikations-Lag"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-134",
+    "backStructured": {
+      "summary": "Den **Custom Endpoint** — er zeigt auf eine **selbst definierte Untergruppe** von Instanzen. Die anderen: **Cluster/Writer** (Schreiben), **Reader** (Round-Robin über **alle** Replicas — träfe hier auch die kleinen), **Instance** (eine einzelne, meist Diagnose).",
+      "why": "Der Reader-Endpoint kennt **keine Workload-Trennung** — er verteilt stumpf über alle Replicas. Custom Endpoints **segmentieren die Flotte**: Analytics-Traffic auf die großen r-Instanzen, OLTP-Reads auf die kleinen, ohne dass Anwendungen einzelne Instanzen kennen müssen.",
+      "example": "Cluster mit 2× `db.r6g.large` (App-Reads) + 2× `db.r6g.4xlarge` (Reporting) → **Custom Endpoint `analytics`** nur über die 4xlarge-Instanzen; die Reporting-App verbindet dorthin.",
+      "examTrap": "Vier Endpoints, vier Zwecke — die Falle ist der **Reader-Endpoint als Antwort auf „nur bestimmte Instanzen“**: Er kann nicht selektieren, das kann nur der Custom Endpoint.",
+      "mnemonic": "**Merke:** **Teilmengen der Replicas adressiert nur der Custom Endpoint** — der Reader trifft immer alle.",
+      "keywords": [
+        "Aurora Endpoints",
+        "Custom Endpoint",
+        "Reader-Endpoint",
+        "Workload-Trennung"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-135",
+    "backStructured": {
+      "summary": "In **ACUs** (~2 GiB RAM + zugehörige CPU), von **0 bis 256** in **0,5er-Schritten**; seit Ende 2024 **Scale-to-Zero** (Resume < 15 s). Richtig bei **variabler, unvorhersehbarer oder intermittierender** Last — bei **konstanter Dauerlast ist Provisioned günstiger**.",
+      "why": "Serverless v2 skaliert **in-place und sekundenschnell** (kein Instanzwechsel wie v1) und rechnet pro ACU-Sekunde ab — perfekt, wenn die Kurve schwankt oder lange Null ist. Läuft die Last flach durch, zahlt man den Serverless-Aufpreis ohne Gegenwert.",
+      "example": "Dev-/Test-Cluster, abends und am Wochenende ungenutzt → Serverless v2 mit **Scale-to-Zero**: nachts 0 ACU, morgens in Sekunden zurück.",
+      "examTrap": "Zwei Prüf-Details: **RDS Proxy verhindert Scale-to-Zero** (hält die DB wach), und **Serverless v1 ist seit 31.12.2024 EOL** — v1-Antworten sind Aktualitätsfallen. Zahlen: 0–256 ACU, halbe Schritte.",
+      "mnemonic": "**Merke:** Serverless v2 = **0–256 ACU für schwankende Last** — Dauerlast fährt mit Provisioned günstiger.",
+      "keywords": [
+        "Aurora Serverless v2",
+        "ACU 0–256",
+        "Scale-to-Zero",
+        "RDS Proxy"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-136",
+    "backStructured": {
+      "summary": "**Redis OSS**: Persistenz, Replikation, **Multi-AZ mit Auto-Failover**, komplexe Datenstrukturen, Pub/Sub — **single-threaded pro Shard**. **Memcached**: **multi-threaded**, simple Key-Values, **keine** Persistenz/Replikation/Multi-AZ. **Valkey**: seit 2024 **dritte Engine** (Redis-7.2-Fork der Linux Foundation, ~20 % günstiger) — **keine Umbenennung**.",
+      "why": "Die Wahl folgt den Anforderungen: Braucht der Cache **Haltbarkeit, HA oder Datenstrukturen** (Sorted Sets für Leaderboards, Pub/Sub), führt kein Weg an Redis/Valkey vorbei. Memcached gewinnt nur den Nischenfall „maximal simpler, multi-threaded RAM-Cache, Datenverlust egal“.",
+      "example": "Gaming-Leaderboard mit Rankings → **Redis/Valkey Sorted Sets**. Reiner HTML-Fragment-Cache, verzichtbar → **Memcached**.",
+      "examTrap": "Aktualitätsfalle: **Valkey ist eine DRITTE Engine, kein Redis-Rename** — Redis OSS bleibt parallel wählbar. Und **Cluster Mode = Sharding, NICHT HA** — Hochverfügbarkeit braucht Multi-AZ + Automatic Failover.",
+      "mnemonic": "**Merke:** **Features heißen Redis/Valkey, Simpel-Multithreading heißt Memcached** — Valkey ist die neue dritte Engine.",
+      "keywords": [
+        "ElastiCache",
+        "Redis OSS",
+        "Valkey",
+        "Memcached"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-137",
+    "backStructured": {
+      "summary": "**C** = Compute (Batch, HPC, Game-Server) · **M** = General Purpose · **R/X** = Memory (In-Memory-DB; **X** für SAP HANA) · **I/D** = Storage (**I** = NVMe-IOPS, **D** = dichte HDD) · **P/G** = GPU (**P** = ML-Training, **G** = Grafik/Inferenz) · **T** = Burstable.",
+      "why": "Die Buchstaben kodieren das **Engpass-Profil** des Workloads — die Prüfung beschreibt einen Workload und erwartet die Familie: rechenintensiv → C, speicherhungrig → R, lokale I/O-Monster → I, Training → P. Wer das Raster hat, braucht keine Instanz-Details.",
+      "example": "„In-Memory-Analytics mit 700 GB Datensatz“ → **R** (oder X bei SAP-Dimensionen). „Video-Encoding-Farm“ → **C**. „Kafka-Broker mit lokalem NVMe“ → **I**.",
+      "examTrap": "Die Feinunterscheidungen sind die Fallen: **P (Training) vs. G (Inferenz/Grafik)** und **I (IOPS) vs. D (Dichte)**. Und T ist nie die Antwort auf Dauerlast — eigene Karte.",
+      "mnemonic": "**Merke:** **C rechnet, R erinnert, I speichert schnell, P trainiert, G rendert, T burstet.**",
+      "keywords": [
+        "EC2-Familien",
+        "Compute vs Memory",
+        "GPU P vs G",
+        "Storage I vs D"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-138",
+    "backStructured": {
+      "summary": "Die **CPU Credits sind aufgebraucht** → die Instance fällt auf ihre **Baseline** (Bruchteil einer vCPU). **Fix 1: Unlimited Mode** (bursted weiter, Aufpreis bei Credit-Defizit). **Fix 2: Familie wechseln** (M/C) — bei **echter Dauerlast ist T grundsätzlich falsch**.",
+      "why": "T-Instanzen sind ein **Kreditmodell**: unterhalb der Baseline sparen sie Credits an, oberhalb verbrauchen sie sie. Das passt zu Web-Servern mit Lastspitzen — nicht zu **Volllast**, wo das Konto zwangsläufig **leerläuft** und die Instanz auf einen Bruchteil ihrer Leistung kollabiert.",
+      "example": "Monitoring zeigt **`CPUCreditBalance` → 0** und gleichzeitigen Performance-Einbruch nach ~2 h Volllast — das Signaturmuster **erschöpfter Credits**.",
+      "examTrap": "Unlimited ist die **Symptom-Antwort** (funktioniert, kostet dauerhaft Aufpreis), der Familienwechsel die **Architektur-Antwort** — bei „konstanter Last“ verlangt die Prüfung Letzteres. `CPUCreditBalance` ist die verratende Metrik.",
+      "mnemonic": "**Merke:** T-Instanzen leben von **CPU-Credits** — Dauerlast gehört auf M oder C, nicht in den Unlimited Mode.",
+      "keywords": [
+        "T-Instanzen",
+        "CPU Credits",
+        "Unlimited Mode",
+        "Baseline"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-139",
+    "backStructured": {
+      "summary": "**Cluster**: Instances eng zusammen in **einer AZ** → niedrigste Latenz/höchster Durchsatz (HPC). **Spread**: jede Instance auf **eigener Hardware** → **max 7 laufende Instances pro AZ** (kritische Einzelinstanzen). **Partition**: **max 7 Partitionen pro AZ**, je eigenes Rack-Set → große verteilte Systeme (HDFS, Cassandra, Kafka).",
+      "why": "Drei Gruppen, drei Optimierungsziele: Cluster **minimiert Distanz** (und maximiert damit das gemeinsame Ausfallrisiko), Spread **maximiert Isolation** pro Einzelinstanz, Partition isoliert **Gruppen** — genau das Fehlermodell replikationsbewusster verteilter Systeme.",
+      "example": "Kafka-Cluster mit 30 Brokern → **Partition Placement Group** mit 3 Partitionen: Ein Rack-Ausfall trifft genau eine Replika-Gruppe. 5 kritische Appliances → **Spread**.",
+      "examTrap": "Die harten Limits sind prüfbar: **Spread = 7 Instanzen/AZ, Partition = 7 Partitionen/AZ**, Cluster = eine AZ (Latenz gegen Blast Radius). „Spread für 50 Instanzen“ scheitert an der Mathematik.",
+      "mnemonic": "**Merke:** **Cluster = nah, Spread = einzeln (7/AZ), Partition = gruppenweise (7 Partitionen/AZ).**",
+      "keywords": [
+        "Placement Groups",
+        "Cluster",
+        "Spread max 7",
+        "Partition"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-140",
+    "backStructured": {
+      "summary": "**EFA (Elastic Fabric Adapter)** — erlaubt **OS-Bypass**: MPI/NCCL sprechen **direkt mit der Hardware**, ohne Kernel-Netzwerkstack. **ENA** ist Enhanced Networking (hoher Durchsatz, normaler Stack). Signalwörter **„MPI“, „tightly-coupled HPC“, „verteiltes ML-Training“** → **EFA + Cluster Placement Group**.",
+      "why": "Bei tightly-coupled Workloads dominiert die **Latenz zwischen den Nodes**, nicht die Bandbreite — der Kernel-Stack ist dort der Flaschenhals. EFA umgeht ihn (libfabric), was nur für Kommunikationsbibliotheken wie MPI/NCCL zählt; normale TCP-Anwendungen profitieren nicht.",
+      "example": "Wetter-Simulation über 200 Nodes mit MPI → **EFA-fähige Instanzen in einer Cluster Placement Group** — die Kombination ist die Standard-Prüfungsantwort für HPC.",
+      "examTrap": "ENA vs. EFA ist eine Zweck-Frage, keine Geschwindigkeits-Frage: **Durchsatz allein → ENA reicht · Inter-Node-Latenz mit MPI → EFA.** EFA für eine normale Web-App ist der sinnlose Distraktor.",
+      "mnemonic": "**Merke:** **MPI-Latenz heißt EFA mit OS-Bypass** — ENA ist nur der schnelle Normal-Stack.",
+      "keywords": [
+        "EFA",
+        "ENA",
+        "MPI",
+        "OS-Bypass"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-141",
+    "backStructured": {
+      "summary": "**Mehr Memory zuweisen** — bei Lambda **skaliert die CPU proportional zum Memory**. Bei **1.769 MB = genau 1 vCPU**; bis ~6 vCPUs bei 10.240 MB. **Es gibt keinen separaten CPU-Regler.** Folge: Mehr Memory kann die Funktion **schneller UND günstiger** machen.",
+      "why": "Memory ist bei Lambda der **einzige Leistungsregler** — CPU, Netzwerk-I/O und sogar `/tmp`-Durchsatz hängen daran. Weil der Preis pro ms × Memory geht, kann Verdoppeln des Memorys bei halber Laufzeit kostenneutral oder billiger sein.",
+      "example": "Bildverarbeitung: 1.024 MB → 12 s Laufzeit; **2.048 MB → 5,5 s** — schneller UND minimal günstiger. Tools wie Lambda Power Tuning finden das Optimum empirisch.",
+      "examTrap": "Die Zahl **1.769 MB = 1 vCPU** ist direkt prüfbar. Kontraintuitiv-Falle: „Memory reduzieren spart Kosten“ stimmt bei CPU-gebundenen Funktionen oft **nicht** — längere Laufzeit frisst die Ersparnis.",
+      "mnemonic": "**Merke:** Lambdas CPU-Regler heißt **Memory** — **1.769 MB sind 1 vCPU**, mehr kann schneller und billiger sein.",
+      "keywords": [
+        "Lambda",
+        "1.769 MB = 1 vCPU",
+        "Memory-Skalierung",
+        "Power Tuning"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-142",
+    "backStructured": {
+      "summary": "**Ja** — `/tmp` (Ephemeral Storage) ist von **512 MB bis 10.240 MB** konfigurierbar (Default 512 MB). Die Grenzen drumherum: **Timeout 15 Min (900 s)**, Memory 128–10.240 MB, **synchrones Payload 6 MB**, Package 50 MB gezippt / 250 MB entpackt — oder **Container-Image bis 10 GB**.",
+      "why": "Das **/tmp-Upgrade (2022)** hat Lambda für Datei-Workloads geöffnet — vorher war bei 512 MB Schluss. Die Limits bilden zusammen die Eignungs-Checkliste: Payload-Grenze umgeht man per **S3-Pointer**, Package-Grenzen per **Container-Image**, nur Timeout und Memory sind hart.",
+      "example": "3-GB-Videodatei: Event liefert den **S3-Key** (nicht die Datei — 6-MB-Payload!), Lambda lädt nach **/tmp (4.096 MB konfiguriert)**, verarbeitet, lädt das Ergebnis zurück nach S3.",
+      "examTrap": "Das Zahlen-Set ist Kern-Prüfstoff: **15 min · 10.240 MB Memory · 512–10.240 MB /tmp · 6 MB sync Payload · 50/250 MB Package · 10 GB Image.** Default-/tmp (512 MB) als „geht nicht“-Falle kennen.",
+      "mnemonic": "**Merke:** Lambda-/tmp geht **bis 10 GB** — aber die Datei kommt per **S3-Key**, nie im 6-MB-Payload.",
+      "keywords": [
+        "Lambda",
+        "/tmp 512–10.240 MB",
+        "15 Minuten",
+        "6 MB Payload"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-143",
+    "backStructured": {
+      "summary": "**Nein** — Lambda endet bei **15 Minuten** und **10 GB Memory**. Antwort: **AWS Batch** (managed Compute Environments, On-Demand **oder Spot**, Job Queues, Array Jobs) oder ECS/Fargate Tasks. Signalwörter für Batch: „langlaufend“, „Batch-Verarbeitung“, „Spot zur Kostensenkung“.",
+      "why": "Sobald ein Job eine der **harten Lambda-Grenzen** reißt, wechselt die Serverless-Antwort die Ebene: AWS Batch orchestriert Container-Jobs auf verwalteter Compute-Kapazität — inklusive Queues, Prioritäten, Retry und der **Spot-Integration**, die lange Jobs billig macht.",
+      "example": "Nächtliche Genom-Analyse, 2 h, 32 GB RAM, 500 parallele Läufe → **AWS Batch Array Job auf Spot** — Checkpointing macht Unterbrechungen unkritisch.",
+      "examTrap": "Die zwei Lambda-K.-o.-Zahlen (**15 min, 10 GB**) sind der Filter: Reißt der Job eine davon, sind alle Lambda-Optionen (auch „Step Functions verkettet Lambdas“) meist die umständlicheren Distraktoren gegen Batch/Fargate.",
+      "mnemonic": "**Merke:** Über **15 Minuten oder 10 GB** hinaus übernimmt **AWS Batch** — gern auf Spot.",
+      "keywords": [
+        "AWS Batch",
+        "Lambda-Limits",
+        "Spot",
+        "Array Jobs"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-144",
+    "backStructured": {
+      "summary": "Der **RAM-Inhalt wird aufs (verschlüsselte!) EBS-Root-Volume geschrieben** → die Instance startet mit **warmem Cache und laufenden Prozessen**. Grenzen: **Linux > 150 GiB RAM** und **Windows > 16 GiB RAM** können NICHT hibernieren. Weitere Bedingungen: verschlüsseltes Root-Volume, kein Bare-Metal, max 60 Tage.",
+      "why": "Hibernation ist **Suspend-to-Disk** für EC2: Lange Initialisierung (Caches, JVM-Warmup, geladene Modelle) übersteht den Stopp — beim Start entfällt der **Kaltstart**. Während des Ruhezustands kostet **nur EBS**, keine Compute-Zeit.",
+      "example": "Analytics-Instanz mit 40 Minuten Warmup-Zeit, nachts ungenutzt → **hibernieren statt stoppen**: morgens in Minuten arbeitsfähig statt nach 40 Minuten Initialisierung.",
+      "examTrap": "Die zwei RAM-Grenzen sind das Prüf-Detail: **Linux 150 GiB, Windows 16 GiB** — dazu die Pflicht zum **verschlüsselten Root-Volume** (unverschlüsselt = Hibernation nicht aktivierbar) und das 60-Tage-Maximum.",
+      "mnemonic": "**Merke:** Hibernation friert den RAM aufs **verschlüsselte Root-Volume** — Linux bis 150 GiB, Windows nur bis 16 GiB.",
+      "keywords": [
+        "EC2 Hibernation",
+        "150 GiB / 16 GiB",
+        "Verschlüsseltes Root-Volume",
+        "Warm Start"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-145",
+    "backStructured": {
+      "summary": "**CloudFront Functions**: JavaScript an **200+ Edge Locations**, **sub-Millisekunde**, nur **viewer request/response**, **KEIN Netzwerk-/Filesystem-Zugriff**, ~1/6 der Kosten → Header, URL-Rewrites, Cache-Key-Normalisierung. **Lambda@Edge**: Node/Python an 13 Regional Edge Caches, bis **5 s/30 s**, Netzwerk + Filesystem, **alle 4 Trigger**, Body-Zugriff.",
+      "why": "Zwei Werkzeuge, zwei Größenordnungen: CF Functions sind **ultraleichte Prozessoren** für Millionen simpler Transformationen direkt am Viewer; Lambda@Edge ist „richtige“ Compute näher am Origin — mit **Netzwerkfähigkeit**, die für externe Lookups (Auth-Service, A/B-Konfiguration) unverzichtbar ist.",
+      "example": "JWT-Signatur prüfen und URL normalisieren → **CF Function** (kein Netz nötig, Mikrosekunden). Personalisierung per Aufruf eines externen Profildienstes → **Lambda@Edge** am origin request.",
+      "examTrap": "Der K.-o.-Marker: **„externe API/DB am Edge aufrufen“ → nur Lambda@Edge** — CF Functions haben schlicht kein Netzwerk. Trigger-Detail: CF Functions kennen nur die zwei Viewer-Hooks.",
+      "mnemonic": "**Merke:** **CF Functions transformieren, Lambda@Edge telefoniert** — Netzwerkzugriff gibt es nur bei Letzterem.",
+      "keywords": [
+        "CloudFront Functions",
+        "Lambda@Edge",
+        "Viewer/Origin-Trigger",
+        "Kein Netzwerkzugriff"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-146",
+    "backStructured": {
+      "summary": "**Nein — Global Accelerator.** GA arbeitet auf **Layer 4 (TCP/UDP)**, **cached nicht**, liefert **2 statische Anycast-IPs** und schaltet bei Ausfall **auf Netzwerkebene** um (kein DNS-TTL-Warten). CloudFront ist ein **Layer-7-CDN mit Caching** für HTTP(S).",
+      "why": "Beide nutzen das Edge-Netz, lösen aber verschiedene Probleme: CloudFront bringt **Inhalte** näher zum Nutzer (Cache), GA bringt **Pakete** schneller zum Endpoint (Anycast-Eintritt in den AWS-Backbone). UDP, statische IPs und deterministisches Failover kann nur GA.",
+      "example": "Multiplayer-Game (UDP) mit Servern in 3 Regionen → **Global Accelerator**: Spieler treffen die nächste Edge, der Backbone routet zum gesunden, nächsten Endpoint — Failover in Sekunden.",
+      "examTrap": "Drei GA-Marker im Szenario: **non-HTTP-Protokoll, statische IP-Anforderung, Failover ohne DNS-Verzögerung.** Trifft keiner zu und der Content ist cachebar → CloudFront. Beide zusammen sind selten nötig.",
+      "mnemonic": "**Merke:** **CloudFront cached HTTP, Global Accelerator beschleunigt Pakete** — UDP und statische IPs heißen GA.",
+      "keywords": [
+        "Global Accelerator",
+        "Anycast-IPs",
+        "UDP",
+        "CloudFront"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-147",
+    "backStructured": {
+      "summary": "**Signed URL** = Zugriff auf **eine einzelne Datei** (zeitlich begrenzter Download-Link). **Signed Cookie** = Zugriff auf **mehrere Dateien / einen ganzen Bereich** (Video-Serie, Premium-Bereich), **ohne für jede Datei eine eigene URL** zu erzeugen.",
+      "why": "Beide tragen dieselbe Policy (Ablauf, IP-Beschränkung) — der Unterschied ist der Transport: Die URL trägt die Signatur selbst (ideal zum Verschicken), das Cookie sitzt im Browser und autorisiert **jeden** passenden Request automatisch — perfekt für Player, die viele Segmente nachladen.",
+      "example": "HLS-Video-Streaming (tausende `.ts`-Segmente) → **Signed Cookies**: einmal setzen, der Player lädt alle Segmente autorisiert. Einzelner Rechnungs-Download per Mail → **Signed URL**.",
+      "examTrap": "Zählwort entscheidet: **eine Ressource → URL, viele Ressourcen → Cookie.** Zusatzfalle: Signed URLs funktionieren auch ohne Cookie-Support (CLI, native Apps) — Cookies nicht.",
+      "mnemonic": "**Merke:** **Eine Datei = Signed URL, ein Bereich = Signed Cookie.**",
+      "keywords": [
+        "Signed URL",
+        "Signed Cookie",
+        "Private Content",
+        "CloudFront"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-148",
+    "backStructured": {
+      "summary": "**Origin Shield** — eine zusätzliche, **zentrale Caching-Schicht** vor dem Origin. Alle Edge Locations fragen **zuerst den Shield**; nur bei einem Miss dort geht ein Request zum Origin. Ergebnis: **höhere Cache-Hit-Ratio, deutlich weniger Origin-Last**.",
+      "why": "Ohne Shield fragt jede Regional-Edge-Cache-Region den Origin unabhängig — dieselbe Datei wird **dutzendfach** geholt (Request Collapsing nur lokal). Der Shield bündelt alle Misses an einem Punkt nahe dem Origin: **ein Fetch, viele versorgte Edges**.",
+      "example": "Live-Event mit Zuschauern weltweit: Ohne Shield schlagen Misses aus 13 Regional Caches parallel am Origin ein — mit **Origin Shield in der Origin-Region** holt genau einer das Segment.",
+      "examTrap": "Signalmuster: **„Origin wird von vielen Edge Locations gleichzeitig angefragt“ / „Origin-Last senken“** → Origin Shield. Distraktoren: TTL erhöhen (hilft, löst aber die Parallelität nicht) oder größerer Origin (Symptomkur).",
+      "mnemonic": "**Merke:** **Origin Shield bündelt alle Edge-Misses** an einem Punkt — ein Fetch statt dutzende.",
+      "keywords": [
+        "Origin Shield",
+        "Cache-Hit-Ratio",
+        "Origin-Last",
+        "Regional Edge Cache"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-149",
+    "backStructured": {
+      "summary": "**Dedicated**: eigener physischer Port (1/10/100/400 Gbps), LAG- und MACsec-fähig. **Hosted**: über einen DX-Partner, 50 Mbps–25 Gbps. **FALLE:** Eine **LAG** bündelt Links zu **mehr Bandbreite** — sie erhöht **NICHT die Resilienz**, alle Links hängen am **selben Endpunkt**. Echte HA = Verbindungen an **mehreren DX-Locations**.",
+      "why": "Die LAG ist ein Bandbreiten-Werkzeug: mehrere Ports, ein logischer Link — aber ein Standort, ein Gerät, ein gemeinsames Schicksal. Resilienz entsteht nur durch **geografische Redundanz**; das AWS Resiliency Toolkit unterscheidet genau danach (Development bis Maximum Resiliency).",
+      "example": "SLA-Anforderung „DX darf nicht ausfallen“ → **zweite Verbindung an einer ZWEITEN DX-Location** (oder mindestens Site-to-Site-VPN als Backup) — eine LAG am selben Standort erfüllt das nicht.",
+      "examTrap": "Die LAG-Falle ist der Kern: **Bandbreite ≠ Verfügbarkeit.** Und der Backup-Klassiker: DX primär + **VPN als günstiger Failover** ist die Standard-Antwort auf „resilient, aber ohne zweite DX-Leitung“.",
+      "mnemonic": "**Merke:** Eine **LAG macht dick, nicht robust** — Resilienz brauchen zwei DX-Locations oder ein VPN-Backup.",
+      "keywords": [
+        "Direct Connect",
+        "LAG",
+        "Dedicated vs Hosted",
+        "Resilienz"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-150",
+    "backStructured": {
+      "summary": "**Direct Connect Gateway** — eine **globale** Ressource, die eine DX-Verbindung mit VPCs in **beliebigen Regionen** verbindet (kombiniert mit **Transit Gateway** bei vielen VPCs). Bonus: **SiteLink** verbindet zwei DX-Locations direkt über den AWS-Backbone, ohne eine Region zu durchqueren.",
+      "why": "Ohne DX Gateway bräuchte jede Region eine eigene physische Anbindung — das Gateway **entkoppelt die Leitung von der Region**: ein Private/Transit VIF aufs Gateway, dahinter VPCs weltweit. Bei VPC-Wildwuchs übernimmt das **Transit Gateway** die Verteilung hinter dem DX Gateway.",
+      "example": "Frankfurt-Rechenzentrum, eine DX-Leitung, VPCs in eu-central-1, us-east-1 und ap-southeast-2 → **ein DX Gateway**, drei Attachments — keine weiteren Leitungen.",
+      "examTrap": "Signalwort **„eine DX-Verbindung, mehrere Regionen“ → DX Gateway** — Distraktoren sind DX-Leitungen pro Region oder Inter-Region-Peering-Bastellösungen. SiteLink ist das Nischen-Extra für Standort-zu-Standort über den Backbone.",
+      "mnemonic": "**Merke:** **Eine Leitung, viele Regionen = Direct Connect Gateway** — bei vielen VPCs plus Transit Gateway.",
+      "keywords": [
+        "Direct Connect Gateway",
+        "Multi-Region",
+        "Transit Gateway",
+        "SiteLink"
+      ]
+    }
+  }
+]

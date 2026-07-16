@@ -1,0 +1,482 @@
+[
+  {
+    "seedKey": "saa-c03-card-091",
+    "backStructured": {
+      "summary": "**RPO und RTO nahe Null** — beide Regionen bedienen produktiv Traffic, im Ausfall übernimmt die andere. Preis: **doppelte Infrastruktur** und die eigentliche Härte, **Datenkonsistenz über Regionen** zu lösen (Global Tables, Aurora Global mit Write Forwarding). Teuerste und komplexeste Option.",
+      "why": "Active/Active eliminiert den Failover als Ereignis — es gibt nichts mehr umzuschalten, nur Traffic umzuverteilen (Route 53/Global Accelerator). Die Rechnung zahlt man doppelt: **volle Kapazität in beiden Regionen** plus die Architektur-Komplexität von **Multi-Region-Datenhaltung** und Konfliktauflösung.",
+      "example": "Zwei Regionen hinter **Route 53 Latency Routing**, Daten in **DynamoDB Global Tables** — fällt eu-central-1 aus, fließt der Traffic ohne manuelle Aktion nach us-east-1 weiter.",
+      "examTrap": "Multi-Site ist fast nie die richtige Antwort auf ein Budget-Szenario — die Prüfung will die **günstigste Strategie, die RPO/RTO noch erfüllt**. Und die Datenfrage gehört zur Antwort: ohne Global Tables/Aurora Global ist Active/Active nur ein Wunsch.",
+      "mnemonic": "**Merke:** Multi-Site Active/Active = **RPO/RTO ~0** — bezahlt mit doppelter Infrastruktur und Multi-Region-Datenkomplexität.",
+      "keywords": [
+        "Multi-Site Active/Active",
+        "RPO/RTO ~0",
+        "Global Tables",
+        "Doppelte Kosten"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-092",
+    "backStructured": {
+      "summary": "**Warm Standby.** Backup & Restore (Stunden) und Pilot Light (*tens of minutes*) reißen die RTO; Multi-Site würde übererfüllen und unnötig kosten. **Nimm die günstigste Strategie, die RPO und RTO gerade noch einhält** — die Logik hinter jeder DR-Frage.",
+      "why": "DR-Fragen sind **Constraint-Matching**: Die RPO/RTO-Vorgabe streicht die zu langsamen Stufen, das Budget streicht die zu teuren — übrig bleibt genau eine. Warm Standby liefert RPO Sekunden / RTO Minuten, weil die verkleinerte Umgebung bereits läuft und nur hochskalieren muss.",
+      "example": "Vorgabe **RTO ≤ 15 min, RPO ≤ 30 s, „möglichst kostengünstig“** → Pilot Light scheitert an der RTO (erst hochfahren), Multi-Site am Budget → **Warm Standby**.",
+      "examTrap": "Alle vier Optionen **funktionieren** technisch — die Falle ist, die beste statt der **passend günstigsten** zu wählen. „MOST cost-effective while meeting RTO/RPO“ ist die Standard-Formulierung.",
+      "mnemonic": "**Merke:** DR-Fragen löst man als **Constraint-Matching** — die billigste Stufe, die RPO/RTO noch schafft.",
+      "keywords": [
+        "Warm Standby",
+        "RTO Minuten",
+        "Constraint-Matching",
+        "DR-Strategien"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-093",
+    "backStructured": {
+      "summary": "**AWS Backup**: policy-basierte Backup-Pläne über viele Services hinweg (EC2/EBS, RDS, Aurora, DynamoDB, EFS, FSx, Storage Gateway …), **Cross-Region UND Cross-Account Copy**, plus **Backup Vault Lock (WORM)** — unveränderlich, schützt gegen Ransomware und böswillige Admins.",
+      "why": "Ein zentraler Dienst ersetzt den Zoo aus Snapshot-Lambdas und Cron-Jobs: **Backup Plans** definieren Frequenz/Retention als Policy (auch **organisationsweit**), Copy-Jobs bringen die Kopien in andere Regionen und Accounts — die Cross-Account-Kopie ist der Schutz gegen kompromittierte Quell-Accounts.",
+      "example": "Backup Plan: täglich, 35 Tage Retention, **Copy nach eu-west-1 in den Audit-Account**, Vault dort mit **Vault Lock Compliance Mode** — selbst ein Angreifer mit Admin-Rechten im Quell-Account kommt an diese Kopien nicht heran.",
+      "examTrap": "Der Distraktor ist immer der **Eigenbau** (Lambda + Snapshots) — funktioniert, skaliert aber nicht policy-getrieben. Vault-Lock-Detail: **Compliance Mode** ist nach der Grace Period (min. 3 Tage) **auch für Root unlöschbar**, Governance Mode kann ein Admin entfernen.",
+      "mnemonic": "**Merke:** Service-übergreifende, unveränderliche Backups heißen **AWS Backup mit Vault Lock** — nicht Lambda-Bastelei.",
+      "keywords": [
+        "AWS Backup",
+        "Vault Lock",
+        "Cross-Account Copy",
+        "WORM"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-094",
+    "backStructured": {
+      "summary": "**1. Versioning**: `DELETE` setzt nur einen **Delete Marker**, die Version bleibt. **2. MFA Delete**: permanentes Löschen von Versionen erfordert MFA. **3. Object Lock (WORM)**: im **Compliance Mode** kann **niemand** löschen — auch Root nicht. Steigende Härte, steigende Unumkehrbarkeit.",
+      "why": "Die drei Stufen adressieren verschiedene Angreifer: Versioning heilt **Versehen** (Marker entfernen = wiederhergestellt), MFA Delete stoppt **kompromittierte Credentials ohne zweiten Faktor**, Object Lock Compliance stoppt **jeden** — den böswilligen Admin eingeschlossen. Der Preis: Compliance Mode ist bis zum Ablauf der Retention absolut unumkehrbar.",
+      "example": "Ransomware-Szenario: Bucket mit **Versioning + Object Lock Compliance Mode (Retention 90 Tage)** — der Angreifer kann überschreiben und „löschen“, aber keine gelockte Version vernichten.",
+      "examTrap": "**Governance Mode** ist die Falle im Detail: Nutzer mit `s3:BypassGovernanceRetention` können ihn umgehen — als Insider-/Ransomware-Schutz zählt nur **Compliance Mode**. Und Object Lock **setzt Versioning voraus**.",
+      "mnemonic": "**Merke:** **Versioning → MFA Delete → Object Lock Compliance** — jede Stufe härter, die letzte auch gegen Root.",
+      "keywords": [
+        "S3 Versioning",
+        "MFA Delete",
+        "Object Lock",
+        "Compliance Mode"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-095",
+    "backStructured": {
+      "summary": "Server werden **nicht gepatcht, sondern ersetzt**: neues AMI bauen → neue **Launch-Template-Version** → **Instance Refresh** (oder Blue/Green). Vorteil: **kein Konfigurations-Drift**, reproduzierbare Deployments, **Rollback = alte Template-Version ausrollen**.",
+      "why": "Mutable Server driften: Jedes SSH-Patch macht die Flotte heterogener und Deployments unreproduzierbar. Immutable dreht das um — das **AMI ist das Artefakt**, die Instanz ist Wegwerfware, und der Instance Refresh tauscht die Flotte rollierend gegen die neue Version.",
+      "example": "Pipeline: **EC2 Image Builder** baut das gepatchte AMI → neue Launch-Template-Version → **ASG Instance Refresh** mit z. B. 90 % Min-Healthy — die Flotte erneuert sich ohne Downtime.",
+      "examTrap": "**„Per SSH patchen“ / „Config-Änderung auf laufenden Instanzen“** ist der Anti-Pattern-Distraktor. Zweite Ebene: **Launch Configurations sind abgekündigt** — die richtige Antwort spricht immer von Launch **Templates** (versioniert!).",
+      "mnemonic": "**Merke:** Immutable heißt **ersetzen statt patchen** — AMI neu, Template-Version hoch, Instance Refresh.",
+      "keywords": [
+        "Immutable Infrastructure",
+        "Launch Template",
+        "Instance Refresh",
+        "AMI"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-096",
+    "backStructured": {
+      "summary": "**ALB**: **Layer 7** (HTTP/HTTPS) — Content-based Routing nach Host/Pfad/Header, WAF-fähig, Lambda als Target. **NLB**: **Layer 4** (TCP/UDP/TLS) — extremer Durchsatz, niedrigste Latenz, **statische/Elastic IP**, erhält die Source-IP. **GWLB**: **Layer 3** — schleift **Security-Appliances** transparent ein (GENEVE).",
+      "why": "Drei Balancer, drei Ebenen: Der ALB **versteht HTTP** und routet nach Inhalt; der NLB **reicht Pakete durch** und liefert dafür Eigenschaften, die der ALB nicht hat (statische IP, Source-IP-Erhalt, Millionen RPS); der GWLB ist gar kein App-Balancer, sondern der **Einschleifpunkt für Firewalls/IDS von Drittherstellern**.",
+      "example": "`/api/*` auf die API-Targets, `/static/*` auf die Web-Targets → **ALB Path-based Routing**. Traffic aller VPCs durch eine zentrale Palo-Alto-Flotte → **GWLB**.",
+      "examTrap": "GWLB ist der am häufigsten falsch zugeordnete: Signalwort **„Third-Party-Appliance / Traffic-Inspektion einschleifen“** → GWLB, nicht NLB. Und **WAF geht nur an den ALB**, nie an den NLB.",
+      "mnemonic": "**Merke:** **ALB versteht HTTP, NLB schiebt Pakete, GWLB schleift Appliances ein.**",
+      "keywords": [
+        "ALB",
+        "NLB",
+        "GWLB",
+        "Layer 7 vs 4 vs 3"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-097",
+    "backStructured": {
+      "summary": "**(1)** **Statische IP / Elastic IP** nötig (Kunden-Firewall-Whitelisting). **(2)** **Nicht-HTTP-Protokolle** (TCP/UDP). **(3)** **Extreme Performance** (Millionen Requests/s, ultraniedrige Latenz). **(4)** Die **Client-Source-IP** muss unverändert ankommen.",
+      "why": "Alle vier Auslöser sind Dinge, die der ALB **prinzipiell nicht kann**: Er hat wechselnde IPs (nur per DNS-Name adressierbar), spricht nur HTTP(S), terminiert Verbindungen (Source-IP landet im `X-Forwarded-For`-Header statt im Paket) und ist auf L7-Verarbeitung optimiert statt auf rohen Durchsatz.",
+      "example": "„Der Kunde muss unsere Endpunkt-IPs in seiner Firewall freischalten“ → **NLB mit Elastic IPs** (pro AZ eine) — ein ALB kann diese Anforderung schlicht nicht erfüllen.",
+      "examTrap": "Die Whitelisting-Anforderung ist der häufigste Auslöser in Prüfungsfragen — **„feste IP“ disqualifiziert den ALB sofort**. Braucht man L7-Features UND feste IP: **Global Accelerator vor den ALB**.",
+      "mnemonic": "**Merke:** **Feste IP, rohes TCP/UDP, Extremlast oder echte Client-IP** — jeder der vier Punkte heißt NLB.",
+      "keywords": [
+        "NLB",
+        "Elastic IP",
+        "Source-IP",
+        "TCP/UDP"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-098",
+    "backStructured": {
+      "summary": "**ALB: standardmäßig AN** (und kostenlos). **NLB: standardmäßig AUS** (Aktivierung verursacht Cross-AZ-Transferkosten). Falle: ungleiche Instanzverteilung + NLB ohne Cross-Zone → **eine AZ mit einer Instanz bekommt genauso viel Traffic wie eine AZ mit zehn**.",
+      "why": "Ohne Cross-Zone verteilt jeder LB-Knoten nur an die Targets **seiner eigenen AZ** — der Traffic wird erst 50/50 auf die AZs gesplittet und dann lokal verteilt. Die einsame Instanz in AZ-b trägt damit die halbe Gesamtlast, während zehn Instanzen in AZ-a sich die andere Hälfte teilen.",
+      "example": "NLB, AZ-a mit 10 Targets, AZ-b mit 1 Target: Ohne Cross-Zone bekommt das einzelne Target in AZ-b **50 % des Traffics** → überlastet, obwohl die Flotte insgesamt üppig ist.",
+      "examTrap": "Die Default-Asymmetrie ist der Prüfstoff: **ALB an+kostenlos, NLB aus+kostenpflichtig**. Szenario „ungleiche Last trotz gesunder Targets“ → Cross-Zone am NLB aktivieren (Distraktoren: mehr Instanzen, manuelles Rebalancing).",
+      "mnemonic": "**Merke:** Cross-Zone: **ALB an und gratis, NLB aus und kostet** — ungleiche AZs brauchen es zwingend.",
+      "keywords": [
+        "Cross-Zone Load Balancing",
+        "ALB",
+        "NLB",
+        "Ungleiche AZ-Verteilung"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-099",
+    "backStructured": {
+      "summary": "**Deregistration Delay / Connection Draining** (Default **300 Sekunden**): Der Load Balancer schickt **keine neuen** Requests mehr an das Target, lässt **laufende zu Ende laufen**. Zu niedrig gesetzt (oder Target hart entfernt) → offene Verbindungen werden gekappt.",
+      "why": "Beim Deregistrieren wechselt das Target in den Zustand **`draining`**: neue Verbindungen gehen an andere Targets, bestehende dürfen die Delay-Frist ausnutzen. Das ist die Voraussetzung für unterbrechungsfreie Deployments und Scale-in-Events.",
+      "example": "Lange Downloads/Reports bis 10 Minuten → **Deregistration Delay auf 600 s** erhöhen; kurze, zustandslose APIs → auf 30–60 s senken, damit Deployments schneller durchlaufen.",
+      "examTrap": "Der Default **300 s** ist prüfbar. Verwechslungsgefahr mit dem **ASG Lifecycle Hook**: Der Delay schützt **Verbindungen am LB**, der Hook pausiert die **Instanz-Terminierung** (z. B. für Log-Flush) — verschiedene Ebenen.",
+      "mnemonic": "**Merke:** **Deregistration Delay (300 s)** lässt laufende Requests ausatmen — neue gehen woanders hin.",
+      "keywords": [
+        "Deregistration Delay",
+        "Connection Draining",
+        "300 Sekunden",
+        "Zero-Downtime"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-100",
+    "backStructured": {
+      "summary": "**Den State auslagern** — Sessions in **ElastiCache** oder **DynamoDB**, App **stateless** machen. **Sticky Sessions** (ALB-Cookie) sind nur der Workaround: ungleiche Lastverteilung, und beim Instanzausfall ist die Session trotzdem weg.",
+      "why": "Stateless ist die Architektur-Antwort, Stickiness die Pflaster-Antwort: Liegt die Session zentral, ist **jede** Instanz gleichwertig — Scaling, Deployments und Ausfälle werden trivial. Stickiness bindet Nutzer an Instanzen und macht genau diese drei Dinge fragil.",
+      "example": "Session-Store in **ElastiCache (Redis/Valkey)** mit TTL — der ALB darf frei verteilen, ein Instanzausfall kostet niemanden den Warenkorb.",
+      "examTrap": "Fragt das Szenario nach der **besten/resilientesten** Lösung → **State auslagern**. Sticky Sessions sind nur richtig, wenn explizit „ohne Code-Änderung / schnellster Workaround“ gefordert ist.",
+      "mnemonic": "**Merke:** Sessions gehören in **ElastiCache/DynamoDB** — Sticky Sessions sind das Pflaster, nicht die Heilung.",
+      "keywords": [
+        "Stateless",
+        "ElastiCache",
+        "Sticky Sessions",
+        "Session-Store"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-101",
+    "backStructured": {
+      "summary": "**Simple · Weighted · Latency · Failover · Geolocation · Geoproximity · Multivalue Answer** — plus als achte **IP-based Routing** (Zuordnung nach Client-CIDR, seit 2022). Multivalue liefert bis zu **8 gesunde Records** — DNS-Lastausgleich mit Health Checks, aber **kein Load-Balancer-Ersatz**.",
+      "why": "Jede Policy beantwortet eine andere Verteilungsfrage: **Gewichte** (Canary), **Latenz** (Performance), **Standort** (Compliance), **Failover** (DR), Nähe mit **Bias** (Steuerung), mehrere Antworten (einfache Redundanz). **IP-based** ergänzt das Raster um bekannte Client-Netze (z. B. eigene Standorte auf eigene Endpunkte).",
+      "example": "**Canary-Release**: Weighted Routing 95/5 zwischen alter und neuer Version — Gewicht schrittweise verschieben, bei Problemen zurück.",
+      "examTrap": "**Multivalue ≠ Load Balancer**: keine Verbindungssteuerung, keine Kapazitätslogik — nur bis zu 8 gesunde IPs in zufälliger Reihenfolge. Wer echten LB braucht, nimmt ELB; Multivalue ist die Billig-Redundanz.",
+      "mnemonic": "**Merke:** Sieben klassische Policies plus **IP-based** — und **Multivalue ist kein Load Balancer**.",
+      "keywords": [
+        "Route 53",
+        "Routing Policies",
+        "Multivalue Answer",
+        "Weighted"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-102",
+    "backStructured": {
+      "summary": "**Latency**: nach gemessener **Netzwerk-Latenz** → *beste Performance*. **Geolocation**: nach **Standort des Users** → *EU-Nutzer auf EU-Server* (Compliance, Sprache). **Geoproximity**: nach **geografischer Nähe mit Bias** zum Vergrößern/Verkleinern des Einzugsgebiets.",
+      "why": "Die Trennlinie ist das **Entscheidungskriterium**, nicht das Ergebnis: Latency misst das Netz (und kann Nutzer in eine geografisch fernere Region schicken), Geolocation garantiert die **Herkunfts-Zuordnung** (Recht/Content), Geoproximity ist Geografie **plus Stellschraube** für bewusste Traffic-Verschiebung.",
+      "example": "„Deutsche Nutzer müssen aus Datenschutzgründen auf die Frankfurt-Region“ → **Geolocation** — Latency könnte sie nach Irland schicken, wenn das Netz dorthin schneller ist.",
+      "examTrap": "**Nächste Region ≠ niedrigste Latenz** — genau darauf zielt die Falle: Compliance-/Rechts-Anforderungen heißen **Geolocation**, Performance-Anforderungen **Latency**. Der **Bias**-Begriff gehört exklusiv zu Geoproximity.",
+      "mnemonic": "**Merke:** **Latency misst das Netz, Geolocation den Standort, Geoproximity die Nähe mit Bias.**",
+      "keywords": [
+        "Latency Routing",
+        "Geolocation",
+        "Geoproximity",
+        "Bias"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-103",
+    "backStructured": {
+      "summary": "Ein **Health Check** auf dem Primary-Record. Wird er ungesund, antwortet Route 53 mit dem **Secondary**. Das ist der DNS-Baustein von **Pilot Light** und **Warm Standby**. **Ohne Health Check kein Failover.**",
+      "why": "DNS hat keinen eigenen Blick auf die Anwendung — der Health Check ist Route 53s **einzige Informationsquelle** über den Zustand des Primary. Fehlt er, wird der Failover-Record schlicht nie aktiviert, egal wie tot der Endpunkt ist.",
+      "example": "Failover-Setup: Primary = ALB in eu-central-1 mit **Health Check auf `/health`**, Secondary = Warm-Standby-ALB in eu-west-1 — Route 53 schwenkt automatisch, sobald der Check rot wird.",
+      "examTrap": "Die Falle ist die vergessene Voraussetzung: Konfigurationen „Failover-Policy ohne Health Check“ sind wirkungslos. Client-Seite mitdenken: DNS-Schwenks greifen erst nach Ablauf der **TTL** — kurze TTLs am Failover-Record.",
+      "mnemonic": "**Merke:** Route-53-Failover funktioniert **nur mit Health Check** — und wirkt erst nach der TTL.",
+      "keywords": [
+        "Route 53 Failover",
+        "Health Check",
+        "TTL",
+        "DR"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-104",
+    "backStructured": {
+      "summary": "**Nur Alias.** Ein **CNAME darf nicht auf dem Zone Apex** stehen (nackte Domain) — DNS-Standard. **Alias** ist AWS-spezifisch, funktioniert am Apex, ist bei Anfragen **kostenlos** und zeigt auf AWS-Ressourcen (ALB/NLB, CloudFront, S3-Website, API Gateway).",
+      "why": "Der Apex trägt zwingend SOA/NS-Records, neben denen ein CNAME laut RFC nicht existieren darf. Der Alias umgeht das, weil Route 53 ihn **serverseitig zu A/AAAA-Records auflöst** — für den Resolver sieht er wie ein normaler A-Record aus. Wichtig, weil der **ALB keine feste IP** hat, auf die man zeigen könnte.",
+      "example": "`example.com` → **Alias A-Record** auf `my-alb-123.eu-central-1.elb.amazonaws.com`; `www.example.com` dürfte auch ein CNAME sein — der Apex nicht.",
+      "examTrap": "Signalwortkette **„nackte Domain / Zone Apex + AWS-Ressource“** → Alias. Bonuspunkte: Alias-Queries auf AWS-Ziele sind **kostenlos**, CNAMEs kosten — auch abseits des Apex spricht das für Alias.",
+      "mnemonic": "**Merke:** Am **Zone Apex** geht nur der **Alias** — CNAME verbietet der DNS-Standard.",
+      "keywords": [
+        "Alias-Record",
+        "CNAME",
+        "Zone Apex",
+        "ALB"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-105",
+    "backStructured": {
+      "summary": "Ein **Shard** leistet **1 MB/s bzw. 1.000 Records/s rein** und **2 MB/s raus** (im Shared Fan-out unter **allen** Consumern geteilt). 5 MB/s Ingest → **mindestens 5 Shards**. Damit sich die 3 Consumer nicht aushungern: **Enhanced Fan-out** → eigene **2 MB/s pro Shard je Consumer**.",
+      "why": "Kapazitätsplanung ist Shard-Arithmetik: Ingest bestimmt die Mindestzahl (1 MB/s je Shard), die Consumer-Seite entscheidet über den Modus — Shared Fan-out teilt die 2 MB/s Egress **unter allen**, Enhanced Fan-out gibt jedem registrierten Consumer eine **dedizierte Pipe** (Push via HTTP/2 statt Polling).",
+      "example": "5 MB/s × 3 Consumer im Shared-Modus bräuchten 7,5 MB/s Egress bei nur 10 MB/s Gesamt (5 Shards × 2) — knapp und mit Latenz; **Enhanced Fan-out** löst es sauber: 3 × 2 MB/s **pro Shard**.",
+      "examTrap": "Die Zahlen sind direkt prüfbar: **1 MB/s / 1.000 rec/s rein, 2 MB/s raus je Shard**. Signal für Enhanced Fan-out: **„mehrere Consumer“ + „geringe Latenz“**. On-Demand-Mode ist der Ausweg, wenn die Last unvorhersehbar ist.",
+      "mnemonic": "**Merke:** Shard = **1 MB/s rein, 2 MB/s raus** — mehrere Consumer brauchen **Enhanced Fan-out**.",
+      "keywords": [
+        "Kinesis",
+        "Shard",
+        "Enhanced Fan-out",
+        "1 MB/s"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-106",
+    "backStructured": {
+      "summary": "**Reserved**: reserviert einen Teil der Account-Concurrency für die Funktion **und deckelt sie zugleich** → keine Funktion frisst das Account-Limit auf. **Provisioned**: hält Instanzen **warm** → beseitigt **Cold Starts**. „Cold Start“ → Provisioned · „darf andere nicht verdrängen“ → Reserved.",
+      "why": "Zwei verschiedene Probleme: Reserved ist **Kapazitäts-Governance** (Garantie nach unten, Deckel nach oben — kostenlos), Provisioned ist **Latenz-Optimierung** (vorinitialisierte Execution Environments — kostet pro bereitgehaltener Instanz und Stunde).",
+      "example": "Checkout-Funktion darf nie throttlen, Batch-Funktion darf nie alles fressen → **Reserved** für beide. API mit p99-Latenzziel unter 100 ms → **Provisioned** (ggf. per Application Auto Scaling nach Tageszeit).",
+      "examTrap": "Die Begriffe werden gezielt vertauscht angeboten. Merkanker: **Reserved = Rechnen mit Limits, Provisioned = Warmhalten.** Provisioned kostet auch ungenutzt — bei knappem Budget ist Reserved nie die Antwort auf Cold Starts.",
+      "mnemonic": "**Merke:** **Reserved teilt das Limit zu, Provisioned hält warm** — Cold Starts löst nur Provisioned.",
+      "keywords": [
+        "Lambda",
+        "Reserved Concurrency",
+        "Provisioned Concurrency",
+        "Cold Start"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-107",
+    "backStructured": {
+      "summary": "In einem privaten Subnet hat Lambda **keinen Internetzugang** — der S3-Zugriff läuft normalerweise über den öffentlichen Endpoint. Fixes: **(1) Gateway Endpoint für S3** (kostenlos, Traffic bleibt im AWS-Netz — die bessere Antwort) oder **(2) NAT Gateway** (kostet pro Stunde + GB).",
+      "why": "VPC-Lambda hängt an ENIs in deinen Subnets und erbt deren Routing — ohne Route ins Internet oder zu einem Endpoint endet jeder S3-Call im Timeout. Der Gateway Endpoint ergänzt die Route Table um den privaten S3-Pfad; das NAT Gateway wäre der teure Generalschlüssel für **alles** Öffentliche.",
+      "example": "Route Table des Lambda-Subnets: **Gateway Endpoint `com.amazonaws.<region>.s3`** eintragen — der Timeout verschwindet, null laufende Kosten.",
+      "examTrap": "Kosten-Signal entscheidet: Braucht die Funktion **nur S3/DynamoDB** → Gateway Endpoint. Braucht sie **beliebige externe APIs** → NAT Gateway. „Internet Gateway ans private Subnet“ ist der strukturell falsche Distraktor.",
+      "mnemonic": "**Merke:** VPC-Lambda erreicht S3 über den **kostenlosen Gateway Endpoint** — NAT nur, wenn wirklich Internet nötig ist.",
+      "keywords": [
+        "Lambda in VPC",
+        "Gateway Endpoint",
+        "NAT Gateway",
+        "S3"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-108",
+    "backStructured": {
+      "summary": "**Synchron** (API Gateway, ALB): Fehler direkt an den Aufrufer, **kein Auto-Retry**. **Asynchron** (S3, SNS, EventBridge): **2 automatische Retries**, dann **DLQ/On-Failure-Destination**. **Stream-basiert** (Kinesis, DynamoDB Streams): der **Shard blockiert**, bis die Nachricht durchgeht oder abläuft — Poison Pill!",
+      "why": "Der Invocation-Typ bestimmt, **wem der Fehler gehört**: synchron dem Aufrufer (der selbst retryen muss), asynchron der Lambda-Queue (Retries + Destination), beim Stream der **Ordnungsgarantie** — weil Reihenfolge heilig ist, wartet der Shard, statt zu überspringen.",
+      "example": "Kinesis-Consumer mit defektem Record: **`BisectBatchOnFunctionError`** halbiert den Batch, **`MaximumRetryAttempts`** begrenzt die Versuche, die **On-Failure-Destination** fängt den Schuldigen — der Shard läuft weiter.",
+      "examTrap": "Die Stream-Blockade ist die eigentliche Prüfungsfalle: **Ein giftiger Record stoppt den ganzen Shard** (bis zu dessen Retention). Und asynchron heißt konkret **2 Retries** — die Zahl wird abgefragt.",
+      "mnemonic": "**Merke:** **Sync = Fehler beim Aufrufer, async = 2 Retries + DLQ, Stream = Shard blockiert** — Poison Pills brauchen Bisect + Retry-Limit.",
+      "keywords": [
+        "Lambda",
+        "Invocation-Typen",
+        "BisectBatchOnFunctionError",
+        "DLQ"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-109",
+    "backStructured": {
+      "summary": "**Fargate**: kein Server-Management, Abrechnung **pro Task**, ideal bei schwankender Last. **EC2**: du verwaltest die Instances, dafür **günstiger bei konstanter Dauerlast** (Spot/Reserved/Savings Plans) und volle Kontrolle (**GPU**, spezielle Instance-Typen, Daemon-Container).",
+      "why": "Es ist der Trade-off **Betriebsaufwand gegen Kostenkontrolle**: Fargate abstrahiert die Hosts komplett weg (kein Patchen, kein Capacity-Management), EC2 öffnet die Preis-Werkzeugkiste (Spot bis −90 %, RIs/SPs) und die Hardware-Sonderfälle, die Fargate nicht bedient.",
+      "example": "Nächtlicher Batch mit stark schwankender Parallelität → **Fargate** (zahlt nur die Task-Laufzeit). 24/7-Microservice-Flotte mit stabiler Grundlast → **ECS auf EC2** mit Savings Plan + Spot-Anteil.",
+      "examTrap": "Signalwörter: **„Overhead/Verwaltung minimieren“ → Fargate** · **„Kosten bei Dauerlast minimieren“ / „GPU“ → EC2**. Für GPU-Tasks ist Fargate keine Option — der Klassiker unter den Ausschlusskriterien.",
+      "mnemonic": "**Merke:** **Fargate kauft Bequemlichkeit, EC2 kauft Kostenkontrolle** — GPU und Spot sprechen für EC2.",
+      "keywords": [
+        "ECS",
+        "Fargate",
+        "EC2 Launch Type",
+        "Spot"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-110",
+    "backStructured": {
+      "summary": "**Task Role** = Berechtigungen für **deinen Code im Container** (S3 lesen, DynamoDB schreiben, SQS pollen). **Task Execution Role** = Berechtigungen für den **ECS-Agenten** (Image aus **ECR** ziehen, Logs nach **CloudWatch**, Secrets injizieren).",
+      "why": "Zwei Akteure, zwei Identitäten: **Vor** dem Start braucht die Infrastruktur Rechte (Image-Pull, Log-Setup, Secret-Injection) — das ist die Execution Role. **Nach** dem Start ruft dein Anwendungscode AWS-APIs — das ist die Task Role. Least Privilege verlangt die Trennung.",
+      "example": "Fehlerbild „`CannotPullContainerError` / Image-Pull aus ECR scheitert“ → **Execution Role** fehlt `ecr:GetDownloadUrlForLayer` & Co. — die Task Role ist hier völlig unbeteiligt.",
+      "examTrap": "Die Zuordnung per Fehlerbild ist der Prüfungshebel: **Startet nicht (Image/Logs/Secrets) → Execution Role · läuft, aber API-Calls scheitern → Task Role.**",
+      "mnemonic": "**Merke:** **Execution Role startet den Container, Task Role arbeitet darin.**",
+      "keywords": [
+        "ECS",
+        "Task Role",
+        "Task Execution Role",
+        "ECR"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-111",
+    "backStructured": {
+      "summary": "**AWS X-Ray** — verteiltes **Tracing**: verfolgt einen Request **über Service-Grenzen hinweg** und zeigt in der Service Map, welcher Hop Latenz oder Fehler verursacht. CloudWatch zeigt Metriken **pro Service**, nicht den **Pfad eines einzelnen Requests**.",
+      "why": "Metriken aggregieren, Traces erzählen: Bei sechs Services kann jede Einzelmetrik grün sein, während die **Summe der Hops** den Request langsam macht. X-Ray propagiert eine Trace-ID durch die Kette und zerlegt die Gesamtlatenz in **Segmente pro Service** — der Bremsklotz wird sichtbar statt erraten.",
+      "example": "Service Map zeigt: API Gateway 20 ms → Service A 15 ms → **Service D 1.800 ms** (DynamoDB-Call ohne Index) → Rest normal — gefunden in Minuten statt Log-Archäologie.",
+      "examTrap": "Signalwörter **„über mehrere Services verfolgen“ / „welcher Microservice ist langsam“** → X-Ray. CloudWatch (Metriken/Logs/Alarme) ist der Distraktor — richtig für Monitoring, falsch für Request-Pfad-Analyse.",
+      "mnemonic": "**Merke:** **Ein Request durch viele Services = X-Ray** — CloudWatch misst Dienste, X-Ray misst den Weg.",
+      "keywords": [
+        "X-Ray",
+        "Distributed Tracing",
+        "Service Map",
+        "Microservices"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-112",
+    "backStructured": {
+      "summary": "**Cooldown** (Default **300 s**): Pause **zwischen zwei Scaling-Aktionen** — verhindert Thrashing; gilt nur für **Simple Scaling**. **Health-Check-Grace-Period** (Default **300 s**): Schonfrist für eine **neue Instanz**, bevor Health Checks sie töten dürfen.",
+      "why": "Beide bremsen, aber an verschiedenen Stellen: Der Cooldown bremst die **Scaling-Entscheidung** (keine Reaktion auf Metriken mitten im Umbau), die Grace Period bremst das **Health-Urteil** (bootende Instanz gilt nicht als krank). Moderne Policies (Target Tracking) nutzen statt Cooldown das **`DefaultInstanceWarmup`**.",
+      "example": "App braucht 4 Minuten zum Booten, ASG killt Instanzen nach 60 s als „unhealthy“ → **Grace Period auf ≥ 300 s** — nicht den Cooldown anfassen, der hat damit nichts zu tun.",
+      "examTrap": "Die Falle ist die Zuordnung: **Instanzen sterben beim Start → Grace Period** · **ASG schwingt auf und ab → Cooldown/Warmup**. Und: **Cooldown gilt nur für Simple Scaling** — bei Target Tracking ist er der falsche Hebel.",
+      "mnemonic": "**Merke:** **Cooldown bremst das Skalieren, Grace Period schützt den Boot** — beide default 300 s.",
+      "keywords": [
+        "Auto Scaling",
+        "Cooldown",
+        "Health-Check-Grace-Period",
+        "300 s"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-113",
+    "backStructured": {
+      "summary": "**gp3.** Es liefert **3.000 IOPS / 125 MiB/s Baseline bei JEDER Größe** — unabhängig von der Kapazität und **ohne Burst-Credits**. gp2 gäbe bei 100 GiB nur **300 IOPS** Baseline (3 IOPS/GiB); die 3.000 kämen aus Burst-Credits, die bei Dauerlast **leerlaufen**. gp3 ist zudem ~20 % günstiger.",
+      "why": "gp2 koppelt Performance an Kapazität (3 IOPS/GiB) — kleine Volumes leben von Credits, die Dauerlast aufzehrt. gp3 **entkoppelt** beides: 3.000 IOPS sind garantierte Baseline, mehr lässt sich unabhängig von der Größe dazubuchen. „Dauerhaft“ im Szenario ist das Todesurteil für Burst-Modelle.",
+      "example": "100-GiB-DB-Volume mit konstant 3.000 IOPS: **gp3 out of the box**; auf gp2 müsste das Volume auf **1.000 GiB** wachsen, nur um dieselbe Baseline zu erreichen.",
+      "examTrap": "Signalwort **„dauerhaft/sustained“** schließt gp2-Bursting aus. Und die Migrationsantwort ist prüfungsrelevant: gp2→gp3 geht **live per Modify Volume**, ohne Downtime.",
+      "mnemonic": "**Merke:** **gp3 = 3.000 IOPS Baseline ab Werk, ohne Credits** — gp2 koppelt IOPS an GiB.",
+      "keywords": [
+        "gp3",
+        "gp2",
+        "3.000 IOPS Baseline",
+        "Burst-Credits"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-114",
+    "backStructured": {
+      "summary": "**3 IOPS pro GiB**, Minimum **100**, Maximum **16.000** (bei 5.334 GiB). Volumes ≤ 33,33 GiB bekommen die Mindest-100. Kleine Volumes bursten auf **3.000 IOPS** — solange **I/O-Credits** da sind. Bei Dauerlast sind sie leer → Performance fällt **hart auf die Baseline**.",
+      "why": "Das Credit-Modell ist ein **Konto**: Es füllt sich unterhalb der Baseline und leert sich beim Bursten. Kleine Volumes wirken im Test schnell (**Burst!**) und brechen in Produktion ein — das klassische **„lief in Dev, stirbt unter Last“**-Muster.",
+      "example": "20-GiB-gp2-Boot-Volume: Baseline **100 IOPS**, bursted auf 3.000 — nach erschöpften Credits kriecht die Instanz bei 100 IOPS, und das Monitoring zeigt `BurstBalance` gegen 0.",
+      "examTrap": "Erkennungsmerkmal im Szenario: **„anfangs schnell, nach Stunden langsam“** + kleines gp2-Volume → Credits leer. Der Fix ist fast nie „Volume vergrößern“, sondern **auf gp3 wechseln**.",
+      "mnemonic": "**Merke:** gp2 = **3 IOPS je GiB plus Burst-Konto** — Dauerlast leert das Konto und die Performance kollabiert.",
+      "keywords": [
+        "gp2",
+        "I/O-Credits",
+        "BurstBalance",
+        "3 IOPS/GiB"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-115",
+    "backStructured": {
+      "summary": "Bis **16.000 IOPS** und **1.000 MiB/s**, **unabhängig voneinander** buchbar. Haken: max. IOPS erst **ab 32 GiB** (Ratio 500 IOPS/GiB), max. Throughput erst **ab 8.000 IOPS**. Wer **mehr als 16.000 IOPS** braucht → **io2 Block Express**.",
+      "why": "gp3 verkauft Performance à la carte — aber mit zwei Kopplungsresten: Die **500:1-Ratio** verhindert Mini-Volumes mit Maximal-IOPS, und der Durchsatz hängt an der IOPS-Buchung (**0,25 MiB/s je IOPS**). Oberhalb von **16.000 IOPS** beginnt die io2-Welt.",
+      "example": "Analytics-Volume, 64 GiB, braucht 900 MiB/s: **IOPS auf ≥ 3.600 anheben** (0,25 × 3.600 = 900) — Kapazität muss dafür nicht wachsen.",
+      "examTrap": "Die Grenzwerte sind prüfbar: **16.000 IOPS / 1.000 MiB/s / ab 32 GiB / Throughput ab 8.000 IOPS**. „gp3 auf 32.000 IOPS konfigurieren“ ist eine Fangoption — das kann nur io2.",
+      "mnemonic": "**Merke:** gp3 endet bei **16.000 IOPS und 1.000 MiB/s** — darüber beginnt io2 Block Express.",
+      "keywords": [
+        "gp3",
+        "16.000 IOPS",
+        "1.000 MiB/s",
+        "io2"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-116",
+    "backStructured": {
+      "summary": "**io1**: 64.000 IOPS · 1.000 MB/s · Ratio **50:1** · Durability 99,8–99,9 %. **io2 Block Express**: **256.000 IOPS** · 4.000 MB/s · Ratio **1.000:1** · Durability **99,999 %** · nur auf **Nitro**. **Seit 30.04.2025 sind ALLE io2-Volumes automatisch Block Express.**",
+      "why": "io2 Block Express ist eine neue Storage-Architektur (SRD-Netzprotokoll) — daher der Sprung auf 256k IOPS und fünf Neunen Durability zum gleichen Preis wie io1. Die frühere Unterscheidung „io2 klassisch vs. Block Express“ ist seit April 2025 Geschichte: **io2 = Block Express, immer**.",
+      "example": "SAP-HANA-artige Datenbank mit 150.000 IOPS auf einem Volume → nur **io2 Block Express** kann das; io1 endet bei 64.000, gp3 bei 16.000.",
+      "examTrap": "Aktualitätsfalle: Ältere Kursmaterialien unterscheiden noch zwei io2-Varianten — **veraltet**. Prüfbare Marker: **256.000 IOPS, 1.000:1, 99,999 %, Nitro-only**. Und für Boot-Volumes sind alle vier SSD-Typen erlaubt, HDD nie.",
+      "mnemonic": "**Merke:** **io2 ist seit 30.04.2025 immer Block Express** — 256k IOPS, fünf Neunen, Nitro.",
+      "keywords": [
+        "io2 Block Express",
+        "256.000 IOPS",
+        "99,999 % Durability",
+        "30.04.2025"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-117",
+    "backStructured": {
+      "summary": "**st1**: Baseline **40 MB/s pro TiB**, Burst 250 MB/s/TiB, max **500 MB/s** (Big Data, Logs, Data Warehouse). **sc1**: Baseline **12 MB/s pro TiB**, Burst 80, max **250 MB/s** (cold, selten gelesen). **Harter Ausschluss: HDD-Typen können NIE Boot-Volume sein.**",
+      "why": "HDDs verkaufen **Durchsatz pro Kapazität**, nicht IOPS — sequenzielle Scans großer Dateien sind ihr Terrain, Random-I/O ihr Feind. Deshalb skaliert die Baseline mit der TiB-Größe, und deshalb taugen sie nicht als Boot-Volume (Boot = viele kleine Random-Reads).",
+      "example": "Log-Aggregation, sequenziell geschrieben und batch-gelesen, 8 TiB → **st1** mit 320 MB/s Baseline (8 × 40) — für einen Bruchteil des SSD-Preises.",
+      "examTrap": "Zwei Prüfpunkte: das **Boot-Volume-Verbot** (nur gp2/gp3/io1/io2 booten) und die Zuordnung **st1 = throughput-workload, sc1 = Kühlschrank**. Random-I/O-Anforderungen disqualifizieren beide sofort.",
+      "mnemonic": "**Merke:** **st1 für sequenziellen Durchsatz, sc1 fürs Kalte — und HDD bootet niemals.**",
+      "keywords": [
+        "st1",
+        "sc1",
+        "Throughput",
+        "Kein Boot-Volume"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-118",
+    "backStructured": {
+      "summary": "**EBS Multi-Attach**: nur **io1/io2**, bis **16 Nitro-Instances**, alle in **derselben AZ**. **Zwingend: ein cluster-aware Filesystem** (GFS2, OCFS2). Mit **XFS/EXT4 → garantierte Datenkorruption**. In Prüfungsfragen ist oft **EFS** die bessere Antwort.",
+      "why": "Multi-Attach gibt mehreren Instanzen Block-Zugriff auf **dasselbe** Volume — aber Blöcke kennen keine Sperren: Ohne clusterweites Locking (GFS2/OCFS2) überschreiben sich die Dateisysteme gegenseitig. Und weil ein EBS-Volume in **einer AZ** lebt, ist Multi-Attach nie Multi-AZ-Shared-Storage.",
+      "example": "Shared Storage für Instanzen in **mehreren AZs** mit normalem Linux-Setup → **EFS** (NFS, Multi-AZ, kein Cluster-FS nötig) — Multi-Attach fällt schon an der AZ-Grenze durch.",
+      "examTrap": "Zwei K.-o.-Kriterien im Szenario: **„mehrere AZs“** oder **„EXT4/XFS ohne Umbau“** → Multi-Attach raus, EFS rein. Die Marker **io1/io2, 16 Instances, eine AZ, Cluster-FS** sind direkt prüfbar.",
+      "mnemonic": "**Merke:** Multi-Attach = **eine AZ, io1/io2, Cluster-Filesystem** — für alles Bequeme gibt es EFS.",
+      "keywords": [
+        "EBS Multi-Attach",
+        "Cluster-Filesystem",
+        "AZ-gebunden",
+        "EFS"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-119",
+    "backStructured": {
+      "summary": "Bei **maximaler lokaler I/O** (physisches NVMe am Host): Cache, Scratch, Buffer, temporäre Verarbeitung, bereits replizierte Daten (Cassandra/Hadoop). **Daten überleben einen Reboot — aber NICHT Stop, Terminate oder Host-Failure.**",
+      "why": "Instance Store ist Platte **im Host** — keine Netz-Hops, daher Millionen IOPS, die kein EBS erreicht. Der Preis ist die Bindung an die Hardware: Stop/Start verschiebt die Instanz auf einen anderen Host, und dort wartet leerer Speicher. Nur Workloads, die Datenverlust selbst kompensieren, gehören darauf.",
+      "example": "Cassandra-Ring über drei Instanzen mit Instance Store: Stirbt ein Node, **repliziert der Cluster die Daten zurück** — die Roh-I/O des NVMe wird genutzt, die Haltbarkeit liefert die Anwendung.",
+      "examTrap": "Der Lebenszyklus ist die Falle: **Reboot ja, Stop/Terminate nein.** Signalwort „höchste IOPS / temporär / selbst repliziert“ → Instance Store · „muss persistent sein / Snapshot“ → EBS.",
+      "mnemonic": "**Merke:** Instance Store = **schnellste, aber flüchtige Platte** — überlebt den Reboot, nie den Stop.",
+      "keywords": [
+        "Instance Store",
+        "NVMe",
+        "Flüchtig",
+        "Reboot vs Stop"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-120",
+    "backStructured": {
+      "summary": "Mindestens **3.500 PUT/COPY/POST/DELETE** und **5.500 GET/HEAD** pro Sekunde — **pro Präfix**. Die **Präfix-Anzahl ist unbegrenzt** → Verteilung über mehrere Präfixe skaliert **linear**. **Veraltet:** die „Random-Prefix“-Regel — seit 2018 unnötig.",
+      "why": "Das Limit hängt am **Präfix, nicht am Bucket** — S3 partitioniert intern nach Key-Namensräumen. Zehn Präfixe heben die Lesegrenze also auf **55.000 GET/s**, und sinnvolle fachliche Präfixe (Datum, Mandant) reichen; kryptografische **Hash-Präfixe sind seit 2018 Folklore**.",
+      "example": "Bildpipeline mit 20.000 GET/s: Keys auf **vier Präfixe** verteilen (`img/a/…`–`img/d/…`) → 4 × 5.500 = 22.000 GET/s Headroom; dazu **CloudFront** davor, das den Großteil ohnehin abfängt.",
+      "examTrap": "Zahlen-Duo **3.500 / 5.500 pro Präfix** ist direkt prüfbar. Aktualitätsfalle: Optionen mit **„zufällige Hash-Präfixe einführen“** waren bis 2018 richtig — heute Distraktor. Bei Hotspot-Reads ist **CloudFront** die ergänzende richtige Antwort.",
+      "mnemonic": "**Merke:** S3 skaliert **pro Präfix (3.500 Schreib-/5.500 Lese-RPS)** — mehr Präfixe, mehr Durchsatz, Hashes braucht niemand mehr.",
+      "keywords": [
+        "S3 Performance",
+        "3.500/5.500",
+        "Präfix",
+        "CloudFront"
+      ]
+    }
+  }
+]

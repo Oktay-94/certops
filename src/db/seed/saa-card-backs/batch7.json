@@ -1,0 +1,434 @@
+[
+  {
+    "seedKey": "saa-c03-card-181",
+    "backStructured": {
+      "summary": "**Seit Nov 2024 (Preissenkung −50 %) ist On-Demand die AWS-Default-Empfehlung**: kein Capacity Planning, Bezahlung pro Request, ideal bei unvorhersehbarer Last und neuen Anwendungen. **Provisioned + Auto Scaling** lohnt noch bei **stetiger, hoch ausgelasteter** Last — und nur dort gibt es **Reserved Capacity**.",
+      "why": "Die alte Kostenlogik („On-Demand ist pro Request deutlich teurer“) ist seit der Halbierung überholt: Der Aufpreis ist klein genug, dass sich Capacity Planning erst bei **konstant hoher Auslastung** rechnet — dort holt Provisioned mit Reserved Capacity den Vorsprung zurück.",
+      "example": "Neues Feature mit unbekanntem Traffic → **On-Demand starten**; zeigt das Muster nach Monaten eine flache 80 %-Dauerlast → auf **Provisioned + Auto Scaling** (ggf. Reserved Capacity) wechseln.",
+      "examTrap": "Aktualitätsfalle: Materialien vor Nov 2024 nennen On-Demand pauschal teuer — **veraltet**. Und Reserved Capacity existiert **nur für Provisioned**, nie für On-Demand.",
+      "mnemonic": "**Merke:** DynamoDB startet seit der **−50 %-Senkung** mit **On-Demand** — Provisioned lohnt erst bei flacher Dauerlast.",
+      "keywords": [
+        "DynamoDB On-Demand",
+        "−50 % Nov 2024",
+        "Provisioned",
+        "Reserved Capacity"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-182",
+    "backStructured": {
+      "summary": "**RDS kostet pro Instanz-Stunde** — auch nachts bei null Zugriffen. **DynamoDB On-Demand kostet pro Request** — bei Leerlauf **nahezu nichts**. Bedingung: Das Zugriffsmuster muss **key-basiert** sein (keine komplexen Joins, keine Ad-hoc-Queries).",
+      "why": "Es ist der Wechsel vom **Kapazitäts- zum Verbrauchsmodell**: Die RDS-Instanz ist ein **gemietetes Haus** (Miete läuft immer), DynamoDB On-Demand ein Taxi (zahlt nur die Fahrt). Der Tausch funktioniert aber nur, wenn die App auf das **Key-Value-Modell** passt — relationale Features gibt man mit ab.",
+      "example": "Session-/Profil-Lookups per `userId`, tagsüber Spitzen, nachts Stille → **DynamoDB On-Demand**: Die Nacht kostet praktisch nur Storage statt voller Instanzstunden.",
+      "examTrap": "Das K.-o.-Kriterium steht im Zugriffsmuster: **Joins, Transaktions-Reports, Ad-hoc-SQL → DynamoDB fällt raus**, egal wie gut die Kostenstory klingt. „Einfache Lookups + schwankende Last“ ist das Go-Signal.",
+      "mnemonic": "**Merke:** **RDS mietet Stunden, DynamoDB On-Demand zahlt Requests** — der Tausch gilt nur für Key-Value-Muster.",
+      "keywords": [
+        "DynamoDB vs RDS",
+        "Pro Request",
+        "Key-Value",
+        "Instanz-Stunden"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-183",
+    "backStructured": {
+      "summary": "**Aurora Serverless v2 mit Scale-to-Zero** — skaliert bei Inaktivität auf **0 ACU** (Resume < 15 s), dann zahlst du **nur noch Storage**. Eine provisionierte Instanz kostet **24/7 die volle Instanzstunde**. **Falle:** Bei konstanter Dauerlast ist Serverless **teurer** als Provisioned.",
+      "why": "Dev/Test hat das **ideale Serverless-Profil**: lange Leerlaufphasen, kurze Aktivitätsfenster — genau die Kurve, bei der **pro-Sekunde-Abrechnung mit Null-Basis** gewinnt. Der Resume unter 15 Sekunden macht die Pause für Entwickler praktisch unsichtbar.",
+      "example": "Dev-DB, genutzt Mo–Fr 9–17 Uhr: Serverless v2 mit Scale-to-Zero → **~75 % der Woche fallen nur Storage-Kosten an**; der erste Morgen-Connect weckt den Cluster in Sekunden.",
+      "examTrap": "Zwei Prüf-Details aus der Faktenbasis: **RDS Proxy verhindert Scale-to-Zero** (hält wach), und die Kosten-Falle dreht sich um — **Dauerlast gehört auf Provisioned**, Serverless zahlt dort nur Aufpreis.",
+      "mnemonic": "**Merke:** Dev/Test-Datenbanken schlafen mit **Serverless v2 auf 0 ACU** — Dauerlast fährt provisioned günstiger.",
+      "keywords": [
+        "Aurora Serverless v2",
+        "Scale-to-Zero",
+        "0 ACU",
+        "Dev/Test"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-184",
+    "backStructured": {
+      "summary": "**RDS Reserved Instances** — deutlicher Rabatt bei 1- oder 3-Jahres-Commitment. **Prüfungswichtig:** Die klassischen **Compute Savings Plans decken EC2, Fargate und Lambda ab — NICHT RDS-Instanzstunden.** (Ende 2025 kamen separate *Database Savings Plans*; die erwartete SAA-C03-Antwort bleibt **RDS RIs**.)",
+      "why": "Zwei Jahre unveränderte Produktion ist das **Bilderbuch-Commitment-Profil**: stabil, vorhersehbar, langfristig. Der Stolperstein ist der **Geltungsbereich der SPs** — wer seinen Compute SP auch auf die RDS-Rechnung wirken sieht, hat die Abdeckung falsch im Kopf.",
+      "example": "Stabile `db.r6g.xlarge` seit zwei Jahren → **RDS RI, 3 Jahre, Partial Upfront** — der Workload ändert sich nicht, also darf das Commitment lang und tief sein.",
+      "examTrap": "Die Abdeckungs-Falle ist der Kern: **„Unser Compute SP rabattiert auch RDS“ ist falsch.** Database SPs (Dez 2025) existieren, aber die Prüfung erwartet RDS RIs — Aktualitätswissen als Bonus, nicht als Antwort.",
+      "mnemonic": "**Merke:** Stabile RDS-Last rabattieren **RDS Reserved Instances** — der Compute SP erreicht RDS nie.",
+      "keywords": [
+        "RDS Reserved Instances",
+        "Compute SP deckt RDS nicht",
+        "Database SP",
+        "Commitment"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-185",
+    "backStructured": {
+      "summary": "**Das Entscheidungskriterium ist die Cache-Hit-Rate.** **Wiederkehrende** Reads → **ElastiCache**: meist günstiger UND schneller (Cache-Node < DB-Replica, Reads aus dem RAM). **Diverse** Reads oder **Aktualitäts-Pflicht** → **Read Replica**.",
+      "why": "Ein Cache lohnt, wenn **dieselben Antworten mehrfach** gebraucht werden — dann ersetzt eine **kleine RAM-Node** teure DB-Arbeit. Sind die Queries divers (jede Antwort einmalig) oder darf nichts veraltet sein, **verpufft der Cache** und nur eine echte Replica trägt die Last.",
+      "example": "Produktseiten-Reads (Top-1000-Artikel dominieren) → **ElastiCache** mit TTL. BI-Adhoc-Queries über wechselnde Zeiträume → **Read Replica**, ein Cache hätte kaum Hits.",
+      "examTrap": "Die Kostenlogik ist der Prüfhebel: **hohe Hit-Rate schlägt die Replica in Preis UND Latenz** — aber „immer aktuelle Daten“ oder „jede Query anders“ kippt die Antwort zur Replica. Beides zusammen anzubieten ist das klassische Options-Paar.",
+      "mnemonic": "**Merke:** **Wiederholte Reads cached ElastiCache, diverse oder frische Reads trägt die Replica.**",
+      "keywords": [
+        "ElastiCache vs Read Replica",
+        "Cache-Hit-Rate",
+        "RAM",
+        "Aktualität"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-186",
+    "backStructured": {
+      "summary": "**(1) Provisioned IOPS** (io1/io2) gebucht, obwohl **gp3** reicht — jede IOPS kostet extra. **(2) Snapshots und Backups**, die über die Retention hinaus liegen bleiben. **(3) Multi-AZ verdoppelt die Instanzkosten** — richtig für Produktion, **falsch für Dev/Test**.",
+      "why": "Alle drei sind **Gewohnheits-Kosten**: io-Storage aus alten Performance-Ängsten, **Snapshot-Friedhöfe** ohne Löschdisziplin und das reflexhafte Multi-AZ-Häkchen auch dort, wo ein Ausfall niemanden weckt. Jede Position ist einzeln unspektakulär — zusammen oft der **halbe RDS-Posten**.",
+      "example": "Dev-Umgebung: **Single-AZ statt Multi-AZ** (−50 % Instanzkosten), Storage auf **gp3**, Snapshot-Retention auf 7 Tage + alte manuelle Snapshots löschen — drei Handgriffe, große Wirkung.",
+      "examTrap": "Die Multi-AZ-Falle hat zwei Seiten: Für **Produktion** ist der doppelte Preis die richtige Antwort (HA!), für **Dev/Test** der Kostenfehler — die Prüfung testet, ob du nach Umgebung unterscheidest.",
+      "mnemonic": "**Merke:** RDS-Geld versickert in **unnötigen IOPS, vergessenen Snapshots und Dev-Multi-AZ**.",
+      "keywords": [
+        "RDS-Kostenfallen",
+        "gp3 statt io1",
+        "Snapshot-Retention",
+        "Multi-AZ Dev/Test"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-187",
+    "backStructured": {
+      "summary": "**TTL (Time To Live)** aktivieren — DynamoDB löscht abgelaufene Items **automatisch und kostenlos** (**keine WCU**). Ein manueller Lösch-Batch würde WCUs verbrennen. Bonus: TTL-Löschungen erscheinen in **DynamoDB Streams** — Items lassen sich vorher automatisch nach **S3** archivieren.",
+      "why": "TTL ist der seltene Fall einer **Gratis-Operation**: Ein Timestamp-Attribut markiert das Ablaufdatum, DynamoDB räumt im Hintergrund auf — **ohne Durchsatzverbrauch**, ohne Lambda-Kosten. Der Streams-Hook macht daraus eine vollständige **Archivierungs-Pipeline**.",
+      "example": "Attribut `expiresAt` (Unix-Timestamp) beim Schreiben setzen, **TTL auf `expiresAt`** aktivieren → 90 Tage später verschwindet das Item von selbst; ein Streams-Consumer schreibt es zuvor nach S3.",
+      "examTrap": "Der Kontrast ist die Prüfungsfrage: **TTL löscht kostenlos, manuelles Löschen kostet WCUs** — jede Batch-Delete-Option ist der teure Distraktor. Detail: TTL löscht **verzögert** (innerhalb von Tagen), nicht sekundengenau.",
+      "mnemonic": "**Merke:** Ablaufdaten räumt **TTL kostenlos** ab — manuelles Löschen verbrennt WCUs.",
+      "keywords": [
+        "DynamoDB TTL",
+        "Kostenlos ohne WCU",
+        "Streams-Archivierung",
+        "expiresAt"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-188",
+    "backStructured": {
+      "summary": "**Aurora I/O-Optimized** — eine Cluster-Konfiguration, bei der **I/O nicht mehr einzeln abgerechnet** wird (dafür höherer Instanz- und Storage-Preis). Faustregel: **lohnt ab ~25 % I/O-Anteil** an der Aurora-Rechnung. Bei niedrigem I/O bleibt **Aurora Standard** günstiger.",
+      "why": "Aurora Standard rechnet drei Posten ab (Instanz, Storage, I/O) — bei I/O-intensiven Workloads wird der dritte **unberechenbar groß**. I/O-Optimized tauscht ihn gegen **planbare, höhere Fixpreise**: eine Versicherung, die sich genau ab der **25 %-Schwelle amortisiert**.",
+      "example": "Cost Explorer zeigt: 35 % der Aurora-Kosten sind I/O → **Cluster auf I/O-Optimized umstellen** (eine Konfigurationsänderung, kein Umzug) — die I/O-Zeile verschwindet von der Rechnung.",
+      "examTrap": "Die **25 %-Schwelle** ist der prüfbare Umschaltpunkt aus der Faktenbasis — darunter ist I/O-Optimized die teurere Wahl. Optionen ohne Schwellen-Logik („immer I/O-Optimized“) sind Distraktoren.",
+      "mnemonic": "**Merke:** Frisst **I/O über 25 %** der Aurora-Rechnung, lohnt **I/O-Optimized** — darunter bleibt Standard.",
+      "keywords": [
+        "Aurora I/O-Optimized",
+        "25 %-Schwelle",
+        "I/O-Kosten",
+        "Cluster-Konfiguration"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-189",
+    "backStructured": {
+      "summary": "**KOSTENLOS:** Data Transfer **IN** aus dem Internet · Traffic **innerhalb einer AZ über private IPs**. **KOSTET:** Transfer **OUT** ins Internet (der große Posten) · Traffic **zwischen AZs — in beide Richtungen** · zwischen **Regionen** · über eine **öffentliche IP, selbst in derselben AZ**.",
+      "why": "Die Merkregel dahinter: AWS lässt Daten **gern rein und intern kurz laufen** — bezahlt wird Distanz (AZ, Region, Internet) und der Umweg über öffentliche Adressen. Die Public-IP-Falle ist die gemeinste: gleiche AZ, aber öffentlich adressiert = Transferkosten.",
+      "example": "Zwei Instanzen in derselben AZ tauschen über **Elastic-IP-Adressen** Daten → kostet, obwohl sie Rack an Rack stehen. Fix: **private IPs** verwenden — derselbe Traffic wird kostenlos.",
+      "examTrap": "Zwei Prüf-Klassiker: **Cross-AZ zählt doppelt** (out + in) und **öffentliche IPs kosten auch AZ-intern**. „Ingress kostet“ ist immer falsch — rein ist frei.",
+      "mnemonic": "**Merke:** **Rein und AZ-intern-privat ist frei** — bezahlt werden Distanz und öffentliche IPs.",
+      "keywords": [
+        "Datentransferkosten",
+        "Cross-AZ beide Richtungen",
+        "Public IP",
+        "Egress"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-190",
+    "backStructured": {
+      "summary": "NAT kostet **pro Stunde + pro verarbeitetem GB**. **Ursachen:** (1) Der gesamte **S3-/DynamoDB-Traffic** läuft durchs NAT. (2) **Ein NAT pro AZ** (HA) verdreifacht bei 3 AZs die Stundenkosten. **Fixes:** (1) **Gateway Endpoints** — kostenlos, umgehen das NAT. (2) HA-Bedarf gegen Kosten abwägen: zentrales NAT ist billiger, aber ein SPOF.",
+      "why": "Die **GB-Gebühr ist der Hebel**: Bulk-Traffic zu S3/DynamoDB gehört nie durchs NAT, weil der Gateway Endpoint denselben Weg **gratis anbietet** — das ist laut Faktenbasis DIE Standard-Kostenentscheidung der Domain. Die Stundengebühr **multipliziert sich** dagegen still mit der AZ-Zahl.",
+      "example": "VPC-Flow-Log-Analyse zeigt: 80 % des NAT-Volumens gehen an S3 → **Gateway Endpoint anlegen**, Route Tables anpassen — die GB-Gebühr für diesen Traffic fällt auf null.",
+      "examTrap": "Reihenfolge der richtigen Antwort: **erst Endpoints, dann NAT-Topologie** — „größeres NAT“ oder „NAT-Instanz statt Gateway“ sind die Distraktoren. Der Endpoint-Fix ist auch die Antwort auf Compliance („Traffic verlässt AWS nicht“).",
+      "mnemonic": "**Merke:** Die NAT-Rechnung drückt man mit **Gateway Endpoints** — S3-Traffic hat im NAT nichts verloren.",
+      "keywords": [
+        "NAT Gateway",
+        "GB-Gebühr",
+        "Gateway Endpoints",
+        "Ein NAT pro AZ"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-191",
+    "backStructured": {
+      "summary": "**Gateway Endpoint** (nur **S3 und DynamoDB**): **komplett kostenlos** — kein Stundenpreis, keine Datengebühr. **Interface Endpoint** (PrivateLink): kostet **pro Stunde je ENI je AZ + pro GB**. Summiert sich über 3 AZs — bleibt bei hohem Volumen aber **günstiger als NAT-Datenverarbeitung**.",
+      "why": "Die Architektur erklärt den Preis: Der Gateway Endpoint ist nur ein Routing-Eintrag (nichts läuft, nichts kostet), der Interface Endpoint sind echte ENIs mit Kapazität dahinter. Deshalb die Faustregel-Kaskade: **erst Gateway (gratis), dann Interface (billig), erst dann NAT (teuer)**.",
+      "example": "12 Interface Endpoints × 3 AZs = **36 ENI-Stunden-Posten** — prüfen, ob wirklich jeder Service einen eigenen Endpoint braucht, oder ob **zentrale Endpoints** in einer Shared-VPC (RAM) die Flotte versorgen.",
+      "examTrap": "Zahlungs-Zuordnung ist der Prüfstoff: **Gateway = gratis, Interface = Stunde + GB.** Und die Service-Grenze bleibt: Gateway kann **nur S3/DynamoDB** — für alles andere führt am Interface Endpoint kein Weg vorbei.",
+      "mnemonic": "**Merke:** **Gateway Endpoints sind gratis, Interface Endpoints kosten Stunde und GB** — beide schlagen das NAT.",
+      "keywords": [
+        "Gateway Endpoint kostenlos",
+        "Interface Endpoint",
+        "ENI pro AZ",
+        "PrivateLink"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-192",
+    "backStructured": {
+      "summary": "Zwei Effekte: **(1)** Transfer **OUT von CloudFront ist billiger** als direkt aus EC2/S3. **(2)** Gecachter Content erreicht den Origin **gar nicht erst**. Dazu: Der **Origin-Fetch von S3/EC2 zu CloudFront ist kostenlos**. Wer statischen Content direkt aus S3 liefert, zahlt drauf.",
+      "why": "CloudFront dreht die **Egress-Rechnung doppelt**: Der Edge-Ausgang hat bessere GB-Preise, und die **Cache-Hit-Rate** reduziert das Origin-Volumen — bezahlt wird also weniger UND zum **günstigeren Tarif**. Der kostenlose Origin-Fetch macht die Kette komplett.",
+      "example": "1 TB statischer Assets monatlich direkt aus S3 → voller S3-Egress-Preis. Mit CloudFront davor: **Origin-Fetch gratis**, **90 % Cache-Hits**, Rest zum niedrigeren CloudFront-Tarif — spürbar günstiger UND schneller.",
+      "examTrap": "Der Denkfehler im Distraktor: „zusätzlicher Dienst = zusätzliche Kosten“ — bei nennenswertem Egress gilt das Gegenteil. Bonus-Hebel: **Price Classes** begrenzen die Edge-Regionen und drücken die Kosten weiter.",
+      "mnemonic": "**Merke:** **CloudFront verbilligt den Egress doppelt** — günstigerer Tarif plus Cache statt Origin.",
+      "keywords": [
+        "CloudFront-Kosten",
+        "Origin-Fetch kostenlos",
+        "Cache-Hit",
+        "Egress-Tarif"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-193",
+    "backStructured": {
+      "summary": "**Zwischen den AZs — in beide Richtungen berechnet.** Typische Quellen: **Cross-Zone LB beim NLB** (beim ALB inklusive), App-Server in AZ-A gegen die **DB in AZ-B**, Replikation zwischen AZs. Kein Grund, HA aufzugeben — aber Traffic **AZ-lokal** halten, wo möglich.",
+      "why": "Multi-AZ ist Architektur-Pflicht, aber jeder AZ-Querverkehr trägt eine **Doppelgebühr** — bei chatty Microservices und Read-Heavy-Apps summiert sich das unsichtbar. Die Optimierung heißt **Lokalität**: Reads gegen die Replica in der eigenen AZ, LB-Ziele **zonenbewusst**.",
+      "example": "App-Flotte in 3 AZs fragt eine Aurora in AZ-a ab → **Reader pro AZ** bereitstellen und per zone-aware Routing die lokale Replica bevorzugen — der Cross-AZ-Posten schrumpft massiv.",
+      "examTrap": "Das Detail-Paar ist prüfbar: **NLB-Cross-Zone kostet, ALB-Cross-Zone ist inklusive.** Und die Antwort ist nie „Multi-AZ abschaffen“, sondern Traffic-Lokalität — HA bleibt gesetzt.",
+      "mnemonic": "**Merke:** **Cross-AZ kostet doppelt und heimlich** — HA behalten, Traffic lokal halten.",
+      "keywords": [
+        "Cross-AZ-Kosten",
+        "NLB vs ALB Cross-Zone",
+        "Traffic-Lokalität",
+        "Multi-AZ"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-194",
+    "backStructured": {
+      "summary": "DX hat **hohe Fixkosten** (Port-Stunden + Partner-Gebühren), aber deutlich **niedrigere Transfer-Out-Raten pro GB**. Lohnt bei **konstant hohem, vorhersehbarem Volumen** (mehrere TB/Monat). Bei **sporadischem** Traffic: Internet/VPN. In Prüfungsfragen ist DX meist die Antwort auf **konsistente Latenz**, nicht auf Kosten.",
+      "why": "Es ist eine klassische **Fixkosten-Amortisation**: Der Port kostet immer, der GB-Rabatt zahlt ihn erst ab einem **Schwellenvolumen** zurück. Deshalb trennt die Prüfung sauber: Kosten-Argument nur bei Dauervolumen — das eigentliche DX-Verkaufsargument ist die **private, konsistente Leitung**.",
+      "example": "On-prem-Backup schiebt konstant 40 TB/Monat nach AWS → die DX-GB-Rate amortisiert den Port locker. Gelegentliche Deployments und Admin-Traffic → **Site-to-Site VPN** genügt.",
+      "examTrap": "Signalwort-Trennung: **„vorhersehbar, hohes Dauervolumen“ → DX als Kostenantwort** · **„konsistente Latenz / private Verbindung“ → DX als Qualitätsantwort** · „sporadisch“ → VPN. DX als Pauschal-Sparhebel ist der Distraktor.",
+      "mnemonic": "**Merke:** **DX rechnet sich erst mit Dauervolumen** — sein eigentliches Argument ist die konsistente Leitung.",
+      "keywords": [
+        "Direct Connect",
+        "Fixkosten vs GB-Rate",
+        "TB/Monat",
+        "VPN-Alternative"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-195",
+    "backStructured": {
+      "summary": "**Fast nie.** GA hat einen **festen Stundenpreis + Transfer-Aufschlag** — ein **Performance-/Failover-Werkzeug** (non-HTTP, statische IPs, Sub-Minuten-Failover), **kein Kostenhebel**. In Kostenfragen ist **CloudFront** die Antwort, weil es Egress **verbilligt**.",
+      "why": "Die beiden Edge-Dienste haben gegensätzliche Kostenprofile: CloudFront **senkt** die Rechnung (Cache + Tarif), GA **erhöht** sie (Aufschlag für Anycast-Routing). GA kauft man für Eigenschaften, die sonst niemand liefert — nie zum Sparen.",
+      "example": "Frage nennt „Kosten senken für globale Content-Auslieferung“ → **CloudFront**. Frage nennt „UDP, statische IPs, Failover in Sekunden“ → **GA** — der Preis ist dort nicht das Kriterium.",
+      "examTrap": "Die Falle ist die Edge-Verwechslung: Beide klingen nach „global schneller“ — aber in einer **Kosten**-Frage ist GA praktisch immer der Distraktor gegen CloudFront.",
+      "mnemonic": "**Merke:** **Global Accelerator kostet extra, CloudFront spart** — in Kostenfragen gewinnt immer CloudFront.",
+      "keywords": [
+        "Global Accelerator",
+        "Kein Kostenhebel",
+        "CloudFront",
+        "Aufschlag"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-196",
+    "backStructured": {
+      "summary": "**Ja.** Eine EIP ohne laufende gebundene Instanz kostet eine **Stundengebühr** — und seit **Februar 2024** berechnet AWS **jede öffentliche IPv4** (auch gebundene). Hebel: ungenutzte EIPs **freigeben**, **IPv6** nutzen, Instanzen **ohne Public IP** hinter NAT/ALB betreiben.",
+      "why": "Das IPv4-Charging hat die alte Regel („**gebunden = gratis**“) gekippt: Öffentliche v4-Adressen sind knapp, AWS bepreist jetzt den **Besitz, nicht nur die Verschwendung**. IPv6 ist der strukturelle Ausweg — Adressen dort sind kostenlos und unbegrenzt.",
+      "example": "Kosten-Audit: `describe-addresses` listet 14 ungebundene EIPs aus alten Projekten → **freigeben**; neue Architektur: private Subnets + ALB, öffentliche IPs nur wo zwingend.",
+      "examTrap": "Aktualitätsfalle mit Datum: **Seit 1. Februar 2024 kostet jede öffentliche IPv4** — Optionen, die gebundene EIPs als kostenlos behandeln, sind veraltet. Trusted Advisor findet die ungenutzten.",
+      "mnemonic": "**Merke:** Seit **Februar 2024 kostet jede öffentliche IPv4** — freigeben, verstecken oder auf IPv6 wechseln.",
+      "keywords": [
+        "Elastic IP",
+        "IPv4-Charging Feb 2024",
+        "IPv6 kostenlos",
+        "Ungenutzte EIPs"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-197",
+    "backStructured": {
+      "summary": "**Cost Explorer**: **rückblickend** analysieren (13 Monate + Forecast), inkl. **RI-/SP-Empfehlungen**. **AWS Budgets**: proaktiv **warnen UND handeln** — **Budget Actions** wenden IAM-/SCP-Policies an und **stoppen EC2/RDS wirklich**. **CUR**: der **Rohdaten-Export** nach S3 für eigene Analysen (Athena/QuickSight) — dokumentiert, erkennt nichts.",
+      "why": "Drei Werkzeuge, **drei Zeitrichtungen**: Explorer schaut zurück und projiziert, Budgets bewacht die Zukunft mit **Schwellen und Durchgriff**, der CUR ist das **Rohmaterial** für alles Eigene. Die Prüfung testet fast nur die Zuordnung per Verb im Szenario.",
+      "example": "„Wenn das Monatsbudget 90 % erreicht, sollen die Dev-Instanzen **automatisch stoppen**“ → **Budgets mit Budget Action** — kein anderer der drei kann handeln.",
+      "examTrap": "Das Signalwort **„automatisch eingreifen/stoppen“ → Budget Actions** — Cost Explorer und CUR sind dort immer Distraktoren. Umgekehrt: „letzte 13 Monate analysieren“ → Explorer, nie Budgets.",
+      "mnemonic": "**Merke:** **Explorer analysiert, Budgets handelt, der CUR liefert Rohdaten** — stoppen kann nur die Budget Action.",
+      "keywords": [
+        "Cost Explorer",
+        "Budget Actions",
+        "CUR",
+        "13 Monate"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-198",
+    "backStructured": {
+      "summary": "**Cost Allocation Tags**: Ressourcen taggen (`Department=Marketing`), die Tags in der Billing-Console **aktivieren** — dann gruppiert Cost Explorer danach. **Falle: Tags wirken erst AB der Aktivierung — rückwirkend gibt es nichts.** Durchsetzung via **Tag Policies** (Organizations) oder eine **SCP** gegen ungetaggte Ressourcen.",
+      "why": "Kostenzuordnung ist ein **Datenerfassungs-Problem**: Die Billing-Pipeline schreibt Tag-Dimensionen erst mit, wenn sie aktiviert sind — vergangene Nutzung bleibt **für immer unzugeordnet**. Deshalb gehört **Tag-Governance** an den Anfang, nicht ans Quartalsende.",
+      "example": "CFO-Report pro Abteilung → Tag-Standard definieren, **Tags in der Billing-Console aktivieren**, per **Tag Policy** erzwingen — ab dann liefert Cost Explorer die Gruppierung `Department=…`.",
+      "examTrap": "Die Rückwirkungs-Falle ist der Prüfungskern: **Aktivierung wirkt nur nach vorn.** Zweite Ebene: Tags existieren ≠ Tags aktiv — der Aktivierungs-Schritt in der Billing-Console wird gern vergessen.",
+      "mnemonic": "**Merke:** **Cost Allocation Tags zählen erst ab Aktivierung** — rückwirkend bleibt die Rechnung anonym.",
+      "keywords": [
+        "Cost Allocation Tags",
+        "Nicht rückwirkend",
+        "Tag Policies",
+        "Billing-Console"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-199",
+    "backStructured": {
+      "summary": "**Consolidated Billing**: Die Nutzung **aller Accounts wird zusammengerechnet** — **(a) Volumen-Staffelpreise** greifen früher (z. B. S3), **(b) RIs/Savings Plans werden accountübergreifend geteilt**: Eine ungenutzte RI in Account A kommt Account B zugute. Plus: **eine Rechnung statt zwanzig**.",
+      "why": "Die Organization macht aus vielen kleinen Verbrauchern **einen großen**: Staffelrabatte, die kein Einzel-Account je erreichen würde, und ein **Commitment-Pool**, in dem Reservierungen automatisch dorthin fließen, wo sie gebraucht werden — Sharing lässt sich **pro Account auch abschalten**.",
+      "example": "Account A hat eine RI für `m6g.large`, die Instanz wurde abgeschaltet; Account B startet denselben Typ → **der RI-Rabatt wandert automatisch zu B** — kein manuelles Umbuchen.",
+      "examTrap": "Beide Effekte einzeln kennen: **Staffelpreise** (aggregiertes Volumen) und **RI/SP-Sharing** (Discount-Pool). Distraktor ist „Organizations gibt pauschal Mengenrabatt“ — der Mechanismus sind die geteilten Staffeln und Commitments.",
+      "mnemonic": "**Merke:** **Consolidated Billing poolt Volumen und Commitments** — ungenutzte RIs verschenken nichts mehr.",
+      "keywords": [
+        "Consolidated Billing",
+        "RI/SP-Sharing",
+        "Volumen-Staffeln",
+        "Organizations"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-200",
+    "backStructured": {
+      "summary": "**AWS Trusted Advisor** — prüft automatisch gegen Best Practices in fünf Kategorien (**Cost Optimization**, Performance, Security, Fault Tolerance, Service Limits): idle EC2, ungenutzte EIPs, verwaiste Load Balancer, unterausgelastete RDS. **Haken: Der volle Check-Umfang braucht Business- oder Enterprise-Support.**",
+      "why": "Trusted Advisor ist der **automatische Auditor** ohne Setup — aber sein Umfang ist **support-plan-gestaffelt**: Basic/Developer sehen nur die Kern-Checks, die volle Kosten-Kategorie öffnet erst der Business-Plan. Für konkrete Zielinstanz-Empfehlungen bleibt der (kostenlose) **Compute Optimizer** zuständig.",
+      "example": "Schnell-Audit im fremden Account: Trusted Advisor Cost-Checks durchgehen → 9 idle Instanzen, 14 lose EIPs, 3 verwaiste ELBs — die **Quick-Wins ohne eigene Analyse**.",
+      "examTrap": "Der Support-Plan-Haken ist die prüfbare Bedingung: **volle Checks erst ab Business Support.** Abgrenzung zur Vorgänger-Karte: Advisor **findet** Verschwendung, Compute Optimizer **empfiehlt** den Ersatztyp.",
+      "mnemonic": "**Merke:** **Trusted Advisor findet die Verschwendung** — aber die volle Checkliste kostet Business Support.",
+      "keywords": [
+        "Trusted Advisor",
+        "Fünf Kategorien",
+        "Business Support",
+        "Idle-Ressourcen"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-201",
+    "backStructured": {
+      "summary": "**Dedicated Host** — nur er macht **Sockets und physische Cores sichtbar** und bietet Placement-Kontrolle → Voraussetzung für per-socket/per-core-BYOL (Oracle, SQL Server, Windows Server). **Dedicated Instances** isolieren zwar physisch, zeigen aber **keine Host-Details** und tragen solche Lizenzen **nicht**.",
+      "why": "Das **Lizenzmodell diktiert die Sichtbarkeit**: Wer pro Core lizenziert, muss **Cores zählen** und nachweisen können — das geht nur mit einem festen, sichtbaren physischen Host. Dedicated Instances garantieren nur „kein fremder Mieter auf der Hardware“, nicht „du **kennst die Hardware**“.",
+      "example": "Oracle-BYOL per Prozessor-Lizenz → **Dedicated Host** buchen, Lizenz auf dessen Cores zuordnen, **License Manager** überwacht die Compliance; Host Affinity hält die Instanz auf demselben Blech.",
+      "examTrap": "Das Begriffspaar ist die klassische Verwechslungsfalle: **Isolation können beide — Core-/Socket-Sichtbarkeit nur der Host.** Signalwort „Lizenz an physische Hardware gebunden“ entscheidet sofort.",
+      "mnemonic": "**Merke:** **Lizenz an Hardware gebunden heißt Dedicated Host** — die Dedicated Instance kennt ihre Cores nicht.",
+      "keywords": [
+        "Dedicated Host",
+        "Dedicated Instances",
+        "BYOL per Core",
+        "License Manager"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-202",
+    "backStructured": {
+      "summary": "**Nein.** Eine **Regional RI gibt nur den Rabatt — KEINE Kapazität.** Kapazität garantieren nur **zonale RIs** (Rabatt + Kapazität in einer AZ) und **ODCRs** (Kapazität, **kein** Rabatt). **Königsweg: ODCR + Savings Plan/Regional RI stapeln** → Kapazität UND Rabatt.",
+      "why": "Regional RIs kauften **Flexibilität** (AZ-unabhängig, Size Flexibility) und gaben dafür die **Reservierung auf** — der Name täuscht. Die **Stapelbarkeit** löst das Dilemma: ODCR hält den Platz frei, das parallele Preis-Commitment rabattiert die Nutzung darauf.",
+      "example": "Kritischer Failover-Bestand: **ODCR über 20 `r6g.xlarge` in eu-central-1a** anlegen; der bestehende **Compute SP** rabattiert die Stunden, sobald sie laufen — Garantie und Preis zugleich.",
+      "examTrap": "Laut Faktenbasis eine der härtesten Fallen der Domain: **Regional RI = Rabatt ohne Platz, ODCR = Platz ohne Rabatt, zonale RI = beides in genau einer AZ.** Zusatz: Zonale RI-Discounts greifen NICHT auf ODCRs — stapeln geht nur mit SP/Regional RI.",
+      "mnemonic": "**Merke:** **Regional reserviert nichts** — Platz garantiert die zonale RI oder die ODCR, den Rabatt stapelt man dazu.",
+      "keywords": [
+        "Regional RI",
+        "Zonal RI",
+        "ODCR",
+        "Stapelbar"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-203",
+    "backStructured": {
+      "summary": "Die **Table Class „Standard-IA“**: bis zu **60 % geringere Storage-Kosten**, dafür **höhere Durchsatzkosten**. **Faustregel: lohnt, wenn Storage > 50 % der Tabellenkosten.** Der Wechsel ist eine **Einstellung** — kein Datenumzug, kein Code. Bei traffic-lastigen Tabellen bleibt **Standard** günstiger. Ergänzend: **TTL** löscht Ablaufdaten kostenlos.",
+      "why": "Standard-IA verschiebt die **Kostenkurve**: billigeres Lager, teurerer Zugriff — dieselbe Logik wie bei S3-IA, nur als Tabellenklasse. Die **50 %-Schwelle** ist der mathematische **Kipppunkt**, ab dem die Storage-Ersparnis die Durchsatz-Aufschläge übersteigt.",
+      "example": "Audit-Log-Tabelle: 2 TB Daten, wenige Reads, Storage = 70 % der Kosten → **Table Class auf Standard-IA umstellen** (Konsole/API, eine Einstellung) — Ersparnis ohne Migration.",
+      "examTrap": "Die **50 %-Schwelle** ist der prüfbare Umschaltpunkt — Standard-IA auf eine traffic-lastige Tabelle anzuwenden macht sie **teurer**. Und der No-Migration-Fakt gehört zur Antwort: Es ist ein Schalter, kein Umzug.",
+      "mnemonic": "**Merke:** **DynamoDB Standard-IA lohnt erst ab 50 % Storage-Anteil** — ein Schalter, kein Datenumzug.",
+      "keywords": [
+        "DynamoDB Standard-IA",
+        "60 % Storage-Ersparnis",
+        "50 %-Schwelle",
+        "Table Class"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-204",
+    "backStructured": {
+      "summary": "**Spot Blocks sind ABGEKÜNDIGT** — garantierte Laufzeit zum Spot-Preis gibt es nicht mehr; dafür **On-Demand oder ODCR**. Für Spot-Flotten empfiehlt AWS **price-capacity-optimized**; **lowest-price wird explizit NICHT empfohlen** (höchste Interruption-Rate). **Zusatz:** Der Maximalpreis schützt **nicht** vor Unterbrechung — die **Kapazitätslage** entscheidet.",
+      "why": "Die Strategie-Empfehlung folgt der **Interruption-Ökonomie**: lowest-price jagt den billigsten Pool und wird am häufigsten unterbrochen — die **Neustart-Kosten fressen die Ersparnis**. price-capacity-optimized wägt Preis gegen Pool-Tiefe ab und ist deshalb der **offizielle Default**.",
+      "example": "ASG mit Mixed Instances Policy: **Allocation Strategy `price-capacity-optimized`** + breite Instanztyp-Auswahl (Attribute-based Selection) — billig UND selten unterbrochen.",
+      "examTrap": "Drei Fallen in einer Karte: **Spot Blocks tot** (Aktualität), **lowest-price als Anti-Empfehlung**, **Maximalpreis ≠ Unterbrechungsschutz**. Alle drei tauchen als plausible Distraktoren auf.",
+      "mnemonic": "**Merke:** **Spot Blocks sind Geschichte, lowest-price ist verpönt** — AWS empfiehlt price-capacity-optimized.",
+      "keywords": [
+        "Spot Blocks abgekündigt",
+        "price-capacity-optimized",
+        "lowest-price",
+        "Interruption"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-205",
+    "backStructured": {
+      "summary": "**RDS Extended Support** greift automatisch: Zusatzgebühr **pro vCPU-Stunde** — für **jede** betroffene Instanz, **inklusive Multi-AZ-Standby und jeder Read Replica**. **Nicht durch RIs/SPs rabattiert**, **verdoppelt sich ab Jahr 3** (MySQL 5.7/PostgreSQL 11 seit 1. März 2026). **Einziger Ausweg: das Versions-Upgrade** — z. B. per Blue/Green Deployment.",
+      "why": "Extended Support ist eine bewusst **wachsende Straf-Gebühr**: AWS hält EOL-Engines am Leben, bepreist das aber pro vCPU und eskaliert im dritten Jahr — der **ökonomische Druck ZUM Upgrade** ist das Design. Dass Standby und Replicas mitzählen, **multipliziert den Posten** unbemerkt.",
+      "example": "Multi-AZ MySQL 5.7 mit 2 Read Replicas, je 4 vCPUs = **16 vCPUs zahlen Extended Support**, ab Jahr 3 zum doppelten Satz → das **Blue/Green-Upgrade** auf 8.0 stoppt die Gebühr komplett.",
+      "examTrap": "Drei Prüf-Details: **Standby + Replicas zahlen mit**, **kein RI/SP-Rabatt darauf**, **Year-3-Verdopplung seit 1. März 2026.** Die richtige Antwort ist immer das Upgrade, nie ein Preismodell-Trick.",
+      "mnemonic": "**Merke:** **EOL-Engines zahlen Extended Support pro vCPU** — auf allem, ohne Rabatt, ab Jahr 3 doppelt: upgraden.",
+      "keywords": [
+        "RDS Extended Support",
+        "Pro vCPU-Stunde",
+        "Year-3-Verdopplung",
+        "Blue/Green-Upgrade"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-206",
+    "backStructured": {
+      "summary": "**Nein.** RDS-Stop gilt **maximal 7 aufeinanderfolgende Tage** — danach startet die Instanz **automatisch** wieder (Wartung/Patches). Optionen: ein **Scheduler**, der nach jedem Auto-Restart erneut stoppt, oder **finaler Snapshot + Instanz löschen** (später Restore). Gestoppt entfallen die **Instanzstunden** — weiter laufen **Storage, Snapshots, öffentliche IPv4**. Instanzen mit **Read Replicas lassen sich gar nicht stoppen**.",
+      "why": "Der 7-Tage-Deckel ist **Wartungslogik**, kein Versehen: AWS muss patchen können, also erwacht die Instanz. Für echte Langzeitpausen ist der Snapshot der **ehrliche Weg** — null Instanzkosten, voller Zustand konserviert; der Scheduler ist der Kompromiss, wenn die **Instanz-Identität** (Endpoint, Konfiguration) bestehen bleiben soll.",
+      "example": "Monatspause: **finaler Snapshot → Instanz löschen → bei Bedarf Restore** — oder EventBridge-Regel, die den Auto-Restart erkennt und sofort wieder stoppt.",
+      "examTrap": "Das Zahlen-Trio ist prüfbar: **7 Tage Stop-Maximum**, **Storage/Snapshots kosten weiter**, **mit Read Replicas kein Stop möglich.** „Einfach stoppen für einen Monat“ ist die Falle im Fragentext selbst.",
+      "mnemonic": "**Merke:** **RDS schläft höchstens 7 Tage** — für den Monat heißt es Snapshot und löschen.",
+      "keywords": [
+        "RDS Stop 7 Tage",
+        "Auto-Restart",
+        "Snapshot + Restore",
+        "Storage läuft weiter"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-207",
+    "backStructured": {
+      "summary": "**AWS Cost Anomaly Detection** — **ML-basiert und kostenlos**: lernt das normale Ausgabenmuster je Service/Account und meldet **Abweichungen ohne festen Schwellenwert** — auch schleichende Anstiege. Abgrenzung: **Budgets** = feste Schwellen (+ Actions) · **CUR** = Rohdaten · **Compute Optimizer** = Rightsizing, keine Anomalien.",
+      "why": "Feste Schwellen sind blind für das Schleichende: Ein Budget bei 10.000 $ schweigt, während die Kosten monatlich um 8 % kriechen. Anomaly Detection vergleicht gegen das **gelernte eigene Muster** — die Abweichung ist der Alarm, nicht die absolute Zahl.",
+      "example": "Vergessener Debug-Log-Stream lässt die CloudWatch-Kosten über Wochen leise wachsen → **Anomaly Detection** meldet die Service-Anomalie, lange bevor irgendein Budget reißt; Alerts per SNS ans Team.",
+      "examTrap": "Das Signalwort ist die Schwellen-Losigkeit: **„ungewöhnlich/unerwartet/schleichend, ohne definierten Grenzwert“ → Anomaly Detection** — Budgets ist dort der Distraktor. Bonus-Fakt: Der Dienst ist kostenlos.",
+      "mnemonic": "**Merke:** **Schleichende Kosten fängt die Anomaly Detection** — Budgets sehen nur gerissene Schwellen.",
+      "keywords": [
+        "Cost Anomaly Detection",
+        "ML-basiert kostenlos",
+        "Ohne Schwellenwert",
+        "Budgets-Abgrenzung"
+      ]
+    }
+  }
+]

@@ -1,0 +1,482 @@
+[
+  {
+    "seedKey": "saa-c03-card-151",
+    "backStructured": {
+      "summary": "**Site-to-Site VPN als Backup-Pfad** über das Internet. Fällt DX aus, übernimmt das VPN — mit **geringerer, variabler** Performance, aber die Verbindung bleibt. Das Standard-Resilienz-Pattern bei begrenztem Budget. **Maximale** Resilienz: zwei DX an **zwei verschiedenen Locations**.",
+      "why": "Das VPN kostet fast nichts und nutzt einen **komplett unabhängigen Pfad** (Internet statt dedizierter Leitung) — genau die Diversität, die Resilienz braucht. BGP-Routing bevorzugt im Normalfall DX und schwenkt beim Ausfall automatisch aufs VPN um.",
+      "example": "DX (1 Gbps) primär + **Site-to-Site VPN** als Standby, beide am selben Virtual Private Gateway/Transit Gateway — beim DX-Ausfall fließt der Traffic mit reduzierter Bandbreite weiter.",
+      "examTrap": "Die Prüfung staffelt nach Budget: **„kostengünstig resilient“ → DX + VPN-Backup** · **„höchste Resilienz“ → zweite DX an zweiter Location.** Eine LAG ist nie die Resilienz-Antwort (vorige Karte).",
+      "mnemonic": "**Merke:** Der günstige DX-Fallback heißt **Site-to-Site VPN** — langsamer, aber ein unabhängiger Pfad.",
+      "keywords": [
+        "Direct Connect",
+        "VPN-Backup",
+        "Resilienz",
+        "BGP-Failover"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-152",
+    "backStructured": {
+      "summary": "**Innerhalb einer VPC**: bis **9001 Bytes MTU** → weniger Overhead, mehr Durchsatz bei großen Transfers. **Über ein Internet Gateway wird auf 1500 Bytes begrenzt** — auch Inter-Region-Peering und VPN haben kleinere MTUs. Jumbo Frames helfen dort nicht.",
+      "why": "Jede Ebene der Paket-Verarbeitung kostet pro Paket — größere Frames heißt **weniger Pakete** für dieselbe Datenmenge. Das lohnt aber nur, wo der Pfad **durchgängig 9001** unterstützt: VPC-intern (inkl. EFA/HPC, Same-Region-Peering); jede 1500er-Etappe erzwingt **Fragmentierung** oder Verwerfen.",
+      "example": "HPC-/Storage-Traffic zwischen Instances **derselben VPC** → MTU 9001 auf den ENIs — spürbar mehr Durchsatz bei Bulk-Transfers.",
+      "examTrap": "Die Grenze ist der Prüfstoff: **VPC-intern 9001, hinter dem IGW 1500** — „Jumbo Frames für schnellere Internet-Downloads“ ist strukturell falsch.",
+      "mnemonic": "**Merke:** **Jumbo Frames (9001) wirken nur VPC-intern** — das Internet Gateway deckelt auf 1500.",
+      "keywords": [
+        "Jumbo Frames",
+        "MTU 9001",
+        "Internet Gateway 1500",
+        "VPC-intern"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-153",
+    "backStructured": {
+      "summary": "**Write: 1 MB/s ODER 1.000 Records/s. Read: 2 MB/s** — im Standard-Modus **geteilt unter allen Consumern**. Record-Größe: Default max **1 MiB**. **Aktualität:** Das Shard-Kontingent stieg im **April 2025 von 500 auf bis zu 20.000 pro Account** (große Regionen) — alte Materialien nennen 500.",
+      "why": "Der Shard ist die Skalierungs- und Ordnungseinheit von Kinesis: Kapazität kauft man in Shards, Reihenfolge gilt **pro Shard** (Partition Key entscheidet die Zuordnung). Die asymmetrischen Limits (1 rein, 2 raus) sind die Rechenbasis jeder Kapazitätsfrage.",
+      "example": "8 MB/s Ingest geplant → mindestens **8 Shards**; sollen 4 Consumer parallel mit voller Rate lesen, kommt Enhanced Fan-out dazu (nächste Karte).",
+      "examTrap": "Das Zahlen-Trio **1 MB/s / 1.000 rec/s / 2 MB/s** wird wörtlich geprüft. Aktualitätsfalle: **Shard-Quota 20.000 seit April 2025** — „500 Shards Maximum“ ist veraltet.",
+      "mnemonic": "**Merke:** Ein Shard schafft **1 MB/s rein und 2 MB/s raus** — und die Account-Quota liegt längst bei 20.000.",
+      "keywords": [
+        "Kinesis Shard",
+        "1 MB/s / 2 MB/s",
+        "1.000 Records/s",
+        "Quota 20.000"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-154",
+    "backStructured": {
+      "summary": "Im **Standard-Modus teilen sich ALLE Consumer die 2 MB/s pro Shard** → bei fünf bleiben je ~400 KB/s, Latenz steigt Richtung Sekunde. **Fix: Enhanced Fan-out** — jeder **registrierte** Consumer bekommt **eigene 2 MB/s pro Shard** und **Push via HTTP/2** (~70 ms statt ~200 ms). Grenze: **max 20 registrierte Consumer**.",
+      "why": "Shared Fan-out ist ein **Buffet mit einer Ausgabe**: Jeder zusätzliche Consumer verkleinert die Portion aller. Enhanced Fan-out stellt jedem Consumer eine eigene Ausgabe hin — **dedizierte Bandbreite** plus **Push-Zustellung** statt Polling, bezahlt pro Consumer-Shard-Stunde und GB.",
+      "example": "5 Analytics-Consumer auf einem Stream: **alle als Enhanced-Fan-out-Consumer registrieren** → jeder liest 2 MB/s pro Shard mit ~70 ms Latenz, keiner hungert den anderen aus.",
+      "examTrap": "Signaturmuster im Szenario: **„mehrere Consumer, ALLE werden langsam“** = Shared-Egress-Teilung → Enhanced Fan-out. Die Grenzen (20 Consumer, ~70 ms) sind prüfbare Details; Resharding wäre hier die falsche Baustelle.",
+      "mnemonic": "**Merke:** Teilen sich Consumer die 2 MB/s, hungern alle — **Enhanced Fan-out gibt jedem seine eigene Pipe**.",
+      "keywords": [
+        "Enhanced Fan-out",
+        "2 MB/s pro Consumer",
+        "HTTP/2 Push",
+        "20 Consumer"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-155",
+    "backStructured": {
+      "summary": "**Resharding**: **Shard Split** (1 → 2, mehr Kapazität, mehr Kosten) bzw. **Merge** (2 benachbarte → 1) — immer **paarweise**, bequemer via **`UpdateShardCount`**. Oder: **On-Demand-Modus**, der selbst skaliert (bis zum **Doppelten des Peak der letzten 30 Tage**).",
+      "why": "Provisioned verlangt **aktives Kapazitätsmanagement** — Splits verteilen den Key-Raum neu, was bei stark schwankender Last zur Dauerbaustelle wird. Der On-Demand-Modus verlagert das zu AWS und rechnet pro GB ab: teurer pro Einheit, aber **ohne Throttling-Risiko** bei Spikes.",
+      "example": "Ingest verdoppelt sich planbar zum Quartalsende → **`UpdateShardCount`** vorab. Unvorhersehbare virale Spitzen → **On-Demand-Modus** und das Sizing vergessen.",
+      "examTrap": "Zwei Detail-Fallen: Resharding ist **paarweise** (kein 1→5-Split), und On-Demand skaliert nur bis **2× des 30-Tage-Peaks** — ein noch nie dagewesener Extremspike kann trotzdem drosseln.",
+      "mnemonic": "**Merke:** Kinesis wächst per **Split/UpdateShardCount** — oder per **On-Demand** bis zum doppelten 30-Tage-Peak.",
+      "keywords": [
+        "Resharding",
+        "UpdateShardCount",
+        "On-Demand-Modus",
+        "Shard Split"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-156",
+    "backStructured": {
+      "summary": "**KDS**: eigene Consumer-Apps, **Replay** (bis 365 Tage), strikte **Ordnung**. **Amazon Data Firehose**: managed **Delivery** nach S3/Redshift/OpenSearch/Splunk — **kein Code, kein Replay**, near-real-time. **MSK**: **Kafka-kompatibel** für migrierte Kafka-Apps. **Flink**: echtes **Stream-Processing** (SQL/Java) in Echtzeit.",
+      "why": "Die Matrix sortiert nach Job: **Transportieren mit Kontrolle** (KDS), **Abliefern ohne Aufwand** (Firehose), **Kafka-Erbe weiterbetreiben** (MSK), **Rechnen auf dem Strom** (Flink). Kombinationen sind normal: KDS → Flink → Firehose → S3 ist die klassische Pipeline.",
+      "example": "„Clickstream soll einfach in S3 landen, kein eigener Consumer“ → **Firehose**. „Bestehende Kafka-Producer/-Consumer lift-and-shift“ → **MSK**. „Gleitende 1-Minuten-Aggregate in Echtzeit“ → **Flink**.",
+      "examTrap": "Umbenennungs-Falle: **Kinesis Data Firehose heißt Amazon Data Firehose**, **Kinesis Data Analytics heißt Managed Service for Apache Flink** — alte Namen tauchen als Distraktoren auf. Und: Firehose kann **kein Replay**, KDS schon.",
+      "mnemonic": "**Merke:** **KDS transportiert, Firehose liefert ab, MSK spricht Kafka, Flink rechnet** auf dem Strom.",
+      "keywords": [
+        "KDS",
+        "Data Firehose",
+        "MSK",
+        "Apache Flink"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-157",
+    "backStructured": {
+      "summary": "**Ja** — Firehose beherrscht **Format-Konvertierung JSON → Parquet/ORC** nativ (nutzt das **Glue-Schema**), dazu **Dynamic Partitioning** und Kompression. Für komplexere Logik: **Lambda-Transformation** dazwischenschalten. Buffer: **1–128 MB oder 60–900 s** — deshalb **near-real-time**, nicht real-time.",
+      "why": "Firehose ist die **codefreie Ingest-Strecke** in den Data Lake: Schema aus dem Glue Data Catalog, columnar konvertiert und partitioniert abgelegt — die Athena-Abfragen darauf werden automatisch billig (nächste Karte). Der Buffer ist der Preis: Zustellung erst bei **Größen- oder Zeit-Schwelle**.",
+      "example": "Event-Pipeline: Firehose mit **Record Format Conversion (Parquet, Glue-Schema)** + **Dynamic Partitioning nach `eventDate`** → S3 — Athena-ready ohne eine Zeile ETL-Code.",
+      "examTrap": "Das Buffer-Intervall ist der Prüfungshaken: **minimal 60 Sekunden** — wer „Real-time unter 1 s“ braucht, ist bei KDS + eigenem Consumer, nicht bei Firehose. Zahlen 1–128 MB / 60–900 s sind abfragbar.",
+      "mnemonic": "**Merke:** Firehose konvertiert **JSON zu Parquet ohne Code** — aber frühestens nach 60 Sekunden Buffer.",
+      "keywords": [
+        "Firehose",
+        "Parquet-Konvertierung",
+        "Glue-Schema",
+        "Buffer 60–900 s"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-158",
+    "backStructured": {
+      "summary": "Athena kostet **~5 $ pro gescanntem TB** — also die **gescannte Menge** senken: **(1) Partitionierung** (Partition Pruning), **(2) Columnar Format** (Parquet/ORC — nur abgefragte Spalten), **(3) Kompression** (Snappy/ZSTD). Zusammen typisch **85–99 % Ersparnis**. **„Größere Instanz“ gibt es nicht — Athena ist serverless.**",
+      "why": "Das Preismodell macht die Optimierung zur **Datenlayout-Frage**: Wer nach `year/month/day` partitioniert, Parquet schreibt und komprimiert, lässt Athena statt 2 TB nur **20 GB** anfassen — dieselbe Query, ein **Bruchteil des Preises** und schneller obendrein.",
+      "example": "Query auf 2 TB JSON: 10 $ pro Lauf. Nach **Parquet + Partitionierung + Snappy**: dieselbe Auswertung scannt ~25 GB → **~0,13 $** — Faktor ~80.",
+      "examTrap": "Der Distraktor „Compute vergrößern“ scheitert am Serverless-Modell — es gibt keinen Regler. Die drei Hebel wirken multiplikativ; Bonus-Werkzeug: **CTAS**, um Bestandsdaten einmalig nach Parquet zu konvertieren.",
+      "mnemonic": "**Merke:** Athena wird billig über **Partitionen, Parquet und Kompression** — bezahlt wird pro gescanntem TB.",
+      "keywords": [
+        "Athena",
+        "5 $/TB",
+        "Partition Pruning",
+        "Parquet"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-159",
+    "backStructured": {
+      "summary": "**Athena** — serverless, kein Cluster, Bezahlung pro Query. **Redshift**: eigener Cluster für **dauerhafte, komplexe BI-Workloads** (columnar MPP). **Redshift Spectrum**: erweitert einen **bestehenden** Redshift-Cluster auf S3-Daten. **EMR**: wenn du Hadoop/Spark **selbst kontrollieren** musst. Signalwort **„gelegentlich, kein Cluster verwalten“** → Athena.",
+      "why": "Die Entscheidung folgt Frequenz und Betriebsmodell: Sporadische Ad-hoc-Fragen rechtfertigen keinen 24/7-Cluster (Athena); ständige BI-Last amortisiert ihn (Redshift); Spectrum ist kein Athena-Ersatz, sondern die S3-Verlängerung eines **vorhandenen** Clusters; EMR kauft maximale Framework-Kontrolle mit maximalem Betriebsaufwand.",
+      "example": "Data-Science-Team fragt 2–3× pro Woche ad hoc Parquet-Daten in S3 ab → **Athena**. Dashboard-Flotte mit Sub-Sekunden-SLAs auf kuratierten Sternschemata → **Redshift**.",
+      "examTrap": "Spectrum-Falle: Es **setzt einen laufenden Redshift-Cluster voraus** — als Standalone-Antwort auf „gelegentliche S3-Queries“ ist es immer falsch. „Kein Cluster verwalten“ disqualifiziert EMR und Redshift gleichzeitig.",
+      "mnemonic": "**Merke:** **Gelegentlich und serverless heißt Athena** — Spectrum braucht immer schon einen Redshift-Cluster.",
+      "keywords": [
+        "Athena",
+        "Redshift",
+        "Redshift Spectrum",
+        "EMR"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-160",
+    "backStructured": {
+      "summary": "**Glue**: serverless **ETL** + **Data Catalog** (zentrale Metadaten für Athena/Redshift/EMR) + **Crawler** (Schema-Erkennung). **DMS**: Datenbank-**Migration/Replikation** (homogen und heterogen). **Lake Formation**: feingranulare **Berechtigungen** auf dem Data Lake (Tabellen/Spalten/Zeilen) — **Governance, kein ETL**.",
+      "why": "Drei Rollen im Data-Lake-Ökosystem: Glue **bewegt und beschreibt** Daten (Transformation + Katalog), DMS **holt sie aus Datenbanken heraus** (einmalig oder als CDC-Dauerreplikation), Lake Formation **regelt, wer was sehen darf** — es baut auf dem Glue-Katalog auf, ersetzt ihn aber nicht.",
+      "example": "„Analysten dürfen nur die Spalten ohne PII sehen“ → **Lake Formation Column-Level Permissions**. „Oracle kontinuierlich nach S3 replizieren“ → **DMS (CDC)**. „CSV-Wildwuchs automatisch katalogisieren“ → **Glue Crawler**.",
+      "examTrap": "Die Verwechsler-Paare: **Glue (ETL) vs. DMS (DB-Migration)** — beide „bewegen Daten“, aber DMS spricht Datenbank-Engines; **Lake Formation vs. IAM** — Zeilen-/Spalten-Granularität kann nur Lake Formation.",
+      "mnemonic": "**Merke:** **Glue transformiert und katalogisiert, DMS migriert Datenbanken, Lake Formation vergibt die Rechte.**",
+      "keywords": [
+        "Glue",
+        "DMS",
+        "Lake Formation",
+        "Data Catalog"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-161",
+    "backStructured": {
+      "summary": "Bis zu **~90 % günstiger** als On-Demand. **Bedingung: Der Workload muss unterbrechbar sein** — AWS kann die Instanz mit **2 Minuten Vorwarnung** zurückholen. Ideal: Batch, CI/CD, Big Data, stateless Worker, **EMR Task-Nodes**. Falsch: Datenbanken, Stateful-Sessions, alles ohne Checkpointing.",
+      "why": "Spot verkauft ungenutzte Kapazität — der Rabatt ist der Preis für die Rückrufoption. Tauglich ist ein Workload nur, wenn ein Abbruch **billig** ist (Checkpoint, Queue-Retry, idempotente Tasks). Die 2-Minuten-Notice (IMDS + EventBridge) reicht genau für geordnetes Aufräumen.",
+      "example": "Rendering-Farm: Frames aus einer SQS-Queue, jeder Task idempotent → **Spot-Flotte**; die Interruption-Notice triggert Checkpoint + Requeue, kein Frame geht verloren.",
+      "examTrap": "Zwei Zusatz-Fallen aus der Faktenbasis: **Der Maximalpreis schützt NICHT vor Unterbrechung** (die Kapazitätslage entscheidet), und **Spot Blocks sind abgekündigt** — „garantierte Laufzeit zum Spot-Preis“ gibt es nicht mehr.",
+      "mnemonic": "**Merke:** Spot heißt **bis zu 90 % Rabatt gegen 2-Minuten-Kündigungsfrist** — nur für Unterbrechbares.",
+      "keywords": [
+        "Spot Instances",
+        "90 %",
+        "2-Minuten-Notice",
+        "Unterbrechbar"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-162",
+    "backStructured": {
+      "summary": "**Compute SP**: bis **66 %**, total flexibel — jede Family, Region, OS, **deckt auch Fargate UND Lambda** ab. **EC2 Instance SP**: bis **72 %**, gebunden an **eine Family in einer Region** (flexibel nur Size/OS/Tenancy), kein Fargate/Lambda. Faustregel: **6 Prozentpunkte mehr Rabatt gegen jede Flexibilität**.",
+      "why": "Beide committen einen **$/Stunde-Betrag**, nicht einen Instance-Typ — der Unterschied ist der Geltungsbereich. Wer weiß, dass `m7g` in eu-central-1 die nächsten drei Jahre läuft, nimmt die 72 %. Wer Migration zu Graviton, anderen Regionen oder Serverless plant, kauft mit dem Compute SP Zukunftssicherheit.",
+      "example": "Roadmap sagt „Teile der Flotte wandern 2027 zu Fargate“ → **Compute SP** — der Rabatt wandert mit. Stabile, festgelegte Kern-Flotte → **EC2 Instance SP** für die vollen 72 %.",
+      "examTrap": "Die Fargate/Lambda-Abdeckung ist das prüfungsrelevante Alleinstellungsmerkmal des Compute SP. Zweite Ebene: Ein **EC2 Instance SP auf `m5` wird beim Graviton-Wechsel wertlos** — Familienbindung ernst nehmen.",
+      "mnemonic": "**Merke:** **Compute SP folgt dir überallhin (66 %), EC2 Instance SP zahlt mehr für Treue (72 %).**",
+      "keywords": [
+        "Compute SP",
+        "EC2 Instance SP",
+        "66 vs 72 %",
+        "Fargate/Lambda"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-163",
+    "backStructured": {
+      "summary": "Der Rabatt ist **nicht** der Unterschied (SP 66/72 % ≈ RI 66/72 %). Entscheidend: **(1)** SPs decken **auch Fargate und Lambda** ab — RIs nur EC2. **(2)** Nur **Standard RIs** sind im **RI Marketplace verkäuflich** — SPs niemals. Strukturell: SP = Commitment auf **$/Stunde**, RI = Commitment auf einen **Instance-Typ**.",
+      "why": "Die verbreitete Kurzformel „SP flexibler, RI mehr Rabatt“ ist **falsch** — die Prozentpaare sind identisch (72/72, 66/66). Was wirklich trennt: der **Geltungsbereich** (Serverless-Abdeckung) und die **Exit-Option** (Marketplace). Wer beides nicht braucht, entscheidet nach Verwaltungskomfort.",
+      "example": "„Wir wollen notfalls aus dem Commitment aussteigen können“ → **Standard RI** (verkäuflich). „Unser Commitment soll die Fargate-Migration überleben“ → **Compute SP**.",
+      "examTrap": "Die Rabatt-Gleichheit ist selbst die Falle: Optionen, die SPs oder RIs pauschal „mehr Rabatt“ zuschreiben, sind Distraktoren. Merke die zwei echten Unterschiede — **Abdeckung** und **Verkäuflichkeit**.",
+      "mnemonic": "**Merke:** SP und RI rabattieren **gleich** — SPs decken **Serverless** ab, nur Standard-RIs sind **verkäuflich**.",
+      "keywords": [
+        "Savings Plans",
+        "Reserved Instances",
+        "RI Marketplace",
+        "Gleiche Rabatte"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-164",
+    "backStructured": {
+      "summary": "**Falsch.** Savings Plans geben **ausschließlich einen Preisnachlass — KEINE Kapazitätsgarantie**. Ist eine AZ ausverkauft, hilft der SP nicht. Für garantierte Kapazität: **On-Demand Capacity Reservation (ODCR)** oder **Zonal RI**. Beides **kombinierbar**: ODCR für die Kapazität + SP für den Preis.",
+      "why": "Rabatt und Reservierung sind zwei getrennte Produkte: SPs (und Regional RIs) senken die Rechnung für das, was läuft — sie halten nichts frei. Die ODCR reserviert physische Kapazität in einer AZ (kostet ohne Nutzung trotzdem), gibt aber selbst **keinen** Rabatt; erst die Stapelung mit SP/Regional RI liefert beides.",
+      "example": "DR-Anforderung „im Failover MÜSSEN 50 m6g.xlarge in eu-central-1b verfügbar sein“ → **ODCR über 50 Instanzen** + bestehender **Compute SP** rabattiert die Nutzung.",
+      "examTrap": "Das ist Prüfungsfalle #2 und #3 der Faktenbasis in einem: **Regional RIs und SPs garantieren NIE Kapazität** — bei „garantiert verfügbar“ führt kein Weg an **ODCR oder Zonal RI** vorbei. ODCR allein rabattiert nichts.",
+      "mnemonic": "**Merke:** **SPs zahlen weniger, reservieren nichts** — Kapazität garantiert nur ODCR oder die zonale RI.",
+      "keywords": [
+        "Savings Plans",
+        "ODCR",
+        "Zonal RI",
+        "Keine Kapazitätsgarantie"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-165",
+    "backStructured": {
+      "summary": "**Standard**: bis **72 %**, starr (Family/Region fix) — aber der **einzige** RI-Typ, der im **RI Marketplace verkäuflich** ist: die Notausstiegstür. **Convertible**: bis **66 %**, dafür **tauschbar** (Family/Size/OS/Tenancy, nur gegen gleichen oder höheren Wert) — aber **nicht verkäuflich**.",
+      "why": "Zwei verschiedene Flexibilitäts-Arten: Der Convertible flext **innerhalb** des Commitments (Exchange), der Standard flext **aus dem Commitment heraus** (Verkauf). Wer Workload-Wandel erwartet, tauscht; wer Workload-**Ende** fürchtet, will verkaufen können.",
+      "example": "Projekt könnte in 18 Monaten eingestellt werden → **Standard RI** (im Zweifel verkaufen). Flotte wird sicher weiterlaufen, aber vielleicht auf anderer Family → **Convertible RI** (tauschen).",
+      "examTrap": "Die Kreuz-Falle: Convertible = tauschbar, aber **unverkäuflich** · Standard = verkäuflich, aber **untauschbar** — Optionen kombinieren die Eigenschaften gern falsch. Exchange geht nur wertgleich oder aufwärts.",
+      "mnemonic": "**Merke:** **Standard kann man verkaufen, Convertible kann man tauschen** — nie beides.",
+      "keywords": [
+        "Standard RI",
+        "Convertible RI",
+        "RI Marketplace",
+        "Exchange"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-166",
+    "backStructured": {
+      "summary": "Auf **Graviton (ARM)** wechseln — `m7g` statt `m5`: bis zu **~40 % besseres Preis-Leistungs-Verhältnis**. Voraussetzung: ARM-lauffähige Software (Java/Python/Node/Go meist trivial, native x86-Binaries nicht). **Falle:** Ein **EC2 Instance SP auf `m5` wird durch den Wechsel wertlos** — ein **Compute SP folgt dir**.",
+      "why": "Graviton ist der Kostenhebel **ohne Architekturänderung**: gleiche Instanzrolle, anderer Prozessor. Der Hebel wirkt breit — EC2, RDS, Aurora, ElastiCache, Lambda (arm64 ~20 % günstiger je GB-Sekunde), Fargate — und **managed Services** nehmen ihm sogar das **Kompatibilitätsrisiko** ab.",
+      "example": "Erst risikofrei anfangen: **RDS/Aurora auf Graviton-Instanzklassen** umstellen (AWS betreibt die Engine, Kompatibilität garantiert) — dann die EC2-Flotte nach ARM-Test nachziehen.",
+      "examTrap": "Die Commitment-Falle gehört zur Antwort: Familienwechsel `m5`→`m7g` **strandet einen EC2 Instance SP** — vor der Migration prüfen, ob ein Compute SP (family-agnostisch) die bessere Bindung ist.",
+      "mnemonic": "**Merke:** **Graviton bringt ~40 % Preis-Leistung** — aber nur der Compute SP überlebt den Familienwechsel.",
+      "keywords": [
+        "Graviton",
+        "40 %",
+        "arm64",
+        "Compute SP"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-167",
+    "backStructured": {
+      "summary": "**AWS Compute Optimizer** — analysiert CloudWatch-Metriken und liefert **konkrete Rightsizing-Empfehlungen mit Zielinstanz** (auch für EBS, Lambda, ECS/Fargate, ASGs). **Trusted Advisor** *meldet* nur „idle/underutilized“ als Check — die Empfehlung mit Typ kommt vom Compute Optimizer.",
+      "why": "Die Abgrenzung ist Melden vs. Empfehlen: Trusted Advisor ist der breite Gesundheits-Check (Kosten, Security, Limits — volle Checks erst mit Business/Enterprise Support), Compute Optimizer das ML-Spezialwerkzeug, das aus Metrik-Historie eine konkrete Alternative errechnet — und **kostenlos** ist.",
+      "example": "Flotte bei 8 % CPU → Compute Optimizer empfiehlt **`m5.2xlarge` → `m6g.large`** samt projizierter Ersparnis und Performance-Risiko-Einstufung — umsetzbar statt nur alarmierend.",
+      "examTrap": "Signalwort **„sagt mir KONKRET, welchen Typ“ → Compute Optimizer** — Trusted Advisor ist der Distraktor (und braucht für die vollen Checks Business Support). Cost Explorer zeigt nur, WO Geld fließt.",
+      "mnemonic": "**Merke:** **Trusted Advisor meldet, Compute Optimizer empfiehlt** — mit Zielinstanz und gratis.",
+      "keywords": [
+        "Compute Optimizer",
+        "Trusted Advisor",
+        "Rightsizing",
+        "CloudWatch-Metriken"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-168",
+    "backStructured": {
+      "summary": "**Ausschalten, wenn ungenutzt** — per **Instance Scheduler** (Systems Manager/EventBridge). Bei 12 h × 5 Tagen statt 24/7: **~70 % Ersparnis**. Ergänzend eine **T-Instance** (Burstable). **Falle:** T-Instances sind bei **echter Dauerlast** falsch — die Credits laufen leer.",
+      "why": "Der billigste Compute ist der **ausgeschaltete**: Dev/Test hat **definierte Nutzungsfenster**, also ist ein Zeitplan die sauberste Optimierung — kein Commitment, kein Risiko. Die T-Familie passt dazu, weil Dev-Last genau das **Burst-Profil** hat, für das Credits gedacht sind.",
+      "example": "**Instance Scheduler**: Start 8:00, Stop 20:00, Mo–Fr → aus 168 Wochenstunden werden 60 — die Rechnung folgt linear. EBS-Kosten laufen im Stop weiter (klein, aber erwähnbar).",
+      "examTrap": "Die Schwellen-Tabelle der Faktenbasis: **„Dev/Test außerhalb der Arbeitszeiten“ → Instance Scheduler** — RIs/SPs auf einen 25 %-Auslastungs-Server sind der Distraktor (Commitment auf Leerlauf).",
+      "mnemonic": "**Merke:** Dev-Server spart man per **Zeitplan, nicht per Commitment** — aus ist das neue günstig.",
+      "keywords": [
+        "Instance Scheduler",
+        "Dev/Test",
+        "70 % Ersparnis",
+        "T-Instance"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-169",
+    "backStructured": {
+      "summary": "Lambda kostet **Requests + GB-Sekunden** (Memory × Laufzeit). **Weniger Memory = weniger CPU = längere Laufzeit** → das Produkt kann **steigen**. Richtig: Memory **empirisch** optimieren (**Power Tuning**), **Graviton/arm64** (~20 % günstiger je GB-Sekunde), und ein **Compute SP deckt Lambda ab**.",
+      "why": "Weil CPU an Memory hängt, ist die Kostenkurve U-förmig: Zu wenig Memory verlängert die Laufzeit überproportional, zu viel bezahlt ungenutzte Kapazität — das Optimum findet nur Messung, nicht Intuition. Die SP-Abdeckung gilt dabei **nur für die Duration**, nie für die Request-Gebühr.",
+      "example": "**Lambda Power Tuning** (Step-Functions-Tool) fährt die Funktion mit 128–10.240 MB durch und zeichnet die Kosten-Laufzeit-Kurve — das Minimum liegt oft bei überraschend viel Memory.",
+      "examTrap": "Zwei Fallen: **„Memory runter = billiger“ ist bei CPU-gebundenen Funktionen oft falsch**, und **die Request-Gebühr wird von keinem SP rabattiert** — nur die GB-Sekunden.",
+      "mnemonic": "**Merke:** Lambda-Kosten sind **Memory mal Zeit** — messen statt raten, arm64 nehmen, SP deckt nur die Duration.",
+      "keywords": [
+        "Lambda-Kosten",
+        "GB-Sekunden",
+        "Power Tuning",
+        "arm64"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-170",
+    "backStructured": {
+      "summary": "**ECS auf EC2.** Bei konstanter Dauerlast ist Fargate teurer — auf EC2 wirken **Spot, RIs und Savings Plans**. **Fargate** lohnt bei **schwankender/unvorhersehbarer** Last oder wenn der Ops-Overhead teurer ist als der Compute-Aufschlag. (Fargate Spot existiert, ist aber ebenfalls unterbrechbar.)",
+      "why": "Es ist dieselbe Rechnung wie bei Serverless generell: Fargate rechnet pro Task-Sekunde ohne Leerlaufrisiko — bei 24/7-Volllast gibt es aber **keinen Leerlauf**, den man vermeiden könnte, und der **Komfort-Aufschlag** bleibt. EC2 öffnet dann die **volle Preis-Werkzeugkiste** (SP + Spot-Anteil in der Capacity-Provider-Strategie).",
+      "example": "Konstante 40-Task-Grundlast → **ECS auf EC2** mit Compute SP + 30 % Spot-Kapazität. Nächtliche Verarbeitungs-Spitzen obendrauf → die dürfen gern auf **Fargate (Spot)** laufen.",
+      "examTrap": "Das Signalwort dreht die Antwort: **„konstant 24/7“ → EC2** · **„unvorhersehbar/spiky“ oder „kein Server-Management“ → Fargate.** Wer pauschal „Fargate ist moderner“ wählt, zahlt den Aufschlag ohne Nutzen.",
+      "mnemonic": "**Merke:** **Dauerlast gehört auf EC2 mit SP und Spot** — Fargate bezahlt man für Schwankung und Bequemlichkeit.",
+      "keywords": [
+        "Fargate vs EC2",
+        "Dauerlast",
+        "Savings Plans",
+        "Capacity Provider"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-171",
+    "backStructured": {
+      "summary": "**Mindestspeicherdauer.** Standard-IA berechnet **30 Tage**, egal ob früher gelöscht oder weitergeschoben wird. Die Staffel: **Standard-IA / One Zone-IA = 30 Tage · Glacier Instant + Flexible = 90 Tage · Deep Archive = 180 Tage.** S3 Standard hat keine.",
+      "why": "Die Mindestdauern sind das **Kleingedruckte** der billigen Klassen: AWS subventioniert den GB-Preis gegen eine Mindest-Verweildauer — wer nach 10 Tagen transitioniert, zahlt die restlichen 20 als **Early-Delete-Gebühr** trotzdem. Lifecycle-Regeln müssen deshalb zur **Objekt-Lebensdauer** passen.",
+      "example": "Objekte leben nur 20 Tage → **gar keine Transition** (S3 Standard bis zum Expire ist billiger als IA + 30-Tage-Mindestberechnung).",
+      "examTrap": "Die Staffel **30/90/180** ist Kern-Prüfstoff — und die Umkehrfalle aus der Schwellen-Tabelle: **Lebensdauer < 30 Tage ⇒ keine IA-Klasse, keine Regel.** Dazu die 128-KB-Mindestgröße der IA-Klassen im Hinterkopf.",
+      "mnemonic": "**Merke:** IA und Glacier haben **Mindestmieten: 30, 90, 180 Tage** — kürzere Lebensdauer bleibt in Standard.",
+      "keywords": [
+        "Mindestspeicherdauer",
+        "30/90/180 Tage",
+        "Standard-IA",
+        "Lifecycle"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-172",
+    "backStructured": {
+      "summary": "Wegen der **Abrufgebühr pro GB (Retrieval Fee)**. Der Storage ist billiger, aber **jeder GET kostet extra** — bei häufigem Zugriff frisst die Abrufgebühr die Ersparnis. Faustregel: **IA erst ab „seltener als etwa einmal im Monat“**.",
+      "why": "IA-Klassen verschieben Kosten vom Lagern zum Holen — das Modell lohnt nur, wenn wenig geholt wird. Die Gesamtkostenrechnung ist Storage-Preis × Volumen **plus** Retrieval-Preis × Zugriffsvolumen; ab ~monatlichem Vollzugriff kippt sie zugunsten von Standard.",
+      "example": "1 TB, komplett 3× pro Monat gelesen: Standard-IA spart ~10 $ Storage, kostet aber ~30 $ Retrieval → **Standard gewinnt deutlich**.",
+      "examTrap": "Das Szenario-Signal ist die Zugriffsfrequenz, nicht der GB-Preis: **„häufig gelesen“ disqualifiziert jede IA-Klasse** — die günstige Storage-Zahl in der Option ist der Köder.",
+      "mnemonic": "**Merke:** **IA bezahlt man beim Abruf** — häufig Gelesenes bleibt in Standard, egal wie billig das Lager wirkt.",
+      "keywords": [
+        "Retrieval Fee",
+        "Standard-IA",
+        "Zugriffsfrequenz",
+        "Gesamtkosten"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-173",
+    "backStructured": {
+      "summary": "**S3 Intelligent-Tiering** — verschiebt Objekte automatisch zwischen Tiers, **ohne Abrufgebühren** (Alleinstellungsmerkmal) und ohne Mindestdauer. Kostet eine **Monitoring-Gebühr pro Objekt**. **Zwei Fallen:** Objekte **< 128 KB werden nicht auto-getiert**, und bei Millionen winziger Objekte frisst die Pro-Objekt-Gebühr den Nutzen. Bekanntes Muster → direkte Lifecycle-Regel ist günstiger.",
+      "why": "Intelligent-Tiering ist die **Versicherung gegen Unwissen**: Statt Zugriffsmuster zu raten, beobachtet S3 pro Objekt und stuft selbst um — **retrieval-frei**, also ohne das IA-Kostenrisiko der vorigen Karte. Die Prämie ist die **Monitoring-Gebühr**, und die rechnet sich nur bei hinreichend großen Objekten.",
+      "example": "Data-Lake mit unklaren, wechselnden Analysemustern → **Intelligent-Tiering als Default-Klasse** beim Upload; optional die Archive-Tiers für Langzeit-Kaltdaten aktivieren.",
+      "examTrap": "Das Entscheidungswort: **„unbekannt/schwankend“ → Intelligent-Tiering · „bekannt“ → Lifecycle-Regel** (billiger, keine Gebühr). Die 128-KB-Grenze und die Pro-Objekt-Gebühr sind die zwei prüfbaren Haken.",
+      "mnemonic": "**Merke:** **Unbekannte Muster heißen Intelligent-Tiering** — bekannte Muster regelt eine Lifecycle-Regel billiger.",
+      "keywords": [
+        "Intelligent-Tiering",
+        "Monitoring-Gebühr",
+        "128 KB",
+        "Keine Retrieval Fees"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-174",
+    "backStructured": {
+      "summary": "**Erlaubt** bei **reproduzierbaren** Daten: Thumbnails, transkodierte Kopien, Zweitkopien — **~20 % günstiger** als Standard-IA. **Fahrlässig** bei Primärdaten: Die Objekte liegen in **einer einzigen AZ** — bei AZ-Verlust **weg**. Alle anderen S3-Klassen replizieren über **≥ 3 AZs**.",
+      "why": "One Zone-IA verkauft die Multi-AZ-Redundanz für 20 % Rabatt — ein fairer Deal genau dann, wenn der Verlust nur Rechenzeit kostet (neu generieren) statt Daten. Die Frage an jedes Objekt lautet: **Kann ich dich aus einer Quelle wiederherstellen?**",
+      "example": "Bildpipeline: Originale in **Standard**, generierte Thumbnails in **One Zone-IA** — fällt die AZ aus, rechnet ein Batch-Job die Thumbnails aus den Originalen neu.",
+      "examTrap": "Das Wort **„reproduzierbar“** ist der Schalter: Fehlt es im Szenario (Nutzerdaten, Backups als einzige Kopie), ist One Zone-IA die Fangoption — der Preisvorteil ist der Köder.",
+      "mnemonic": "**Merke:** **One Zone-IA nur für Nachkochbares** — eine AZ, ein Ausfall, weg.",
+      "keywords": [
+        "One Zone-IA",
+        "Reproduzierbar",
+        "Eine AZ",
+        "20 % günstiger"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-175",
+    "backStructured": {
+      "summary": "**S3 Glacier Deep Archive** — die günstigste Klasse überhaupt. Abruf **12–48 Stunden**, Mindestdauer **180 Tage**. Abgrenzung: **Millisekunden-Abruf** gefordert → **Glacier Instant Retrieval** · **Minuten bis Stunden** → **Glacier Flexible** (Expedited 1–5 min, Standard 3–5 h, Bulk 5–12 h).",
+      "why": "Die drei Glacier-Klassen staffeln nach **Abruf-Toleranz**: Instant hält Archivpreise bei Standard-IA-Latenz, Flexible bietet drei Abrufgeschwindigkeiten, Deep Archive tauscht maximale Wartezeit gegen den **absoluten Minimalpreis**. „Wartezeit egal“ + Jahres-Frequenz zeigt eindeutig auf Deep Archive.",
+      "example": "7-Jahre-Compliance-Archiv, Prüfer-Abruf 1× jährlich mit Vorlauf → **Deep Archive** per Lifecycle nach 30 Tagen; Abruf via Standard-Restore (12 h) oder Bulk (48 h).",
+      "examTrap": "Die Abrufzeiten sind das Prüfraster: **Instant = ms · Flexible = 1 min bis 12 h · Deep = 12–48 h (kein Expedited!)**. Wer bei „sofortiger Zugriff nötig“ Deep Archive wählt, fällt in die Latenz-Falle.",
+      "mnemonic": "**Merke:** **Wartezeit egal plus Langzeit heißt Deep Archive** — sofortiger Archiv-Zugriff heißt Glacier Instant.",
+      "keywords": [
+        "Deep Archive",
+        "12–48 Stunden",
+        "Glacier Instant",
+        "180 Tage"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-176",
+    "backStructured": {
+      "summary": "**(1) Noncurrent Versions** — bei Versioning sammeln sich alte Objektversionen unbegrenzt an und kosten voll → `NoncurrentVersionExpiration`. **(2) `AbortIncompleteMultipartUpload`** — abgebrochene Multipart-Uploads liegen **unsichtbar** im Bucket und werden berechnet. Beides räumt je eine Lifecycle-Zeile ab.",
+      "why": "Beide Posten sind unsichtbar in der normalen Objektliste — deshalb überleben sie jede manuelle Aufräumaktion: Alte Versionen sieht nur, wer Versionen listet; verwaiste Parts sieht gar niemand. AWS empfiehlt die Abort-Regel deshalb für **jeden** Bucket mit Multipart-Uploads.",
+      "example": "Lifecycle-Regeln: **`NoncurrentVersionExpiration: 90 Tage`** + `AbortIncompleteMultipartUpload: 7 Tage` — zwei Zeilen, die in versionierten Upload-Buckets oft **zweistellige Prozente** sparen.",
+      "examTrap": "Zusatz-Falle zur ersten: **Versioning deaktivieren löscht bestehende Versionen NICHT** — nur die Expiration-Regel räumt auf. Szenario-Signal: „Bucket-Kosten steigen, Objektzahl nicht“.",
+      "mnemonic": "**Merke:** Die zwei unsichtbaren Kostenfresser: **alte Versionen und verwaiste Multipart-Parts** — je eine Lifecycle-Zeile.",
+      "keywords": [
+        "NoncurrentVersionExpiration",
+        "AbortIncompleteMultipartUpload",
+        "Versioning",
+        "Versteckte Kosten"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-177",
+    "backStructured": {
+      "summary": "**Nein — EBS Snapshots sind inkrementell.** Nur der erste ist voll; jeder weitere speichert **nur geänderte Blöcke**. Beim Löschen bleiben Blöcke erhalten, die andere Snapshots noch brauchen. Langzeit-Archiv: **EBS Snapshots Archive** (bis ~75 % günstiger, Restore bis 72 h).",
+      "why": "Snapshots teilen sich einen **Block-Pool**: 30 Snapshots referenzieren größtenteils dieselben unveränderten Blöcke — bezahlt wird der **einzigartige Bestand**, nicht 30 × 500 GB. Deshalb ist auch das Löschen alter Snapshots sicher: **Referenzierte Blöcke wandern**, statt zu verschwinden.",
+      "example": "500-GB-Volume, 2 % tägliche Änderung: 30 Snapshots ≈ 500 GB + 29 × ~10 GB ≈ **~800 GB** bezahlt — nicht 15 TB. Kalt-Bestände zusätzlich in den **Archive Tier** verschieben.",
+      "examTrap": "Zwei Prüfpunkte: **inkrementell + sicheres Löschen** (kein Snapshot „bricht“ durch das Löschen eines Vorgängers) und der **Archive Tier** mit seinen Eckdaten ~75 % / bis 72 h Restore.",
+      "mnemonic": "**Merke:** Snapshots zahlen **nur geänderte Blöcke** — und Löschen zerstört nie die Kette.",
+      "keywords": [
+        "EBS Snapshots",
+        "Inkrementell",
+        "Snapshots Archive",
+        "Geänderte Blöcke"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-178",
+    "backStructured": {
+      "summary": "**gp2 → gp3 migrieren.** gp3 ist **~20 % günstiger pro GB**, liefert **3.000 IOPS Baseline unabhängig von der Größe**, und der Wechsel läuft **online** (Elastic Volumes, kein Downtime). Bei gp2 kaufte man **Größe, um IOPS zu bekommen** — gp3 entkoppelt beides.",
+      "why": "Der Quick-Win ist **risikofrei**: gleicher Volume-Inhalt, gleiche oder bessere Performance, niedrigerer Preis, **Live-Migration** per `modify-volume`. Besonders lukrativ bei Volumes, die nur wegen der 3-IOPS/GiB-Kopplung **überdimensioniert** wurden — die können nach dem Wechsel auch schrumpfen (via Snapshot).",
+      "example": "`aws ec2 modify-volume --volume-id vol-… --volume-type gp3` — läuft im Betrieb; Flottenweite Kandidaten findet der **Compute Optimizer** (EBS-Empfehlungen).",
+      "examTrap": "Prüfbare Marker: **~20 % günstiger, 3.000/125 Baseline ab Werk, online ohne Downtime.** Der Distraktor ist Aufschub („erst testen, Downtime einplanen“) — genau die gibt es nicht.",
+      "mnemonic": "**Merke:** **gp2 nach gp3 ist der EBS-Quick-Win** — 20 % billiger, live migriert, IOPS entkoppelt.",
+      "keywords": [
+        "gp3-Migration",
+        "20 % günstiger",
+        "Elastic Volumes",
+        "Online"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-179",
+    "backStructured": {
+      "summary": "**EFS Lifecycle Management** aktivieren — verschiebt Dateien nach *n* Tagen ohne Zugriff automatisch nach **EFS Standard-IA** oder **EFS Archive** (deutlich günstiger pro GB). Ein Zugriff holt sie transparent zurück. Bei **reproduzierbaren** Daten zusätzlich: **One Zone** statt Standard.",
+      "why": "EFS-Kosten skalieren mit belegtem GB — bei 90 % Kaltanteil zahlt man **fast das Zehnfache** des Nötigen. Lifecycle Management ist der Intelligent-Tiering-Gedanke für Dateisysteme: **Zugriffszeit steuert die Klasse**, die Anwendung merkt nichts (nur der erste Zugriff auf Kaltes ist langsamer).",
+      "example": "Policy „Transition to IA after 30 days, to Archive after 90“ — bei 90 % Kaltdaten sinken die EFS-Kosten um Größenordnungen (EFS-IA **bis ~94 % günstiger** als Standard).",
+      "examTrap": "Zuordnung wie bei S3: **automatisch nach Zugriffsmuster = Lifecycle/IA-Klassen**, dazu die One-Zone-Bedingung **„reproduzierbar“**. Distraktor ist der Umzug nach S3 — der bräuchte App-Umbau (NFS ≠ Objekt-API).",
+      "mnemonic": "**Merke:** Kalte EFS-Dateien wandern per **Lifecycle nach IA/Archive** — transparent und ohne App-Änderung.",
+      "keywords": [
+        "EFS Lifecycle",
+        "Standard-IA",
+        "EFS Archive",
+        "One Zone"
+      ]
+    }
+  },
+  {
+    "seedKey": "saa-c03-card-180",
+    "backStructured": {
+      "summary": "**Requester Pays** auf dem Bucket — dann zahlt der **Abrufende** Request- und Transferkosten, du nur den **Storage**. Voraussetzung: Der Anfragende muss **authentifiziert** sein (kein anonymer Zugriff mehr). Alternative für offene Daten: das **AWS Open Data Program**.",
+      "why": "Requester Pays dreht das Kostenmodell um: Der **Nutzen-Empfänger trägt den Transfer** — das Standard-Muster für große öffentliche Forschungs- und Referenzdatensätze. Die Authentifizierungspflicht ist systembedingt: Irgendein AWS-Konto muss die **Rechnung bekommen**.",
+      "example": "Genomik-Datensatz, 200 TB, weltweit abgerufen → **Requester Pays**: Institute zahlen ihren eigenen Egress (`x-amz-request-payer`-Header im Request), der Anbieter nur noch die Lagerung.",
+      "examTrap": "Die eingebaute Konsequenz ist der Prüfpunkt: **Requester Pays schließt anonymen Zugriff aus** — „öffentlich UND anonym UND kostenneutral“ geht nicht zusammen. Für echte Open-Data-Fälle ist das Open Data Program der Ausweg.",
+      "mnemonic": "**Merke:** **Requester Pays lässt den Abrufer zahlen** — dafür muss jeder Abrufer authentifiziert sein.",
+      "keywords": [
+        "Requester Pays",
+        "Egress-Kosten",
+        "Authentifizierung",
+        "Open Data Program"
+      ]
+    }
+  }
+]
