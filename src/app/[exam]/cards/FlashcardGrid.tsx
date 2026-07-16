@@ -124,21 +124,23 @@ export type FlashcardItem = {
 
 // Section boxes on the structured back. Tints are token-derived (count-pill
 // recipe: color-mix over var(--ink)/var(--accent)) so they track theme AND
-// exam accent; the warn box reuses the established amber idiom
-// (ServiceCardGrid/BattleQuiz) and is deliberately a notch stronger.
-type SectionVariant = "neutral" | "warn" | "accent";
-
-const SECTION_BOX: Record<SectionVariant, string> = {
-  neutral: "color-mix(in srgb, var(--ink) 4%, transparent)",
-  warn: "", // Tailwind amber classes below (literal, purge-safe)
+// exam accent. The three "neutral" boxes are deliberately distinguishable but
+// stay in the 4–8 % range on just two token hues (accent + ink) — no rainbow:
+//   Kurz gesagt  → accent 6 % (lighter than Merksatz's 10 %)
+//   Warum so?    → ink 4 %
+//   Beispiel     → ink 8 % (stronger panel = the code/surface-2 character)
+// Warn reuses the established amber idiom (ServiceCardGrid/BattleQuiz), a
+// notch stronger. Merksatz adds an amber border on its accent tint; the
+// Knackpunkt box stays borderless amber FILL, so the two read differently.
+const TINT = {
+  accentSoft: "color-mix(in srgb, var(--accent) 6%, transparent)",
+  ink: "color-mix(in srgb, var(--ink) 4%, transparent)",
+  inkStrong: "color-mix(in srgb, var(--ink) 8%, transparent)",
   accent: "color-mix(in srgb, var(--accent) 10%, transparent)",
-};
+} as const;
 
-const SECTION_LABEL: Record<SectionVariant, string> = {
-  neutral: "text-ink-faint",
-  warn: "text-amber-700 dark:text-amber-300",
-  accent: "text-accent",
-};
+const LABEL_NEUTRAL = "text-ink-faint";
+const LABEL_WARN = "text-amber-700 dark:text-amber-300";
 
 // Fixed section order on the structured back; missing/empty sections are
 // simply skipped. Labels are the product wording (see flashcard-back.ts).
@@ -146,39 +148,62 @@ const BACK_SECTIONS: Array<{
   key: keyof Omit<FlashcardBackStructured, "keywords">;
   label: string;
   Icon: typeof Zap;
-  variant: SectionVariant;
+  bg?: string; // inline color-mix tint; omitted → boxClass carries the fill
+  boxClass?: string;
+  labelClass: string;
   mono?: boolean;
 }> = [
-  { key: "summary", label: "Kurz gesagt", Icon: Zap, variant: "neutral" },
-  { key: "why", label: "Warum so?", Icon: HelpCircle, variant: "neutral" },
+  {
+    key: "summary",
+    label: "Kurz gesagt",
+    Icon: Zap,
+    bg: TINT.accentSoft,
+    labelClass: LABEL_NEUTRAL,
+  },
+  {
+    key: "why",
+    label: "Warum so?",
+    Icon: HelpCircle,
+    bg: TINT.ink,
+    labelClass: LABEL_NEUTRAL,
+  },
   {
     key: "example",
     label: "Beispiel",
     Icon: Terminal,
-    variant: "neutral",
+    bg: TINT.inkStrong,
+    labelClass: LABEL_NEUTRAL,
     mono: true,
   },
   {
     key: "examTrap",
     label: "Prüfungs-Knackpunkt",
     Icon: AlertTriangle,
-    variant: "warn",
+    boxClass: "bg-amber-500/15",
+    labelClass: LABEL_WARN,
   },
-  { key: "mnemonic", label: "Merksatz", Icon: Lightbulb, variant: "accent" },
+  {
+    key: "mnemonic",
+    label: "Merksatz",
+    Icon: Lightbulb,
+    bg: TINT.accent,
+    boxClass: "border border-amber-500/60",
+    labelClass: "text-accent",
+  },
 ];
 
 function SectionLabel({
   Icon,
   label,
-  variant,
+  labelClass,
 }: {
   Icon: typeof Zap;
   label: string;
-  variant: SectionVariant;
+  labelClass: string;
 }) {
   return (
     <h4
-      className={`flex items-center gap-1.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] ${SECTION_LABEL[variant]}`}
+      className={`flex items-center gap-1.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em] ${labelClass}`}
     >
       <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
       {label}
@@ -190,20 +215,16 @@ function StructuredBack({ data }: { data: FlashcardBackStructured }) {
   const keywords = (data.keywords ?? []).filter((k) => k.trim() !== "");
   return (
     <div className="space-y-2.5">
-      {BACK_SECTIONS.map(({ key, label, Icon, variant, mono }) => {
+      {BACK_SECTIONS.map(({ key, label, Icon, bg, boxClass, labelClass, mono }) => {
         const text = data[key];
         if (!text || text.trim() === "") return null;
         return (
           <section
             key={key}
-            className={`rounded-lg p-3 ${variant === "warn" ? "bg-amber-500/15" : ""}`}
-            style={
-              variant === "warn"
-                ? undefined
-                : { background: SECTION_BOX[variant] }
-            }
+            className={`rounded-lg p-3 ${boxClass ?? ""}`}
+            style={bg ? { background: bg } : undefined}
           >
-            <SectionLabel Icon={Icon} label={label} variant={variant} />
+            <SectionLabel Icon={Icon} label={label} labelClass={labelClass} />
             <p
               className={`mt-1.5 whitespace-pre-wrap break-words text-ink-soft ${
                 mono ? "font-mono text-[12.5px] leading-relaxed" : ""
@@ -216,10 +237,10 @@ function StructuredBack({ data }: { data: FlashcardBackStructured }) {
       })}
       {keywords.length > 0 && (
         <section
-          className="rounded-lg p-3"
-          style={{ background: SECTION_BOX.neutral }}
+          className="rounded-lg border border-dashed border-line-strong p-3"
+          style={{ background: TINT.ink }}
         >
-          <SectionLabel Icon={Tag} label="Stichworte" variant="neutral" />
+          <SectionLabel Icon={Tag} label="Stichworte" labelClass={LABEL_NEUTRAL} />
           <div className="mt-2 flex flex-wrap gap-1.5">
             {keywords.map((k) => (
               <span
