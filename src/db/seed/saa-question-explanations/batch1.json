@@ -1,0 +1,425 @@
+[
+  {
+    "seedKey": "saa-c03-q-001",
+    "explanationStructured": {
+      "verdict": "Die Auswertungsreihenfolge ist unumstößlich: **explicit Deny → explicit Allow → implicit Deny**. Das explizite Deny in der Bucket-Policy beendet die Auswertung sofort negativ — kein Allow aus Identity-Policy oder SCP kann es aufheben, gleich aus welcher Policy-Art es stammt. Alle Policy-Typen werden **gemeinsam** ausgewertet, ohne Rangordnung.",
+      "optionAnalysis": {
+        "A": "Falsch — dass Identity-Policy und SCP erlauben, ist irrelevant: Ein einziges **explizites Deny** in irgendeiner anwendbaren Policy gewinnt gegen beliebig viele Allows.",
+        "B": "Falsch — eine **Rangordnung zwischen Identity- und Resource-Policies existiert nicht**. Beide werden gemeinsam ausgewertet, und ein Deny in einer von beiden entscheidet.",
+        "C": "Falsch — die SCP ist ein **Filter nach oben** (sie begrenzt das Maximum), kein Übersteuerungsmechanismus nach unten. Sie kann Rechte beschneiden, aber niemals ein Deny einer anderen Ebene neutralisieren.",
+        "D": "**Richtig** — Zugriff verweigert. Das explizite Deny der Bucket-Policy schlägt jedes Allow, egal wo es steht."
+      },
+      "mnemonic": "Eselsbrücke: **Ein Deny ist ein Veto** — eine einzige Gegenstimme kippt jede Mehrheit.",
+      "examTrap": "SAA testet die Deny-Regel gern **über Policy-Typen hinweg** (Identity vs. Bucket vs. SCP). Jede Option, die ein explizites Deny per Allow oder per „höherer Ebene“ übersteuert, ist automatisch falsch."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-002",
+    "explanationStructured": {
+      "verdict": "Eine **Permissions Boundary** deckelt die maximal möglichen Rechte einer einzelnen IAM-Identity — genau die geforderte Granularität. Erzwungen wird sie per Condition **`iam:PermissionsBoundary`** in der Policy der Entwickler: Rollen lassen sich nur noch **mit** angehängter Boundary anlegen. Effektiv gilt die Schnittmenge — selbst ein angehängtes `AdministratorAccess` läuft ins Leere.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Boundary vorgeben + per Condition erzwingen ist das AWS-Muster für delegierte Rollenerstellung mit hartem Deckel, ohne andere Principals zu treffen.",
+        "B": "Falsch für DIESE Anforderung — technisch funktioniert die SCP, aber sie trifft **alle Principals im Account**, also auch CI/CD und Plattform-Team. Nicht „falsch“, sondern **zu grob** — und genau das schließt die Aufgabe aus.",
+        "C": "Falsch — das Verbot löst das Problem, indem es die Anforderung abschafft: Die Entwickler **sollen** ja selbst Rollen anlegen dürfen. Prozess-Bottleneck statt Guardrail.",
+        "D": "Falsch — Resource-based Policies auf Buckets/Log-Groups regeln den Zugriff **auf diese Ressourcen**, begrenzen aber nicht, welche Rechte eine **neu erstellte Rolle** bekommen kann."
+      },
+      "mnemonic": "Eselsbrücke: **Einzelne Identity deckeln = Boundary, ganzen Account deckeln = SCP.**",
+      "examTrap": "Die Falle ist die Ebene: **SCP-Optionen** „funktionieren“ oft technisch, verletzen aber die **Nebenbedingung** („nur die Entwickler-Rollen, nicht alle“). Lies die Einschränkung im Szenario, bevor du zur SCP greifst."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-003",
+    "explanationStructured": {
+      "verdict": "Ein **Instance Profile** bindet eine IAM-Rolle an die Instanz; das SDK bezieht über **IMDS** automatisch rotierte, **temporäre** Credentials. Es existiert kein langlebiger Key mehr — nichts, das geleakt, in ein AMI gebrannt oder committet werden könnte, und nichts, das verwaltet werden muss.",
+      "optionAnalysis": {
+        "A": "Falsch — Secrets Manager mit Rotation ist besser als die Klartext-Datei, aber der **langlebige Key existiert weiter** und muss geschützt, rotiert und im Leak-Fall widerrufen werden. Das Grundproblem bleibt.",
+        "B": "Falsch — SecureString im Parameter Store hat denselben Konstruktionsfehler: Der statische Key lebt weiter, nur besser versteckt.",
+        "C": "**Richtig** — die Rolle via Instance Profile eliminiert das Problem an der Wurzel: keine statischen Keys, automatische Rotation, IMDSv2-gehärtet.",
+        "D": "Falsch und besonders verführerisch — die Verschlüsselung ist **korrekt gelöst**, aber verschlüsselt gespeicherte langlebige Keys sind immer noch langlebige Keys. Ironie am Rande: Für den KMS-Zugriff nutzt (D) bereits eine Rolle — warum dann nicht gleich für S3?"
+      },
+      "mnemonic": "Eselsbrücke: **EC2 spricht AWS über Rollen, nie über Keys** — was nicht existiert, kann nicht leaken.",
+      "examTrap": "Alle drei Distraktoren sind **echte Verbesserungen** und real im Einsatz — die Prüfung will aber die Lösung, die den statischen Key **abschafft**, nicht die, die ihn besser bewacht. „Am sichersten/best practice“ ist das Signalwort."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-004",
+    "explanationStructured": {
+      "verdict": "Bei **Cross-Account müssen beide Seiten zustimmen**: die Resource-based Policy im Ziel-Account (Bucket-Policy in A) **und** die Identity-Policy des Principals im Quell-Account (Lambda-Rolle in B). Fehlt eine Seite, ist der Zugriff verweigert. Innerhalb *eines* Accounts würde eine der beiden genügen — genau darin liegt der Unterschied, den diese Frage testet.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — die Bucket-Policy in Account A öffnet die Ressource für den fremden Principal. Ohne sie blockt Account A jeden Zugriff von außen.",
+        "B": "Falsch — VPC Peering ist eine **Netzwerk**-Maßnahme. S3 wird über den Service-Endpoint erreicht; der Netzwerkpfad ändert an der **Autorisierung** nichts.",
+        "C": "**Richtig (2/2)** — die Identity-Policy der Lambda-Rolle in B autorisiert den eigenen Principal für `s3:GetObject` auf den Bucket-ARN. Cross-Account braucht beide Hälften.",
+        "D": "Falsch — ein Gateway Endpoint ist ebenfalls Netzwerk-Ebene und verweist zudem **nie auf einen Account**, sondern auf den S3-**Service**. Autorisierung löst er nicht.",
+        "E": "Falsch — AWS RAM existiert und teilt real Ressourcen (Subnets, Transit Gateways, Resolver Rules …), aber **S3-Buckets gehören nicht zu den teilbaren Ressourcen**."
+      },
+      "mnemonic": "Eselsbrücke: **Cross-Account = beide Seiten sagen Ja** — der Ziel-Account öffnet, der Quell-Account erlaubt.",
+      "examTrap": "Multi-Select-Muster: Die zwei richtigen Antworten sind die **beiden Hälften derselben Regel** — Netzwerk-Optionen (Peering, Endpoints) sind bei S3-Autorisierungsfragen fast immer Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-005",
+    "explanationStructured": {
+      "verdict": "**Condition Keys sind das Werkzeug, wenn Resource-Level-Permissions nicht verfügbar sind.** Der Wildcard bleibt stehen, **`aws:RequestedRegion`** schneidet die Berechtigung auf `eu-central-1` zu — und zwar exakt für diese eine Rolle, ohne Nebenwirkungen auf andere Principals.",
+      "optionAnalysis": {
+        "A": "Falsch — die Aktion **akzeptiert keine Resource-ARNs**; genau deshalb erzwingt sie den Wildcard. Ein eingeschränkter ARN ließe die Policy ins Leere laufen bzw. die Aktion scheitern.",
+        "B": "Falsch für DIESE Anforderung — die SCP würde funktionieren, trifft aber **alle Principals im Account**. Die Aufgabe verlangt die Einschränkung für diese eine Rolle.",
+        "C": "Falsch — ein Kategorienfehler: **Rollen liegen in Accounts, nicht in OUs.** Eine einzelne IAM-Rolle lässt sich nicht in eine OU verschieben; OUs enthalten Accounts.",
+        "D": "**Richtig** — die Condition `aws:RequestedRegion` in der Rollen-Policy begrenzt die Describe-Calls auf die Region, trotz `Resource: \"*\"`."
+      },
+      "mnemonic": "Eselsbrücke: **Wo der ARN nicht greift, schneidet die Condition zu.**",
+      "examTrap": "Zwei Fallen in einer Frage: der **OU-Kategorienfehler** (Rollen ≠ Accounts) und die Ebenen-Falle (SCP zu grob). „**Least Privilege trotz Resource: ***“ ist das Signalwort für Condition Keys."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-006",
+    "explanationStructured": {
+      "verdict": "**IAM Access Analyzer** wertet Resource-based Policies statisch aus (Automated Reasoning) und meldet jede Ressource, die außerhalb der **Zone of Trust** — hier: der Organization — erreichbar ist. Er ist **präventiv**: Er findet die konfigurierte Lücke, **bevor** jemand sie nutzt. Genau das verlangt die Aufgabe.",
+      "optionAnalysis": {
+        "A": "Falsch — GuardDuty ist **Threat Detection aus Logs**: Es erkennt verdächtiges Verhalten, **wenn es passiert** — nicht die bloße Möglichkeit dazu. Reaktiv statt präventiv.",
+        "B": "**Richtig** — organisationsweite Zone of Trust, native Policy-Analyse über S3, KMS, IAM-Rollen, SQS und mehr, Findings vor dem ersten Zugriff.",
+        "C": "Der stärkste Distraktor — mit genügend Aufwand **ließe sich** eine Config Custom Rule bauen, die Policies auswertet. Es ist nur nicht der **native** Dienst dafür, und genau „nativ“ fordert die Aufgabe.",
+        "D": "Falsch — Detective arbeitet **reaktiv**: Es untersucht und visualisiert bestehende Findings (Root-Cause-Analyse), es entdeckt keine offenen Konfigurationen."
+      },
+      "mnemonic": "Eselsbrücke: **Access Analyzer findet offene Türen, GuardDuty findet Einbrecher, Detective ermittelt danach.**",
+      "examTrap": "Die Vier-Dienste-Zuordnung (Analyzer/GuardDuty/Config/Detective) ist Dauerprüfstoff — entscheide nach Zeitachse: **vorher-konfiguriert** (Analyzer) vs. **währenddessen-verhalten** (GuardDuty) vs. **nachher-ermitteln** (Detective)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-007",
+    "explanationStructured": {
+      "verdict": "Der Root-User steht **außerhalb aller IAM-Guardrail-Mechanismen** — das ist der Kern der Frage. SCPs, Boundaries und Föderation greifen nicht. Wirksam sind nur präventive Maßnahmen am Konto selbst: **Hardware-MFA aktivieren, alle Access Keys löschen**, Root ausschließlich für die wenigen Root-only-Aufgaben nutzen (plus Alarme auf Root-Logins).",
+      "optionAnalysis": {
+        "A": "Falsch — **SCPs greifen nicht auf den Root-User** (im Management Account greifen sie ohnehin auf niemanden). Der Klassiker-Distraktor dieser Domain.",
+        "B": "Falsch — Permissions Boundaries gelten für **IAM-Users und -Roles**; der Root-User ist keines von beidem und kann keine Boundary tragen.",
+        "C": "**Richtig** — Hardware-MFA (phishing-resistent, an physischen Besitz gebunden) plus gelöschte Access Keys ist die einzige wirksame Härtung.",
+        "D": "Falsch — Root ist **nicht föderierbar**: Er hängt an der Account-E-Mail und existiert außerhalb von IAM. Identity Center kann ihn weder verwalten noch mit Permission Sets versehen."
+      },
+      "mnemonic": "Eselsbrücke: **Root härtet man mit Hardware, nicht mit Policies** — was außerhalb von IAM steht, erreicht keine IAM-Policy.",
+      "examTrap": "Alle drei Distraktoren klingen nach solider Governance und scheitern am selben Fakt: **Kein Policy-Mechanismus erreicht Root.** Wer diesen einen Satz kennt, löst die ganze Fragenfamilie."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-008",
+    "explanationStructured": {
+      "verdict": "**IAM-Groups können niemals `Principal` in einer Resource-based Policy sein.** Zulässig sind nur Users, Roles, AWS-Accounts und Services. Die Konsequenz ist hart: Die Policy ist ungültig — **das Speichern schlägt fehl**, sie existiert nie. Der korrekte Weg wäre eine Identity-Policy an der Group oder eine Rolle, die die Mitglieder assumen.",
+      "optionAnalysis": {
+        "A": "**Richtig** — die Policy lässt sich gar nicht erst anlegen; die Group ist als Principal syntaktisch unzulässig.",
+        "B": "Falsch — setzt voraus, dass die Policy speicherbar wäre. Ist sie nicht; über „aktuelle und künftige Mitglieder“ muss man gar nicht erst nachdenken.",
+        "C": "Der raffinierteste Distraktor — er beschreibt korrekt die **Cross-Account-Regel** (beide Seiten müssen erlauben) und wirkt dadurch fachlich fundiert. Nur ist sie hier **nicht anwendbar**, weil die Policy nie existiert.",
+        "D": "Falsch — auch die Same-Account-Bedingung ändert nichts an der ungültigen Principal-Angabe."
+      },
+      "mnemonic": "Eselsbrücke: **Groups verteilen Policies, sind aber nie Principal** — eine Group kann nichts „tun“.",
+      "examTrap": "Distraktor C zeigt das Muster „richtiges Wissen, falsche Frage“: Er zitiert eine echte Regel, die hier nicht greift. Prüfe immer erst, ob die Konstruktion überhaupt **existieren kann**, bevor du über ihr Verhalten nachdenkst."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-009",
+    "explanationStructured": {
+      "verdict": "Eine **Session Policy** verengt eine *einzelne* STS-Session: Effektiv gilt die **Schnittmenge** aus Role-Policy und Session-Policy. Genau dieses Muster ist für Multi-Tenancy gebaut — **eine** generische Rolle, pro `AssumeRole` dynamisch auf den Mandanten-Präfix zugeschnitten. Kein Rollen-Zoo, keine Limits, saubere Isolation pro Session.",
+      "optionAnalysis": {
+        "A": "Falsch für DIESE Anforderung — funktioniert korrekt, scheitert aber an der **Skalierung**: Tausende Mandanten bedeuten tausende Rollen, IAM-Limits und eine unwartbare Rollen-Explosion.",
+        "B": "Falsch an der Mechanik — eine Bucket-Policy adressiert den **Principal**. Bei einer geteilten Rolle ist der für alle Mandanten **identisch**; die Policy kann Mandanten nicht unterscheiden.",
+        "C": "Falsch — eine Boundary, die **alle** Präfixe abdeckt, deckelt nur das Maximum und isoliert nichts: Jede Session dürfte weiterhin jeden Präfix lesen.",
+        "D": "**Richtig** — Session Policy mit dem Mandanten-Präfix beim `AssumeRole`: Die Session sieht nur ihren Ausschnitt, die Rolle bleibt generisch."
+      },
+      "mnemonic": "Eselsbrücke: **Die Session Policy schneidet zu, niemals auf** — eine Rolle, viele maßgeschneiderte Sessions.",
+      "examTrap": "Signalwortkette „**Multi-Tenant + eine geteilte Rolle** + Isolation pro Session“ → Session Policy. Die Pro-Mandant-Rollen-Option ist der **Skalierungs-Distraktor** — technisch richtig, architektonisch falsch."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-010",
+    "explanationStructured": {
+      "verdict": "Die Frage trennt **Trust Policy** von **Permission Policy** — zwei verschiedene Dinge, die regelmäßig verwechselt werden. Die Trust Policy regelt, **wer** die Rolle übernehmen darf: Sie erlaubt es → der **`AssumeRole`-Call gelingt**. Die Permission Policy regelt, **was** die Rolle darf: Sie fehlt → **implicit Deny** bei der S3-Aktion. IAM ist deny-by-default.",
+      "optionAnalysis": {
+        "A": "Falsch — genau die Verwechslung, die die Frage offenlegt: Das Assumen scheitert **nicht** an fehlenden Berechtigungen der Rolle, sondern nur an der Trust Policy — und die erlaubt es hier.",
+        "B": "**Richtig** — Assumen klappt (Trust Policy), die S3-Aktion wird verweigert (keine Permission Policy = implicit Deny).",
+        "C": "Falsch — die Abwesenheit einer Policy ist **keine Erlaubnis**, sondern ein Verbot. Deny-by-default ist das Fundament von IAM.",
+        "D": "Falsch — es gibt keine automatische „Lese-Begrenzung“; ohne Allow existiert **gar kein** Zugriff, auch nicht lesend."
+      },
+      "mnemonic": "Eselsbrücke: **Trust sagt WER, Permission sagt WAS** — und ohne WAS gilt: nichts.",
+      "examTrap": "Der **Zwei-Phasen-Test** ist das Prüfmuster: Erst „darf der Principal assumen?“ (**Trust**), dann „darf die Session die Aktion?“ (**Permission**). Optionen, die beide Phasen vermischen, sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-011",
+    "explanationStructured": {
+      "verdict": "Das **kanonische AWS-Pattern** für MFA-Zwang: ein **`Deny` auf alle Aktionen mit der Condition `aws:MultiFactorAuthPresent: false`** (B) — plus die **`NotAction`-Ausnahme** für MFA-Einrichtung und Passwortwechsel (D), die das entstehende **Henne-Ei-Problem** löst: Ohne die Ausnahme könnte ein neuer User sein MFA-Gerät nie registrieren und wäre dauerhaft ausgesperrt.",
+      "optionAnalysis": {
+        "A": "Falsch — **dieses Account-Setting existiert nicht.** Es gibt keinen Schalter „MFA-Pflicht organisationsweit aktivieren“; der Zwang wird immer über Policies gebaut.",
+        "B": "**Richtig (1/2)** — das Deny mit `aws:MultiFactorAuthPresent: false` ist der Kern: Ohne aktives MFA ist jede Aktion blockiert.",
+        "C": "Der gefährlichste Distraktor — wirkt eleganter (org-weit, zentral), trifft aber auch **Service-Rollen**: Lambda, EC2, CI/CD können technisch **kein MFA vorweisen**. Ergebnis wäre die totale Blockade der Automatisierung.",
+        "D": "**Richtig (2/2)** — die `NotAction`-Ausnahme für `iam:*VirtualMFADevice` und `iam:ChangePassword` hält genau den Pfad offen, den ein User ohne MFA braucht, um MFA einzurichten.",
+        "E": "Falsch — eine Group verteilt nur Policies; ohne die Deny-Condition aus (B) erzwingt sie nichts, und das Henne-Ei-Problem bleibt ungelöst."
+      },
+      "mnemonic": "Eselsbrücke: **Deny ohne MFA — plus Türspalt für die MFA-Einrichtung.**",
+      "examTrap": "Multi-Select-Logik: Die zwei richtigen Antworten sind **Kern + notwendige Ausnahme**. Die SCP-Variante scheitert an Service-Prinzipalen ohne MFA-Fähigkeit — dieser Nebeneffekt ist die eigentliche Prüfungserkenntnis."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-012",
+    "explanationStructured": {
+      "verdict": "Der Fehler **`sts:AssumeRole`** fällt, **bevor** die Funktion Code ausführt: Der **Lambda-Service** selbst kann die Execution Role nicht übernehmen. Zuständig ist die **Trust Policy** — ihr fehlt `lambda.amazonaws.com` als Service-Principal. Die **Fehlermeldung ist der Schlüssel**: Sie nennt die gescheiterte Aktion.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Trust Policy ohne `lambda.amazonaws.com`: Der Service darf die Rolle nicht assumen, die Funktion startet gar nicht erst.",
+        "B": "Falsch — fehlende Rechte auf Zielressourcen würden **später** auffallen, mit einer Meldung zur konkreten Aktion (`s3:GetObject`, `dynamodb:PutItem`), nicht zu `sts:AssumeRole`.",
+        "C": "Falsch — eine Resource-Policy-Verweigerung träte ebenfalls erst **zur Laufzeit** beim Ressourcenzugriff auf, nicht beim Start.",
+        "D": "Falsch — ein Kategorienfehler: **Instance Profiles sind ein EC2-Konstrukt.** Lambda bindet seine Execution Role direkt, ohne Profile."
+      },
+      "mnemonic": "Eselsbrücke: **Lies die Fehlermeldung wie eine Adresse** — `sts:AssumeRole` zeigt auf die Trust Policy, Aktions-Fehler zeigen auf die Permission Policy.",
+      "examTrap": "Debug-Fragen löst die **Zeitachse**: Fehler beim Start = Trust/Assume-Ebene, Fehler zur Laufzeit = Permission/Resource-Ebene. Wer das Raster hat, braucht die Optionen kaum zu lesen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-013",
+    "explanationStructured": {
+      "verdict": "Die effektive Berechtigung ist die **Schnittmenge aller drei Ebenen**: **SCP ∩ Permissions Boundary ∩ Identity-Policy**. `s3:PutObject` fehlt in der Boundary → es fällt aus der Schnittmenge → **verweigert**. Jede Ebene kann verbieten, keine kann übersteuern.",
+      "optionAnalysis": {
+        "A": "Falsch — Boundaries sind **harte Grenzen**, keine Empfehlungen. „Wirkt beratend“ ist frei erfunden.",
+        "B": "Falsch — es gibt keine Hierarchie mit Übersteuerung: Die SCP setzt eine eigene Obergrenze, sie hebt die Boundary nicht auf. Es zählt nur der Schnitt.",
+        "C": "**Richtig** — verweigert, und zwar exakt wegen der Boundary: Dort fehlt `s3:PutObject`, also ist die Schnittmenge leer.",
+        "D": "Der lehrreichste Distraktor — **richtiges Ergebnis, falsche Begründung**: Die SCP erlaubt hier `s3:*`, sie ist gar nicht die Ursache. Wer nach Bauchgefühl „verweigert“ wählt, kann trotzdem daneben liegen."
+      },
+      "mnemonic": "Eselsbrücke: **Drei Siebe übereinander** — durch kommt nur, was durch alle drei passt.",
+      "examTrap": "SAA baut gern Optionen mit **korrektem Ergebnis und falscher Begründung** — hier (D). Die Frage testet nicht das Ja/Nein, sondern ob du weißt, **welche Ebene** blockt."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-014",
+    "explanationStructured": {
+      "verdict": "Die **ExternalId** ist AWS' vorgesehener Schutz gegen den **Confused Deputy**: Der Vendor muss beim `AssumeRole` ein Geheimnis mitschicken, das nur zwischen euch beiden vereinbart ist (Condition `sts:ExternalId` in der Trust Policy). Ohne sie könnte ein **anderer Kunde** desselben Vendors ihn dazu bringen, mit *eurem* Role-ARN zuzugreifen — der Vendor wäre der „verwirrte Stellvertreter“.",
+      "optionAnalysis": {
+        "A": "Falsch — MFA ist bei automatisierten Service-zu-Service-Aufrufen nicht praktikabel und adressiert den Confused-Deputy-Vektor nicht: Der Vendor selbst ist ja legitim authentifiziert.",
+        "B": "Falsch — klingt nach solider Härtung, verfehlt aber den Angriffsvektor komplett: Der Zugriff kommt **legitim vom Vendor** (aus dessen IP-Range) — nur im Auftrag der falschen Person. Die IP-Beschränkung ändert daran nichts.",
+        "C": "Falsch — eine Boundary begrenzt den **Schaden**, verhindert aber nicht die **Verwechslung**: Der falsche Kunde käme weiterhin an eure Metriken.",
+        "D": "**Richtig** — `sts:ExternalId` in der Trust Policy verlangen; der Vendor übergibt pro Kunde die vereinbarte ID. Die Verwechslung ist damit strukturell ausgeschlossen."
+      },
+      "mnemonic": "Eselsbrücke: **ExternalId = das Codewort an der Tür** — der Stellvertreter muss sagen, für wen er kommt.",
+      "examTrap": "Signalwortkette „**Third-Party/SaaS + viele Kunden + AssumeRole**“ → ExternalId, immer. MFA- und IP-Optionen sind die Standard-Distraktoren, weil sie „Sicherheit“ ausstrahlen, aber den Deputy-Vektor nicht berühren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-015",
+    "explanationStructured": {
+      "verdict": "Beim **Role Chaining** (Rolle assumt Rolle) ist die Session **hart auf 1 Stunde begrenzt** — unabhängig von `MaxSessionDuration` der Zielrolle. Ein höherer `DurationSeconds`-Wert lässt den Aufruf **fehlschlagen** (ValidationError), er wird nicht still gekürzt. AWS will, dass man das Chaining bemerkt.",
+      "optionAnalysis": {
+        "A": "**Richtig** — der Call scheitert: 14400 s > 3600-s-Chaining-Limit. Das Limit übersteuert jedes Rollen-Setting.",
+        "B": "Falsch — die angeforderten 4 Stunden sind beim Chaining schlicht nicht erreichbar, egal was die Zielrolle erlaubt.",
+        "C": "Der Distraktor, den die meisten wählen — die Annahme, AWS kappe still auf 1 Stunde, ist intuitiv und **falsch**. Der Unterschied „gekürzt vs. Fehler“ entscheidet, ob ein Deployment durchläuft oder abbricht.",
+        "D": "Falsch — `MaxSessionDuration` gilt für direkte Assumes; beim Chaining hat das **1-h-Limit Vorrang** vor jedem Rollen-Attribut."
+      },
+      "mnemonic": "Eselsbrücke: **Rolle-auf-Rolle = maximal eine Stunde** — und zu viel verlangt gibt einen Fehler, keinen Rabatt.",
+      "examTrap": "Zwei prüfbare Details: das Limit **wirft einen Fehler statt zu kürzen**, und die Ausnahme — Workloads über **EC2 Instance Profile** unterliegen der Chaining-Grenze nicht. Beides taucht in Antwortoptionen auf."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-016",
+    "explanationStructured": {
+      "verdict": "**IAM Identity Center** ist die Workforce-Lösung für Multi-Account-Zugriff: Föderation gegen das bestehende AD (als Identity Source), **Permission Sets** je Account, zentrale Zuweisung, keine IAM-Users. Bei 5.000 Mitarbeitern und 20 Accounts ist „minimaler laufender Aufwand“ das Entscheidungskriterium — und genau das liefert nur Identity Center.",
+      "optionAnalysis": {
+        "A": "Falsch — 5.000 IAM-Users **pro Account** × 20 Accounts wäre ein Verwaltungs- und Sicherheits-Albtraum (Passwörter, Keys, Offboarding × 100.000 Identitäten).",
+        "B": "**Richtig** — Identity Center mit AD als Identity Source: einmal föderieren, zentral Permission Sets zuweisen, fertig.",
+        "C": "Falsch — die Kernverwechslung des Themas: **Cognito ist für Endnutzer deiner Anwendung** (Customer Identity), nicht für Mitarbeiter-Zugriff auf AWS-Accounts.",
+        "D": "Der fachlich stärkste Distraktor — **SAML-Föderation direkt zu IAM-Rollen war jahrelang der Standardweg und funktioniert.** Aber: 20× IdP-Konfiguration, 20× Rollenpflege, keine zentrale Zuweisung. Die Anforderung „minimaler laufender Aufwand“ entscheidet gegen ihn."
+      },
+      "mnemonic": "Eselsbrücke: **Mitarbeiter zu Identity Center, App-Kunden zu Cognito.**",
+      "examTrap": "Bei Workforce-Fragen schlägt die **moderne verwaltete Lösung** den historisch korrekten Eigenbau — Distraktor D ist „funktioniert, aber teurer im Betrieb“. Achte auf Aufwands-Formulierungen im Szenario."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-017",
+    "explanationStructured": {
+      "verdict": "Der **Cognito Identity Pool** (Federated Identities) tauscht das Google-Token via **`sts:AssumeRoleWithWebIdentity`** gegen **temporäre AWS-Credentials** — die einzige Komponente im Szenario, die AWS-Credentials ausstellen kann. Damit lädt die App direkt in den nutzer-eigenen S3-Präfix hoch (Rollen-Policy mit `${cognito-identity.amazonaws.com:sub}`-Variablen).",
+      "optionAnalysis": {
+        "A": "Die **häufigste Verwechslung im gesamten Cognito-Themenfeld** — der **User Pool authentifiziert** und liefert **JWT-Tokens**, niemals AWS-Credentials. S3 versteht keine JWTs.",
+        "B": "Falsch — in eine Mobile-App eingebettete Keys sind trivial extrahierbar; die Präfix-Begrenzung der Policy ändert nichts daran, dass ein **langlebiges Geheimnis öffentlich verteilt** würde.",
+        "C": "Falsch — ein IAM-User pro App-Nutzer skaliert nicht (IAM-Limits), verletzt den Zweck von IAM (Workforce, nicht Customer) und erzeugt Key-Verwaltung für jeden einzelnen Endnutzer.",
+        "D": "**Richtig** — Identity Pool: Google-Token rein, temporäre, präfix-beschränkte AWS-Credentials raus."
+      },
+      "mnemonic": "Eselsbrücke: **User Pool = wer du bist (JWT), Identity Pool = was du in AWS darfst (STS-Credentials).**",
+      "examTrap": "Die Prüfung formuliert User-Pool- und Identity-Pool-Optionen bewusst **gleich plausibel**. Der Test ist immer: Braucht der Client **AWS-Credentials** (direkter Ressourcen-Zugriff)? Dann führt kein Weg am Identity Pool vorbei."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-018",
+    "explanationStructured": {
+      "verdict": "Die Session-Dauer hat **zwei Stellschrauben, und beide müssen stimmen**: Die Rolle muss die Dauer über **`MaxSessionDuration`** (1–12 h) erlauben, **und** der Aufrufer muss sie über **`DurationSeconds`** anfordern. Der Default liegt bei **1 Stunde** — exakt das erklärt den Abbruch nach 60 Minuten. (C) ist eine reine Konfigurationsänderung — der geringste Aufwand.",
+      "optionAnalysis": {
+        "A": "Falsch — das Zerlegen des Jobs ist ein Workaround, der die Architektur verkompliziert, statt eine Konfigurationszeile zu ändern.",
+        "B": "Falsch — der Rückschritt zu langlebigen Access Keys tauscht ein Session-Problem gegen ein dauerhaftes Sicherheitsproblem.",
+        "C": "**Richtig** — `MaxSessionDuration` auf ≥ 8 h setzen und `DurationSeconds` entsprechend anfordern: zwei Einstellungen, kein Code.",
+        "D": "Der beste Distraktor — Credential-Refresh **funktioniert tatsächlich** und ist in vielen SDKs eingebaut. Er erfordert nur **Code-Änderungen**, während (C) reine Konfiguration ist. „Geringster Aufwand“ entscheidet."
+      },
+      "mnemonic": "Eselsbrücke: **Zwei Regler für die Session-Länge** — die Rolle muss erlauben, der Aufrufer muss anfordern.",
+      "examTrap": "Zahlen-Fundament: **15 min Minimum, 1 h Default, 12 h Maximum** via MaxSessionDuration. Und das Muster „Distraktor funktioniert, kostet aber mehr Aufwand“ — die Nebenbedingung im Fragentext entscheidet."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-019",
+    "explanationStructured": {
+      "verdict": "Beide etablierten Cross-Account-Wege für SQS: **(A)** Resource-based Policy auf der Queue — direkter Zugriff, der Principal behält seine Identität, einfacher. **(D)** `AssumeRole` in Account A — Identitätswechsel mit temporären Credentials, besser auditierbar und der **einzige** Weg bei Services **ohne** Resource-based Policy.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — SQS unterstützt Queue-Policies; der Principal aus B wird direkt erlaubt und behält seine Identität.",
+        "B": "Falsch — Netzwerk-Ebene: SQS wird über den Service-Endpoint erreicht, VPC Peering hat mit der Autorisierung nichts zu tun.",
+        "C": "Der stärkste Distraktor — **AWS RAM existiert und teilt real Ressourcen** (Subnets, Transit Gateways, Resolver Rules, License Configurations). **SQS-Queues gehören nicht dazu.**",
+        "D": "**Richtig (2/2)** — Rolle in A mit SQS-Rechten, die B assumen darf: das universelle Cross-Account-Muster.",
+        "E": "Falsch — **SCPs gewähren niemals Rechte**, schon gar nicht auf Ressourcen in einem fremden Account. Sie deckeln nur die eigenen Principals."
+      },
+      "mnemonic": "Eselsbrücke: **Cross-Account geht über die Ressource (Policy) oder über die Identität (AssumeRole)** — nie übers Netzwerk.",
+      "examTrap": "RAM-Distraktoren prüfen, ob du die **teilbare Ressourcenliste** kennst — SQS ist nicht dabei. Und die SCP-gewährt-nichts-Regel taucht auch in Multi-Select-Fragen als fünfte Option auf."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-020",
+    "explanationStructured": {
+      "verdict": "Der `Principal` in einer Trust Policy kann **so eng wie ein einzelner Role-ARN** sein — der vollständige ARN der Lambda-Execution-Role ist die direkteste und sicherste Umsetzung von „ausschließlich diese eine Rolle“.",
+      "optionAnalysis": {
+        "A": "**Richtig** — der exakte Role-ARN als Principal: Nur dieser eine Principal kann assumen, keine Delegation, keine Indirektion.",
+        "B": "Der Fehler, der in der Praxis am häufigsten passiert — mit der **Account-ID** delegierst du die Entscheidung an Account A: **Jede** Rolle dort, deren Identity-Policy `sts:AssumeRole` erlaubt, kann übernehmen. Genau das soll verhindert werden.",
+        "C": "Falsch — SCPs **begrenzen** nur; sie können den Kreis der Berechtigten in der Trust Policy nicht definieren und gewähren nichts.",
+        "D": "Raffiniert, aber falsch für „sicherstellen“ — Tag-Conditions **funktionieren**, sind aber indirekt und nur so verlässlich wie die Kontrolle darüber, **wer Tags setzen darf**. Der direkte ARN ist strikt stärker."
+      },
+      "mnemonic": "Eselsbrücke: **So eng wie möglich principaln** — der volle ARN schlägt jede Umschreibung.",
+      "examTrap": "Die Account-ID-als-Principal-Falle ist der Kern: Sie klingt restriktiv, öffnet aber den **ganzen Account**. „Ausschließlich diese eine Rolle“ im Szenario verlangt den exakten ARN."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-021",
+    "explanationStructured": {
+      "verdict": "**`sts:SourceIdentity`** trägt eine **unveränderliche** Identitätsangabe durch alle Role-Chains und erscheint in **jedem** CloudTrail-Event. Über die Trust Policy (`sts:SetSourceIdentity`-Bedingung) lässt sie sich **erzwingen** — die Rolle kann ohne gesetzte Source Identity gar nicht assumiert werden. Genau das liefert die geforderte zuverlässige Mensch-Zuordnung.",
+      "optionAnalysis": {
+        "A": "Falsch — Data Events protokollieren **Ressourcen-Zugriffe** (S3-Objekte, Lambda-Invokes) feiner, lösen aber das Identitätsproblem der geteilten Rolle nicht.",
+        "B": "Falsch — Config überwacht **Konfigurationszustände** der Rolle, nicht, welcher Mensch eine Session nutzt.",
+        "C": "**Richtig** — SourceIdentity: unveränderlich, chain-übergreifend, per Trust Policy erzwingbar, in CloudTrail sichtbar.",
+        "D": "Der beste Distraktor der Domain — der **Session-Name erscheint tatsächlich in CloudTrail** und wird real dafür genutzt. Aber er ist **frei wählbar und nicht erzwingbar**: Wer etwas verbergen will, setzt einen anderen. „Zuverlässig“ disqualifiziert ihn."
+      },
+      "mnemonic": "Eselsbrücke: **SourceIdentity ist der fälschungssichere Absender** — der Session-Name nur ein Adressaufkleber.",
+      "examTrap": "Der Unterschied **erzwingbar vs. freiwillig** entscheidet: Session-Name = Konvention, SourceIdentity = Kontrolle. Bei „zuverlässig/nachweisbar“ im Szenario immer die erzwingbare Variante."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-022",
+    "explanationStructured": {
+      "verdict": "**Eine SCP gewährt niemals Rechte — sie setzt ausschließlich die Obergrenze.** Die tatsächliche Berechtigung muss aus einer IAM-Policy kommen. Effektiv gilt **SCP ∩ IAM-Policy**; die IAM-Seite ist hier leer → **implicit Deny**, Zugriff verweigert.",
+      "optionAnalysis": {
+        "A": "Falsch — die SCP „sendet“ keine Berechtigungen an Principals; sie filtert nur, was IAM-Policies maximal gewähren dürften.",
+        "B": "Falsch — es gibt keine automatische Teilberechtigung; ohne IAM-Allow existiert **gar kein** Zugriff, auch kein Listen.",
+        "C": "Falsch — SCPs werden nicht „geerbt“ wie Identity-Policies; sie sind ein externer Filter, keine implizite Policy des Accounts.",
+        "D": "**Richtig** — SCPs begrenzen nur. Ohne IAM-Allow bleibt der implicit Deny bestehen."
+      },
+      "mnemonic": "Eselsbrücke: **SCPs deckeln, IAM gewährt** — ein Filter sendet nichts.",
+      "examTrap": "Die wichtigste Einzelaussage zu SCPs, in Dauerschleife geprüft: Auch `FullAWSAccess` gewährt **nichts**. Alle drei Distraktoren sind Varianten desselben Denkfehlers (SCP als Sender)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-023",
+    "explanationStructured": {
+      "verdict": "**SCPs — und seit November 2024 auch RCPs — greifen ausschließlich in Member Accounts, niemals im Management Account.** Eine harte, oft übersehene Eigenschaft von Organizations. Genau deshalb lautet die Best Practice: **keine Workloads im Management Account** — er ist strukturell ungeschützt.",
+      "optionAnalysis": {
+        "A": "Falsch — durch die Aufgabenstellung ausgeschlossen: In den Member Accounts greift die SCP nachweislich, also ist sie korrekt attached.",
+        "B": "**Richtig** — der Admin arbeitet im Management Account, und dort wirken SCPs auf keinen Principal.",
+        "C": "Falsch — unmöglich: **Kein Allow kann ein SCP-Deny überschreiben**; SCPs sind Obergrenzen, keine verhandelbaren Policies.",
+        "D": "Falsch — faktisch daneben: **EC2 ist ein regionaler Service**; `aws:RequestedRegion`-Bedingungen greifen dort völlig normal."
+      },
+      "mnemonic": "Eselsbrücke: **Der Wächter bewacht alle Häuser — nur sein eigenes nicht.**",
+      "examTrap": "Die **Management-Account-Ausnahme** erklärt zwei Prüfmuster zugleich: „Warum wirkt die SCP hier nicht?“ und „Warum keine Workloads im Management Account?“ — **dieselbe Antwort**."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-024",
+    "explanationStructured": {
+      "verdict": "**RCPs (seit November 2024) sind resource-centric**: Sie kontrollieren, **wer auf deine Ressourcen zugreifen darf** — auch **externe** Principals. Eine RCP mit **`aws:PrincipalOrgID`**-Condition sperrt jeden Fremdzugriff org-weit aus, **egal was eine einzelne Bucket-Policy erlaubt**. Unterstützte Services: S3, STS, KMS, SQS, Secrets Manager.",
+      "optionAnalysis": {
+        "A": "**Richtig** — die RCP setzt den Data Perimeter zentral durch; die versehentlich geöffnete Bucket-Policy läuft dagegen ins Leere.",
+        "B": "Der Kern der Frage — **SCPs sind principal-centric**: Sie regeln, was die *eigenen* Identities dürfen. Einen **externen** Principal erreichen sie **strukturell nicht**; genau diese Lücke schließen RCPs.",
+        "C": "Falsch — Block Public Access blockiert nur **öffentlichen** Zugriff (`Principal: \"*\"`). Ein **benannter** fremder Account ist nicht „public“ und schlüpft durch.",
+        "D": "Falsch — Access Analyzer **findet und meldet** die Fehlkonfiguration, verhindert sie aber nicht. Die Aufgabe verlangt Prävention."
+      },
+      "mnemonic": "Eselsbrücke: **SCP zügelt meine Identities, RCP schützt meine Ressourcen.**",
+      "examTrap": "Drei Abstufungen im Optionsfeld: verhindern (RCP) vs. melden (Access Analyzer) vs. nur-public-blocken (BPA). „Externen Zugriff org-weit **verhindern**“ zeigt eindeutig auf die RCP — und das Nov-2024-Datum macht sie zum Aktualitätsthema."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-025",
+    "explanationStructured": {
+      "verdict": "**AWS Control Tower** liefert exakt dieses Paket als vorkonfigurierte **Landing Zone**: **Account Factory** (standardisiertes Provisioning), **preventive Guardrails** (SCPs), **detective Guardrails** (Config Rules), zentrales **Log-Archive-** und **Audit-Account** sowie **Drift Detection**.",
+      "optionAnalysis": {
+        "A": "Falsch — beschreibt genau die **Handarbeit**, die Control Tower automatisiert: alles einzeln je Account einrichten und konsistent halten.",
+        "B": "Falsch — StackSets sind ein *Baustein* (Control Tower nutzt sie intern), liefern aber weder Guardrails noch Account Factory noch Drift Detection.",
+        "C": "**Richtig** — Control Tower mit Account Factory und Guardrails ist die fertige Best-Practice-Fabrik über Organizations.",
+        "D": "Falsch — Service Catalog verwaltet **Produkte innerhalb** von Accounts; die Account Factory nutzt ihn zwar, aber allein provisioniert er keine Accounts mit Guardrails."
+      },
+      "mnemonic": "Eselsbrücke: **Organizations ist der Baukasten, Control Tower das Fertighaus.**",
+      "examTrap": "Signalwörter „**Landing Zone, Account-Fabrik, Guardrails out-of-the-box, Drift Detection**“ → Control Tower. Die Baustein-Distraktoren (StackSets, Service Catalog) sind Komponenten der Lösung, nicht die Lösung."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-026",
+    "explanationStructured": {
+      "verdict": "SCPs werden über die **gesamte Hierarchie geschnitten**: Eine Aktion muss auf **jeder** Ebene (Root, OU, Account) erlaubt sein. Die Root erlaubt nur `ec2:*`, die OU nur `s3:*` — die **Schnittmenge ist leer**, im betroffenen Account geht **gar nichts** mehr. Die klassische Falle der Allow-List-Strategie: Ohne `FullAWSAccess` muss jede benötigte Aktion auf jeder Ebene explizit stehen.",
+      "optionAnalysis": {
+        "A": "**Richtig** — leerer Schnitt über die Ebenen: Root ∩ OU = {} → Totalblockade.",
+        "B": "Falsch — es gibt **keine Überschreibungs-Hierarchie**: Die Root-SCP setzt keine OU-SCP außer Kraft; alle Ebenen werden geschnitten.",
+        "C": "Falsch — SCPs sind an **Root, OU und Account** gleichermaßen anhängbar; eine „nur am Account“-Regel für Allow-Listen existiert nicht.",
+        "D": "Falsch — IAM-Policies sind von der SCP-Strategie unberührt; sie müssen nicht neu erstellt werden. Sie laufen nur ins Leere, solange die SCP-Schnittmenge leer ist."
+      },
+      "mnemonic": "Eselsbrücke: **Jede Ebene ist ein Sieb** — die Allow-List muss auf allen Sieben dasselbe Loch haben.",
+      "examTrap": "Der Wechsel Deny-List → Allow-List ist das Szenario-Signal: Danach gilt **explizit erlauben auf jeder Ebene**. Überschreibungs- und Vorrang-Formulierungen in Optionen sind bei SCPs immer falsch — es gibt nur den Schnitt."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-027",
+    "explanationStructured": {
+      "verdict": "**SCPs haben eine dokumentierte Ausnahme: Service-Linked Roles.** Auto Scaling handelt über `AWSServiceRoleForAutoScaling` — und diese Rolle wird von SCPs **nicht** eingeschränkt. Dasselbe gilt für die Service-Linked Roles anderer Dienste (ELB, RDS …). Deshalb startet die ASG trotz `ec2:RunInstances`-Deny weiter Instanzen.",
+      "optionAnalysis": {
+        "A": "Falsch — beschreibt eine **echte** SCP-Ausnahme (Management Account), nur nicht die hier zutreffende: Die ASG läuft in einem Member Account.",
+        "B": "**Richtig** — Service-Linked Roles sind von SCPs ausgenommen; die ASG-Aktionen laufen unter genau so einer Rolle.",
+        "C": "Falsch — das Launch Template ist eine Konfigurationsvorlage und hat **keinerlei Einfluss auf die Autorisierung**; eine „SCP-Umgehung“ per Template existiert nicht.",
+        "D": "Falsch — SCPs wirken sehr wohl auf IAM-Roles — nur eben nicht auf **Service-Linked** Roles."
+      },
+      "mnemonic": "Eselsbrücke: **SCP-Lücken: Management Account, Root-only-Tasks und Service-Linked Roles** — der Hausmeister-Schlüssel passt immer.",
+      "examTrap": "Die Frage testet, ob du die **Ausnahmenliste** kennst, nicht die Regel. Distraktor A nennt eine echte Ausnahme im falschen Kontext — prüfe, welche Ausnahme zum Szenario passt."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-028",
+    "explanationStructured": {
+      "verdict": "**Tag Policies** (AWS Organizations) sind der einzige Mechanismus, der eine **Schreibweise standardisiert** und **erlaubte Werte** definiert — mit optionalem **Enforcement**, das nicht-konforme Tagging-Operationen blockiert. Genau die geforderte org-weite Vereinheitlichung von `CostCenter`.",
+      "optionAnalysis": {
+        "A": "Falsch — die Config Rule `required-tags` **findet** Verstöße (detektiv), **verhindert** sie aber nicht. Die Aufgabe verlangt Durchsetzung.",
+        "B": "Der stärkste Distraktor — eine SCP mit `aws:RequestTag` kann die **Existenz** eines Tags erzwingen, aber sie kann `costcenter` nicht von `CostCenter` unterscheiden oder normalisieren: Für sie sind das **zwei verschiedene Keys**. Das Schreibweisen-Problem bleibt.",
+        "C": "**Richtig** — Tag Policy mit Enforcement: definiert Key-Schreibweise und Wertelisten, blockiert Abweichungen org-weit.",
+        "D": "Falsch — eine Boundary pro Team skaliert nicht, ist der falsche Mechanismus (deckelt Rechte, verwaltet keine Tag-Standards) und löst die Schreibweise ebenfalls nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Tags normiert die Tag Policy** — die SCP kann nur „Tag da/nicht da“, nicht „Tag richtig geschrieben“.",
+      "examTrap": "Die Feinunterscheidung **Existenz erzwingen (SCP) vs. Schreibweise standardisieren (Tag Policy)** ist der ganze Punkt der Frage. „Uneinheitliche Schreibweisen“ im Szenario ist das Signalwort für Tag Policies."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-029",
+    "explanationStructured": {
+      "verdict": "AWS Organizations kennt **zwei Feature Sets**: **„Consolidated Billing Only“** (nur gemeinsame Abrechnung) und **„All Features“**. **SCPs — wie alle Policy-Typen — erfordern „All Features“.** Läuft die Organization im Billing-only-Modus, fehlt der komplette Policy-Reiter. Der Wechsel ist ein expliziter, einmaliger Schritt mit Zustimmung aller Member Accounts.",
+      "optionAnalysis": {
+        "A": "Falsch, aber real relevant — SCPs lassen sich nur im Management Account **verwalten**. Das erklärt aber nicht das **Fehlen des gesamten Policy-Reiters**; der fehlt nur im Billing-only-Modus.",
+        "B": "Falsch — Control Tower **nutzt** SCPs, ist aber keine Voraussetzung dafür. SCPs funktionieren mit purem Organizations (All Features).",
+        "C": "Falsch — eine „Aktivierung per CLI im Account“ existiert nicht; Policy-Typen werden auf Organization-Ebene aktiviert, sobald All Features läuft.",
+        "D": "**Richtig** — die Organization läuft im Modus „Consolidated Billing Only“; erst der Wechsel auf All Features schaltet SCPs (und Tag/Backup/AI-Policies) frei."
+      },
+      "mnemonic": "Eselsbrücke: **Billing-only rechnet nur zusammen — regieren kann erst All Features.**",
+      "examTrap": "Das Feature-Set-Detail ist ein klassischer Setup-Stolperstein: „Option fehlt komplett in der Konsole“ → **Modus-Frage**, nicht Berechtigungs-Frage. Distraktor A prüft, ob du **Verwalten-dürfen von Verfügbar-sein** trennst."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-030",
+    "explanationStructured": {
+      "verdict": "**Delegated Administrator** ist exakt dafür gebaut: Der Management Account delegiert die Verwaltung eines Services (GuardDuty, Security Hub, Config, Access Analyzer, Macie, Inspector …) an einen Member Account. Das Security-Team bekommt **volle GuardDuty-Kontrolle über die Organization — ohne jeden Zugang zum Management Account**.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Security-Account als Delegated Administrator für GuardDuty benennen: zentrale Detektor-Verwaltung, alle Findings, kein Management-Account-Zugriff.",
+        "B": "Falsch — die Cross-Account-Rolle **in den Management Account** verletzt exakt die Anforderung: Das Team soll dort keinen Zugang haben.",
+        "C": "Teilweise funktional, aber falsch — EventBridge kann Findings **sammeln**, erlaubt aber keine **zentrale Konfiguration** der Detektoren (aktivieren, Einstellungen, Suppression) und ist erheblicher Eigenbau.",
+        "D": "Falsch — auch ein „eingeschränktes“ Permission Set im Management Account gibt dem Team Zugriff genau dorthin, wo er ausgeschlossen sein soll."
+      },
+      "mnemonic": "Eselsbrücke: **Delegated Admin = der Schlüssel für ein Amt, nicht fürs Rathaus.**",
+      "examTrap": "Signalwortkette „**Service org-weit verwalten + ohne Management-Account-Zugriff**“ → Delegated Administrator. Beide Management-Account-Optionen scheitern an der Anforderung selbst — lies die Ausschlussbedingung zuerst."
+    }
+  }
+]

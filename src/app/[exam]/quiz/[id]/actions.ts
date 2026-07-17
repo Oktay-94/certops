@@ -4,6 +4,10 @@ import { cookies } from "next/headers";
 import { db } from "@/db";
 import { getQuestionById, insertAttempt } from "@/db/repository";
 import { getActiveProfileId } from "@/lib/profile-cookie";
+import {
+  isQuestionExplanationStructured,
+  type QuestionExplanationStructured,
+} from "@/lib/question-explanation";
 
 const SESSION_COOKIE = "certops_session_id";
 const ROUND_COOKIE = "certops_round_id";
@@ -11,6 +15,8 @@ const ROUND_COOKIE = "certops_round_id";
 export type SubmitAnswerResult = {
   correct: boolean;
   explanation: string;
+  // Shape-guarded server-side; null → flat explanation fallback in the UI.
+  explanationStructured: QuestionExplanationStructured | null;
   correctIds: string[];
 };
 
@@ -56,6 +62,11 @@ export async function submitAnswer(input: {
   return {
     correct: isCorrect,
     explanation: question.explanation,
+    explanationStructured: isQuestionExplanationStructured(
+      question.explanationStructured,
+    )
+      ? question.explanationStructured
+      : null,
     correctIds: question.correct,
   };
 }

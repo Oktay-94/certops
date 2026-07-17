@@ -6,6 +6,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import type { FlashcardBackStructured } from "../lib/flashcard-back";
+import type { QuestionExplanationStructured } from "../lib/question-explanation";
 
 export type Choice = { id: string; text: string };
 
@@ -22,6 +23,13 @@ export const questions = sqliteTable(
     choices: text("choices", { mode: "json" }).$type<Choice[]>().notNull(),
     correct: text("correct", { mode: "json" }).$type<string[]>().notNull(),
     explanation: text("explanation").notNull(),
+
+    // Structured explanation sections (SAA enrichment), nullable — CLF stays
+    // NULL, flat `explanation` is the render fallback. See
+    // src/lib/question-explanation.ts.
+    explanationStructured: text("explanation_structured", {
+      mode: "json",
+    }).$type<QuestionExplanationStructured>(),
 
     difficulty: integer("difficulty"),
     sourceRef: text("source_ref"),

@@ -22,6 +22,8 @@
     "db:backfill-seed-key:remote": "tsx src/db/backfill-seed-key-remote.ts",
     "db:backfill-back-structured": "tsx src/db/backfill-back-structured.ts",
     "db:backfill-back-structured:remote": "tsx src/db/backfill-back-structured-remote.ts",
+    "db:backfill-explanation-structured": "tsx src/db/backfill-explanation-structured.ts",
+    "db:backfill-explanation-structured:remote": "tsx src/db/backfill-explanation-structured-remote.ts",
     "db:migrate:remote": "drizzle-kit migrate --config=drizzle.config.turso.ts",
     "db:seed:remote": "tsx src/db/seed.ts"
   },

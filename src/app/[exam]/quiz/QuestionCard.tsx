@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { AlertTriangle, Lightbulb } from "lucide-react";
 import { renderInline } from "@/lib/inline-markup";
-import type { QuestionDisplay } from "@/db/schema";
+import type { Choice, QuestionDisplay } from "@/db/schema";
+import type { QuestionExplanationStructured } from "@/lib/question-explanation";
 import { BRAND_ORANGE } from "@/lib/brand";
 import { submitAnswer } from "./[id]/actions";
 
@@ -18,8 +20,98 @@ type Props = {
 type Verdict = {
   correct: boolean;
   explanation: string;
+  explanationStructured: QuestionExplanationStructured | null;
   correctIds: Set<string>;
 };
+
+// Structured explanation blocks under the verdict box. Tint recipe = the
+// flashcard section boxes (v4): Eselsbrücke = rose tint + rose border,
+// Prüfungsfalle = borderless amber fill. Option rows reuse the quiz verdict
+// colors (correct → success, chosen-wrong → danger).
+function StructuredExplanation({
+  data,
+  choices,
+  selected,
+  correctIds,
+}: {
+  data: QuestionExplanationStructured;
+  choices: Choice[];
+  selected: Set<string>;
+  correctIds: Set<string>;
+}) {
+  const label =
+    "flex items-center gap-1.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.12em]";
+  const rows = choices.filter((c) => data.optionAnalysis?.[c.id]?.trim());
+  const both = !!data.mnemonic && !!data.examTrap;
+
+  return (
+    <>
+      {(data.mnemonic || data.examTrap) && (
+        <div className={`mt-3 grid gap-3 ${both ? "sm:grid-cols-2" : ""}`}>
+          {data.mnemonic && (
+            <section className="rounded-lg border border-rose-500 bg-rose-500/10 p-3 dark:border-rose-400">
+              <h4 className={`${label} text-rose-700 dark:text-rose-300`}>
+                <Lightbulb className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Eselsbrücke
+              </h4>
+              <p className="mt-1.5 whitespace-pre-wrap break-words text-[13.5px] leading-relaxed text-ink-soft">
+                {renderInline(data.mnemonic)}
+              </p>
+            </section>
+          )}
+          {data.examTrap && (
+            <section className="rounded-lg bg-amber-500/15 p-3">
+              <h4 className={`${label} text-amber-700 dark:text-amber-300`}>
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Prüfungsfalle
+              </h4>
+              <p className="mt-1.5 whitespace-pre-wrap break-words text-[13.5px] leading-relaxed text-ink-soft">
+                {renderInline(data.examTrap)}
+              </p>
+            </section>
+          )}
+        </div>
+      )}
+
+      {rows.length > 0 && (
+        <div className="mt-3 space-y-1.5" data-testid="option-analysis">
+          {rows.map((c) => {
+            const isAnswer = correctIds.has(c.id);
+            const isChosenWrong = !isAnswer && selected.has(c.id);
+            return (
+              <p
+                key={c.id}
+                className={`flex items-start gap-2.5 rounded-md px-3 py-2 text-[13.5px] leading-relaxed ${
+                  isAnswer
+                    ? "bg-success-soft"
+                    : isChosenWrong
+                      ? "bg-danger-soft"
+                      : ""
+                }`}
+              >
+                <span
+                  className="pt-px font-mono font-bold"
+                  style={{
+                    color: isAnswer
+                      ? "var(--success)"
+                      : isChosenWrong
+                        ? "var(--danger)"
+                        : "var(--ink-faint)",
+                  }}
+                >
+                  {c.id}
+                </span>
+                <span className="whitespace-pre-wrap break-words text-ink-soft">
+                  {renderInline(data.optionAnalysis![c.id]!)}
+                </span>
+              </p>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
+}
 
 export function QuestionCard({ question, nextHref, homeHref, isLast }: Props) {
   const router = useRouter();
@@ -59,6 +151,7 @@ export function QuestionCard({ question, nextHref, homeHref, isLast }: Props) {
         setVerdict({
           correct: res.correct,
           explanation: res.explanation,
+          explanationStructured: res.explanationStructured,
           correctIds: new Set(res.correctIds),
         });
       } catch (err) {
@@ -240,9 +333,22 @@ export function QuestionCard({ question, nextHref, homeHref, isLast }: Props) {
               {verdict.correct ? "Richtig" : "Falsch"}
             </header>
             <p className="mt-3 leading-relaxed text-ink-soft">
-              {renderInline(verdict.explanation)}
+              {renderInline(
+                verdict.explanationStructured?.verdict?.trim()
+                  ? verdict.explanationStructured.verdict
+                  : verdict.explanation,
+              )}
             </p>
           </section>
+
+          {verdict.explanationStructured && (
+            <StructuredExplanation
+              data={verdict.explanationStructured}
+              choices={question.choices}
+              selected={selectedSet}
+              correctIds={verdict.correctIds}
+            />
+          )}
 
           <div className="mt-6 flex items-center justify-between gap-3">
             <Link
