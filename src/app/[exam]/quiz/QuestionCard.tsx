@@ -78,26 +78,24 @@ function StructuredExplanation({
           {rows.map((c) => {
             const isAnswer = correctIds.has(c.id);
             const isChosenWrong = !isAnswer && selected.has(c.id);
+            // Every wrong option gets a red tint; the CHOSEN wrong one stands
+            // out with the stronger soft fill + a danger border (transparent
+            // border on the others keeps row sizes identical).
             return (
               <p
                 key={c.id}
-                className={`flex items-start gap-2.5 rounded-md px-3 py-2 text-[13.5px] leading-relaxed ${
+                className={`flex items-start gap-2.5 rounded-md border px-3 py-2 text-[13.5px] leading-relaxed ${
                   isAnswer
-                    ? "bg-success-soft"
+                    ? "border-transparent bg-success-soft"
                     : isChosenWrong
-                      ? "bg-danger-soft"
-                      : ""
+                      ? "border-danger/50 bg-danger-soft"
+                      : "border-transparent bg-danger/5"
                 }`}
               >
                 <span
-                  className="pt-px font-mono font-bold"
-                  style={{
-                    color: isAnswer
-                      ? "var(--success)"
-                      : isChosenWrong
-                        ? "var(--danger)"
-                        : "var(--ink-faint)",
-                  }}
+                  className={`pt-px font-mono font-bold ${
+                    isAnswer ? "text-success" : "text-danger"
+                  }`}
                 >
                   {c.id}
                 </span>
@@ -316,19 +314,20 @@ export function QuestionCard({ question, nextHref, homeHref, isLast }: Props) {
 
       {verdict && (
         <>
+          {/* State-colored verdict box: success/danger tint + strong stripe
+              with a soft ring glow (damped in dark — the card mnemonic-ring
+              pattern). Tokens only, so it tracks theme + exam. */}
           <section
-            className="mt-8 rounded-[0_9px_9px_0] border-l-[3px] bg-surface-2 p-5"
-            style={{
-              borderColor: verdict.correct
-                ? "var(--success)"
-                : "var(--danger)",
-            }}
+            className={`mt-8 rounded-[0_9px_9px_0] border-l-[3px] p-5 ring-2 ${
+              verdict.correct
+                ? "border-success bg-success/10 ring-success/30 dark:ring-success/15"
+                : "border-danger bg-danger/10 ring-danger/30 dark:ring-danger/15"
+            }`}
           >
             <header
-              className="text-sm font-semibold uppercase tracking-wide"
-              style={{
-                color: verdict.correct ? "var(--success)" : "var(--danger)",
-              }}
+              className={`text-sm font-semibold uppercase tracking-wide ${
+                verdict.correct ? "text-success" : "text-danger"
+              }`}
             >
               {verdict.correct ? "Richtig" : "Falsch"}
             </header>
