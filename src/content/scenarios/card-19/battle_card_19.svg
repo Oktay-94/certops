@@ -1,0 +1,115 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#B0084D"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/></marker>
+    <marker id="arrGy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 19 — EBS gp3 vs. io2 Block Express · Snapshots</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Zahlungsdienstleister braucht garantierte IOPS und einen Restore, der sofort volle Leistung bringt</text>
+
+  <!-- gp2 verworfen -->
+  <rect x="40" y="160" width="250" height="150" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="165" y="196" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">gp2 4 TiB (heute)</text>
+  <text x="165" y="224" font-size="15" fill="#444444" text-anchor="middle">3 IOPS/GiB + Burst</text>
+  <text x="165" y="246" font-size="15" fill="#444444" text-anchor="middle">Credits laufen leer</text>
+  <text x="165" y="274" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Latenz bricht ein</text>
+
+  <!-- A: EC2 DB -->
+  <rect x="40" y="430" width="250" height="180" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="468" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">EC2 · PostgreSQL</text>
+  <text x="165" y="496" font-size="15" fill="#444444" text-anchor="middle">OLTP, 22.000 IOPS Spitze</text>
+  <text x="165" y="518" font-size="15" fill="#444444" text-anchor="middle">p99-Latenz &lt; 10 ms</text>
+  <text x="165" y="540" font-size="15" fill="#444444" text-anchor="middle">4 TiB Datenbestand</text>
+  <text x="165" y="568" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">self-managed, kein RDS</text>
+
+  <!-- G: gp3 -->
+  <rect x="470" y="150" width="380" height="190" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="660" y="190" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">gp3 — General Purpose SSD</text>
+  <text x="660" y="220" font-size="15" fill="#444444" text-anchor="middle">Basis 3.000 IOPS + 125 MiB/s inklusive</text>
+  <text x="660" y="242" font-size="15" fill="#444444" text-anchor="middle">IOPS und Durchsatz unabhängig wählbar</text>
+  <text x="660" y="264" font-size="15" fill="#444444" text-anchor="middle">bis 80.000 IOPS / 2.000 MB/s (Aufpreis)</text>
+  <text x="660" y="286" font-size="15" fill="#444444" text-anchor="middle">Durability 99,8–99,9 %</text>
+  <text x="660" y="314" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">kein Burst-Modell, 1 GiB – 16 TiB</text>
+
+  <!-- I: io2 -->
+  <rect x="470" y="430" width="380" height="215" rx="10" fill="#FDF0F5" stroke="#B0084D" stroke-width="2.5"/>
+  <text x="660" y="470" font-size="22" font-weight="bold" fill="#8A0A3F" text-anchor="middle">io2 Block Express</text>
+  <text x="660" y="500" font-size="15" fill="#444444" text-anchor="middle">bis 256.000 IOPS / 4.000 MB/s</text>
+  <text x="660" y="522" font-size="15" fill="#444444" text-anchor="middle">bis 64 TiB je Volume</text>
+  <text x="660" y="544" font-size="15" fill="#444444" text-anchor="middle">Durability 99,999 %</text>
+  <text x="660" y="566" font-size="15" fill="#444444" text-anchor="middle">Latenz im Mittel &lt; 500 µs (16 KiB)</text>
+  <text x="660" y="588" font-size="15" fill="#444444" text-anchor="middle">Multi-Attach: bis 16 Nitro-Instanzen</text>
+  <text x="660" y="616" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">gewählt für die Primary-DB</text>
+
+  <!-- S: Snapshot -->
+  <rect x="1010" y="150" width="490" height="190" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1255" y="190" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">EBS Snapshot</text>
+  <text x="1255" y="220" font-size="15" fill="#444444" text-anchor="middle">inkrementell — nur geänderte Blöcke</text>
+  <text x="1255" y="242" font-size="15" fill="#444444" text-anchor="middle">regional, AZ-unabhängig, von AWS verwaltet</text>
+  <text x="1255" y="264" font-size="15" fill="#444444" text-anchor="middle">Restore lädt Blöcke lazy nach → erste Zugriffe langsam</text>
+  <text x="1255" y="292" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Snapshot Archive: min. 90 Tage, Restore 24–72 h</text>
+  <text x="1255" y="316" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Zeitplan über DLM oder AWS Backup</text>
+
+  <!-- F: FSR -->
+  <rect x="1010" y="430" width="490" height="180" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="1255" y="470" font-size="22" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Fast Snapshot Restore</text>
+  <text x="1255" y="500" font-size="15" fill="#444444" text-anchor="middle">pro Snapshot UND pro AZ aktivieren</text>
+  <text x="1255" y="522" font-size="15" fill="#444444" text-anchor="middle">neues Volume ist sofort voll leistungsfähig</text>
+  <text x="1255" y="544" font-size="15" fill="#444444" text-anchor="middle">kein Lazy-Loading, kein Warmlaufen</text>
+  <text x="1255" y="572" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">kostet pro DSU-Stunde, Credit-Limit je AZ</text>
+
+  <!-- Entscheidungsregel -->
+  <rect x="40" y="680" width="1460" height="125" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="60" y="712" font-size="20" font-weight="bold" fill="#555555">Wann io2 Block Express statt gp3?</text>
+  <text x="60" y="742" font-size="15" fill="#444444">Mindestens eines muss zutreffen: mehr IOPS als gp3 liefert · konstant sub-Millisekunden-Latenz · 99,999 % Durability · Multi-Attach an bis zu 16 Nitro-Instanzen</text>
+  <text x="60" y="768" font-size="15" fill="#444444">Sonst gp3 — deutlich billiger. io1 = Vorgänger (max. 64.000 IOPS, 99,8–99,9 %). gp2 = Burst-Credits, kein eigenständiges IOPS-Provisioning.</text>
+
+  <!-- verworfen: bei gp2 bleiben -->
+  <line x1="165" y1="430" x2="165" y2="310" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGy)"/>
+  <text x="195" y="375" font-size="16" fill="#555555">verworfen</text>
+  <text x="195" y="397" font-size="16" fill="#555555">Burst-Cliff</text>
+  <circle cx="165" cy="370" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="152" y1="357" x2="178" y2="383" stroke="#C7161D" stroke-width="4"/>
+  <line x1="178" y1="357" x2="152" y2="383" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- 1: DB -> gp3 -->
+  <path d="M290,470 L380,470 L380,240 L470,240" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <text x="298" y="300" font-size="16" fill="#2E6318">Reporting</text>
+  <text x="298" y="322" font-size="16" fill="#2E6318">Replica</text>
+  <circle cx="380" cy="350" r="15" fill="#3F8624"/>
+  <text x="380" y="356" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2: DB -> io2 -->
+  <line x1="290" y1="520" x2="470" y2="520" stroke="#B0084D" stroke-width="3" marker-end="url(#arrR)"/>
+  <text x="300" y="492" font-size="16" fill="#8A0A3F">Primary-Datenbank</text>
+  <circle cx="380" cy="520" r="15" fill="#B0084D"/>
+  <text x="380" y="526" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3: io2 -> Snapshot -->
+  <path d="M850,470 L945,470 L945,240 L1010,240" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="858" y="290" font-size="16" fill="#232F3E">täglich</text>
+  <text x="858" y="312" font-size="16" fill="#232F3E">Snapshot</text>
+  <circle cx="945" cy="360" r="15" fill="#232F3E"/>
+  <text x="945" y="366" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4: Snapshot -> FSR -->
+  <line x1="1255" y1="340" x2="1255" y2="430" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <text x="1040" y="392" font-size="16" fill="#5B2BAF">FSR aktivieren</text>
+  <circle cx="1255" cy="385" r="15" fill="#7A3FE0"/>
+  <text x="1255" y="391" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 5: FSR -> neues Volume -->
+  <line x1="1010" y1="560" x2="850" y2="560" stroke="#7A3FE0" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrP)"/>
+  <text x="860" y="592" font-size="16" fill="#5B2BAF">Restore: voll</text>
+  <text x="860" y="614" font-size="16" fill="#5B2BAF">leistungsfähig</text>
+  <circle cx="930" cy="560" r="15" fill="#7A3FE0"/>
+  <text x="930" y="566" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  gp3 = 3.000 IOPS Basis, IOPS/Durchsatz getrennt · io2 BE bei sub-ms, 99,999 % oder Multi-Attach · Snapshots inkrementell · FSR gegen lahmen Restore</text>
+</svg>

@@ -1,0 +1,112 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrGd" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 16 — S3 File Gateway · Amazon S3</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Ingenieurbüro schreibt weiter auf sein Netzlaufwerk — die Dateien landen als Objekte in S3</text>
+
+  <!-- Zone ON-PREMISE -->
+  <rect x="40" y="150" width="470" height="520" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="275" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE — Ingenieurbüro Nordwerk</text>
+
+  <!-- A: Anwendung -->
+  <rect x="80" y="205" width="250" height="110" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="205" y="240" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">CAD-Anwendung</text>
+  <text x="205" y="268" font-size="15" fill="#444444" text-anchor="middle">PDM-Server, SMB v3</text>
+  <text x="205" y="292" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Laufwerk Z:\ unverändert</text>
+
+  <!-- B: Gateway -->
+  <rect x="80" y="375" width="250" height="135" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="205" y="408" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">S3 File Gateway</text>
+  <text x="205" y="435" font-size="15" fill="#444444" text-anchor="middle">VM im eigenen RZ (ESXi/KVM)</text>
+  <text x="205" y="457" font-size="15" fill="#444444" text-anchor="middle">übersetzt Datei ↔ Objekt</text>
+  <text x="205" y="484" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">auch als Hardware-Appliance</text>
+
+  <!-- C: Cache -->
+  <rect x="80" y="575" width="250" height="70" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="205" y="605" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Lokaler Cache</text>
+  <text x="205" y="630" font-size="15" fill="#444444" text-anchor="middle">read-through, bis 64 TB</text>
+
+  <!-- D: S3 -->
+  <rect x="700" y="390" width="300" height="170" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="850" y="428" font-size="23" font-weight="bold" fill="#2E6318" text-anchor="middle">Amazon S3 (Bucket)</text>
+  <text x="850" y="457" font-size="15" fill="#444444" text-anchor="middle">1 Datei = 1 Objekt</text>
+  <text x="850" y="479" font-size="15" fill="#444444" text-anchor="middle">Object Key = Dateipfad</text>
+  <text x="850" y="501" font-size="15" fill="#444444" text-anchor="middle">SSE-S3 / SSE-KMS / DSSE-KMS</text>
+  <text x="850" y="529" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Versioning &amp; Replication nutzbar</text>
+
+  <!-- E: Glacier -->
+  <rect x="700" y="650" width="300" height="105" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="850" y="686" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Glacier Deep Archive</text>
+  <text x="850" y="713" font-size="15" fill="#444444" text-anchor="middle">Projekte älter als 90 Tage</text>
+  <text x="850" y="736" font-size="15" fill="#444444" text-anchor="middle">Restore in Stunden</text>
+
+  <!-- F: Services -->
+  <rect x="1080" y="180" width="420" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1290" y="218" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">AWS-Services auf den Objekten</text>
+  <text x="1290" y="248" font-size="15" fill="#444444" text-anchor="middle">Lambda-Trigger, Athena-SQL, SageMaker</text>
+  <text x="1290" y="270" font-size="15" fill="#444444" text-anchor="middle">möglich, weil kein proprietäres Format</text>
+  <text x="1290" y="299" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">bei Volume/Tape Gateway nicht möglich</text>
+
+  <!-- G: Abgrenzung -->
+  <rect x="1080" y="430" width="420" height="230" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1290" y="468" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Nicht verwechseln</text>
+  <text x="1100" y="500" font-size="15" fill="#444444">Volume Gateway: iSCSI-Blöcke, EBS-Snapshots</text>
+  <text x="1100" y="524" font-size="15" fill="#444444">Tape Gateway: virtuelle Tapes (VTL)</text>
+  <text x="1100" y="548" font-size="15" fill="#444444">DataSync: geplanter Kopier-Job, kein Mount</text>
+  <text x="1100" y="572" font-size="15" fill="#444444">Snowball Edge: Einmal-Transport per Gerät</text>
+  <text x="1100" y="606" font-size="15" fill="#666666" font-style="italic">File Gateway = dauerhafter Mount-Punkt</text>
+  <text x="1100" y="630" font-size="15" fill="#666666" font-style="italic">mit 1:1-Objektabbildung</text>
+
+  <!-- 1: App -> Gateway -->
+  <line x1="205" y1="315" x2="205" y2="375" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="228" y="338" font-size="16" fill="#1B3E86">Write über SMB</text>
+  <text x="228" y="358" font-size="16" fill="#1B3E86">(NFS v3/4.1 auch)</text>
+  <circle cx="205" cy="345" r="15" fill="#2E6BE6"/>
+  <text x="205" y="351" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2: Gateway -> Cache -->
+  <line x1="205" y1="510" x2="205" y2="575" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="228" y="535" font-size="16" fill="#232F3E">synchron in den Cache</text>
+  <text x="228" y="555" font-size="16" fill="#232F3E">→ sofortiger ACK</text>
+  <circle cx="205" cy="542" r="15" fill="#232F3E"/>
+  <text x="205" y="548" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3: Gateway -> S3 -->
+  <line x1="330" y1="400" x2="700" y2="400" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="420" y="364" font-size="16" fill="#232F3E">Upload asynchron über HTTPS</text>
+  <text x="420" y="386" font-size="16" fill="#232F3E">Dateipfad wird Object Key</text>
+  <circle cx="390" cy="400" r="15" fill="#232F3E"/>
+  <text x="390" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4: S3 -> Gateway (read-through) -->
+  <line x1="700" y1="470" x2="330" y2="470" stroke="#3F8624" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGr)"/>
+  <text x="380" y="500" font-size="16" fill="#2E6318">Cache-Miss: read-through</text>
+  <text x="380" y="522" font-size="16" fill="#2E6318">aus S3 nachladen</text>
+  <circle cx="640" cy="470" r="15" fill="#3F8624"/>
+  <text x="640" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 5: S3 -> Glacier -->
+  <line x1="760" y1="560" x2="760" y2="650" stroke="#A16E00" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGd)"/>
+  <text x="790" y="598" font-size="16" fill="#7A5300">Lifecycle-Regel</text>
+  <text x="790" y="620" font-size="16" fill="#7A5300">nach 90 Tagen</text>
+  <circle cx="760" cy="605" r="15" fill="#A16E00"/>
+  <text x="760" y="611" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- 6: S3 -> Services -->
+  <path d="M900,390 L900,255 L1080,255" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="920" y="232" font-size="16" fill="#A85A05">direkt lesbar</text>
+  <text x="920" y="288" font-size="16" fill="#A85A05">kein Export nötig</text>
+  <circle cx="900" cy="330" r="15" fill="#D97706"/>
+  <text x="900" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  File Gateway = NFS/SMB-Mount auf S3 · 1 Datei = 1 Objekt · Write: sync in Cache, async nach S3 · Volume GW = iSCSI-Blöcke, Tape GW = VTL</text>
+</svg>

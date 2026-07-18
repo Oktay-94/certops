@@ -1,0 +1,114 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+    <marker id="arrGy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 17 — Snowball Edge · Amazon S3</text>
+  <text x="60" y="106" font-size="21" fill="#555555">500 TB Altdaten in die Cloud — die Leitung bräuchte fünf Monate, das Gerät drei Wochen</text>
+
+  <!-- Zone ON-PREMISE -->
+  <rect x="40" y="300" width="600" height="380" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="440" y="328" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE — Landesmedienarchiv</text>
+
+  <!-- A: SAN -->
+  <rect x="75" y="355" width="265" height="125" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="207" y="390" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Altdaten-SAN</text>
+  <text x="207" y="417" font-size="15" fill="#444444" text-anchor="middle">500 TB Filmarchiv</text>
+  <text x="207" y="439" font-size="15" fill="#444444" text-anchor="middle">300 Mbit/s frei → 154 Tage</text>
+  <text x="207" y="465" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Online-Upload unrealistisch</text>
+
+  <!-- C: OpsHub -->
+  <rect x="380" y="355" width="225" height="125" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="492" y="390" font-size="22" font-weight="bold" fill="#5B2BAF" text-anchor="middle">AWS OpsHub</text>
+  <text x="492" y="417" font-size="15" fill="#444444" text-anchor="middle">Gerät entsperren</text>
+  <text x="492" y="439" font-size="15" fill="#444444" text-anchor="middle">Job überwachen</text>
+  <text x="492" y="465" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Manifest + Unlock-Code</text>
+
+  <!-- B: Snowball -->
+  <rect x="75" y="545" width="530" height="110" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="340" y="578" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">3 × Snowball Edge Storage Optimized</text>
+  <text x="340" y="606" font-size="15" fill="#444444" text-anchor="middle">je 210 TB NVMe · bis 1,5 GB/s · KMS-verschlüsselt</text>
+  <text x="340" y="632" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">temporär im Haus — geht zurück</text>
+
+  <!-- G: verworfen -->
+  <rect x="660" y="180" width="380" height="150" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="850" y="218" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Direktupload über die Leitung</text>
+  <text x="850" y="248" font-size="15" fill="#444444" text-anchor="middle">500 TB bei 300 Mbit/s ≈ 154 Tage</text>
+  <text x="850" y="272" font-size="15" fill="#444444" text-anchor="middle">Leitung wäre monatelang belegt</text>
+  <text x="850" y="300" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">verworfen — Deadline 8 Wochen</text>
+
+  <!-- T: Transport -->
+  <rect x="760" y="545" width="300" height="110" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="910" y="580" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Rückversand &amp; Ingest</text>
+  <text x="910" y="606" font-size="15" fill="#444444" text-anchor="middle">E-Ink-Label, Carrier, AWS-Ingest</text>
+  <text x="910" y="632" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Geräte werden NIST-gelöscht</text>
+
+  <!-- D: S3 -->
+  <rect x="1180" y="370" width="320" height="175" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1340" y="408" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Amazon S3 (Zielbucket)</text>
+  <text x="1340" y="437" font-size="15" fill="#444444" text-anchor="middle">Import durch AWS</text>
+  <text x="1340" y="459" font-size="15" fill="#444444" text-anchor="middle">SSE-KMS wie im Job definiert</text>
+  <text x="1340" y="481" font-size="15" fill="#444444" text-anchor="middle">Job-Report + CloudWatch-Logs</text>
+  <text x="1340" y="509" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">danach Lifecycle nach Glacier</text>
+
+  <!-- F: DataSync -->
+  <rect x="1180" y="650" width="320" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1340" y="686" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">AWS DataSync</text>
+  <text x="1340" y="713" font-size="15" fill="#444444" text-anchor="middle">gleicht die Wochen ab, die</text>
+  <text x="1340" y="735" font-size="15" fill="#444444" text-anchor="middle">während des Transports liefen</text>
+
+  <!-- H: Stand 2026 -->
+  <rect x="40" y="700" width="700" height="105" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="60" y="730" font-size="20" font-weight="bold" fill="#555555">Stand 2026 — wichtig</text>
+  <text x="60" y="757" font-size="15" fill="#444444">Snowball Edge seit 07.11.2025 nur noch für Bestandskunden.</text>
+  <text x="60" y="781" font-size="15" fill="#444444">Neukunden: DataSync · AWS Data Transfer Terminal · Partner-Appliance.</text>
+
+  <!-- verworfener Pfad -->
+  <path d="M207,355 L207,255 L640,255" fill="none" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGy)"/>
+  <text x="250" y="225" font-size="16" fill="#555555">verworfen: 154 Tage bei 300 Mbit/s</text>
+  <circle cx="430" cy="255" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="417" y1="242" x2="443" y2="268" stroke="#C7161D" stroke-width="4"/>
+  <line x1="443" y1="242" x2="417" y2="268" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- 1: SAN -> Snowball -->
+  <line x1="207" y1="480" x2="207" y2="545" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="230" y="505" font-size="16" fill="#232F3E">NFS-Mount oder</text>
+  <text x="230" y="525" font-size="16" fill="#232F3E">S3-kompatible API</text>
+  <circle cx="207" cy="512" r="15" fill="#232F3E"/>
+  <text x="207" y="518" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2: OpsHub -> Snowball -->
+  <line x1="492" y1="480" x2="492" y2="545" stroke="#7A3FE0" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrP)"/>
+  <text x="517" y="505" font-size="16" fill="#5B2BAF">Unlock &amp;</text>
+  <text x="517" y="525" font-size="16" fill="#5B2BAF">Monitoring</text>
+  <circle cx="492" cy="512" r="15" fill="#7A3FE0"/>
+  <text x="492" y="518" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3: Snowball -> Rückversand -->
+  <line x1="605" y1="600" x2="760" y2="600" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="612" y="572" font-size="16" fill="#1B3E86">Carrier holt ab</text>
+  <circle cx="682" cy="600" r="15" fill="#2E6BE6"/>
+  <text x="682" y="606" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4: Ingest -> S3 -->
+  <path d="M910,545 L910,440 L1180,440" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="940" y="418" font-size="16" fill="#1B3E86">Import in den Bucket</text>
+  <text x="940" y="470" font-size="16" fill="#1B3E86">SSE-KMS bleibt erhalten</text>
+  <circle cx="910" cy="500" r="15" fill="#2E6BE6"/>
+  <text x="910" y="506" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 5: DataSync -> S3 -->
+  <line x1="1340" y1="650" x2="1340" y2="545" stroke="#D97706" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrO)"/>
+  <text x="1170" y="592" font-size="16" fill="#A85A05">Delta nachziehen</text>
+  <circle cx="1340" cy="598" r="15" fill="#D97706"/>
+  <text x="1340" y="604" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Leitung zu langsam + viele TB → Snowball · 1 Gerät = 210 TB · Unlock per OpsHub, E-Ink-Label für den Rückweg · seit 07.11.2025 nur Bestandskunden</text>
+</svg>

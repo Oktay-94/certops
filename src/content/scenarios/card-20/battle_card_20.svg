@@ -1,0 +1,140 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/></marker>
+    <marker id="arrGy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 20 — S3 Access Points · VPC Endpoints</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Ein 8-PB-Bucket, drei Teams, eine Bucket Policy am Limit — und kein Byte über das Internet</text>
+
+  <!-- Zonen -->
+  <rect x="40" y="150" width="320" height="250" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="200" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">VPC — DATA SCIENCE</text>
+
+  <rect x="40" y="470" width="320" height="250" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="200" y="498" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE — FINANCE</text>
+
+  <rect x="860" y="150" width="690" height="570" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="1205" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AMAZON S3</text>
+
+  <!-- A1 -->
+  <rect x="70" y="200" width="260" height="170" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="200" y="238" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">Data-Science-VPC</text>
+  <text x="200" y="266" font-size="15" fill="#444444" text-anchor="middle">EC2 · EMR · SageMaker</text>
+  <text x="200" y="288" font-size="15" fill="#444444" text-anchor="middle">liest und schreibt</text>
+  <text x="200" y="310" font-size="15" fill="#444444" text-anchor="middle">Präfix /curated</text>
+  <text x="200" y="338" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">private Subnetze</text>
+
+  <!-- A2 -->
+  <rect x="70" y="520" width="260" height="170" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="200" y="558" font-size="19" font-weight="bold" fill="#232F3E" text-anchor="middle">Finance (eigenes RZ)</text>
+  <text x="200" y="586" font-size="15" fill="#444444" text-anchor="middle">BI-Tool, nur lesend</text>
+  <text x="200" y="608" font-size="15" fill="#444444" text-anchor="middle">Präfix /finance</text>
+  <text x="200" y="630" font-size="15" fill="#444444" text-anchor="middle">kein Internetweg erlaubt</text>
+  <text x="200" y="658" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Anbindung über Direct Connect</text>
+
+  <!-- E1 -->
+  <rect x="470" y="200" width="300" height="170" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="620" y="240" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">S3 Gateway Endpoint</text>
+  <text x="620" y="270" font-size="15" fill="#444444" text-anchor="middle">Eintrag in der Route Table</text>
+  <text x="620" y="292" font-size="15" fill="#444444" text-anchor="middle">kein ENI, keine Kosten</text>
+  <text x="620" y="314" font-size="15" fill="#444444" text-anchor="middle">Endpoint-Policy begrenzt Buckets</text>
+  <text x="620" y="342" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">nur aus dieser VPC nutzbar</text>
+
+  <!-- E2 -->
+  <rect x="470" y="520" width="300" height="170" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="620" y="560" font-size="22" font-weight="bold" fill="#5B2BAF" text-anchor="middle">S3 Interface Endpoint</text>
+  <text x="620" y="590" font-size="15" fill="#444444" text-anchor="middle">PrivateLink: ENI mit privater IP</text>
+  <text x="620" y="612" font-size="15" fill="#444444" text-anchor="middle">Stundenpreis + GB-Preis</text>
+  <text x="620" y="634" font-size="15" fill="#444444" text-anchor="middle">auch aus dem RZ erreichbar</text>
+  <text x="620" y="662" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Private DNS möglich</text>
+
+  <!-- AP1 -->
+  <rect x="890" y="200" width="280" height="170" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1030" y="238" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Access Point</text>
+  <text x="1030" y="266" font-size="15" fill="#444444" text-anchor="middle">Name: ds-curated</text>
+  <text x="1030" y="288" font-size="15" fill="#444444" text-anchor="middle">Network Origin: VPC</text>
+  <text x="1030" y="310" font-size="15" fill="#444444" text-anchor="middle">eigener Hostname + Policy</text>
+  <text x="1030" y="338" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Block Public Access an</text>
+
+  <!-- AP2 -->
+  <rect x="890" y="520" width="280" height="170" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1030" y="558" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Access Point</text>
+  <text x="1030" y="586" font-size="15" fill="#444444" text-anchor="middle">Name: finance-ro</text>
+  <text x="1030" y="608" font-size="15" fill="#444444" text-anchor="middle">Network Origin: VPC</text>
+  <text x="1030" y="630" font-size="15" fill="#444444" text-anchor="middle">nur s3:GetObject</text>
+  <text x="1030" y="658" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Präfix /finance erzwungen</text>
+
+  <!-- B -->
+  <rect x="1250" y="370" width="280" height="180" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1390" y="410" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Bucket — Data Lake</text>
+  <text x="1390" y="440" font-size="15" fill="#444444" text-anchor="middle">8 PB, ein einziger Bucket</text>
+  <text x="1390" y="462" font-size="15" fill="#444444" text-anchor="middle">Bucket Policy delegiert an</text>
+  <text x="1390" y="484" font-size="15" fill="#444444" text-anchor="middle">die Access Points</text>
+  <text x="1390" y="506" font-size="15" fill="#444444" text-anchor="middle">statt 240 Statements</text>
+  <text x="1390" y="534" font-size="15" fill="#666666" font-style="italic" text-anchor="middle">Policy-Limit 20 KB</text>
+
+  <!-- Abgrenzung -->
+  <rect x="40" y="735" width="1510" height="75" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="60" y="765" font-size="15" fill="#444444">Gateway Endpoint: Route-Table-Eintrag, kostenlos, nur aus der eigenen VPC — nicht on-premises, nicht über Transit Gateway, nicht aus gepeerten VPCs anderer Regionen.</text>
+  <text x="60" y="791" font-size="15" fill="#444444">Interface Endpoint (PrivateLink): ENI mit privater IP, Stunden- und GB-Preis, erreichbar aus dem eigenen RZ über Direct Connect oder VPN und aus gepeerten VPCs.</text>
+
+  <!-- verworfen -->
+  <path d="M330,560 L400,560 L400,340 L470,340" fill="none" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGy)"/>
+  <text x="425" y="455" font-size="16" fill="#555555">Gateway EP geht</text>
+  <text x="425" y="477" font-size="16" fill="#555555">nicht on-premises</text>
+  <circle cx="400" cy="450" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="387" y1="437" x2="413" y2="463" stroke="#C7161D" stroke-width="4"/>
+  <line x1="413" y1="437" x2="387" y2="463" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- 1 -->
+  <line x1="330" y1="285" x2="470" y2="285" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="336" y="257" font-size="16" fill="#1B3E86">AP-Hostname</text>
+  <text x="336" y="325" font-size="16" fill="#1B3E86">aus der VPC</text>
+  <circle cx="390" cy="285" r="15" fill="#2E6BE6"/>
+  <text x="390" y="291" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2 -->
+  <line x1="770" y1="285" x2="890" y2="285" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <text x="776" y="257" font-size="16" fill="#0B5A66">Gateway EP</text>
+  <text x="776" y="325" font-size="16" fill="#0B5A66">kostenlos</text>
+  <circle cx="830" cy="285" r="15" fill="#0F7C8C"/>
+  <text x="830" y="291" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3 -->
+  <path d="M1030,370 L1030,440 L1250,440" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="1060" y="418" font-size="16" fill="#A85A05">Delegation</text>
+  <text x="1060" y="468" font-size="16" fill="#A85A05">per Bucket Policy</text>
+  <circle cx="1030" cy="405" r="15" fill="#D97706"/>
+  <text x="1030" y="411" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4 -->
+  <line x1="330" y1="605" x2="470" y2="605" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="336" y="577" font-size="16" fill="#232F3E">Direct Connect</text>
+  <text x="336" y="645" font-size="16" fill="#232F3E">oder VPN</text>
+  <circle cx="390" cy="605" r="15" fill="#232F3E"/>
+  <text x="390" y="611" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 5 -->
+  <line x1="770" y1="605" x2="890" y2="605" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <text x="776" y="577" font-size="16" fill="#5B2BAF">Interface EP</text>
+  <text x="776" y="645" font-size="16" fill="#5B2BAF">ENI + Kosten</text>
+  <circle cx="830" cy="605" r="15" fill="#7A3FE0"/>
+  <text x="830" y="611" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- 6 -->
+  <path d="M1170,570 L1210,570 L1210,520 L1250,520" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="1176" y="600" font-size="16" fill="#A85A05">nur GET</text>
+  <text x="1176" y="622" font-size="16" fill="#A85A05">auf /finance</text>
+  <circle cx="1210" cy="545" r="15" fill="#D97706"/>
+  <text x="1210" y="551" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Access Point = eigener Hostname + eigene Policy je Team · Network Origin VPC sperrt alles andere aus · Gateway EP gratis, aber nicht on-prem</text>
+</svg>
