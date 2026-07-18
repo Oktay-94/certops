@@ -1,0 +1,777 @@
+[
+  {
+    "seedKey": "saa-c03-q-151",
+    "explanationStructured": {
+      "verdict": "**st1** ist der throughput-optimierte HDD-Typ, gebaut für große **sequenzielle** Workloads wie Kafka, Log-Processing und MapReduce: **40 MB/s Baseline pro TiB**, Burst bis 250 MB/s/TiB, max **500 MB/s pro Volume** — zu einem Bruchteil der SSD-Kosten. Da die Kafka-Daten repliziert sind, ist HDD hier kein Risiko.",
+      "optionAnalysis": {
+        "A": "**Richtig** — st1: sequenzieller Durchsatz, mit der Volume-Größe skalierend, billig; ideal für Kafka-Log-Segmente.",
+        "B": "Falsch für die Kosten — gp3 liefert den Durchsatz auch, bezahlt ihn aber als **SSD deutlich teurer**, ohne dass der sequenzielle Workload SSD braucht.",
+        "C": "Falsch — sc1 ist noch billiger, aber **cold** (12 MB/s/TiB Baseline); für einen aktiv laufenden Kafka-Cluster zu langsam.",
+        "D": "Falsch — io2 Block Express ist Sub-Millisekunden-**Random-IOPS**-Storage; für rein sequenziellen Durchsatz maßlos überteuert."
+      },
+      "mnemonic": "Eselsbrücke: **Sequenzieller Durchsatz, günstig = st1** — Random-I/O spielt keine Rolle.",
+      "examTrap": "st1 vs. sc1: **st1 = throughput-workload (Kafka/Logs), sc1 = Kühlschrank.** Random-I/O-Bedarf würde beide disqualifizieren; hier ist es rein sequenziell."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-152",
+    "explanationStructured": {
+      "verdict": "**io2 Block Express** ist der einzige EBS-Typ, der beide Anforderungen nativ erfüllt: bis **256.000 IOPS** auf Nitro, durchschnittliche Latenz **unter 500 µs** und **99,999 % Durability** — zwei Größenordnungen über den 99,8–99,9 % der übrigen Typen. Seit April 2025 ist jedes io2-Volume automatisch Block Express.",
+      "optionAnalysis": {
+        "A": "Falsch — mehrere gp3 (je 16.000 IOPS) im RAID-0 erreichen die IOPS rechnerisch, aber **RAID-0 multipliziert das Ausfallrisiko** und ist Eigenbau statt eines Volumes.",
+        "B": "**Richtig** — io2 Block Express: 256.000 IOPS, Sub-Millisekunden-Latenz, fünf Neunen Durability — nativ.",
+        "C": "Falsch — Instance Store hat die niedrigste Latenz, ist aber **flüchtig**; für eine persistente Oracle-DB ungeeignet.",
+        "D": "Falsch — st1 ist HDD-Durchsatz, liefert **keine** 120.000 Random-IOPS bei Sub-Millisekunden-Latenz."
+      },
+      "mnemonic": "Eselsbrücke: **Sehr hohe IOPS + niedrigste Latenz + persistent = io2 Block Express.**",
+      "examTrap": "Aktualität: **io2 = Block Express seit April 2025** (256k IOPS, 99,999 %). RAID-0 aus gp3 ist der Distraktor — es erhöht das Ausfallrisiko und ist kein natives Einzelvolumen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-153",
+    "explanationStructured": {
+      "verdict": "**Instance Store** (lokales NVMe, physisch am Host) liefert die höchste erreichbare I/O-Performance — ohne Netzwerk-Umweg und ohne Extra-Speicherkosten (im Instanzpreis enthalten). Dass die Daten bei Stop/Hardware-Fehler verloren gehen, ist irrelevant: Es sind **verwerfbare Zwischendateien**, das Ergebnis liegt in S3.",
+      "optionAnalysis": {
+        "A": "Falsch — maximal konfigurierte gp3-Volumes sind teurer und langsamer als lokales NVMe für flüchtige Scratch-Daten.",
+        "B": "Falsch — io2 Block Express ist persistenter, teurer Netzwerk-Storage; für wegwerfbare Zwischendateien überdimensioniert.",
+        "C": "Falsch — FSx for Lustre ist ein **geteiltes** Filesystem; die Instanzen brauchen hier aber je **lokalen** Scratch-Speicher, kein Sharing.",
+        "D": "**Richtig** — Instanztypen mit lokalem NVMe-Instance-Store: schnellste, kostenfreie Ablage für verwerfbare Zwischendateien."
+      },
+      "mnemonic": "Eselsbrücke: **Schnell und wegwerfbar = Instance Store** — die Persistenz liegt in S3.",
+      "examTrap": "**„Temporär, höchste I/O, Ergebnis liegt woanders“** → Instance Store. Der Datenverlust bei Stop ist genau hier kein Problem — das ist die Kernerkenntnis."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-154",
+    "explanationStructured": {
+      "verdict": "Die **5-GB-Grenze ist das Limit eines einzelnen PUT** — größere Objekte brauchen zwingend **Multipart Upload** (empfohlen ab 100 MB). Multipart löst auch das zweite Problem: Teile (5 MiB–5 GiB) werden unabhängig/parallel übertragen, und bei Abbruch wird nur der **fehlgeschlagene Teil** wiederholt.",
+      "optionAnalysis": {
+        "A": "Falsch — Transfer Acceleration beschleunigt den Netzwerkpfad, **hebt die 5-GB-Single-PUT-Grenze aber nicht auf**.",
+        "B": "**Richtig** — auf Multipart Upload umstellen: einzige Lösung für Objekte über 5 GB, plus resilienter Wiederanlauf.",
+        "C": "Falsch — Komprimieren bringt 2–40 GB nicht zuverlässig unter 5 GB; kein robuster Fix.",
+        "D": "Falsch — CloudFront ist ein Download-CDN; für große Uploads löst es die PUT-Grenze nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Über 5 GB = Multipart Upload Pflicht** — ab 100 MB empfohlen.",
+      "examTrap": "**„Kleine kommen an, große scheitern“** → Single-PUT-5-GB-Grenze → Multipart. Transfer Acceleration (nur Netzwerkpfad) ist der Köder, der die Grenze nicht anfasst."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-155",
+    "explanationStructured": {
+      "verdict": "**S3 skaliert pro Präfix**: mindestens **3.500 PUT/COPY/POST/DELETE** und **5.500 GET/HEAD pro Sekunde**, und die Präfix-Anzahl ist **unbegrenzt**. 20.000 PUT/s auf einem einzigen Präfix sprengen dessen Rate; verteilt über sechs+ Präfixe skaliert der Durchsatz **linear**. Zufällige Hash-Präfixe sind seit 2018 unnötig.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Objektschlüssel auf mehrere Präfixe verteilen: die Request-Rate gilt pro Präfix, mehr Präfixe = mehr Durchsatz.",
+        "B": "Falsch — es gibt **kein globales Request-Quota** für einen Bucket, das man erhöhen könnte; die Grenze ist die Rate pro Präfix.",
+        "C": "Falsch — Transfer Acceleration beschleunigt den Netzwerkpfad, verteilt aber keine Request-Rate über Präfixe.",
+        "D": "Falsch — Objekte clientseitig bündeln ändert das Zugriffsmuster (weniger, größere Objekte) und ist ein Workaround, kein sauberes Skalieren der Rate."
+      },
+      "mnemonic": "Eselsbrücke: **S3-Rate gilt pro Präfix (3.500 schreiben / 5.500 lesen)** — mehr Präfixe, mehr Durchsatz.",
+      "examTrap": "Aktualitätsfalle: **Random-Hash-Präfixe sind seit 2018 überflüssig** — eine sinnvolle Struktur (Datum/Shard) reicht. „Bucket-Quota erhöhen“ ist der Distraktor (existiert so nicht)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-156",
+    "explanationStructured": {
+      "verdict": "**Transfer Acceleration** ist genau dafür gebaut: Der Client lädt zum nächsten CloudFront-Edge hoch, ab dort läuft der Transfer über das **AWS-Backbone** statt übers öffentliche Internet — je weiter der Client, desto größer der Gewinn. Die App ändert nur den Endpunkt (`s3-accelerate`).",
+      "optionAnalysis": {
+        "A": "Falsch — regionale Buckets + Replikation ist erheblicher Mehr-Infrastruktur-Aufwand für ein reines Upload-Latenz-Problem.",
+        "B": "Falsch — ein VPN über das öffentliche Internet stabilisiert die Route nicht wie das AWS-Backbone und ist Betriebsaufwand.",
+        "C": "**Richtig** — Transfer Acceleration am Bucket: nächster Edge + Backbone, minimaler Eingriff (nur Endpunkt).",
+        "D": "Falsch — stärkere Kompression reduziert Bytes, löst aber nicht die Latenz der langen Internet-Strecke."
+      },
+      "mnemonic": "Eselsbrücke: **Weite Uploads → Transfer Acceleration** (Edge + Backbone), nur Endpunkt ändern.",
+      "examTrap": "**„Weltweite Uploads in einen zentralen Bucket beschleunigen“** → Transfer Acceleration. Regionale Buckets/VPN sind die schwergewichtigen Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-157",
+    "explanationStructured": {
+      "verdict": "**Glacier Instant Retrieval** ist exakt für dieses Muster: Archivdaten, quartalsweise gebraucht, aber im Zugriffsfall **sofort** da. Latenz wie Standard-IA (Millisekunden, **kein Restore**) bei deutlich niedrigerem Speicherpreis.",
+      "optionAnalysis": {
+        "A": "Falsch — Glacier Flexible Retrieval braucht selbst mit Expedited **1–5 min + expliziten Restore**; die Sofort-Anforderung ist ausgeschlossen.",
+        "B": "Falsch — Standard-IA hat Millisekunden-Latenz, ist aber **teurer** als Instant Retrieval bei diesem seltenen Zugriff.",
+        "C": "Falsch — Deep Archive ist am billigsten, aber **12–48 h Abruf**; für sofortigen Zugriff unbrauchbar.",
+        "D": "**Richtig** — Glacier Instant Retrieval: Archivpreis mit Millisekunden-Abruf ohne Restore."
+      },
+      "mnemonic": "Eselsbrücke: **Selten gebraucht, aber sofort da = Glacier Instant Retrieval.**",
+      "examTrap": "Die drei Glacier-Klassen nach Abruf-Toleranz: **Instant = ms, Flexible = min–h, Deep = 12–48 h.** „Sofort ohne Restore“ bei Archivpreis → nur Instant Retrieval."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-158",
+    "explanationStructured": {
+      "verdict": "**Glacier Flexible Retrieval** kennt drei Abrufoptionen: **Expedited (1–5 min)**, Standard (3–5 h), Bulk (5–12 h, kostenlos). Für eine 15-Minuten-Frist ist **Expedited** die einzige passende Option; für garantierte Kapazität unter Last lässt sich Provisioned Capacity buchen.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Restore mit Expedited: 1–5 min pro Objekt, erfüllt die 15-Minuten-Frist.",
+        "B": "Falsch — Standard dauert **3–5 Stunden**, nicht Minuten; die Frist wird um Größenordnungen verfehlt.",
+        "C": "Falsch — eine Lifecycle-Regel nach S3 Standard läuft asynchron über Stunden und trifft die Frist nicht.",
+        "D": "Falsch — Bulk ist kostenlos, dauert aber **5–12 Stunden**; für 15 Minuten unbrauchbar."
+      },
+      "mnemonic": "Eselsbrücke: **Flexible + 15-Minuten-Frist = Expedited** — Standard/Bulk sind Stunden.",
+      "examTrap": "Die Abrufzeiten sind prüfbar: **Expedited 1–5 min, Standard 3–5 h, Bulk 5–12 h.** „In Minuten“ → Expedited, immer. Standard klingt schnell, ist aber Stunden."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-159",
+    "explanationStructured": {
+      "verdict": "**Deep Archive kennt nur Standard (12 h) und Bulk (bis 48 h) — kein Expedited.** Ein RTO von 8 Stunden ist damit strukturell unerreichbar; die Daten gehörten in **Glacier Flexible Retrieval** (Standard 3–5 h) oder Instant Retrieval.",
+      "optionAnalysis": {
+        "A": "Falsch — **Expedited existiert für Deep Archive nicht**; eine Option anderer Klassen wird hier fälschlich übertragen.",
+        "B": "**Richtig** — Deep Archive: schnellster Abruf 12 h, kein Expedited → 8-h-RTO unmöglich.",
+        "C": "Falsch — Provisioned Capacity beschleunigt **Expedited-Abrufe (Flexible)**, die es in Deep Archive gar nicht gibt.",
+        "D": "Falsch — eine Lifecycle-Regel stuft nicht „im Ernstfall sofort“ um; die Objekte müssten erst regulär abgerufen werden."
+      },
+      "mnemonic": "Eselsbrücke: **Deep Archive = 12–48 h, kein Expedited** — für Stunden-RTO ungeeignet.",
+      "examTrap": "Der Prüfpunkt ist die fehlende Expedited-Option bei Deep Archive. **„RTO in Stunden“** bei Deep Archive ist eine Latenz-Falle — dafür ist Flexible (3–5 h) oder Instant zuständig."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-160",
+    "explanationStructured": {
+      "verdict": "**Intelligent-Tiering** ist für **unvorhersehbare** Muster gebaut: Es beobachtet jedes Objekt und verschiebt es automatisch zwischen Frequent, Infrequent und Archive Instant Access — alle mit Millisekunden-Latenz, **ohne Abrufgebühren**, ohne Regelpflege. Kaltes wird wieder heiß und wandert selbstständig zurück.",
+      "optionAnalysis": {
+        "A": "Falsch — eine feste 30-Tage-Lifecycle-Regel passt nicht zu **völlig unvorhersehbaren** Mustern; sie verschiebt starr, nicht bedarfsgerecht.",
+        "B": "Falsch für die einfachste Lösung — Storage Class Analysis + manuelle Regeln ist Daueranalyse und Regelpflege; Intelligent-Tiering macht das automatisch.",
+        "C": "**Richtig** — Intelligent-Tiering: automatische, gebührenfreie Umschichtung nach beobachtetem Zugriff, ideal für unbekannte Muster.",
+        "D": "Falsch — pauschal nach Glacier Instant ignoriert, dass manche Objekte plötzlich wieder heiß werden; Intelligent-Tiering handhabt beides."
+      },
+      "mnemonic": "Eselsbrücke: **Unbekannte/schwankende Muster = Intelligent-Tiering** — bekannte Muster regelt eine Lifecycle-Regel.",
+      "examTrap": "Entscheidungswort **„unvorhersehbar/schwankend“** → Intelligent-Tiering (keine Retrieval Fees). Feste Lifecycle-Regeln sind der Distraktor für bekannte, nicht für unbekannte Muster."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-161",
+    "explanationStructured": {
+      "verdict": "**FSx for Lustre** ist das HPC/ML-Filesystem: hunderte GB/s, Millionen IOPS, Sub-Millisekunden-Latenz — und über eine **Data Repository Association** direkt mit S3 verknüpft. Objekte erscheinen als Dateien und werden beim ersten Zugriff nachgeladen (Lazy Loading); Ergebnisse gehen zurück nach S3. Kein Kopier-Workflow.",
+      "optionAnalysis": {
+        "A": "Falsch — EFS mit Elastic Throughput ist solides geteiltes NFS, spielt aber **nicht in der GB/s-Liga** von Lustre für GPU-Training.",
+        "B": "Falsch — io2 Multi-Attach ist AZ-gebunden und block-basiert; kein paralleles POSIX-Filesystem mit S3-Anbindung für viele GPU-Instanzen.",
+        "C": "Falsch — S3 Mountpoint bietet keine echte parallele Filesystem-Performance mit Lazy Loading wie Lustre; für Hochdurchsatz-Training unterlegen.",
+        "D": "**Richtig** — FSx for Lustre mit DRA auf den Bucket + Lazy Loading: HPC-Durchsatz plus native S3-Integration."
+      },
+      "mnemonic": "Eselsbrücke: **GPU-Training aus S3 mit hunderten GB/s = FSx for Lustre (DRA + Lazy Loading).**",
+      "examTrap": "**„Hunderte GB/s + shared + S3-Integration“** → nur Lustre. EFS (zu langsam für diese Liga) und S3 Mountpoint sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-162",
+    "explanationStructured": {
+      "verdict": "**FSx for Windows File Server** setzt auf einem echten Windows-Server-Dateisystem auf: natives **SMB**, **NTFS-ACLs**, DFS, Schattenkopien und direkte **Active-Directory-Integration** — die Anwendungen merken vom Umzug nichts.",
+      "optionAnalysis": {
+        "A": "**Richtig** — FSx for Windows: SMB, NTFS-ACLs und AD-Integration nativ; nahtlose Fileserver-Migration.",
+        "B": "Falsch — EFS spricht **nur NFS**; ein Samba-Layer auf EC2 ist selbst betriebene Infrastruktur, kein Feature.",
+        "C": "Falsch für die einfachste Wahl — FSx for NetApp ONTAP kann SMB auch, ist aber für Multiprotokoll/erweiterte Storage-Features gedacht; für reinen Windows-Fileserver ist FSx for Windows der direkte Fit.",
+        "D": "Falsch — S3 + File Gateway bietet SMB, aber **keine echten NTFS-ACLs und AD-Semantik** eines Windows-Dateisystems."
+      },
+      "mnemonic": "Eselsbrücke: **Windows-Fileserver (SMB + NTFS + AD) = FSx for Windows File Server.**",
+      "examTrap": "**„SMB + NTFS-Berechtigungen + Active Directory“** → FSx for Windows. EFS (nur NFS) und File Gateway (keine echten NTFS-ACLs) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-163",
+    "explanationStructured": {
+      "verdict": "**Scratch** ist für kurzlebige, temporäre Verarbeitung gebaut: kein repliziertes Storage, dafür günstiger — und das fehlende Sicherheitsnetz ist irrelevant, weil **Quelle und Ergebnis in S3** liegen. Das Filesystem wird je Lauf per DRA erzeugt und danach gelöscht; zwischen den Läufen keine Kosten.",
+      "optionAnalysis": {
+        "A": "Falsch — Persistent bezahlt **Replikation und Dauerbetrieb** für ein Filesystem, das nur 6 h pro Lauf lebt.",
+        "B": "Falsch — Persistent HDD ist immer noch Dauerbetrieb + Replikation; für kurze HPC-Läufe unnötig teuer.",
+        "C": "**Richtig** — Scratch für temporäre Verarbeitung, Daten in S3 gesichert: günstigste passende Wahl.",
+        "D": "Falsch — die DRA gibt es **nicht nur** bei Scratch; das ist kein Unterscheidungsmerkmal (Persistent kann sie auch)."
+      },
+      "mnemonic": "Eselsbrücke: **Kurze HPC-Läufe, Daten in S3 = Scratch** — Persistent nur für dauerhafte Arbeitsdaten.",
+      "examTrap": "Scratch vs. Persistent = **temporär vs. langlebig**. Distraktor D behauptet fälschlich, DRA sei Scratch-exklusiv — beide Modi unterstützen sie."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-164",
+    "explanationStructured": {
+      "verdict": "Im **Bursting-Modus skaliert der EFS-Durchsatz mit der gespeicherten Datenmenge** — 80 GiB ergeben eine winzige Baseline, Credits sind unter Dauerlast schnell weg. **Elastic Throughput** entkoppelt beides: Durchsatz folgt automatisch der Last, Abrechnung nach Nutzung, keine Kapazitätsplanung.",
+      "optionAnalysis": {
+        "A": "Falsch — Dummy-Daten zur Baseline-Erhöhung ist der alte Trick; funktioniert, bezahlt aber **dauerhaft ungenutzten Speicher**.",
+        "B": "**Richtig** — auf Elastic Throughput umstellen: automatischer, lastgerechter Durchsatz bei kleiner Datenmenge und schwankender Last.",
+        "C": "Falsch für die beste Wahl — Provisioned Throughput fest oberhalb der Spitze bezahlt Dauerkapazität auch in den langen Leerlaufphasen der CI/CD-Last.",
+        "D": "Falsch — Max I/O ist „previous generation“ (höhere Latenz) und löst das Durchsatz/Baseline-Problem nicht; es betrifft Parallelität, nicht Throughput."
+      },
+      "mnemonic": "Eselsbrücke: **Kleine Daten, schwankende Last = Elastic Throughput** — Bursting-Baseline hängt an der Datenmenge.",
+      "examTrap": "Bursting koppelt Durchsatz an gespeicherte GiB — bei wenig Daten winzig. **„Schwankend, wenig Daten“** → Elastic. Dummy-Daten (dauerhafte Kosten) und Max I/O (previous gen) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-165",
+    "explanationStructured": {
+      "verdict": "Zwei Bausteine, zwei Probleme: **(C)** **CloudFront** vor dem Bucket cacht die großen Firmware-Images an Edge-Standorten nahe der Kunden — der Idealfall für ein CDN, die Origin-Strecke entfällt. **(A)** **Byte-Range Fetches** laden das Objekt in Teilen parallel und fordern bei Abbruch nur den fehlenden Bereich erneut an.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — Byte-Range Fetches: paralleler Teil-Download, resilient gegen Abbrüche (nur fehlendes Stück erneut).",
+        "B": "Falsch — S3 Express One Zone senkt die Latenz **einzelner Requests** in einer AZ, adressiert aber weder die globale Distanz noch die Download-Abbrüche.",
+        "C": "**Richtig (2/2)** — CloudFront: cacht die Images global am Edge, verkürzt die Distanz für wiederholte Downloads.",
+        "D": "Falsch — mehr Präfixe erhöhen die Request-Rate, lösen aber weder die Distanz zum Kunden noch die Abbrüche großer Downloads.",
+        "E": "Falsch — Versioning gibt keine „stabile Version für Wiederaufnahme“; Resume löst man per Byte-Range, nicht per Versionierung."
+      },
+      "mnemonic": "Eselsbrücke: **Distanz → CloudFront, Abbrüche → Byte-Range Fetches.**",
+      "examTrap": "Zwei getrennte Probleme, zwei Werkzeuge: **CDN-Cache (Distanz)** und **Byte-Range (Resume/Parallelität)**. Präfixe (Rate) und Versioning (Resume) sind die themenfremden Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-166",
+    "explanationStructured": {
+      "verdict": "Der **DataSync-Kernfall**: Ein On-Premises-Agent liest das NFS-Share, überträgt mit eingebautem **Bandbreiten-Throttling** und Zeitplänen, verifiziert per Checksummen, und die **inkrementellen** Folgeläufe übertragen nur die Änderungen — bis zum finalen Delta beim Cutover. Alles verwaltet, nichts selbst gebaut.",
+      "optionAnalysis": {
+        "A": "**Richtig** — DataSync mit Agent, Bandbreiten-Limit, Zeitplänen und inkrementellen Läufen: der Standardweg für NFS→S3-Migration.",
+        "B": "Falsch — S3 File Gateway ist für **laufenden hybriden Zugriff**, nicht für eine einmalige 90-TB-Migration.",
+        "C": "Falsch — ein CLI-`sync`-Skript ist Eigenbau ohne verwaltetes Throttling, Verifikation und Scheduling.",
+        "D": "Falsch — Transfer Family (SFTP) ist für **Partner-Datenaustausch**, nicht für eine verifizierte NAS-Massenmigration."
+      },
+      "mnemonic": "Eselsbrücke: **NAS→S3 migrieren mit Verifikation und Throttling = DataSync.**",
+      "examTrap": "Signalwortkette **„NFS/NAS + Migration + Bandbreitenlimit + inkrementell + verifiziert“** → DataSync. File Gateway (laufender Zugriff) und Transfer Family (Partner) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-167",
+    "explanationStructured": {
+      "verdict": "Das **S3 File Gateway** ist die Brücke für **laufenden** Betrieb: Die Anwendung spricht weiter **NFS**, jede Datei landet 1:1 als **S3-Objekt** (für Analytics/Lifecycle direkt nutzbar), und der lokale **Cache** hält Genutztes mit LAN-Geschwindigkeit. Writes werden lokal bestätigt und asynchron hochgeladen.",
+      "optionAnalysis": {
+        "A": "Falsch — DataSync ist ein **Kopierwerkzeug**, kein Dateisystem: Zwischen Läufen divergieren die Seiten, die App hat keinen kontinuierlichen NFS-Zugriff auf S3.",
+        "B": "Falsch — Volume Gateway (Cached) bietet **iSCSI-Block**, nicht das geforderte NFS-Dateisystem mit Objekten in S3.",
+        "C": "**Richtig** — S3 File Gateway: NFS-Share, Objekte in S3, lokaler Cache für Häufiges — laufender hybrider Zugriff.",
+        "D": "Falsch — EFS über Direct Connect ist ein NFS-Mount, legt die Daten aber **nicht als S3-Objekte** für Analytics ab."
+      },
+      "mnemonic": "Eselsbrücke: **Laufend NFS sprechen, Daten in S3 = S3 File Gateway** (mit lokalem Cache).",
+      "examTrap": "**„Weiter NFS, aber Daten in S3 für Analytics, häufig Genutztes lokal schnell“** → S3 File Gateway. DataSync (einmalige Kopie) ist der Migrations-Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-168",
+    "explanationStructured": {
+      "verdict": "Das **Tape Gateway** emuliert eine **Tape Library über iSCSI-VTL** — NetBackup/Veeam/Commvault sehen weiter Bänder und Laufwerke, die Jobs laufen unverändert. Die virtuellen Tapes liegen in S3; archivierte wandern nach Glacier/Deep Archive. Genau der Tausch: Hardware weg, Software bleibt.",
+      "optionAnalysis": {
+        "A": "Falsch — AWS Backup ersetzt die **Backup-Software** (sichert AWS-Ressourcen), nicht die physische Tape-Library hinter der bestehenden Software.",
+        "B": "Falsch — ein S3 File Gateway (SMB) bietet kein **VTL-Interface**; die Backup-Software erwartet Bänder/Laufwerke, kein Datei-Share.",
+        "C": "Falsch — DataSync liest keine proprietären Tape-Images aus einer physischen Library aus; das ist nicht sein Modell.",
+        "D": "**Richtig** — Tape Gateway: virtuelle Tape Library über iSCSI-VTL, Tapes in S3/Glacier, Backup-Software unverändert."
+      },
+      "mnemonic": "Eselsbrücke: **Physische Bänder ersetzen, Backup-Software behalten = Tape Gateway (VTL).**",
+      "examTrap": "**„Tape-Library ablösen, Software (NetBackup) bleibt“** → Tape Gateway. AWS Backup (ersetzt Software) und File Gateway (kein VTL) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-169",
+    "explanationStructured": {
+      "verdict": "Der **Stored-Modus** hält **alle Primärdaten lokal** — jeder Zugriff ist lokal, ein Cache-Miss ist strukturell unmöglich — und sichert **asynchron Snapshots** nach AWS (als EBS-Snapshots, im DR-Fall direkt zu Volumes). Genau die Latenzanforderung „jeder Zugriff lokal“.",
+      "optionAnalysis": {
+        "A": "Falsch, die klassische Verwechslung — im **Cached-Modus liegen die Primärdaten in S3**; egal wie groß der Cache, ein Miss geht übers Netz. Latenzgarantie verletzt.",
+        "B": "**Richtig** — Volume Gateway Stored: alle Daten lokal (kein Miss), asynchrone Snapshots nach AWS für DR.",
+        "C": "Falsch — S3 File Gateway ist NFS/SMB-Datei-, kein iSCSI-Block-Zugriff; passt nicht zur iSCSI-Anwendung.",
+        "D": "Falsch — Elastic Disaster Recovery repliziert Server für DR, bietet aber nicht den geforderten lokalen iSCSI-Primärzugriff im Normalbetrieb."
+      },
+      "mnemonic": "Eselsbrücke: **Alle Daten lokal + Snapshots nach AWS = Volume Gateway Stored** — Cached hält Primärdaten in S3.",
+      "examTrap": "Stored vs. Cached: **Stored = Primärdaten lokal (kein Miss), Cached = Primärdaten in S3.** „Jeder Zugriff muss lokal sein“ → Stored, immer."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-170",
+    "explanationStructured": {
+      "verdict": "**Transfer Family** ist der verwaltete Dienst für genau dieses Muster: ein **SFTP-Endpunkt** (auch FTPS/FTP/AS2), hinter dem direkt S3 liegt. Die Partner ändern nichts (Host-Key/Zugangsdaten übernehmbar), jede Datei ist sofort ein S3-Objekt und kann per Event die Pipeline anstoßen. Der eigene Server entfällt.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Transfer Family mit SFTP-Endpunkt, Dateien direkt nach S3: verwaltet, Partner ändern nichts.",
+        "B": "Falsch — DataSync-Agents bei den **Partnern** zu installieren dreht die Verantwortung um und ist praktisch nicht durchsetzbar.",
+        "C": "Falsch — ein eigenes File Gateway im RZ ist selbst betriebene Infrastruktur; Transfer Family ist der managed SFTP-Dienst.",
+        "D": "Falsch — Presigned URLs verlangen einen anderen Client-Flow; die Partner nutzen bestehende **SFTP**-Clients."
+      },
+      "mnemonic": "Eselsbrücke: **Partner liefern per SFTP nach S3 = AWS Transfer Family.**",
+      "examTrap": "**„Externe Partner, SFTP, kein eigener Server“** → Transfer Family. DataSync-Agents beim Partner und Presigned URLs sind die unpraktischen Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-171",
+    "explanationStructured": {
+      "verdict": "**Oracle → Aurora PostgreSQL ist heterogen** — zwei Schritte: erst **Schemakonvertierung** (DMS Schema Conversion / SCT), dann **AWS DMS mit Full Load + CDC** (Change Data Capture) für alles, was sich währenddessen ändert. Die Quelle läuft durch; im Wartungsfenster nur noch das letzte Delta anwenden und umschalten.",
+      "optionAnalysis": {
+        "A": "Falsch — ein Export/Import lässt sich **nicht** ohne größeres Fenster machen und ignoriert die Schemakonvertierung Oracle→PostgreSQL.",
+        "B": "Falsch — DataSync ist für Dateien/Objekte, **nicht** für konsistente Datenbank-Migration mit laufender Änderungserfassung.",
+        "C": "Falsch — es gibt **keine Aurora Read Replica einer Oracle-Datenbank**; Replica-Ketten funktionieren nicht cross-engine so.",
+        "D": "**Richtig** — DMS Schema Conversion + DMS Full Load + CDC: heterogene Live-Migration mit minimalem Cutover-Fenster."
+      },
+      "mnemonic": "Eselsbrücke: **Heterogen (Oracle→Aurora PG) = Schema Conversion + DMS Full Load + CDC.**",
+      "examTrap": "Heterogene Migration braucht **immer zwei Schritte**: Schema (SCT/DMS SC) und Daten (DMS + CDC). Export/Import und DataSync sind die Distraktoren, die das Live-Cutover-Fenster nicht einhalten."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-172",
+    "explanationStructured": {
+      "verdict": "Die **Rechnung** entscheidet: 600 TB über 250 Mbit/s (nur nachts) brauchen selbst im Idealfall **weit über ein Jahr** — Netzwerk scheidet aus. **Snowball Edge Storage Optimized** (210 TB/Gerät) löst es offline: drei Geräte parallel beladen, zurücksenden, Import in S3 — in wenigen Wochen.",
+      "optionAnalysis": {
+        "A": "Falsch — DataSync über die schmale, nur nachts freie Leitung dauert Jahre; die Bandbreite ist der harte Engpass.",
+        "B": "Falsch — Transfer Acceleration optimiert nur den Pfad; die 250-Mbit/s-Leitung bleibt der Flaschenhals.",
+        "C": "**Richtig** — Snowball Edge Storage Optimized (210 TB), drei Geräte parallel: 600 TB offline in Wochen.",
+        "D": "Falsch — eine dedizierte DX-Leitung neu bereitzustellen dauert Wochen–Monate und verursacht laufende Kosten für einen **einmaligen** Transfer."
+      },
+      "mnemonic": "Eselsbrücke: **Riesige Datenmenge / schmale Leitung = Snow Family (offline).**",
+      "examTrap": "Bei extremem Verhältnis Datenmenge/Bandbreite entscheidet die **Transferzeit-Rechnung** → Snowball. DataSync/Transfer Acceleration/DX scheitern alle an der 250-Mbit/s-Leitung."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-173",
+    "explanationStructured": {
+      "verdict": "Zwei Schritte, zwei Dienste: **(A)** **DataSync** liest das NFS-NAS über einen Agent, nutzt die freie 10-Gbit/s-Leitung und verifiziert per Checksummen — der Standardweg für die NAS→S3-Migration. **(D)** **S3 File Gateway** stellt danach ein **SMB-Share auf denselben Bucket** bereit; die Windows-Clients arbeiten wie gewohnt, Häufiges liegt im Cache.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — DataSync für die verifizierte Bestandsmigration NFS-NAS → S3.",
+        "B": "Falsch — Transfer Family ist SFTP-Partneraustausch, nicht der laufende **SMB**-Zugriff der Windows-Clients.",
+        "C": "Falsch — Volume Gateway (Cached) bietet iSCSI-Block, nicht das geforderte SMB-Share auf dem migrierten Bucket.",
+        "D": "**Richtig (2/2)** — S3 File Gateway mit SMB-Share auf denselben Bucket: laufender Windows-Zugriff nach der Migration.",
+        "E": "Falsch — Elastic Disaster Recovery repliziert für DR, ist aber weder Migrations- noch laufender Datei-Zugriffsdienst hier."
+      },
+      "mnemonic": "Eselsbrücke: **Migrieren = DataSync, danach laufend zugreifen = File Gateway.**",
+      "examTrap": "Zwei-Phasen-Muster: **DataSync (einmalige verifizierte Migration) + File Gateway (laufender Zugriff auf denselben Bucket).** Transfer Family (SFTP) und Volume Gateway (Block) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-174",
+    "explanationStructured": {
+      "verdict": "Der **Cached-Modus** passt: Die **Primärdaten liegen vollständig in S3** — der lokale Array trägt nur den **Cache**, nicht die 60 TB —, und die ~4 TB aktiver Daten werden lokal mit LAN-Geschwindigkeit bedient. Die Anwendung spricht unverändert **iSCSI**.",
+      "optionAnalysis": {
+        "A": "Falsch, die Gegenrichtung — im **Stored-Modus bleibt der komplette Bestand on-premises**; das volle 60-TB-Array wird nicht entlastet.",
+        "B": "**Richtig** — Volume Gateway Cached: 60 TB Primärdaten in S3, ~4 TB aktiver Cache lokal, iSCSI unverändert.",
+        "C": "Falsch — S3 File Gateway ist NFS/SMB-Datei-, kein iSCSI-Block-Zugriff; passt nicht zur iSCSI-Anwendung.",
+        "D": "Falsch — EBS über VPN der Anwendung „bereitstellen“ ist kein sinnvolles Hybrid-Muster und löst die Array-Entlastung nicht sauber."
+      },
+      "mnemonic": "Eselsbrücke: **Großer Bestand, kleiner heißer Teil, Array entlasten = Cached-Modus** (Primärdaten in S3).",
+      "examTrap": "Cached (Primärdaten in S3, Cache lokal) entlastet den lokalen Array; Stored (alles lokal) tut das nicht. **„Nur 4 von 60 TB aktiv, Array knapp“** → Cached."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-175",
+    "explanationStructured": {
+      "verdict": "Das klassische **Lambda-zu-RDS-Problem**: Jede Ausführungsumgebung öffnet ihre eigene Verbindung, tausende erschöpfen `max_connections`, obwohl die DB Kapazität hätte. **RDS Proxy** hält einen warmen Pool und multiplext — der von AWS empfohlene Fall, dazu transparentes Failover und IAM-Auth.",
+      "optionAnalysis": {
+        "A": "**Richtig** — RDS Proxy zwischen Lambda und DB: Connection Pooling löst die Verbindungsflut an der Wurzel.",
+        "B": "Falsch — eine größere Instanz kauft nur mehr `max_connections` (Hardware), das strukturelle Verbindungsproblem bleibt.",
+        "C": "Falsch — Reserved Concurrency **drosselt** die Funktion (weniger Ausführungen) statt das Verbindungsproblem zu lösen.",
+        "D": "Falsch — eine Read Replica hilft bei **Leselast**, nicht bei der Erschöpfung von `max_connections` durch viele kurzlebige Verbindungen."
+      },
+      "mnemonic": "Eselsbrücke: **Lambda erschöpft DB-Verbindungen → RDS Proxy pooled** — nicht Instanz vergrößern, nicht drosseln.",
+      "examTrap": "Wie q-094/175 mehrfach: **RDS Proxy ist die Standardantwort** für Lambda-Verbindungsfluten. Größere Instanz (Symptom) und Reserved Concurrency (Drosselung) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-176",
+    "explanationStructured": {
+      "verdict": "**RDS Optimized Writes** nutzt die Nitro-Garantie, dass **16-KiB-Seiten atomar** geschrieben werden — Torn Writes ausgeschlossen, der **Doublewrite-Buffer wird überflüssig**, jede Seite nur noch einmal geschrieben. AWS: bis zu **doppelter Schreibdurchsatz**, ohne Aufpreis, bei gleichen IOPS (ab MySQL 8.0.30 auf unterstützten Klassen).",
+      "optionAnalysis": {
+        "A": "Falsch — doppelte IOPS behandeln das Symptom teuer; Optimized Writes eliminiert die doppelte Schreiboperation ganz.",
+        "B": "Falsch — der Multi-AZ-Standby übernimmt **keine** Schreiblast; er ist passiv bis zum Failover.",
+        "C": "**Richtig** — RDS Optimized Writes aktivieren: atomare 16-KiB-Writes, Doublewrite-Buffer weg, bis 2× Schreibdurchsatz gratis.",
+        "D": "Falsch — den Binlog zu deaktivieren opfert Replikation/PITR und ist ein gefährlicher Eingriff, kein sauberer Durchsatzhebel."
+      },
+      "mnemonic": "Eselsbrücke: **MySQL-Schreibengpass am Doublewrite-Buffer → RDS Optimized Writes** (atomare 16-KiB-Writes).",
+      "examTrap": "Optimized Writes ist gratis und verdoppelt den Schreibdurchsatz (Nitro, MySQL 8.0.30+). **„IOPS verdoppeln“** (teuer) und „Standby schreibt mit“ (falsch) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-177",
+    "explanationStructured": {
+      "verdict": "Dafür gibt es **Custom Endpoints**: eine frei definierte Untergruppe von Cluster-Instanzen hinter eigenem DNS-Namen, mit Lastverteilung darüber. Die Analytics-Jobs bekommen den Custom Endpoint mit den **beiden großen Replicas**, die App behält den Reader Endpoint — getrennt, und bei Ausfall verteilt der Endpoint auf die verbleibende.",
+      "optionAnalysis": {
+        "A": "Falsch — Instance Endpoints der einzelnen Replicas verlieren die Lastverteilung und die automatische Umverteilung bei Ausfall.",
+        "B": "**Richtig** — Custom Endpoint nur mit den großen Replicas: Analytics getrennt vom App-Reader-Endpoint, mit Failover innerhalb der Gruppe.",
+        "C": "Falsch — ein zweiter Cluster per Cloning ist Overkill und Zusatzbetrieb für ein reines Endpoint-Routing-Problem.",
+        "D": "Falsch — die kleinen Replicas hochzuskalieren löst die **Trennung** von OLTP und Analytics nicht und kostet unnötig."
+      },
+      "mnemonic": "Eselsbrücke: **Bestimmte Replicas ansteuern = Custom Endpoint** — der Reader-Endpoint trifft immer alle.",
+      "examTrap": "Vier Aurora-Endpoints: Cluster/Reader/Instance/Custom. „Nur eine Teilmenge der Replicas“ → **Custom Endpoint** (mit Failover innerhalb der Gruppe). Instance Endpoints (kein Failover) sind der Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-178",
+    "explanationStructured": {
+      "verdict": "**DAX** ist der verwaltete, **API-kompatible** Cache für genau dieses Profil: read-heavy, **eventually consistent**, wiederkehrende Zugriffe auf heiße Items. Der Tausch des SDK-Clients gegen den DAX-Client ist die einzige Codeänderung; Latenz fällt von Millisekunden auf Mikrosekunden. Strongly consistent Reads werden durchgereicht (nicht gecacht).",
+      "optionAnalysis": {
+        "A": "Falsch für die einfachste Lösung — ElastiCache Cache-Aside verlangt **eigene** Cache-Logik/Invalidierung; DAX ist der DynamoDB-native Drop-in.",
+        "B": "Falsch — On-Demand adressiert **Kapazität/Skalierung**, nicht die **Latenz** heißer Reads (Mikrosekunden).",
+        "C": "Falsch — ein GSI ist eine alternative Zugriffssicht, kein Latenz-Cache für dieselben Get-Zugriffe.",
+        "D": "**Richtig** — DAX-Cluster vor die Tabelle: API-kompatibel, Mikrosekunden für eventually-consistent Reads."
+      },
+      "mnemonic": "Eselsbrücke: **DynamoDB read-heavy + eventually consistent + ohne Code-Umbau = DAX.**",
+      "examTrap": "DAX cached **nur eventually consistent** Reads (Strong wird durchgereicht). „DynamoDB + Mikrosekunden + minimaler Code“ → DAX; ElastiCache (Eigenbau) und GSI (kein Cache) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-179",
+    "explanationStructured": {
+      "verdict": "Ein **GSI** ist genau dafür da: Er definiert einen **komplett anderen Partition Key** (und Sort Key) als die Tabelle und lässt sich **jederzeit nachträglich** anlegen. Mit `customerId`/`orderDate` wird aus dem Scan eine gezielte Query — sortiert und effizient. Preis: eigene Kapazität und nur eventually consistent (hier unkritisch).",
+      "optionAnalysis": {
+        "A": "**Richtig** — GSI mit `customerId`/`orderDate`: anderer Partition Key, nachträglich anlegbar, aus dem Scan wird eine Query.",
+        "B": "Falsch — ein **LSI kann nur den Sort Key** tauschen (gleicher Partition Key) und muss **bei Tabellenerstellung** angelegt werden; für `customerId` als neuen Partition Key ungeeignet.",
+        "C": "Falsch — eine FilterExpression filtert **nach** dem (bezahlten) Scan; sie spart weder RCUs noch macht sie den Zugriff effizient.",
+        "D": "Falsch — eine zweite Tabelle per Streams zu synchronisieren ist aufwendiger Eigenbau; der GSI leistet dasselbe eingebaut."
+      },
+      "mnemonic": "Eselsbrücke: **Anderer Partition Key, nachträglich = GSI** — LSI kann nur den Sort Key, nur bei Erstellung.",
+      "examTrap": "GSI vs. LSI: **GSI = neuer Partition Key, jederzeit, eventual; LSI = gleicher Partition Key, ab Erstellung, strong.** Scan+Filter (bezahlt trotzdem alles) ist der Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-180",
+    "explanationStructured": {
+      "verdict": "Die Anforderung **strongly consistent** entscheidet: **Nur ein LSI unterstützt strongly consistent Reads** (ein GSI ist immer eventually consistent). Der LSI behält den Partition Key (`accountId`), tauscht nur den Sort Key (`amount`), teilt die Kapazität — und muss **bei der Tabellenerstellung** angelegt werden (hier neu, Zugriff bekannt).",
+      "optionAnalysis": {
+        "A": "Falsch — ein nachträglicher GSI ist **grundsätzlich eventually consistent**; die Strong-Consistency-Anforderung ist damit verletzt.",
+        "B": "Falsch — Scan + Sortierung im Code ist ineffizient und teuer; ein Index ist hier klar nötig.",
+        "C": "**Richtig** — LSI mit `amount` als alternativem Sort Key bei Erstellung: strongly consistent, gleicher Partition Key.",
+        "D": "Falsch — zwei getrennte Tabellen sind unnötiger Sync-Aufwand; der LSI liefert die sortierte Sicht mit Strong-Consistency direkt."
+      },
+      "mnemonic": "Eselsbrücke: **Strongly consistent + anderer Sort Key = LSI (bei Erstellung).**",
+      "examTrap": "Der Schaltbegriff ist **„strongly consistent“** → LSI (GSI kann das nie). LSI nur bei Tabellenerstellung — hier erfüllt, weil die Tabelle neu entsteht."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-181",
+    "explanationStructured": {
+      "verdict": "Das Problem ist das **Schlüsseldesign, nicht die Kapazität**: 12 Werte mit massiver Schieflage konzentrieren die Last auf wenige Partitionen, und jede Partition ist hart auf **1.000 WCU** begrenzt — egal, wie viel die Tabelle insgesamt hat. **(B)** hochkardinaler Key (`deviceId`) verteilt die Last; **(D)** **Write Sharding** (Suffix) ist das dokumentierte Muster.",
+      "optionAnalysis": {
+        "A": "Falsch — die Schreibkapazität zu verdreifachen hilft nicht: Die **heiße Partition bleibt bei 1.000 WCU** gedeckelt.",
+        "B": "**Richtig (1/2)** — hochkardinaler Partition Key (`deviceId`): verteilt die Schreiblast über viele Partitionen.",
+        "C": "Falsch — Auto Scaling passt die **Tabellenkapazität** an, ändert aber nichts an der Konzentration auf eine heiße Partition.",
+        "D": "**Richtig (2/2)** — Write Sharding (Suffix am Partition Key): das offizielle Muster gegen Hot Partitions.",
+        "E": "Falsch — On-Demand entfernt die Kapazitätsplanung, aber die **Partitions-Obergrenze (1.000 WCU) bleibt**; ein einzelner Hot Key kann weiter throtteln."
+      },
+      "mnemonic": "Eselsbrücke: **Hot Partition heilt Key-Design (Kardinalität + Sharding), nicht mehr Kapazität.**",
+      "examTrap": "Die 1.000-WCU-Partitionsgrenze ist der Kern. Alle Kapazitäts-Optionen (verdreifachen, Auto Scaling, On-Demand) umgehen sie **nicht** — nur besseres Key-Design tut es."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-182",
+    "explanationStructured": {
+      "verdict": "**On-Demand** ist für dieses Profil gebaut: keine Kapazitätsplanung, sofortige Bedienung stark schwankender Last, Abrechnung pro Request. Der Aufpreis pro Anfrage ist bei wochenlangem Leerlauf irrelevant. Provisioned + Auto Scaling reagiert über CloudWatch-Alarme mit **Minuten Verzögerung** — der Vorverkaufs-Spike ist längst gedrosselt.",
+      "optionAnalysis": {
+        "A": "Falsch — Provisioned + Auto Scaling (auch mit niedriger Zielauslastung) reagiert zu **träge** auf plötzliche, unangekündigte Spikes.",
+        "B": "**Richtig** — On-Demand: sofortige Spitzenbedienung ohne Planung, Abrechnung nach Verbrauch.",
+        "C": "Falsch — Scheduled Scaling setzt **angekündigte** Zeiten voraus; „nicht vorhersehbar“ schließt es aus.",
+        "D": "Falsch — Provisioned dauerhaft auf Spitzenlast bezahlt die Kapazität die ganze (meist leere) Zeit durch."
+      },
+      "mnemonic": "Eselsbrücke: **Unvorhersehbare Spikes + langer Leerlauf = On-Demand.**",
+      "examTrap": "Auto Scaling auf Provisioned ist **alarmgetrieben (Minuten)** und verpasst plötzliche Spikes. „Spitzenlastig, unvorhersehbar“ → On-Demand; die Provisioned-Varianten sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-183",
+    "explanationStructured": {
+      "verdict": "Die drei Anforderungen (Sorted Sets, Multi-AZ-Failover, persistente Snapshots) zeichnen das Profil der **Redis-Familie**: Sorted Sets nativ (Ranglisten), Replikation mit Multi-AZ + Auto-Failover eingebaut, Snapshots für Persistenz. **ElastiCache for Valkey oder Redis OSS** bietet das verwaltet (Valkey = Redis-7.2-Fork, günstiger).",
+      "optionAnalysis": {
+        "A": "Falsch — Memcached hat **keine Sorted Sets, keine Replikation/Multi-AZ, keine Persistenz**; scheitert an allen drei Anforderungen.",
+        "B": "Falsch — DAX ist ein DynamoDB-Cache, kein In-Memory-Store mit Sorted-Set-Operationen für Ranglisten.",
+        "C": "Falsch — selbst betriebenes Redis auf EC2 verlangt eigene Replikations-/Failover-/Snapshot-Konfiguration; ElastiCache liefert das managed.",
+        "D": "**Richtig** — ElastiCache for Valkey/Redis OSS mit Multi-AZ, Auto-Failover und Snapshots: alle drei Anforderungen nativ."
+      },
+      "mnemonic": "Eselsbrücke: **Sorted Sets + HA + Persistenz = Redis/Valkey (ElastiCache), nicht Memcached.**",
+      "examTrap": "Memcached ist der Simpel-Cache (multi-threaded, aber keine Datenstrukturen/HA/Persistenz). **„Ranglisten + Failover + Snapshots“** → Redis-Familie. Valkey ist die neue dritte Engine."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-184",
+    "explanationStructured": {
+      "verdict": "Das Problem ist die **fehlende Invalidierung**: Lazy Loading aktualisiert nur bei einem Miss — ein geladener Preis bleibt stehen, bis er verdrängt wird. **Write-Through** schließt die Lücke: Die Preisänderung schreibt DB **und** Cache im selben Vorgang. Lazy Loading + Write-Through ist der dokumentierte Standard.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Write-Through ergänzen: jede Preisänderung aktualisiert den Cache-Eintrag sofort mit.",
+        "B": "Falsch für die beste Lösung — eine TTV/TTL von 24 h lässt veraltete Preise trotzdem bis zu 24 h stehen; zu grob für Preisdaten.",
+        "C": "Falsch — den ganzen Cache bei jeder Änderung zu leeren erzeugt Miss-Stürme und schlechte Performance.",
+        "D": "Falsch — ein größerer Knoten reduziert Verdrängung, löst aber die **Stale-Data**-Ursache (fehlende Invalidierung) nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Veraltete Cache-Preise → Write-Through** (DB und Cache gemeinsam schreiben).",
+      "examTrap": "Lazy Loading allein invalidiert nie — die Antwort ist **Write-Through** (oder die Kombination beider). TTL (zu grob) und Cache-Leeren (Miss-Sturm) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-185",
+    "explanationStructured": {
+      "verdict": "Das **DynamoDB-Item-Limit liegt hart bei 400 KB** (inkl. Attributnamen und -werten, unabhängig vom Kapazitätsmodus). Das dokumentierte Muster für größere Binärdaten: **PDF nach S3, im Item nur den Objektschlüssel** als Referenz. Metadaten bleiben abfragbar, das Objekt direkt erreichbar; S3 ist für Blobs zudem günstiger.",
+      "optionAnalysis": {
+        "A": "Falsch — Kompression bringt typische PDFs nicht zuverlässig unter 400 KB; kein robuster Fix.",
+        "B": "Falsch — PDFs in Segmente als Item-Collection zu splitten ist fragile Bastelei gegen ein klares S3-Pointer-Muster.",
+        "C": "**Richtig** — PDF nach S3, DynamoDB-Item speichert nur den S3-Objektschlüssel: das Standardmuster für Blobs.",
+        "D": "Falsch — der Kapazitätsmodus ändert das **400-KB-Item-Limit nicht**; On-Demand nimmt keine größeren Items auf."
+      },
+      "mnemonic": "Eselsbrücke: **Über 400 KB → S3-Pointer im Item** — der Kapazitätsmodus hebt das Limit nie.",
+      "examTrap": "Das 400-KB-Limit ist prüfbar und **modus-unabhängig**. „Blob in DynamoDB“ → S3 + Objektschlüssel. On-Demand-als-Lösung ist die Falle (ändert das Item-Limit nicht)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-186",
+    "explanationStructured": {
+      "verdict": "**RDS Optimized Reads** ist genau dafür gebaut: Auf Instanzklassen mit lokalem NVMe (z. B. `db.r6gd`) landen **temporäre Objekte** (On-Disk-Temp-Tables, interne Temp-Files, Binlog-Cache) auf dem **Instance Store** statt auf EBS. Der Netzwerkumweg entfällt exakt für die Objekte, die hier der Engpass sind.",
+      "optionAnalysis": {
+        "A": "Falsch für die beste Lösung — mehr RAM hilft, aber große Sortierungen/Joins fallen trotzdem auf Disk-Temp zurück; Optimized Reads adressiert genau diesen Disk-Pfad.",
+        "B": "**Richtig** — Instanzklasse mit lokalem NVMe + RDS Optimized Reads: Temp-Objekte lokal statt über EBS, deutlich schneller.",
+        "C": "Falsch — mehr provisionierte IOPS beschleunigen EBS, umgehen aber den Netzwerkumweg nicht wie lokales NVMe.",
+        "D": "Falsch — eine Read Replica entlastet den Primary von Leselast, beschleunigt aber die **einzelne** temp-lastige Abfrage nicht (das Temp-I/O bleibt)."
+      },
+      "mnemonic": "Eselsbrücke: **Temp-lastige Reporting-Queries → RDS Optimized Reads (lokales NVMe).**",
+      "examTrap": "**„Große Sortierungen/Joins mit Temp-Objekten langsam“** → Optimized Reads (Temp auf Instance Store). Mehr RAM/IOPS (EBS-Pfad) und Read Replica (Leselast) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-187",
+    "explanationStructured": {
+      "verdict": "Eine **Cross-Region Read Replica** erledigt beides: Die Anwendungen in Singapur **lesen lokal** mit niedriger Latenz, und im Katastrophenfall wird die Replica zur eigenständigen Primary **promotet** — der Doppelnutzen aus Read-Skalierung und DR. Die asynchrone Verzögerung verkraften reine Lesezugriffe.",
+      "optionAnalysis": {
+        "A": "Falsch — Multi-AZ (Standby in weiterer AZ) hilft weder bei der **Latenz in Singapur** noch als Cross-Region-DR.",
+        "B": "Falsch für den Doppelnutzen — ElastiCache in Singapur senkt Leselatenz, bietet aber **kein DR-Promote** der Datenbank.",
+        "C": "Falsch — ein Read-Replica-Endpunkt in **eu-central-1** liegt weiter fern von Singapur; die Latenz bleibt hoch.",
+        "D": "**Richtig** — Cross-Region Read Replica in ap-southeast-1: lokale Reads + Promote im Notfall."
+      },
+      "mnemonic": "Eselsbrücke: **Lokale Reads fern + DR in einem = Cross-Region Read Replica.**",
+      "examTrap": "**„Lesen lokal in ferner Region UND Disaster Recovery“** → Cross-Region Read Replica (promotable). Multi-AZ (gleiche Region) und ElastiCache (kein DR) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-188",
+    "explanationStructured": {
+      "verdict": "Die beiden Begriffe sind die klassische Verwechslung: **Reserved Concurrency garantiert/deckelt Kapazität, initialisiert aber keine Umgebung vor** — der erste Aufruf zahlt den Cold Start trotzdem. **Provisioned Concurrency** hält **fertig initialisierte Umgebungen** bereit (Antwort in zweistelligen Millisekunden), gilt auf einem Alias/Version.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Provisioned Concurrency auf einem Alias: vorinitialisierte Umgebungen eliminieren die Cold-Start-Verzögerung nach Ruhephasen.",
+        "B": "Falsch — mehr Reserved Concurrency **wärmt nichts vor**; sie reserviert nur Kapazität, der Cold Start bleibt.",
+        "C": "Falsch — mehr Speicher (mehr CPU) verkürzt die Init, beseitigt aber den Cold Start bei ruhephasenbedingt neuen Umgebungen nicht.",
+        "D": "Falsch für die saubere Lösung — minütliches Warmpingen ist ein fragiler Hack; Provisioned Concurrency ist der native, verlässliche Weg."
+      },
+      "mnemonic": "Eselsbrücke: **Reserved deckelt, Provisioned wärmt vor** — Cold Starts löst nur Provisioned.",
+      "examTrap": "Die Reserved-vs-Provisioned-Verwechslung ist der Kern: **Reserved = Limit/Garantie (kein Warmhalten), Provisioned = vorinitialisiert.** „Cold Start nach Ruhe“ → Provisioned Concurrency."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-189",
+    "explanationStructured": {
+      "verdict": "**SnapStart** ist für genau diesen Fall gebaut: Beim Publizieren einer Version wird die fertig initialisierte Umgebung als **Firecracker-Snapshot** eingefroren; neue Umgebungen starten daraus in **Sub-Sekunden** statt durch den vollen Framework-Bootstrap. Für **Java kostenlos** — ideal für sporadische Aufrufe.",
+      "optionAnalysis": {
+        "A": "Falsch für die kostengünstigste Lösung — Provisioned Concurrency wärmt vor, kostet aber **dauerhaft** je bereitgehaltener Umgebung; bei sporadischer Last unnötig teuer gegenüber dem kostenlosen SnapStart (Java).",
+        "B": "Falsch — ein Container-Image beschleunigt den Cold Start eines schweren Spring-Boot-Bootstraps nicht wesentlich.",
+        "C": "**Richtig** — SnapStart: initialisierte Umgebung als Snapshot, Sub-Sekunden-Start, für Java gratis.",
+        "D": "Falsch — das Framework durch Handarbeit zu ersetzen ist massiver Aufwand; SnapStart löst es ohne Codeumbau."
+      },
+      "mnemonic": "Eselsbrücke: **Java-Cold-Start bei sporadischer Last → SnapStart** (gratis, Snapshot-Start).",
+      "examTrap": "SnapStart unterstützt **Java 11+, Python 3.12+, .NET 8+** (nicht Node/Ruby, keine Container). Für sporadische Java-Last ist es gratis — Provisioned Concurrency (Dauerkosten) ist hier der teurere Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-190",
+    "explanationStructured": {
+      "verdict": "**SnapStart unterstützt Node.js nicht** (nur Java 11+, Python 3.12+, .NET 8+; keine Container-Images). Für Node.js führt der Weg zu **Provisioned Concurrency**: vorinitialisierte Umgebungen auf einem Alias, bei Bedarf per Application Auto Scaling nach Zeitplan/Auslastung gesteuert.",
+      "optionAnalysis": {
+        "A": "Falsch — SnapStart verlangt **keine** Container-Images (im Gegenteil, Container werden nicht unterstützt); die Aussage ist verdreht.",
+        "B": "**Richtig** — SnapStart unterstützt Node.js nicht; für diese Runtime ist Provisioned Concurrency der Weg.",
+        "C": "Falsch — SnapStart erfordert **keine** Function URL; das ist frei erfunden.",
+        "D": "Falsch — SnapStart wirkt auf **publizierte Versionen/Aliasse**, nicht nur auf `$LATEST`; die Begründung ist falsch."
+      },
+      "mnemonic": "Eselsbrücke: **SnapStart: Java/Python/.NET — NICHT Node/Ruby** → Node braucht Provisioned Concurrency.",
+      "examTrap": "Die Runtime-Grenze ist der Prüfpunkt: **Node.js/Ruby und Container sind von SnapStart ausgeschlossen.** Für Node → Provisioned Concurrency. Die anderen Optionen erfinden falsche SnapStart-Voraussetzungen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-191",
+    "explanationStructured": {
+      "verdict": "**Fargate unterstützt keine GPUs** — eine harte Grenze des serverlosen Modells, unabhängig von Plattformversion oder Konfiguration. Für GPU in ECS: **EC2-Launch-Type** mit GPU-Instanzen (z. B. g5) als **Capacity Provider**, GPU-Anforderung in der Task-Definition, ECS platziert entsprechend.",
+      "optionAnalysis": {
+        "A": "Falsch — eine GPU-Ressourcenanforderung in der **Fargate**-Task-Definition ist nicht erfüllbar; Fargate hat keine GPUs.",
+        "B": "Falsch — keine Plattformversion von Fargate bringt GPU-Unterstützung; die Grenze ist strukturell.",
+        "C": "Falsch — Fargate Spot ist derselbe (GPU-lose) Fargate-Pool, nur unterbrechbar; keine GPUs.",
+        "D": "**Richtig** — auf EC2-Launch-Type mit GPU-Instanzen (Capacity Provider) wechseln: der einzige Weg zu GPU in ECS."
+      },
+      "mnemonic": "Eselsbrücke: **GPU in ECS = EC2-Launch-Type** — Fargate hat keine GPUs.",
+      "examTrap": "„GPU + Fargate“ ist immer falsch (harte Grenze). Für GPU-Container in ECS → **EC2-Launch-Type** mit GPU-Instanzen. Alle Fargate-Varianten sind Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-192",
+    "explanationStructured": {
+      "verdict": "Die Anforderungen — kein Host-Management, schwankende Last, kleines Team — beschreiben den **Fargate-Kernfall**: Kapazität pro Task, keine Instanzen zu patchen/dimensionieren/auslasten. Bei schwankender Last ist Fargate auch wirtschaftlich im Vorteil, weil keine halbleeren Instanzen bezahlt werden.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Fargate: Kapazität pro Task, kein Host-Management; ideal für kleines Team + schwankende Last.",
+        "B": "Falsch — EC2 ist **nicht generell günstiger**; bei schwankender Last zahlt man halbleere Instanzen und den Betriebsaufwand.",
+        "C": "Falsch — EC2 Spot ist billig, aber unterbrechbar und weiterhin **selbst zu verwalten**; widerspricht „kein Host-Management“.",
+        "D": "Falsch — Service Auto Scaling gibt es **auch für EC2-basierte** ECS-Services; die Begründung ist falsch, auch wenn Fargate hier passt."
+      },
+      "mnemonic": "Eselsbrücke: **Kein Host-Management + schwankend + kleines Team = Fargate.**",
+      "examTrap": "Fargate-Signalwörter: **kein Server-Management, variable Last.** Distraktor D nennt ein falsches Alleinstellungsmerkmal (Auto Scaling gibt es auch auf EC2). Kostenargument für EC2 gilt nur bei **konstanter** Last."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-193",
+    "explanationStructured": {
+      "verdict": "Zwei Aufgaben, zwei Werkzeuge: **(A)** **Service Auto Scaling mit Target Tracking auf `ALBRequestCountPerTarget`** koppelt die Task-Anzahl an die Anfragen pro Ziel — die richtige Metrik, wenn die Last den Requests (nicht der CPU) folgt. **(C)** **FARGATE_SPOT** rechnet die Tasks deutlich günstiger ab; die Unterbrechbarkeit verkraftet der Workload.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — Target Tracking auf `ALBRequestCountPerTarget`: Skalierung an der request-getriebenen Last.",
+        "B": "Falsch — es gibt keinen „Lifecycle Hook am Load Balancer, der Tasks anfordert“; das ist erfunden.",
+        "C": "**Richtig (2/2)** — Capacity Provider FARGATE_SPOT: deutlich günstiger, Unterbrechung akzeptabel.",
+        "D": "Falsch — die Task-Größe minimal zu setzen kann die Verarbeitung ausbremsen und ist kein sinnvoller Kosten-/Skalierungshebel hier.",
+        "E": "Falsch — ein **EC2**-Savings-Plan senkt keine **Fargate**-Task-Preise; falsche Commitment-Art."
+      },
+      "mnemonic": "Eselsbrücke: **Request-getrieben skalieren = ALBRequestCountPerTarget, günstig = FARGATE_SPOT.**",
+      "examTrap": "Bei request-getriebener Last ist **`ALBRequestCountPerTarget`** die richtige Metrik (nicht CPU). Und **EC2-Savings-Plans decken Fargate nicht** — der klassische Abdeckungs-Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-194",
+    "explanationStructured": {
+      "verdict": "Die **Cluster Placement Group** ist das Werkzeug für tightly-coupled HPC: Instanzen **physisch dicht in einer AZ** — niedrigste Latenz, höchster Durchsatz zwischen den Knoten, ideal mit **EFA** für MPI. Der Preis (gemeinsame Ausfalldomäne) ist hier ausdrücklich verkraftbar.",
+      "optionAnalysis": {
+        "A": "Falsch — eine Partition Placement Group **entzerrt** über Racks (für verteilte Systeme), erhöht aber die Inter-Node-Latenz; das Gegenteil von tightly-coupled.",
+        "B": "Falsch — eine Spread Placement Group verteilt Instanzen auf eigene Hardware (Isolation), maximiert die Latenz statt sie zu minimieren.",
+        "C": "**Richtig** — Cluster Placement Group: dichte Platzierung in einer AZ für minimale Latenz/maximalen Durchsatz.",
+        "D": "Falsch — Verteilung über drei AZs erhöht die Latenz massiv; für permanent kommunizierende HPC-Knoten fatal."
+      },
+      "mnemonic": "Eselsbrücke: **Tightly-coupled HPC = Cluster Placement Group** (+ EFA), nicht Spread/Partition.",
+      "examTrap": "Drei Placement Groups: **Cluster = nah (Latenz), Spread = einzeln (Isolation), Partition = gruppenweise (verteilte Systeme).** „Permanent kommunizierend, niedrigste Latenz“ → Cluster."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-195",
+    "explanationStructured": {
+      "verdict": "Die **Spread Placement Group** ist für genau diese Situation: wenige **kritische Einzelinstanzen** auf strikt unterschiedliche Hardware. Jede landet auf eigenem Rack mit eigener Strom-/Netzanbindung — ein Hardware-Defekt trifft höchstens eine. Das Limit **7 laufende Instanzen pro AZ** passt zu sechs Brokern.",
+      "optionAnalysis": {
+        "A": "Falsch — eine Cluster Placement Group packt die Broker **zusammen** (gemeinsame Ausfalldomäne); ein Rack-Defekt könnte mehrere treffen.",
+        "B": "**Richtig** — Spread Placement Group: jede Instanz eigenes Rack/Strom/Netz, maximale Isolation für kritische Einzelinstanzen.",
+        "C": "Falsch — sechs Regionen mit Inter-Region-Peering ist massiv überzogen und latenzschädlich für einen Broker-Verbund.",
+        "D": "Falsch — eine Partition Placement Group mit zwei Partitionen bündelt je drei Broker; ein Partitions-Defekt träfe drei auf einmal, nicht die geforderte Einzel-Isolation."
+      },
+      "mnemonic": "Eselsbrücke: **Wenige kritische Instanzen einzeln isolieren = Spread (max 7/AZ).**",
+      "examTrap": "Spread = **7 Instanzen pro AZ**, jede eigene Hardware. „Jede Instanz kritisch, Hardware-Defekt darf nur eine treffen“ → Spread; Cluster (zusammen) und Partition (gruppenweise) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-196",
+    "explanationStructured": {
+      "verdict": "Die Jobs sprengen **zwei harte Lambda-Grenzen** zugleich: **15 min (900 s)** Timeout und **10.240 MB** Speicher — 90 min und 64 GB liegen weit darüber. **AWS Batch** ist der Dienst dafür: Container-Jobs in Job Queues, verwaltete Compute Environments (On-Demand/Spot/Fargate), Aufräumen nach den Läufen.",
+      "optionAnalysis": {
+        "A": "Falsch — Lambda **unterstützt** Container-Images (bis 10 GB); die Begründung ist falsch, und Fargate-Standalone-Task ist nicht die genannte richtige Antwort.",
+        "B": "Falsch — die Begründung („skaliert zu langsam“) trifft nicht den Punkt; das Problem sind die **harten Limits**, nicht die Skalierungsgeschwindigkeit.",
+        "C": "Falsch — Lambda **kann** Warteschlangen anbinden (SQS-Event-Source); die Begründung ist falsch.",
+        "D": "**Richtig** — Lambda-Limits (15 min / 10 GB) gesprengt → AWS Batch für die Container-Jobs (gern auf Spot)."
+      },
+      "mnemonic": "Eselsbrücke: **Über 15 min oder 10 GB → AWS Batch** (Container-Jobs, Queues, Spot).",
+      "examTrap": "Die zwei K.-o.-Zahlen: **15 min, 10 GB.** Reißt ein Job eine davon, ist Lambda raus → AWS Batch. Die falschen Optionen begründen mit erfundenen Lambda-Einschränkungen (Container/Queue)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-197",
+    "explanationStructured": {
+      "verdict": "Das Muster ist eindeutig: **`CPUCreditBalance = 0`** heißt, die Burst-Credits der T-Instanz sind aufgebraucht, die CPU wird auf die **Baseline** gedrosselt — daher die Zähigkeit an den intensiven Tagen. Der **Unlimited Mode** ist die minimale Änderung: bursten über Credits hinaus, nur der Surplus kostet extra (an ruhigen Tagen nichts).",
+      "optionAnalysis": {
+        "A": "**Richtig** — Unlimited Mode aktivieren: bursten über die Credits hinaus, Aufpreis nur für tatsächlichen Surplus.",
+        "B": "Falsch für die minimale Änderung — eine größere T-Instanz verdient mehr Credits, ist aber teurer/dauerhaft und größer als nötig.",
+        "C": "Falsch für den Aufwand — eine c6i-Instanz löst es, ist aber ein Instanztyp-Wechsel; Unlimited Mode ist die kleinste Maßnahme.",
+        "D": "Falsch — eine zweite Instanz + Load Balancer ist Architektur-Umbau für ein Credit-Problem an wenigen Tagen."
+      },
+      "mnemonic": "Eselsbrücke: **`CPUCreditBalance = 0` an Spitzentagen → Unlimited Mode** (minimaler Fix).",
+      "examTrap": "`CPUCreditBalance = 0` ist die verratende Metrik. **„Nur an wenigen Tagen zäh, sonst ruhig“** → Unlimited Mode (billig). Größere Instanz / c6i sind die überdimensionierten Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-198",
+    "explanationStructured": {
+      "verdict": "Der **Elastic Fabric Adapter (EFA)** ist für tightly-coupled HPC/ML über **MPI/NCCL** gebaut: Sein **OS-Bypass** lässt die Anwendung direkt mit der Netzwerk-Hardware sprechen — der Kernel-/TCP/IP-Overhead, den die Profilierung als Engpass zeigt, entfällt, die Latenz der Synchronisationsphasen sinkt.",
+      "optionAnalysis": {
+        "A": "Falsch — Jumbo Frames (MTU 9001) helfen bei **Durchsatz großer Pakete**, nicht bei der **Latenz** kleiner MPI-Synchronisationsnachrichten.",
+        "B": "Falsch — zusätzliche ENAs erhöhen die Bandbreite, umgehen aber nicht den Kernel-Overhead, der hier der Engpass ist.",
+        "C": "**Richtig** — Elastic Fabric Adapter: OS-Bypass für MPI/NCCL, umgeht den Kernel-Netzwerkstack.",
+        "D": "Falsch — ein größerer Instanztyp gibt mehr Bandbreite, aber die **Inter-Node-Latenz** über den Kernel-Stack bleibt."
+      },
+      "mnemonic": "Eselsbrücke: **MPI/NCCL-Latenz → EFA (OS-Bypass)** — ENA/Jumbo Frames sind nur Durchsatz.",
+      "examTrap": "Bei tightly-coupled Workloads dominiert **Inter-Node-Latenz**, nicht Bandbreite. „MPI + Kernel-Overhead“ → EFA. ENA/Jumbo Frames/größere Instanz adressieren Durchsatz, nicht Latenz."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-199",
+    "explanationStructured": {
+      "verdict": "Standardmäßig verarbeitet Lambda **einen Batch je Shard** gleichzeitig — bei 20 Shards also max 20 parallele Ausführungen, egal welches Concurrency-Limit. Der **Parallelization Factor** hebt genau das: bis **10 gleichzeitige Batches je Shard** (bis 200 parallel), ohne Resharding. Ordnung bleibt (gleicher Partition Key → gleicher Batch).",
+      "optionAnalysis": {
+        "A": "Falsch — mehr Reserved Concurrency hilft nicht, wenn die **Shard-Parallelität (1 Batch/Shard)** die Grenze ist.",
+        "B": "**Richtig** — Parallelization Factor erhöhen: mehrere Batches je Shard, mehr Durchsatz ohne Resharding, Ordnung gewahrt.",
+        "C": "Falsch — eine größere Batch-Größe verarbeitet mehr pro Aufruf, erhöht aber nicht die **Parallelität** je Shard (IteratorAge-Problem bleibt).",
+        "D": "Falsch — ein zweiter Stream mit Producer-Aufteilung ist Architektur-Umbau; der Parallelization Factor löst es ohne Resharding."
+      },
+      "mnemonic": "Eselsbrücke: **Kinesis-Consumer-Rückstand (IteratorAge) → Parallelization Factor** (bis 10 Batches/Shard).",
+      "examTrap": "Default: **1 Batch je Shard.** Steigende `IteratorAge` bei genug Concurrency → Parallelization Factor (bis 10/Shard, Ordnung bleibt). Reserved Concurrency/Batch-Größe lösen die Shard-Parallelität nicht."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-200",
+    "explanationStructured": {
+      "verdict": "Das Problem ist die **Cache-Key-Explosion**: Jede Kombination aus Query-Strings und Header-Werten erzeugt einen eigenen Eintrag — bei acht Headern zersplittert derselbe Inhalt in unzählige Varianten. Lösung: **Cache Policy auf inhaltsrelevante Werte reduzieren**, die zwei nötigen Header per **Origin Request Policy** weitergeben (ohne sie in den Cache Key aufzunehmen).",
+      "optionAnalysis": {
+        "A": "Falsch — höhere TTLs helfen nicht, wenn jeder Request wegen der Header-Varianten einen **anderen Cache Key** trifft; es gibt kaum Wiederholungen.",
+        "B": "Falsch — Origin Shield reduziert Origin-Last, behebt aber nicht die **Key-Zersplitterung** (die Hit-Ratio bleibt niedrig).",
+        "C": "**Richtig** — Cache Policy auf inhaltsrelevante Werte reduzieren + Header per Origin Request Policy weitergeben: Cache Key konsolidiert, Hit-Ratio steigt.",
+        "D": "Falsch — eine zweite Distribution ist unnötiger Umbau; die Ursache ist die Cache-Policy-Konfiguration, nicht die Distribution."
+      },
+      "mnemonic": "Eselsbrücke: **Niedrige Hit-Ratio durch zu viele Header im Cache Key → Cache Policy schlank, Header per Origin Request Policy.**",
+      "examTrap": "Der Cache Key darf nur **inhaltsrelevante** Werte enthalten; nötige, aber nicht-cache-relevante Header gehören in die **Origin Request Policy**. TTL-Erhöhen und Origin Shield beheben die Zersplitterung nicht."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-201",
+    "explanationStructured": {
+      "verdict": "**Origin Access Control (OAC)** ist der OAI-Nachfolger und hier zwingend: OAC unterstützt **SSE-KMS-verschlüsselte Objekte** und dynamische Requests wie **PUT**, signiert mit **SigV4** und kurzlebigen Credentials. Der KMS-Key braucht nur den CloudFront-Service-Principal in seiner Key Policy.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Origin Access Control: unterstützt SSE-KMS und PUT, SigV4-signiert; AWS-Empfehlung für neue Distributionen.",
+        "B": "Falsch — die alte **OAI unterstützt kein SSE-KMS** und keine PUT-Requests; genau der Irrtum des alten Runbooks.",
+        "C": "Falsch — ein S3-Website-Endpoint mit „geheimem“ Zugriff ist unsicher und unterstützt die geforderten verschlüsselten/dynamischen Zugriffe nicht sauber.",
+        "D": "Falsch — CloudFront-IP-Bereiche in einer Bucket-Policy zu pflegen ist fragil und nicht die vorgesehene, KMS-fähige Zugriffskontrolle."
+      },
+      "mnemonic": "Eselsbrücke: **SSE-KMS + PUT über CloudFront = Origin Access Control (nicht OAI).**",
+      "examTrap": "Aktualität: **OAC ist der OAI-Nachfolger** und die einzige Variante mit **SSE-KMS + dynamischen Requests**. OAI (kein KMS/PUT) ist der veraltete Runbook-Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-202",
+    "explanationStructured": {
+      "verdict": "Der Lehrbuchfall für **Signed Cookies**: Zugriff auf **viele Dateien** (ganze Bereiche/Abos), ohne die URLs anzufassen. Nach der Anmeldung setzt die App die Cookies, der Player fordert die unveränderten Segment-URLs an, CloudFront prüft die Signatur bei jedem Request.",
+      "optionAnalysis": {
+        "A": "Falsch — Signed URLs sind für **einzelne** Dateien; für tausende Segmente je vorab zu signieren ist unpraktikabel (scheitert an der eigenen Bedingung).",
+        "B": "**Richtig** — Signed Cookies: einmal nach Login setzen, Zugriff auf alle Segmente, URLs bleiben unverändert.",
+        "C": "Falsch für die einfachste Lösung — Lambda@Edge-Validierung gegen DynamoDB ist erheblicher Eigenbau gegenüber der nativen Cookie-Signatur.",
+        "D": "Falsch — Field-Level Encryption verschlüsselt sensible Formularfelder, ist kein Zugriffsschutz für Videosegmente."
+      },
+      "mnemonic": "Eselsbrücke: **Ein Bereich/viele Dateien = Signed Cookies, eine Datei = Signed URL.**",
+      "examTrap": "**„Zugriff auf ganze Video-Serie/Abo ohne jede URL zu ändern“** → Signed Cookies. Signed URLs (pro Datei) und Lambda@Edge (Eigenbau) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-203",
+    "explanationStructured": {
+      "verdict": "Die drei Anforderungen (UDP, statische IP-Freigabe, stabile globale Latenz + schnelles Failover) zeichnen exakt das **Global-Accelerator-Profil**: Layer 4 mit UDP, **zwei statische Anycast-IPs** zum Whitelisten, Einstieg am nächsten Edge aufs **AWS-Backbone**, Failover auf **Netzwerkebene in Sekunden** (ohne DNS).",
+      "optionAnalysis": {
+        "A": "Falsch — CloudFront ist ein **HTTP-CDN**; für UDP-Game-Traffic ungeeignet.",
+        "B": "Falsch — Route-53-Latency-Routing wirkt erst beim **Neu-Auflösen** (DNS-TTL) und bietet keine statischen IPs; für Sekunden-Failover und Firewall-Freigabe unpassend.",
+        "C": "Falsch — eine dritte Relay-Region ist Eigenbau und latenzschädlich; GA löst das nativ.",
+        "D": "**Richtig** — Global Accelerator: UDP (L4), zwei statische Anycast-IPs, Backbone-Routing, Sekunden-Failover ohne DNS."
+      },
+      "mnemonic": "Eselsbrücke: **UDP + statische IPs + Sekunden-Failover = Global Accelerator.**",
+      "examTrap": "GA-Signalwörter: **non-HTTP (UDP), statische IP, DNS-unabhängiges Failover.** CloudFront (HTTP) und Route 53 (DNS-TTL) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-204",
+    "explanationStructured": {
+      "verdict": "Zwei Probleme, zwei Werkzeuge: **(A)** **API-Gateway-Response-Caching** der Stage (0,5–237 GB, TTL Default 300 s) bedient identische GETs aus dem Cache, ohne das Lambda-Backend zu erreichen. **(C)** **Usage Plan mit API-Keys** bindet Rate-/Burst-/Quota-Limits **je Partner** — der fehlerhafte Skript-Partner läuft in sein eigenes Limit.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — Response-Caching auf Stage-Ebene: identische GETs aus dem Cache, Backend entlastet.",
+        "B": "Falsch — mehr Lambda-Concurrency bedient die **Partner-Flut** ebenfalls voll, statt sie zu begrenzen; behandelt das Symptom, nicht die Ursache.",
+        "C": "**Richtig (2/2)** — Usage Plan + API-Keys: pro-Partner-Limits drosseln den fehlerhaften Client isoliert.",
+        "D": "Falsch — Edge-optimized ändert nur den Verteilungspfad; es cacht keine dynamischen API-Antworten und begrenzt keine Partner.",
+        "E": "Falsch — das Account-Level-Throttling abzusenken drosselt **alle** Nutzer pauschal, nicht gezielt den einen Partner."
+      },
+      "mnemonic": "Eselsbrücke: **Identische GETs → Response-Caching, einzelner Partner → Usage Plan mit API-Keys.**",
+      "examTrap": "Zwei getrennte Anforderungen: **Cache (Wiederholungen)** und **pro-Kunde-Drosselung (Usage Plan)**. Lambda-Concurrency (bedient die Flut) und Account-Throttling (trifft alle) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-205",
+    "explanationStructured": {
+      "verdict": "Das **Integration-Timeout von API Gateway liegt bei 29 Sekunden** — das Lambda-Timeout dahinter ist irrelevant, wenn das Gateway vorher kappt. Seit 2024 anhebbar, aber **nur für Regional- und Private REST APIs**, nicht Edge-optimized. Tragfähig ist das **asynchrone Muster**: Auftrag annehmen, Ergebnis später abrufen.",
+      "optionAnalysis": {
+        "A": "Falsch — es gibt kein „Stage-Integration-Timeout auf 300 s“; die harte Grenze (bei Edge-optimized) sind 29 s.",
+        "B": "Falsch — der Lambda-Default greift nicht „vor“ dem Gateway; das Gateway kappt bei 29 s unabhängig vom Lambda-Timeout.",
+        "C": "**Richtig** — 29-s-Integration-Timeout (bei Edge-optimized nicht anhebbar) → asynchrones Muster (Auftrag annehmen, später Ergebnis holen).",
+        "D": "Falsch — die Edge-Standorte kappen nicht wegen der Preisklasse; die Ursache ist das 29-s-Integration-Timeout."
+      },
+      "mnemonic": "Eselsbrücke: **API Gateway kappt bei 29 s** — lange Jobs asynchron (annehmen, später abrufen).",
+      "examTrap": "Das **29-s-Integration-Timeout** ist prüfbar; anhebbar **nur Regional/Private**, nicht Edge-optimized. „20–120 s Report hinter Edge-API“ → asynchrones Muster, nicht am Timeout drehen."
+    }
+  }
+]

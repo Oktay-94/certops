@@ -1,0 +1,424 @@
+[
+  {
+    "seedKey": "saa-c03-q-031",
+    "explanationStructured": {
+      "verdict": "Der **User Pool** liefert nach dem Login **JWT-Tokens** (ID, Access, Refresh) — **niemals AWS-Credentials**. Um direkt gegen einen AWS-Service wie DynamoDB zu sprechen, braucht die App **SigV4-signierte Requests**, also **temporäre AWS-Credentials**. Die liefert ausschließlich der **Identity Pool**, der das JWT via STS eintauscht.",
+      "optionAnalysis": {
+        "A": "Falsch — eine IAM-Policy lässt sich nicht an einen User Pool hängen: **Der User Pool ist kein IAM-Principal**, er verwaltet App-Nutzer, keine AWS-Berechtigungen.",
+        "B": "Falsch — ein Lambda Authorizer schützt **API Gateway**, er autorisiert keine direkten DynamoDB-Aufrufe eines Clients.",
+        "C": "**Richtig** — der Identity Pool tauscht das User-Pool-JWT gegen temporäre AWS-Credentials; erst damit kann die SPA DynamoDB direkt und signiert ansprechen.",
+        "D": "Falsch für DIESE Aufgabe — API Gateway mit Cognito Authorizer ist eine **völlig legitime Architektur**, aber die Aufgabe schließt sie explizit aus („ohne Backend“). Ein Distraktor, der an der Nebenbedingung scheitert, nicht an der Technik."
+      },
+      "mnemonic": "Eselsbrücke: **JWT öffnet die App, Credentials öffnen AWS** — dazwischen steht immer der Identity Pool.",
+      "examTrap": "Die Prüfung baut die Nebenbedingung (**„ohne Backend“**, „direkt“) gezielt ein, um korrekte Architekturen als Distraktoren zu platzieren. Erst die Ausschlusskriterien lesen, dann die Optionen — sonst wählt man die „gute“ statt der geforderten Lösung."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-032",
+    "explanationStructured": {
+      "verdict": "Der **ALB kann nativ authentifizieren**: Die **`authenticate-cognito`-Action** am **HTTPS**-Listener leitet unauthentifizierte Nutzer zum Cognito-Login um und reicht das validierte JWT im Header `x-amzn-oidc-data` ans Target weiter — **null Code-Änderung**, kein zusätzlicher Hop.",
+      "optionAnalysis": {
+        "A": "Falsch — **Lambda@Edge ist an CloudFront gebunden**; es lässt sich nicht „vor einen ALB“ schalten. Ohne CloudFront in der Architektur ist die Option strukturell unmöglich.",
+        "B": "**Richtig** — die Listener-Action `authenticate-cognito` (nur HTTPS) erledigt Login-Redirect, Token-Validierung und Header-Weitergabe komplett im ALB.",
+        "C": "Falsch für DIESE Anforderung — API Gateway mit Cognito Authorizer **funktioniert**, fügt aber einen zusätzlichen Hop, Kosten und Konfiguration hinzu, wo der ALB es nativ kann.",
+        "D": "Falsch — WAF filtert Requests nach **Mustern**; es kann **keinen Login-Flow durchführen** und keine Tokens ausstellen. Ein Cookie-Check ohne Aussteller ist wertlos."
+      },
+      "mnemonic": "Eselsbrücke: **Der ALB kann selbst an der Tür stehen** — authenticate-cognito am HTTPS-Listener, die App merkt nichts.",
+      "examTrap": "Zwei Prüfdetails: Die Auth-Action gibt es **nur auf HTTPS-Listenern**, und „Anwendungscode darf nicht geändert werden“ ist das Signalwort für die **native ALB-Authentifizierung** statt vorgeschalteter Zusatzdienste."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-033",
+    "explanationStructured": {
+      "verdict": "**AD Connector ist ein reiner Proxy**: Er leitet Authentifizierungsanfragen ans on-prem AD weiter und **speichert keinerlei Verzeichnisdaten in AWS** — exakt die Compliance-Anforderung. Seamless Domain Join für Windows-EC2 wird unterstützt.",
+      "optionAnalysis": {
+        "A": "Der stärkste Distraktor — Managed Microsoft AD **funktioniert technisch einwandfrei**, legt aber ein **eigenes Verzeichnis in AWS** an (auch mit Trust liegen Verzeichnisobjekte in AWS). Die Compliance-Vorgabe schließt genau das aus.",
+        "B": "Falsch — Simple AD kann **keinen Trust** und ist **kein Replikat** eines bestehenden AD; eine „Replikation aus dem on-prem AD“ existiert für Simple AD nicht.",
+        "C": "Falsch — IAM Identity Center regelt **Konsolen-/CLI-SSO**, keinen **Domain Join** von Windows-Instanzen.",
+        "D": "**Richtig** — der AD Connector als Proxy: Anmeldungen laufen gegen das on-prem AD, in AWS liegt nichts."
+      },
+      "mnemonic": "Eselsbrücke: **Der Connector ist nur der Türsteher mit Telefon** — er fragt drüben nach, speichert aber nichts.",
+      "examTrap": "Signalwort **„keine Verzeichnisdaten in AWS“** → AD Connector, immer. Managed Microsoft AD ist der Dauerdistraktor, weil es „auch geht“ — die Datenhaltungs-Frage entscheidet, nicht die Funktion."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-034",
+    "explanationStructured": {
+      "verdict": "**AWS Enterprise Applications — WorkSpaces, WorkDocs, WorkMail, QuickSight, IAM Identity Center und der Konsolen-Zugriff — benötigen einen `two-way` Trust.** Das ist eine harte, dokumentierte Anforderung, keine Empfehlung.",
+      "optionAnalysis": {
+        "A": "**Richtig** — der Two-way-Trust ist für WorkSpaces (wie für alle AWS Enterprise Applications) zwingend.",
+        "B": "Gefährlich falsch — die One-way-Variante wäre für **andere Workloads korrekt** (EC2, RDS, FSx funktionieren mit one-way ODER two-way). Bei WorkSpaces reicht sie nicht.",
+        "C": "Falsch — WorkSpaces authentifiziert gegen das **Managed Microsoft AD** (bzw. dessen Trust), nicht direkt gegen das on-prem AD; ganz ohne Trust bliebe nur die AD-Connector-Architektur — dann aber ohne Managed AD im Spiel.",
+        "D": "Falsch — auch die umgekehrte One-way-Richtung erfüllt die Enterprise-Application-Anforderung nicht; es braucht **beide** Richtungen."
+      },
+      "mnemonic": "Eselsbrücke: **Enterprise Apps wollen die Zweibahnstraße** — EC2 und RDS geben sich mit der Einbahn zufrieden.",
+      "examTrap": "Die Falle ist die pauschale Merkregel „one-way reicht“: Sie stimmt für EC2/RDS/FSx und fällt bei **WorkSpaces & Co.** durch. Merke die Enterprise-Application-Liste als Two-way-Pflichtgruppe."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-035",
+    "explanationStructured": {
+      "verdict": "**ABAC (Attribute-Based Access Control)** ist exakt dafür gebaut: IAM Identity Center reicht das AD-Attribut als **Session Tag** durch, und **eine einzige Policy** vergleicht **`aws:PrincipalTag/Team`** mit **`ec2:ResourceTag/Team`**. 40 Teams, eine Policy — neue Teams brauchen keine neue Rolle, nur den korrekten Tag.",
+      "optionAnalysis": {
+        "A": "Falsch für DIESE Anforderung — 40 Permission Sets mit hartkodierten ARNs **funktionieren**, erzeugen aber genau die 40 Konstrukte, die die Aufgabe ausschließt, und veralten bei jeder Ressourcenänderung.",
+        "B": "**Richtig** — ABAC über Session Tags: Attribut aus dem AD, Tag-Vergleich in der Policy, skaliert ohne weiteres Zutun.",
+        "C": "Falsch — SCPs sind **Guardrails an Account-/OU-Grenzen**; sie unterscheiden nicht zwischen einzelnen Instanzen **innerhalb** eines Accounts.",
+        "D": "Falsch — eine Boundary **pro Entwickler** skaliert bei hunderten Nutzern nicht und deckelt nur Maxima, statt die Team-Zuordnung dynamisch zu prüfen."
+      },
+      "mnemonic": "Eselsbrücke: **RBAC zählt Rollen, ABAC vergleicht Etiketten** — bei „viele Teams, keine Rollen-Flut“ gewinnt das Etikett.",
+      "examTrap": "Signalwortkette „**Attribut im Verzeichnis + viele Teams + keine Konstrukt-Explosion**“ → ABAC mit `aws:PrincipalTag` vs. `ResourceTag`. Die Permission-Set-Option ist der Skalierungs-Distraktor: korrekt, aber ausgeschlossen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-036",
+    "explanationStructured": {
+      "verdict": "Seit **November 2024** gliedert Cognito die Features in die Tiers **Lite / Essentials / Plus**. **Threat Protection** — Erkennung kompromittierter Zugangsdaten und **risikobasierte adaptive Authentifizierung** — ist ausschließlich im **Plus-Tier** enthalten.",
+      "optionAnalysis": {
+        "A": "Falsch — MFA-Pflicht ist statisch, keine **Risikoerkennung**: Sie erkennt weder kompromittierte Credentials noch passt sie sich dem Risiko an.",
+        "B": "Falsch — Essentials liefert Managed Login und passwordless Authentifizierung, aber **keine Threat Protection**.",
+        "C": "**Richtig** — der Plus-Tier enthält Threat Protection mit beiden geforderten Fähigkeiten.",
+        "D": "Die Aktualitätsfalle — beschreibt das **alte Modell**: Früher waren die „Advanced Security Features“ (ASF) separat zubuchbar; heute sind sie im **Plus-Tier gebündelt**. Wer mit älterem Kursmaterial lernt, wählt genau diese Option."
+      },
+      "mnemonic": "Eselsbrücke: **Bedrohungsschutz gibt es nur im Plus** — Lite loggt ein, Essentials macht's hübsch, Plus passt auf.",
+      "examTrap": "Cognito-Tiers sind ein **Nov-2024-Aktualitätsthema**: Die alte ASF-Add-on-Antwort ist der gezielte Distraktor für Lerner mit veralteten Unterlagen. Merke die Zuordnung Threat Protection = Plus."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-037",
+    "explanationStructured": {
+      "verdict": "Die beiden Föderations-APIs sind sauber getrennt: **`AssumeRoleWithSAML`** verarbeitet eine **SAML-Assertion** (Enterprise-IdP wie ADFS, Okta, Entra ID), **`AssumeRoleWithWebIdentity`** ein **OIDC-Token** (Google, Apple, Facebook, Cognito). Beide liefern **temporäre Credentials ohne IAM-User** — Szenario 1 → SAML, Szenario 2 → WebIdentity.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — ADFS spricht SAML 2.0, also `AssumeRoleWithSAML` für die Mitarbeiter-Konsole.",
+        "B": "Falsch — `GetFederationToken` existiert, ist aber ein **Legacy-Pfad**: Ein langlebiger IAM-User stellt Credentials für Federated Users aus — genau das Muster, das moderne Föderation vermeidet.",
+        "C": "**Richtig (2/2)** — Google liefert ein OIDC-Token, also `AssumeRoleWithWebIdentity` für die Kunden-App.",
+        "D": "Falsch — `AssumeRole` + `ExternalId` löst das **Confused-Deputy-Problem bei Third-Party-Zugriff**, nicht die Nutzer-Föderation über einen IdP.",
+        "E": "Falsch — `GetSessionToken` liefert MFA-verstärkte Credentials für einen **bestehenden IAM-User** — das ist keine Föderation."
+      },
+      "mnemonic": "Eselsbrücke: **SAML für die Belegschaft, WebIdentity fürs Web-Volk** — der Token-Typ wählt die API.",
+      "examTrap": "Die fünf **STS-APIs** als Zuordnungsraster kennen: SAML-Assertion → WithSAML · OIDC-Token → WithWebIdentity · Third-Party-Rolle → AssumeRole+ExternalId · Legacy-Broker → GetFederationToken · IAM-User+MFA → GetSessionToken. Die Prüfung mischt sie gezielt."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-038",
+    "explanationStructured": {
+      "verdict": "**Simple AD (Small)** deckt bis **500 Nutzer** ab, ist Samba-4-basiert, günstig und exakt für dieses Profil gebaut: kein Trust, kein MFA, kein bestehendes AD. **Aktualitätshinweis:** AWS nimmt ab **30.07.2026 keine Simple-AD-Neukunden** mehr an — in der Prüfung bleibt es die erwartete Antwort, in der Praxis wäre Managed Microsoft AD der zukunftssichere Weg.",
+      "optionAnalysis": {
+        "A": "Falsch — der **AD Connector setzt ein bestehendes AD zwingend voraus**; hier gibt es keins, und „ein neu aufzubauendes AD“ widerspricht dem Kostenziel.",
+        "B": "Der stärkste Distraktor — Managed Microsoft AD **funktioniert einwandfrei**, ist für 300 Nutzer ohne Trust-Bedarf aber **überdimensioniert und teurer**. Die Anforderung „kostengünstig“ entscheidet dagegen.",
+        "C": "Falsch — eine **Linux-PAM-Integration für Cognito existiert nicht**; Cognito ist Customer Identity für Apps, kein Betriebssystem-Verzeichnis.",
+        "D": "**Richtig** — Simple AD (Small): günstig, bis 500 Nutzer, ohne Trust/MFA-Anspruch — mit dem Auslauf-Hinweis für Neukunden."
+      },
+      "mnemonic": "Eselsbrücke: **Simple bleibt simpel** — klein, billig, ohne Trust und MFA; alles darüber heißt Managed AD.",
+      "examTrap": "**Doppelfalle**: fachlich (Simple AD fällt bei Trust/MFA/RDS-SQL-Anforderungen IMMER raus — hier liegt keine vor) und zeitlich (Auslauf ab 30.07.2026 — die Prüfung testet noch den Klassiker, gute Fragen erwähnen den Sunset)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-039",
+    "explanationStructured": {
+      "verdict": "**Die wichtigste KMS-Regel überhaupt:** Jeder Key hat **genau eine Key Policy**, und sie ist die **primäre Autorisierungsinstanz**. AWS wörtlich: *Unless the key policy explicitly allows it, you cannot use IAM policies to allow access to a KMS key.* Eine erlaubende IAM-Policy **allein reicht niemals** — üblicherweise schaltet erst die Account-Principal-Klausel (`kms:*` für den Account-Root) IAM-Policies überhaupt frei.",
+      "optionAnalysis": {
+        "A": "**Richtig** — die Key Policy erlaubt diesem Principal keinen Zugriff (bzw. delegiert nicht an IAM); ohne Key-Policy-Freigabe läuft jede IAM-Policy ins Leere.",
+        "B": "Falsch — für ein `Decrypt` ist **kein `kms:Encrypt`** nötig; die Aktionen sind unabhängig.",
+        "C": "Falsch als Ursache — ein Grant **wäre** ein alternativer Freigabeweg, aber sein Fehlen erklärt den Fehler nicht: Der normale Pfad (Key Policy + IAM) ist hier unterbrochen.",
+        "D": "Falsch — ein **Encryption Context ist optional**; er wird nur geprüft, wenn die Policy ihn per Condition verlangt — das wäre dann eine andere Fehlermeldungslage."
+      },
+      "mnemonic": "Eselsbrücke: **Bei KMS hat der Schlüssel das Hausrecht** — ohne Einladung in der Key Policy kommt keine IAM-Policy rein.",
+      "examTrap": "KMS bricht das gewohnte IAM-Muster: Bei fast allen Services reicht die Identity-Policy — **bei KMS entscheidet die Key Policy zuerst**. `AccessDenied trotz Allow in IAM` ist das Signalbild für genau diese Regel."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-040",
+    "explanationStructured": {
+      "verdict": "Cross-Account-Zugriff auf einen KMS-Key erfordert **beide Seiten**: Die **Key Policy in Account A** muss den fremden Principal explizit erlauben, **und** die **IAM-Policy in Account B** muss `kms:Decrypt` auf den Key-ARN gestatten. Bei KMS ist das strenger als anderswo — die Key Policy ist **immer** zwingend beteiligt.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — ohne Key-Policy-Freigabe in Account A existiert kein Cross-Account-Pfad, egal was Account B erlaubt.",
+        "B": "Falsch — ein **Multi-Region Key löst ein regionsübergreifendes, kein accountübergreifendes** Problem. Für Cross-Account ist er irrelevant.",
+        "C": "**Richtig (2/2)** — der Principal in B braucht die IAM-Erlaubnis auf den Key-ARN; die Key Policy allein autorisiert den fremden Principal nicht abschließend.",
+        "D": "Falsch — ein Interface Endpoint ändert nur den **Netzwerkpfad** zu KMS, nicht die Autorisierung.",
+        "E": "Falsch — KMS-Keys werden **nicht in andere Accounts repliziert**; Zugriff wird über Policies **freigegeben**, nicht über Kopien."
+      },
+      "mnemonic": "Eselsbrücke: **Auch beim Schlüssel gilt: beide Seiten sagen Ja** — Key Policy drüben, IAM-Policy hüben.",
+      "examTrap": "Das Cross-Account-Muster (beide Seiten) kennst du von S3/SQS — die KMS-Verschärfung: Die **Key Policy ist nie optional**. MRK- und Endpoint-Optionen sind thematische Nebelkerzen (Region bzw. Netzwerk statt Autorisierung)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-041",
+    "explanationStructured": {
+      "verdict": "**Envelope Encryption.** Die `Encrypt`-API verarbeitet **maximal 4.096 Bytes**. Für 500 MB ruft man **`GenerateDataKey`** auf: KMS liefert den Data Key im Klartext **und** verschlüsselt. Die Anwendung verschlüsselt die Datei **lokal** mit dem Klartext-Key (AES), verwirft ihn aus dem Speicher und legt den **verschlüsselten** Data Key neben der Datei ab.",
+      "optionAnalysis": {
+        "A": "Raffiniert, aber falsch — technisch *würde* es funktionieren: 500 MB ÷ 4 KB = **128.000 KMS-Aufrufe** — absurd langsam, absurd teuer und sofort im Throttling. Ein Anti-Pattern, kein Verfahren.",
+        "B": "**Richtig** — `GenerateDataKey` + lokale Verschlüsselung ist das Envelope-Muster, für das KMS gebaut ist.",
+        "C": "Falsch — der Direktaufruf scheitert hart an der **4-KB-Grenze**; `kms:Encrypt` ist für kleine Payloads (Keys, Tokens), nicht für Dateien.",
+        "D": "Falsch — asymmetrische Keys haben eine **noch kleinere** Nutzlastgrenze (bei RSA je nach Padding wenige hundert Bytes); sie sind für Signaturen/Schlüsselaustausch da, nicht für Bulk-Daten."
+      },
+      "mnemonic": "Eselsbrücke: **KMS verschlüsselt den Schlüssel, dein Code die Daten** — der Umschlag reist mit der Datei.",
+      "examTrap": "Zahlen-Anker **4.096 Bytes** für `kms:Encrypt`. Die Block-Zerlege-Option ist der Distraktor für Rechner: „geht doch“ — die Prüfung will das **vorgesehene Muster**, nicht die theoretisch mögliche Quälerei."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-042",
+    "explanationStructured": {
+      "verdict": "Seit **April 2024** ist das KMS-Rotationsintervall **konfigurierbar: 90 bis 2.560 Tage** (Default 365). Die 180-Tage-Vorgabe ist damit eine **reine Konfigurationsänderung** — kein Code, kein Re-Encrypting, kein neuer Key.",
+      "optionAnalysis": {
+        "A": "Falsch — beruht auf dem verbreiteten Missverständnis, Rotation erfordere Neuverschlüsselung: **Key-ID, ARN und Alias bleiben identisch**, KMS behält altes Material zum Entschlüsseln. Manuelles Neu-Verschlüsseln ist unnötige Schwerstarbeit.",
+        "B": "Falsch — die fixe Jahres-Rotation **erfüllt die 180-Tage-Vorgabe schlicht nicht**; „gilt als ausreichend“ ist Wunschdenken gegen eine klare Compliance-Zahl.",
+        "C": "**Richtig** — automatische Rotation aktivieren und `rotation-period-in-days: 180` setzen. Fertig.",
+        "D": "Falsch für „geringster Aufwand“ — die EventBridge-On-Demand-Automatik **funktioniert**, ist aber Automatisierungs-Overhead für etwas, das ein Konfigurationsfeld erledigt."
+      },
+      "mnemonic": "Eselsbrücke: **Rotation ist seit 2024 ein Drehregler** — 90 bis 2.560 Tage, einfach einstellen.",
+      "examTrap": "Aktualitätsfalle: Vor April 2024 war „fix jährlich“ korrekt — alte Materialien führen zur EventBridge-Bastellösung. Und die Dauer-Wahrheit dahinter: **Rotation erzwingt nie Re-Encrypting.**"
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-043",
+    "explanationStructured": {
+      "verdict": "Nur beim **Customer Managed Key** kontrolliert der Kunde **Key Policy, Rotationsintervall, Aktivierung/Deaktivierung und Löschung** vollständig — alle drei Auditor-Anforderungen auf einmal.",
+      "optionAnalysis": {
+        "A": "Falsch — **AWS Owned Keys** sind überhaupt nicht sichtbar: weder Metadaten noch CloudTrail-Events, geschweige denn steuerbar.",
+        "B": "Der stärkste Distraktor — **AWS Managed Keys** sind in CloudTrail sichtbar und ihre Policy ist **einsehbar**, aber ausdrücklich **nicht änderbar**: keine Policy-Kontrolle, Rotation fix jährlich, kein Deaktivieren/Löschen. AWS wörtlich: *you cannot change any properties of AWS managed keys.*",
+        "C": "Falsch — der Distraktor mischt zwei Konzepte: **Importiertes Material (BYOK) ist eine Eigenschaft eines Customer Managed Keys**, kein eigener Key-Typ mit „AWS-Managed-Status“.",
+        "D": "**Richtig** — der CMK erfüllt alle drei Forderungen: eigene Key Policy, eigenes Rotationsintervall, Deaktivierung jederzeit."
+      },
+      "mnemonic": "Eselsbrücke: **Sehen ≠ steuern** — AWS Managed Keys darf man anschauen, nur der Customer Managed Key gehorcht.",
+      "examTrap": "Die Drei-Typen-Leiter ist Kernprüfstoff: **Owned (unsichtbar) → Managed (sichtbar, unveränderlich) → Customer Managed (voll steuerbar)**. Auditor-Anforderungen an Policy/Rotation/Deaktivierung zeigen immer auf den CMK."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-044",
+    "explanationStructured": {
+      "verdict": "DynamoDB verschlüsselt standardmäßig mit einem **AWS Owned Key** — diese Keys gehören **nicht deinem Account**, sind **weder in der Konsole noch in CloudTrail sichtbar** und lassen sich nicht auditieren. Für Nachvollziehbarkeit muss die Tabelle auf einen **AWS Managed Key** (`aws/dynamodb`) oder **Customer Managed Key** umgestellt werden.",
+      "optionAnalysis": {
+        "A": "**Richtig** — der Owned-Key-Default erklärt die leere CloudTrail-Spur vollständig; der Key erzeugt keine Events im Kunden-Account.",
+        "B": "Stark, aber falsch — Data Events sind eine **echte** CloudTrail-Eigenheit, betreffen aber **Item-Zugriffe**, nicht KMS-Key-Nutzung. Die KMS-Events fehlten auch mit aktivierten Data Events.",
+        "C": "Falsch — der Owned Key gehört **AWS**, nicht einem „Key-Besitzer-Account“ des Kunden; es gibt keinen fremden Trail, in dem man nachsehen könnte.",
+        "D": "Falsch — **DynamoDB ist immer verschlüsselt** (Encryption at Rest ist nicht abschaltbar), und zwar sehr wohl über KMS-Key-Typen — die Frage ist nur, **mit welchem**."
+      },
+      "mnemonic": "Eselsbrücke: **Owned Keys sind AWS-Privatsache** — wer Spuren will, muss auf Managed oder Customer Managed wechseln.",
+      "examTrap": "Das Signalbild „**Tabelle verschlüsselt, aber null KMS-Events**“ → Owned-Key-Default. Der Data-Events-Distraktor testet, ob du CloudTrail-Wissen an der richtigen Stelle anwendest."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-045",
+    "explanationStructured": {
+      "verdict": "**Grants** sind der KMS-Mechanismus für **temporäre, programmatische Delegation**: per **`CreateGrant`** erteilt, per **`RetireGrant`/`RevokeGrant`** wieder entzogen — **ohne die Key Policy anzufassen**. Exakt der Job-Lebenszyklus aus der Aufgabe (Limit: 50.000 Grants pro Key).",
+      "optionAnalysis": {
+        "A": "Der beste Distraktor — die Session Policy **verengt** eine Session, kann aber **keine Rechte hinzufügen**, die Key Policy/IAM nicht ohnehin gewähren. Sie löst das Erteilen-und-Entziehen-Problem nicht.",
+        "B": "**Richtig** — Grant erstellen, Job läuft, Grant zurückziehen: temporäre KMS-Berechtigung ohne Policy-Änderung.",
+        "C": "Falsch — die Permissions Boundary **deckelt**, sie **gewährt nicht**; für zeitweise Freigaben ist sie das falsche Werkzeug.",
+        "D": "Falsch — ein zweiter Key ändert am **Zeitproblem** nichts: Die Berechtigung auf ihn wäre genauso dauerhaft."
+      },
+      "mnemonic": "Eselsbrücke: **Der Grant ist der Tagespass** — ausgestellt per API, eingezogen per API, das Hausrecht (Key Policy) bleibt unangetastet.",
+      "examTrap": "Grants sind das dritte KMS-Autorisierungsinstrument neben Key Policy und IAM — die Prüfung testet sie über das Muster „**temporär + programmatisch + ohne Policy-Änderung**“. Session Policy/Boundary sind die Kann-nur-verengen-Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-046",
+    "explanationStructured": {
+      "verdict": "**S3 Bucket Keys** ersetzen die KMS-Aufrufe **pro Objekt** durch einen **bucket-level Key** — laut AWS bis zu **99 % weniger** KMS-Anfragen und -Kosten. Der Encryption Context wechselt dabei vom Objekt- auf den **Bucket-ARN**; die Key-Kontrolle (SSE-KMS, CMK) bleibt vollständig erhalten. Ein Schalter, der Ursache UND Kosten löst.",
+      "optionAnalysis": {
+        "A": "Falsch für „wirksamste Maßnahme“ — die Quota-Erhöhung **würde helfen**, behandelt aber das Symptom und **senkt die Kosten nicht**.",
+        "B": "Falsch — Key-Sharding **funktioniert**, kauft die Entlastung aber mit erheblichem Verwaltungsaufwand (Key-Zuordnung, Rotation über n Keys).",
+        "C": "**Richtig** — Bucket Keys aktivieren: Throttling und Rechnung sinken drastisch, Kontrolle bleibt.",
+        "D": "Falsch — SSE-S3 beseitigt zwar die KMS-Calls, **opfert aber genau die Key-Kontrolle**, die laut Aufgabe erhalten bleiben soll."
+      },
+      "mnemonic": "Eselsbrücke: **Ein Bucket-Schlüssel statt Millionen Objekt-Anrufe** — 99 % der KMS-Calls verschwinden per Schalter.",
+      "examTrap": "Signalbild „**SSE-KMS + viele kleine Objekte + Throttling/Kosten**“ → Bucket Keys, immer. Merk-Detail am Rand: Bucket Keys sind **nicht mit DSSE-KMS kombinierbar**."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-047",
+    "explanationStructured": {
+      "verdict": "**SSE-C (Customer-provided Keys)** ist exakt das beschriebene Modell: Der Schlüssel reist **im Request-Header** mit (HTTPS zwingend), S3 ver-/entschlüsselt damit und **verwirft ihn danach** — AWS speichert ihn zu keinem Zeitpunkt. Der Kunde trägt die volle Verantwortung für Aufbewahrung und Verlust.",
+      "optionAnalysis": {
+        "A": "Falsch — bei SSE-KMS liegt der Key **dauerhaft in AWS** (KMS) — genau das untersagt die Vorgabe.",
+        "B": "Falsch — auch DSSE-KMS hält beide Schlüsselebenen **in AWS**; die Doppelverschlüsselung ändert nichts an der Speicherfrage.",
+        "C": "Der stärkste Distraktor — Client-Side Encryption ist sicherheitlich sogar *strenger* (AWS sieht nie Klartext), beschreibt aber einen **anderen Ablauf**: Dort verschlüsselt die **Anwendung selbst** und liefert gar keinen Key an S3. Die Aufgabe verlangt „S3 verschlüsselt mit mitgeliefertem Key“.",
+        "D": "**Richtig** — SSE-C: Key pro Request im Header, S3 nutzt und vergisst ihn."
+      },
+      "mnemonic": "Eselsbrücke: **SSE-C = Schlüssel zum Mitbringen** — S3 benutzt ihn und gibt ihn an der Tür zurück.",
+      "examTrap": "Die Prüfung unterscheidet hier **Ablauf**, nicht Sicherheitsniveau: „AWS speichert nie“ + „Key im Request“ = SSE-C. Wer nach „am sichersten“ sortiert, tappt in den Client-Side-Distraktor — lies, WER verschlüsseln soll."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-048",
+    "explanationStructured": {
+      "verdict": "**Eine der wenigen Stellen, an denen die verbreitete Community-Annahme falsch ist.** Die AWS-Doku ist explizit: S3 CRR *decrypts and re-encrypts the data keys … under the KMS key in the destination Region, **even when the KMS key in both Regions is a related multi-Region key**.* Für S3-CRR bringt ein MRK **keinen Vorteil beim Re-Encrypting** — der Vorschlag greift nicht.",
+      "optionAnalysis": {
+        "A": "**Richtig** — S3 CRR re-encrypted die Data Keys **immer** mit dem Ziel-Region-Key, MRK hin oder her.",
+        "B": "Falsch — genau die Community-Fehlannahme, die diese Frage testet; die Doku widerspricht ihr wörtlich.",
+        "C": "Falsch — auch same-account ändert nichts: Das Re-Encrypting ist CRR-Verhalten, keine Account-Frage.",
+        "D": "Falsch — S3 CRR **unterstützt** MRKs problemlos; es **profitiert** nur nicht von ihnen."
+      },
+      "mnemonic": "Eselsbrücke: **CRR verschlüsselt immer neu** — der Multi-Region Key hilft client-seitig, nie der S3-Replikation.",
+      "examTrap": "MRK-Nutzen liegt bei **client-seitiger** Verschlüsselung, DR, Distributed Signing und Active-Active — NICHT bei S3-CRR. Wer diese Abgrenzung kennt, erkennt die „MRK spart Re-Encrypting“-Option sofort als Falle."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-049",
+    "explanationStructured": {
+      "verdict": "**KMS prüft nicht, ob noch Daten mit einem Key verschlüsselt sind** — nach Ablauf der Wartezeit ist die Löschung **unumkehrbar**, alle damit verschlüsselten Daten sind dauerhaft verloren. Der sichere Weg: **`DisableKey`** (sofort wirksam, jederzeit reversibel), Nutzung über CloudTrail/CloudWatch beobachten, erst bei nachgewiesener Nicht-Nutzung löschen.",
+      "optionAnalysis": {
+        "A": "Falsch — die **7-Tage-Minimalfrist verkürzt genau das Sicherheitsnetz**, das man bei Unsicherheit braucht (Spanne: 7–30 Tage, Default 30).",
+        "B": "**Richtig** — deaktivieren, überwachen, dann entscheiden: reversibel, beobachtbar, risikofrei.",
+        "C": "Die gefährlichste Fehlannahme des Themas — **diesen automatischen Schutz bietet KMS nicht**; die Löschung läuft durch, ob Daten dranhängen oder nicht.",
+        "D": "Falsch — **KMS-Keys lassen sich nicht zwischen Accounts verschieben**; einen „Archiv-Account“ für Keys gibt es nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Erst den Stecker ziehen, dann zuschauen, dann entsorgen** — Disable ist reversibel, Delete nie.",
+      "examTrap": "Das Muster „**unsicher, ob noch genutzt**“ verlangt immer die reversible Zwischenstufe. Die Auto-Block-Option (C) ist der Wunschdenken-Distraktor — KMS kennt die Datenbestände seiner Keys nicht."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-050",
+    "explanationStructured": {
+      "verdict": "**Aktualitätsfrage:** Seit **Februar 2025** sind die HSMs hinter AWS KMS **FIPS 140-3 Level 3** validiert. Wer CloudHSM früher **allein wegen Level 3** brauchte, kann heute KMS nehmen — einfacher und günstiger. Die Behauptung des Architekten ist überholt.",
+      "optionAnalysis": {
+        "A": "Veraltet — bis Anfang 2025 korrekt gelernt, heute falsch: KMS ist nicht mehr auf Level 2.",
+        "B": "Falsch — der Custom Key Store (KMS-Interface + CloudHSM-Backend) **existiert**, ist für reine Level-3-Compliance aber **nicht mehr erforderlich**.",
+        "C": "**Richtig** — KMS erfüllt Level 3 seit Februar 2025; CloudHSM ist dafür nicht mehr zwingend.",
+        "D": "Falsch — beide Dienste erreichen Level 3; ein On-Prem-HSM ist aus Compliance-Sicht unnötig."
+      },
+      "mnemonic": "Eselsbrücke: **Seit Februar 2025 ist Level 3 kein CloudHSM-Argument mehr** — CloudHSM bleibt für Kontrolle und PKCS#11.",
+      "examTrap": "CloudHSM-Trigger sind heute: **single-tenant, eigene Crypto-User, PKCS#11/JCE/CNG** — nicht mehr „FIPS Level 3“. Ältere Kursmaterialien behaupten durchweg das Gegenteil; die Prüfung testet zunehmend den neuen Stand."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-051",
+    "explanationStructured": {
+      "verdict": "**DSSE-KMS (Dual-layer Server-Side Encryption, seit Juni 2023)** legt **zwei unabhängige AES-256-Schichten** über die Objekte — gebaut für Anforderungen wie **CNSSP-15**. Randnotiz: DSSE-KMS ist **nicht mit S3 Bucket Keys kombinierbar**.",
+      "optionAnalysis": {
+        "A": "Falsch — **strukturell unmöglich**: S3 erlaubt pro Objekt **genau eine** Server-Side-Encryption-Methode; SSE-S3 und SSE-KMS lassen sich nicht stapeln.",
+        "B": "Falsch — MRK und Bucket Keys sind reale Features, lösen aber **Regions- bzw. Kostenprobleme** — keine Doppelverschlüsselung.",
+        "C": "Falsch — auch SSE-C plus Default-Encryption ergibt **keine zweite Ebene**: Die zuletzt gesetzte Methode gewinnt, es bleibt bei einer Schicht.",
+        "D": "**Richtig** — DSSE-KMS liefert die geforderten zwei unabhängigen Verschlüsselungsebenen als Bucket-Konfiguration."
+      },
+      "mnemonic": "Eselsbrücke: **Doppelt hält dicht = DSSE** — alles andere ist eine Schicht mit Deko.",
+      "examTrap": "Signalwörter „**zwei unabhängige Ebenen / CNSSP-15 / Dual-layer**“ → DSSE-KMS. Die Stapel-Option (SSE-S3 + SSE-KMS) testet, ob du weißt: **eine SSE-Methode pro Objekt, Punkt.**"
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-052",
+    "explanationStructured": {
+      "verdict": "Die **Alternating-Users-Strategie** rotiert mit **zwei DB-Usern im Wechsel**: Während User A produktiv verbunden ist, bekommt User B das neue Passwort, dann wird umgeschaltet. Es existiert **kein Zeitfenster ohne gültige Credentials** — echte Zero-Downtime-Rotation (Voraussetzung: Superuser-Secret).",
+      "optionAnalysis": {
+        "A": "Der stärkste Distraktor — Single-User ist die **einfachere, häufiger genutzte** Strategie, hat aber genau die ausgeschlossene Lücke: Zwischen DB-Passwortänderung und Secret-Update können Verbindungen scheitern.",
+        "B": "**Richtig** — Alternating Users: zwei User im Wechsel, kein Ausfallfenster, AWS-erprobte Rotations-Vorlage.",
+        "C": "Falsch — ein Wartungsfenster widerspricht „rund um die Uhr, keine fehlgeschlagenen Verbindungen“ frontal.",
+        "D": "Falsch für den Aufwand — die Eigenbau-Lambda **baut Alternating Users faktisch nach**, nur ohne AWS-Vorlage und mit vollem Wartungsaufwand."
+      },
+      "mnemonic": "Eselsbrücke: **Zwei Schlüsselbunde im Wechsel** — einer arbeitet, einer wird erneuert, niemand steht vor verschlossener Tür.",
+      "examTrap": "Signalwörter „**keine fehlgeschlagenen Verbindungen / 24/7**“ → Alternating Users. Praxisdetail, das die Prüfung liebt: **RDS Proxy unterstützt die Alternating-Users-Strategie nicht.**"
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-053",
+    "explanationStructured": {
+      "verdict": "Der **Parameter Store Standard Tier** deckt das Profil exakt ab: **kostenlos**, bis **10.000 Parameter** pro Region/Account, **4 KB** pro Wert — und die Aufgabe sagt ausdrücklich: keine Geheimnisse, keine Rotation, Werte klein.",
+      "optionAnalysis": {
+        "A": "Der teure Distraktor — Secrets Manager kostet **pro Secret und Monat**; bei 10.000 Nicht-Geheimnissen ist das eine erhebliche Rechnung für Features (Rotation), die niemand braucht.",
+        "B": "**Richtig** — Standard Tier: gratis, 10.000er-Limit passt exakt, 4 KB reichen.",
+        "C": "Falsch — der **Advanced Tier** (kostenpflichtig pro Parameter) wird erst nötig bei **>10.000 Parametern, >4 KB oder Parameter Policies** (TTL/Expiration) — nichts davon liegt vor.",
+        "D": "Falsch — die DynamoDB-Eigenbauvariante ersetzt einen fertigen Managed Service durch Code, Betrieb und Caching-Logik."
+      },
+      "mnemonic": "Eselsbrücke: **Konfiguration ist Parameter Store, Geheimnis ist Secrets Manager** — und Standard reicht bis 10.000 × 4 KB.",
+      "examTrap": "Die Grenzwerte sind der Prüfstoff: **Standard = 10.000/4 KB/gratis, Advanced = mehr/8 KB/Policies/kostet**. „Rotation“ ist das einzige Wort, das zum Secrets Manager umschwenken würde — es fehlt hier bewusst."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-054",
+    "explanationStructured": {
+      "verdict": "**CloudFront ist ein globaler Service mit Control Plane in `us-east-1`** — ACM-Zertifikate für CloudFront müssen deshalb **zwingend in `us-east-1`** angefordert werden, **egal wo der Origin steht**. Zertifikate lassen sich nicht zwischen Regionen verschieben; in `us-east-1` neu anfordern ist der Weg.",
+      "optionAnalysis": {
+        "A": "Falsch als Ursache — der Alternate Domain Name ist eine **echte Voraussetzung** der Distribution, erklärt aber nicht, warum das Zertifikat gar nicht erst **in der Auswahlliste** erscheint.",
+        "B": "Falsch — CloudFront akzeptiert ACM-Zertifikate problemlos (und bevorzugt) — nur eben aus der richtigen Region.",
+        "C": "**Richtig** — Zertifikat in `us-east-1` anfordern/validieren, dann taucht es in der CloudFront-Auswahl auf.",
+        "D": "Falsch — die **Validierungsart** (DNS vs. E-Mail) spielt für die Regionsauswahl keine Rolle."
+      },
+      "mnemonic": "Eselsbrücke: **CloudFront-Zertifikate wohnen in Virginia** — der Origin darf wohnen, wo er will.",
+      "examTrap": "Das Regions-Paar ist Dauerprüfstoff: **CloudFront → us-east-1 · ALB/NLB/API Gateway → Region der Ressource.** „Zertifikat erscheint nicht in der Liste“ ist das Signalbild für die falsche Region."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-055",
+    "explanationStructured": {
+      "verdict": "**Standard-ACM-Public-Zertifikate sind nicht exportierbar** — der private Schlüssel verlässt ACM nie; sie funktionieren nur mit **integrierten Services** (CloudFront, ALB/NLB, API Gateway …). Für EC2/on-prem braucht es: ein **exportierbares Public Certificate** (seit 2025, kostenpflichtig), **AWS Private CA** oder ein extern beschafftes Zertifikat.",
+      "optionAnalysis": {
+        "A": "Der klassische Fehler — `export-certificate` **existiert**, funktioniert aber nur für **Private-CA-Zertifikate** (und seit 2025 für explizit exportierbar erstellte Public Certs), nicht für Standard-Public-Zertifikate.",
+        "B": "Falsch — **Zertifikate sind keine IAM-Ressourcen**; eine „Bindung per IAM-Rolle“ an eine Instanz existiert nicht.",
+        "C": "Falsch — ein ALB **reicht Zertifikate nicht an Targets weiter**, und ein Interface Endpoint hat damit nichts zu tun.",
+        "D": "**Richtig** — Standard-ACM bleibt im Haus; nginx auf EC2 braucht ein exportierbares Zertifikat, Private CA oder Fremdbeschaffung."
+      },
+      "mnemonic": "Eselsbrücke: **Der ACM-Schlüssel bleibt im Tresor** — auf die eigene Instanz kommt nur, was als exportierbar geboren wurde.",
+      "examTrap": "Die 2025er-Neuerung (exportierbare Public Certs, `Export=ENABLED` **bei Erstellung**, kostenpflichtig) ist die Aktualitätsschicht — die klassische Prüfungsantwort bleibt „nicht exportierbar, nimm Private CA“."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-056",
+    "explanationStructured": {
+      "verdict": "**NACLs sind stateless** — der Kern des NACL-Themas. Der Client sendet vom **Ephemeral Port** an 443; die **Antwort** läuft von 443 zurück an den **Ephemeral Port des Clients**. Die Outbound-Regel muss deshalb den **Ephemeral-Bereich** erlauben (praxisüblich 1024–65535), nicht Port 443.",
+      "optionAnalysis": {
+        "A": "**Richtig** — die Antworten scheitern an der Outbound-Regel: Sie erlaubt 443, gebraucht wird der Ephemeral-Bereich des Clients.",
+        "B": "Falsch — **NACLs kennen keine Security Groups**, nur CIDR-Blöcke; eine SG-Referenz gibt es dort nicht.",
+        "C": "Falsch — genau umgekehrt: Das **Default**-NACL erlaubt alles, ein **Custom**-NACL verweigert alles, bis Regeln existieren.",
+        "D": "Falsch — Inbound- und Outbound-Regeln haben **getrennte Nummernkreise**; eine Reihenfolge zwischen ihnen existiert nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Stateless heißt: auch der Rückweg braucht ein Ticket** — und der Rückweg fährt über Ephemeral Ports.",
+      "examTrap": "Die Portbereiche sind prüfbar: **Linux 32768–61000 · Windows 49152–65535 · ELB/NAT/Lambda 1024–65535** — im Zweifel 1024–65535 outbound. Und die Default-vs-Custom-Umkehrung (C) ist die zweite Falle derselben Frage."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-057",
+    "explanationStructured": {
+      "verdict": "Eine Security Group kann **eine andere SG als Source referenzieren** — damit sind automatisch **alle Mitglieder** der App-SG erlaubt, unabhängig von wechselnden IPs, ohne Pflege, ohne Code. Das **kanonische Tier-Pattern** (Web-SG → App-SG → DB-SG); die Referenz zählt als **eine** Regel, egal wie viele Instanzen dahinterstehen.",
+      "optionAnalysis": {
+        "A": "Falsch für „sonst niemand“ — der CIDR-Ansatz **funktioniert**, erlaubt aber **jede Ressource im Subnet**, auch eine kompromittierte Nicht-App-Instanz. Zu grob für die Anforderung.",
+        "B": "**Richtig** — App-Tier-SG als Source in der DB-SG: Mitgliedschaft statt IP-Liste, skaliert mit der ASG von selbst.",
+        "C": "Falsch — die Prefix List ist **statisch** und veraltet bei jedem Scaling-Event; genau die Pflege, die vermieden werden soll.",
+        "D": "Falsch für den Aufwand — die Lambda-Automatik **funktioniert**, baut aber mit Code und Wartung nach, was die SG-Referenz nativ kann."
+      },
+      "mnemonic": "Eselsbrücke: **Der Club-Ausweis schlägt die Gästeliste** — wer die SG trägt, darf rein, egal welche IP er heute hat.",
+      "examTrap": "Signalbild „**wechselnde IPs durch Auto Scaling + nur diese Instanzen**“ → SG-Referenz, immer. CIDR (zu grob) und Automatisierung (unnötig) sind die Standard-Distraktoren dieses Klassikers."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-058",
+    "explanationStructured": {
+      "verdict": "**Gateway Endpoints funktionieren ausschließlich über Route-Table-Einträge innerhalb der VPC.** Traffic aus on-prem — ob über **Direct Connect, VPN, Peering oder Transit Gateway** — kann sie **strukturell nicht nutzen**. Die Lösung ist ein **Interface Endpoint (PrivateLink)** für S3: eine **ENI mit privater IP** im Subnet, von on-prem über DX erreichbar (kostet pro Stunde + GB; der Gateway Endpoint ist gratis, aber hier unbrauchbar).",
+      "optionAnalysis": {
+        "A": "Falsch — es gibt keinen „Prefix-List-Eintrag am DX-Gateway“, der einen Gateway Endpoint von außen erreichbar machen würde; die Beschränkung ist eine Eigenschaft des Endpoint-Typs, kein Routing-Detail.",
+        "B": "Falsch — die Endpoint Policy regelt, **was** über den Endpoint erlaubt ist, nicht, **wer ihn erreichen kann**. On-prem-CIDRs hineinzuschreiben ändert die Erreichbarkeit nicht.",
+        "C": "**Richtig** — Interface Endpoint für S3: private ENI, von on-prem via Direct Connect nutzbar, Traffic bleibt komplett privat.",
+        "D": "Falsch — ein NAT Gateway ist für ausgehenden Internet-Traffic privater Subnets da; es „leitet“ keinen DX-Traffic an Gateway Endpoints weiter."
+      },
+      "mnemonic": "Eselsbrücke: **Der Gateway Endpoint ist eine Abkürzung im eigenen Haus** — Besucher von draußen brauchen die Interface-Klingel.",
+      "examTrap": "Die On-prem-Regel ist der Prüfungskern: **Gateway Endpoint = nur VPC-intern · Interface Endpoint = auch DX/VPN.** „Privat aus dem Rechenzentrum auf S3“ zeigt immer auf den Interface Endpoint — trotz des Gratis-Charmes des Gateways."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-059",
+    "explanationStructured": {
+      "verdict": "Der Hebel ist die **Bucket-Policy**: ein **`Deny`** mit `StringNotEquals` auf **`aws:SourceVpce`** (Wert = Endpoint-ID). Damit wird **jeder** Zugriff verweigert, der nicht über diesen Endpoint kommt — **unabhängig von den Credentials**. Nur die Ressource selbst sieht alle Zugriffswege und kann sie deshalb erzwingen. Praxis-Warnung: Diese Policy sperrt auch die **AWS-Konsole** aus.",
+      "optionAnalysis": {
+        "A": "Der stärkste Distraktor — die Endpoint Policy regelt, **was über den Endpoint** läuft; **andere Zugriffswege blockiert sie nicht**: Ein Internet-Zugriff ignoriert sie schlicht.",
+        "B": "Falsch — **Gateway Endpoints haben keine Security Groups** (nur Interface Endpoints besitzen ENIs).",
+        "C": "Falsch — eine NACL gegen „alle S3-IP-Bereiche“ scheitert an den **dynamischen, wechselnden** S3-Adressbereichen und wäre reine Symptombekämpfung.",
+        "D": "**Richtig** — Bucket-Policy-Deny bei `aws:SourceVpce ≠ vpce-…`: der einzige durchsetzbare Ort für „nur über diesen Endpoint“."
+      },
+      "mnemonic": "Eselsbrücke: **Der Türsteher steht an der Ressource** — nur die Bucket-Policy sieht, durch welche Tür jeder kommt.",
+      "examTrap": "Richtungs-Merksatz: **Endpoint Policy filtert, was DURCH den Endpoint geht — die Bucket-Policy erzwingt, dass alles durch ihn MUSS.** Und `aws:SourceVpce` gehört immer in die Bucket-Policy, nie in die Endpoint Policy."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-060",
+    "explanationStructured": {
+      "verdict": "**PrivateLink ist die einzige Option, die bei überlappenden CIDRs funktioniert.** AWS wörtlich: *The consumer and service provider VPCs can have overlapping IP address ranges.* Der Grund: **Es gibt kein Routing zwischen den VPCs** — der Consumer erhält eine **ENI mit einer IP aus der eigenen VPC**, der Traffic fließt unidirektional zum NLB-basierten Endpoint Service.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Endpoint Service vor der API in VPC A, Interface Endpoint in VPC B: Die identischen 10.0.0.0/16 berühren sich nie.",
+        "B": "Falsch — **VPC Peering scheitert hart** an der CIDR-Überlappung: Es basiert auf Routing, und identische Adressräume sind nicht routbar.",
+        "C": "Falsch — auch das **Transit Gateway** ist Routing-basiert und fällt an derselben Überlappung durch; völlig legitim, nur nicht hier.",
+        "D": "Falsch — ein Site-to-Site-VPN mit NAT zwischen VPCs ist kein nativ unterstütztes AWS-Konstrukt für diesen Fall."
+      },
+      "mnemonic": "Eselsbrücke: **PrivateLink routet nicht, es reicht durch** — wo kein Routing ist, stören gleiche Adressen nicht.",
+      "examTrap": "Signalwortkette „**identische/überlappende CIDRs + einzelner Service + kein Re-IP**“ → PrivateLink, immer. Peering und TGW sind die Reflex-Distraktoren — beide sterben am Routing."
+    }
+  }
+]

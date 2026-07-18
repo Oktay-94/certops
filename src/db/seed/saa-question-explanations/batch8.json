@@ -1,0 +1,424 @@
+[
+  {
+    "seedKey": "saa-c03-q-236",
+    "explanationStructured": {
+      "verdict": "**Convertible RIs** erlauben den Tausch in eine andere Instance-**Familie**, Größe, OS oder Tenancy während der Laufzeit — genau die geforderte Flexibilität bei erwartetem Generationswechsel. Preis: niedrigerer Rabatt als Standard RIs; der Tausch erfolgt nur gegen RIs mit gleichem oder höherem Gesamtwert.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Convertible Reserved Instances: familien-/größen-/OS-tauschbar während der Laufzeit, ideal bei geplantem Generationswechsel.",
+        "B": "Falsch — Standard RIs haben den höchsten RI-Rabatt, sind aber **an die Instance-Familie gebunden**; ein Familienwechsel ist nicht möglich.",
+        "C": "Falsch — Zonal RIs geben eine Kapazitätsgarantie, aber keine Familien-Flexibilität für den Generationswechsel.",
+        "D": "Falsch — Regional RIs bieten **Size**-Flexibilität innerhalb einer Familie, aber keinen Wechsel der **Familie** (Generation)."
+      },
+      "mnemonic": "Eselsbrücke: **Familienwechsel geplant = Convertible RI** — Standard RI ist familiengebunden.",
+      "examTrap": "Convertible (familientauschbar, weniger Rabatt) vs. Standard (max. Rabatt, gebunden). **„Neuere Generation im Laufe der Zeit“** → Convertible. Regional-RI-Size-Flexibility ≠ Familienwechsel."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-237",
+    "explanationStructured": {
+      "verdict": "Die Umgebung läuft ~168 h/Woche, gebraucht wird sie ~55 — zwei Drittel der Laufzeit ist Verschwendung. Der **AWS Instance Scheduler** stoppt EC2 **und RDS** nach Zeitplan und startet sie morgens; für gestoppte Instanzen fallen **keine Instanzkosten** an (nur EBS bleibt). Größter Hebel, Anwendungen unangetastet.",
+      "optionAnalysis": {
+        "A": "Falsch — ein Compute SP bezahlt die durchschnittliche Auslastung, senkt aber nicht die **Leerlaufzeit** (nachts/Wochenende), die hier der Kern ist.",
+        "B": "Falsch — Rightsizing hilft ergänzend, adressiert aber nicht die 24/7-Laufzeit einer nur werktags genutzten Umgebung.",
+        "C": "Falsch — Spot passt nicht zu Dev/Test-Instanzen, die zuverlässig zu Arbeitszeiten verfügbar sein sollen; der Hebel ist das Abschalten, nicht der Spot-Rabatt.",
+        "D": "**Richtig** — AWS Instance Scheduler: EC2 + RDS außerhalb der Arbeitszeit stoppen; keine Instanzkosten für Gestopptes."
+      },
+      "mnemonic": "Eselsbrücke: **Dev/Test nur werktags → Instance Scheduler (nachts/WE aus).**",
+      "examTrap": "Der größte Kostenhebel bei Dev/Test ist **Abschalten**, nicht Rabatt. Der Instance Scheduler deckt EC2 und RDS ab. SP (bezahlt Leerlauf) und Spot (unpassend) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-238",
+    "explanationStructured": {
+      "verdict": "AWS kündigt den Spot-Entzug **zwei Minuten vorher** an. Die Anwendung erfährt es über den **Instance Metadata Service (Interruption Notice)** oder das **EC2-Spot-Instance-Interruption-Warning-Event in EventBridge**. Ergänzend gibt die **Rebalance Recommendation** ein noch früheres Signal bei steigendem Risiko.",
+      "optionAnalysis": {
+        "A": "Falsch — es gibt keine CloudWatch-Metrik `SpotInstanceTermination` als das genannte Signal; der Weg ist IMDS/EventBridge.",
+        "B": "**Richtig** — Interruption Notice über IMDS + EC2-Spot-Interruption-Warning in EventBridge: die zwei offiziellen 2-Minuten-Signale.",
+        "C": "Falsch — der Spot-Maximalpreis steuert die Zuteilung, ist aber **kein Entzugssignal** für die Anwendung.",
+        "D": "Falsch — ein ASG-Lifecycle-Hook kann Terminierung verzögern, ist aber nicht der Mechanismus, über den die Anwendung die **2-Minuten-Vorwarnung** erfährt."
+      },
+      "mnemonic": "Eselsbrücke: **Spot-Entzug: 2-Minuten-Notice über IMDS + EventBridge** (plus Rebalance Recommendation).",
+      "examTrap": "Die 2-Minuten-Interruption-Notice kommt über **IMDS oder EventBridge**. Erfundene CloudWatch-Metriken und der Maximalpreis (Zuteilung, kein Signal) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-239",
+    "explanationStructured": {
+      "verdict": "Zwei Anforderungen, zwei Instrumente — und AWS erlaubt das **Stapeln**: **ODCRs** reservieren Kapazität in einer bestimmten AZ (kein Rabatt, On-Demand-Satz), ein **Savings Plan oder eine Regional RI** legt sich darüber und rabattiert genau diese Nutzung. Ergebnis: garantierte Kapazität **plus** Rabatt.",
+      "optionAnalysis": {
+        "A": "Falsch — ein EC2 Instance SP allein gibt **Rabatt, aber keine AZ-Kapazitätsgarantie**.",
+        "B": "Falsch — Regional RIs allein geben **Rabatt, aber keine Kapazitätsreservierung** in einer AZ (der verbreitete Denkfehler).",
+        "C": "**Richtig** — ODCR in der Ziel-AZ (Kapazität) + Savings Plan/Regional RI (Rabatt): beide Anforderungen kombiniert.",
+        "D": "Falsch für die Kosten — Dedicated Hosts liefern zwar Kapazität, sind aber ein teures/überzogenes Instrument, wenn nur AZ-Kapazität + Rabatt gefragt sind."
+      },
+      "mnemonic": "Eselsbrücke: **Kapazitätsgarantie + Rabatt = ODCR + Savings Plan/Regional RI (stapeln).**",
+      "examTrap": "D4-Kernkorrektur: **Regional RI/SP geben nur Rabatt, ODCR nur Kapazität** — man kombiniert beide. „Garantierte AZ-Kapazität UND Rabatt“ → gestapelt, nicht eines allein."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-240",
+    "explanationStructured": {
+      "verdict": "**Aurora I/O-Optimized** berechnet **keine separaten I/O-Gebühren** mehr, dafür höhere Instanz-/Storage-Sätze. AWS-Faustregel: Wechsel lohnt, sobald I/O-Kosten **> 25 %** der Aurora-Rechnung ausmachen — bei **45 %** klar darüber, Ersparnis bis 40 %.",
+      "optionAnalysis": {
+        "A": "**Richtig** — auf Aurora I/O-Optimized umstellen: keine separaten I/O-Gebühren, bei 45 % I/O-Anteil deutliche Ersparnis.",
+        "B": "Falsch — eine größere Writer-Instanz senkt nicht die **I/O-Gebühren** (die am Volumen hängen), sondern erhöht die Instanzkosten.",
+        "C": "Falsch — mehr Replicas verlagern Leselast, reduzieren aber nicht die schreibgetriebenen I/O-Kosten des Clusters.",
+        "D": "Falsch — eine Migration zu RDS PostgreSQL ist ein großer Umbau; Aurora I/O-Optimized löst das Kostenprofil ohne Engine-Wechsel."
+      },
+      "mnemonic": "Eselsbrücke: **Hoher Aurora-I/O-Anteil (> 25 %) → I/O-Optimized** (keine I/O-Gebühren).",
+      "examTrap": "Die 25-%-Faustregel ist prüfbar: **I/O > 25 % der Rechnung → I/O-Optimized.** Größere Instanz/mehr Replicas adressieren nicht die volumengetriebenen I/O-Kosten."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-241",
+    "explanationStructured": {
+      "verdict": "**Aurora Serverless v2 kann seit November 2024 auf 0 ACU** herunterskalieren: Bei Inaktivität pausiert die DB vollständig (nur Storage-Kosten), beim ersten Zugriff läuft sie automatisch in ~15 s wieder an. Genau das Szenario: keine manuelle Interaktion, jederzeit erreichbar, Sekunden Wartezeit ok.",
+      "optionAnalysis": {
+        "A": "Falsch — die kleinste provisionierte Instanz kostet **24/7**, obwohl die Cluster nur wenige Stunden/Woche gebraucht werden.",
+        "B": "**Richtig** — Aurora Serverless v2 mit Minimum 0 ACU: Cluster pausieren bei Inaktivität, automatischer Sekunden-Resume.",
+        "C": "Falsch für die beste Lösung — Lambda-Stop/Start ist Eigenbau mit fester Zeitlogik; Serverless skaliert bedarfsgetrieben ohne Automatisierung.",
+        "D": "Falsch — 1-Jahres-RIs für sporadisch genutzte Feature-Branch-Cluster verschwenden das Commitment (kaum Grundlast)."
+      },
+      "mnemonic": "Eselsbrücke: **Sporadische Aurora-Cluster → Serverless v2, Min 0 ACU** (pausiert bei Ruhe).",
+      "examTrap": "Aktualität: **Scale-to-0-ACU seit Nov 2024 (v2).** „Wenige Stunden/Woche, jederzeit erreichbar, Sekunden ok“ → Serverless v2. RIs (kein Grundlast-Nutzen) und Lambda-Scheduler (Eigenbau) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-242",
+    "explanationStructured": {
+      "verdict": "Die **Standard-IA-Tabellenklasse** ist dafür gebaut: **bis zu 60 % niedrigerer Storage-Preis**, dafür höhere Kosten pro Lese-/Schreibvorgang. AWS-Faustregel: Wechsel, sobald **Storage > 50 % der Durchsatzkosten** — bei 80:20 klar darüber. Die Tabelle bleibt voll abfragbar.",
+      "optionAnalysis": {
+        "A": "Falsch — On-Demand ändert das Abrechnungsmodell des Durchsatzes, senkt aber nicht den **Storage-Preis** der 12 TB (der Kostentreiber).",
+        "B": "Falsch für die Anforderung — TTL löscht Daten, aber die Bestellungen sollen **archiviert/erhalten** bleiben; das Ziel ist billiger Storage, kein Löschen.",
+        "C": "**Richtig** — Tabellenklasse Standard-IA: bis 60 % günstigerer Storage bei selten gelesenen, aber vorzuhaltenden Daten.",
+        "D": "Falsch für die einfachste Lösung — Export nach Glacier + Referenzen ist Eigenbau; Standard-IA hält die Tabelle nativ abfragbar und billig."
+      },
+      "mnemonic": "Eselsbrücke: **DynamoDB storage-dominiert, selten gelesen = Standard-IA-Tabellenklasse (bis 60 % billiger).**",
+      "examTrap": "Die 50-%-Faustregel: **Storage > 50 % der Durchsatzkosten → Standard-IA.** On-Demand (falscher Hebel) und TTL (löscht, statt zu erhalten) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-243",
+    "explanationStructured": {
+      "verdict": "**On-Demand** ist für dieses Profil gebaut: keine Kapazitätsplanung, sofortige Bedienung sprunghafter Last, Abrechnung pro Anfrage. In Ruhephasen kostet die Tabelle fast nichts, der Vorverkaufs-Spike wird ohne Throttling bedient. Seit der 50-%-Preissenkung (Nov 2024) ist On-Demand der empfohlene Standardmodus.",
+      "optionAnalysis": {
+        "A": "Falsch — Provisioned dauerhaft auf Spitzenlast bezahlt die Kapazität die ganze (meist leere) Zeit durch.",
+        "B": "Falsch — es gibt keine „Reserved Capacity für die Tabelle“ als hier passendes Rabattinstrument gegen sprunghafte Last; das Problem ist die Kapazitätsplanung selbst.",
+        "C": "Falsch — Auto Scaling mit niedrigerer Ziel-Auslastung reagiert **alarmgetrieben (Minuten)** und verpasst plötzliche Spikes.",
+        "D": "**Richtig** — On-Demand: sofortige Spitzenbedienung ohne Planung, in Ruhephasen fast kostenlos."
+      },
+      "mnemonic": "Eselsbrücke: **Sprunghaft/unvorhersehbar + lange Ruhe = DynamoDB On-Demand.**",
+      "examTrap": "Wie q-182: Provisioned+Auto-Scaling ist zu träge für Spikes. Aktualität: **On-Demand -50 % seit Nov 2024**, empfohlener Standard. Provisioned-Varianten sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-244",
+    "explanationStructured": {
+      "verdict": "**DynamoDB TTL** löscht Items nach Ablaufzeitstempel automatisch im Hintergrund — **ohne Verbrauch von Schreibkapazität**. Die Kosten des nächtlichen Aufräum-Jobs (Scan + Lambda) entfallen vollständig. Genau dafür gibt es das Feature.",
+      "optionAnalysis": {
+        "A": "**Richtig** — TTL auf ein Ablauf-Attribut: automatisches, kapazitätsfreies Löschen abgelaufener Token; Job entfällt.",
+        "B": "Falsch — Query statt Scan senkt den Verbrauch, kostet aber weiter Lese-/Schreibkapazität und setzt einen passenden Index voraus.",
+        "C": "Falsch — Standard-IA senkt Storage, beseitigt aber nicht den teuren Aufräum-Job (das eigentliche Problem).",
+        "D": "Falsch — den Job in Nebenzeiten zu verlegen reduziert die Job-Kosten nicht; TTL macht ihn ganz überflüssig."
+      },
+      "mnemonic": "Eselsbrücke: **Ablaufende Items automatisch weg = DynamoDB TTL** (kostet keine Schreibkapazität).",
+      "examTrap": "TTL löscht **ohne WCU-Verbrauch** — der Aufräum-Job wird überflüssig. Query-statt-Scan (kostet weiter) und Standard-IA (falscher Hebel) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-245",
+    "explanationStructured": {
+      "verdict": "**RDS erlaubt das Stoppen für maximal 7 aufeinanderfolgende Tage** — danach startet AWS die Instanz automatisch (für ausstehende Wartung). Über drei Wochen lief die DB also den Großteil der Zeit. Lösung: **Automatisierung** (Instance Scheduler oder EventBridge-Lambda), die regelmäßig neu stoppt.",
+      "optionAnalysis": {
+        "A": "Falsch — gestoppte RDS-Instanzen werden **nicht** voll berechnet (nur Storage); der Grund ist der 7-Tage-Auto-Start, nicht die Abrechnung im Stopp.",
+        "B": "Falsch — kein Backup-Fenster startet die Instanz; das Auto-Start-Verhalten hängt am 7-Tage-Limit.",
+        "C": "Falsch — es ist nicht ein einzelnes Wartungsereignis, sondern die generelle **7-Tage-Regel**, die den Auto-Start auslöst.",
+        "D": "**Richtig** — RDS startet nach spätestens 7 Tagen automatisch; ein Scheduler muss regelmäßig neu stoppen."
+      },
+      "mnemonic": "Eselsbrücke: **RDS-Stopp gilt nur 7 Tage → Scheduler muss neu stoppen.**",
+      "examTrap": "Das **7-Tage-Auto-Start-Limit** ist der Prüfpunkt. Manuelles Stoppen reicht nicht über Wochen — es braucht Automatisierung (Instance Scheduler/EventBridge)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-246",
+    "explanationStructured": {
+      "verdict": "**Extended Support** ist die Gebühr dafür, dass AWS eine Major Version nach ihrem regulären Ende weiterpflegt. Sie verschwindet nur durch das **Upgrade auf eine unterstützte Version**. **Blue/Green Deployments** sind der vorgesehene Weg: gespiegelte Umgebung aktualisieren/testen, mit minimaler Ausfallzeit umschwenken.",
+      "optionAnalysis": {
+        "A": "Falsch — RIs geben Rabatt, aber der **Extended-Support-Aufschlag bleibt**; Rabatt entfernt die Gebühr nicht.",
+        "B": "**Richtig** — per Blue/Green Deployment auf eine unterstützte MySQL-Version upgraden: Extended-Support-Gebühr entfällt.",
+        "C": "Falsch — Downsizing der vCPUs senkt Instanzkosten, aber die **Extended-Support-Gebühr** (an der veralteten Version) bleibt.",
+        "D": "Falsch — Extended Support gilt nicht nur für Read Replicas; das Abschalten löst die versionsbedingte Gebühr nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Extended-Support-Gebühr weg = auf unterstützte Version upgraden (Blue/Green).**",
+      "examTrap": "Extended Support hängt an der **veralteten Major Version** — nur ein Upgrade entfernt ihn. RIs (Rabatt ≠ Gebühr weg) und Downsizing sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-247",
+    "explanationStructured": {
+      "verdict": "**RDS Reserved Instances** passen für eine stabile, dauerhaft laufende Produktions-DB: Commitment über 1/3 Jahre auf die genutzte Instanzklasse, erheblicher Rabatt gegenüber On-Demand, mit gewisser Größenflexibilität innerhalb der Familie. Alternativ deckt der **Database Savings Plan** dieselbe Last flexibler ab.",
+      "optionAnalysis": {
+        "A": "Falsch — ein **Compute Savings Plan deckt RDS NICHT ab** (nur EC2/Fargate/Lambda); für die DB wirkungslos.",
+        "B": "Falsch für die stabile Last — Aurora Serverless v2 lohnt bei schwankender/sporadischer Last, nicht bei konstant ausgelasteter 24/7-Produktion.",
+        "C": "**Richtig** — RDS Reserved Instances (1/3 Jahre) für die stabile Instanzklasse; alternativ Database Savings Plan.",
+        "D": "Falsch — Multi-AZ auf Single-AZ zurückzubauen opfert die Hochverfügbarkeit einer Produktions-DB; keine akzeptable Kostenmaßnahme."
+      },
+      "mnemonic": "Eselsbrücke: **Stabile 24/7-RDS → RDS Reserved Instances** (Compute SP deckt keine DB ab).",
+      "examTrap": "Der Compute-SP-Scope-Distraktor kehrt wieder: **RDS ist nicht im Compute SP.** Stabile DB-Last → RDS RI oder Database Savings Plan; Single-AZ-Rückbau ist eine Verfügbarkeits-Falle."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-248",
+    "explanationStructured": {
+      "verdict": "**Redshift Serverless** rechnet nach **tatsächlich verbrauchter Rechenkapazität** ab und fährt zwischen den Abfragen herunter — genau die Kopplung an die Nutzung. Gleiche Engine/SQL, Abfragen unverändert. Für „wenige intensive Tage + lange Untätigkeit“ der größte Hebel.",
+      "optionAnalysis": {
+        "A": "Falsch — Reserved Nodes für einen meist untätigen Cluster bezahlen die Leerlaufzeit; sie verschlimmern die Grundlast-Kosten.",
+        "B": "Falsch für die einfachste Lösung — Cluster verkleinern + Elastic Resize je Lauf ist manueller Betrieb; Serverless macht das automatisch.",
+        "C": "Falsch — Athena ist eine andere Engine/Abfragewelt; „Abfragen umstellen“ ist ein größerer Umbau als der Serverless-Wechsel bei gleicher Engine.",
+        "D": "**Richtig** — Redshift Serverless: zahlt nur verbrauchte Compute, fährt zwischen Läufen herunter, Abfragen unverändert."
+      },
+      "mnemonic": "Eselsbrücke: **Redshift nur wenige Tage/Monat = Redshift Serverless** (zahlt nur genutzte Compute).",
+      "examTrap": "**„Sporadische Reporting-Last, sonst untätig“** → Redshift Serverless (gleiche Engine, unverändertes SQL). Reserved Nodes (bezahlt Leerlauf) und Athena (andere Engine) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-249",
+    "explanationStructured": {
+      "verdict": "Beide greifen am dominierenden **Storage**-Block: **(A)** **TTL** löscht Items nach 90 Tagen automatisch **ohne Schreibkapazität** — die Tabelle schrumpft dauerhaft auf ihr sinnvolles Volumen. **(C)** **Standard-IA-Tabellenklasse** senkt den Preis pro verbleibendem GB (angezeigt, wenn Storage > 50 % der Kosten).",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — TTL auf ein Ablaufattribut: Events nach 90 Tagen kapazitätsfrei löschen, Tabelle schrumpft.",
+        "B": "Falsch — On-Demand ändert das Durchsatz-Abrechnungsmodell, senkt aber nicht die **Storage**-Kosten (70 % der Rechnung).",
+        "C": "**Richtig (2/2)** — Standard-IA-Tabellenklasse: günstigerer Storage pro GB bei storage-dominierten, selten gelesenen Daten.",
+        "D": "Falsch — ein GSI zum Löschen alter Events ist Umweg und **zusätzliche** Kapazität/Kosten; TTL löscht direkter und kapazitätsfrei.",
+        "E": "Falsch — Global Tables **replizieren** die Daten (mehr Storage in weiterer Region), sie senken die Storage-Kosten nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Storage-dominiert = weniger Daten (TTL) + billiger pro GB (Standard-IA).**",
+      "examTrap": "Zwei Storage-Hebel: **Datenmenge senken (TTL)** und **Preis pro GB senken (Standard-IA).** On-Demand (Durchsatz) und Global Tables (mehr Storage) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-250",
+    "explanationStructured": {
+      "verdict": "Der klassische **NAT-Kostenfall**: Ein NAT Gateway berechnet Stundenpreis **plus Verarbeitungsgebühr pro GB** — bei 40 TB/Tag der dominierende Posten. Ein **Gateway VPC Endpoint für S3** kostet nichts: Er wird als Route eingetragen, der S3-Verkehr verlässt die VPC gar nicht mehr über das NAT Gateway.",
+      "optionAnalysis": {
+        "A": "Falsch — ein zweites NAT Gateway erhöht die Kosten (mehr Stunden + weiter GB-Gebühr), statt den S3-Traffic aus der Gebühr zu nehmen.",
+        "B": "**Richtig** — Gateway VPC Endpoint für S3: kostenlos, nimmt den 40-TB-S3-Verkehr aus der NAT-Verarbeitungsgebühr.",
+        "C": "Falsch — eine NAT-Instanz statt Gateway spart die Verarbeitungsgebühr nur scheinbar; sie kostet EC2-Betrieb und ist der falsche Hebel gegenüber dem gratis Gateway Endpoint.",
+        "D": "Falsch für die Kosten — ein **Interface** Endpoint für S3 kostet Stundenpreis + GB-Gebühr; für reinen S3-Verkehr ist der **Gateway** Endpoint (gratis) richtig."
+      },
+      "mnemonic": "Eselsbrücke: **S3-Verkehr aus dem NAT nehmen = Gateway VPC Endpoint (gratis).**",
+      "examTrap": "NAT-GB-Gebühr bei viel S3-Traffic → **Gateway Endpoint (kostenlos, nur S3/DynamoDB).** Zweites NAT (teurer) und Interface Endpoint für S3 (kostet) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-251",
+    "explanationStructured": {
+      "verdict": "**S3 und DynamoDB sind die einzigen Dienste mit Gateway VPC Endpoints — und die kosten nichts** (kein Stundenpreis, keine GB-Gebühr). Da die Instanzen keinen sonstigen Internetzugang brauchen, kann das **NAT Gateway ganz entfallen**; seine Stunden-/Verarbeitungsgebühren verschwinden.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Gateway Endpoints für S3 + DynamoDB, NAT Gateway abschaffen: alle NAT-Kosten weg, Endpoints kostenlos.",
+        "B": "Falsch für die Kosten — **Interface** Endpoints für S3/DynamoDB kosten Stundenpreis + GB, obwohl es gratis Gateway Endpoints gibt.",
+        "C": "Falsch — das NAT Gateway zu behalten lässt die Stunden-/GB-Gebühren bestehen; eine Endpoint-Policy senkt die NAT-Kosten nicht.",
+        "D": "Falsch — Instanzen in ein öffentliches Subnet zu verschieben ist ein Sicherheits-/Architektur-Rückschritt und löst das Kostenproblem nicht sauber."
+      },
+      "mnemonic": "Eselsbrücke: **Nur S3/DynamoDB nötig → Gateway Endpoints, NAT weg** (Endpoints gratis).",
+      "examTrap": "Merke: **Gateway Endpoints nur für S3/DynamoDB, kostenlos.** Wenn kein weiterer Internet-Bedarf besteht, kann das NAT komplett entfallen. Interface Endpoints (kostenpflichtig) sind der Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-252",
+    "explanationStructured": {
+      "verdict": "**Gateway Endpoints gibt es nur für S3/DynamoDB.** Für **ECR, CloudWatch Logs, Secrets Manager** sind **Interface VPC Endpoints (PrivateLink)** der Weg: Der Verkehr bleibt im AWS-Netz, nicht mehr über NAT. Interface Endpoints kosten Stundenpreis je AZ + GB, liegen aber deutlich unter der NAT-Verarbeitungsgebühr.",
+      "optionAnalysis": {
+        "A": "Falsch — der Verkehr auf ein NAT in derselben AZ zu lenken senkt nur Inter-AZ-Kosten, nicht die dominierende NAT-Verarbeitungsgebühr.",
+        "B": "Falsch — ein zweites NAT erhöht die Kosten, statt den Dienst-Verkehr per Endpoint aus dem NAT zu nehmen.",
+        "C": "**Richtig** — Interface VPC Endpoints für ECR, CloudWatch Logs, Secrets Manager: Verkehr bleibt im AWS-Netz, günstiger als NAT-GB-Gebühr.",
+        "D": "Falsch — Container-Images nach S3 auszulagern ist kein realistischer ECR-Ersatz; die Log-/Secrets-Zugriffe bleiben ohnehin ungelöst."
+      },
+      "mnemonic": "Eselsbrücke: **Alles außer S3/DynamoDB → Interface Endpoint (PrivateLink), nicht NAT.**",
+      "examTrap": "Endpoint-Regel: **Gateway = nur S3/DynamoDB (gratis), Interface = alle anderen Dienste (kostet, aber < NAT-GB-Gebühr).** ECR/Logs/Secrets → Interface Endpoints."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-253",
+    "explanationStructured": {
+      "verdict": "**CloudFront** wirkt doppelt: Der Transfer vom AWS-Origin zu CloudFront ist **kostenlos** (kein Internet-Egress am Bucket), und der **CloudFront-Egress zum Nutzer ist günstiger** als direkter S3-Internet-Egress; der Cache bedient die millionenfach identischen Abrufe am Edge (Origin wird kaum noch angefragt).",
+      "optionAnalysis": {
+        "A": "Falsch — Transfer Acceleration beschleunigt Uploads/Downloads über Edges, senkt aber nicht die **Egress-Kosten** der Auslieferung wie ein CDN-Cache.",
+        "B": "Falsch — Cross-Region Replication verursacht zusätzliche Speicher-/Replikationskosten und löst nicht das Egress-Kostenproblem.",
+        "C": "Falsch — Standard-IA senkt Storage, aber **nicht die Transfer-/Egress-Kosten** der weltweiten Auslieferung.",
+        "D": "**Richtig** — CloudFront vor den Bucket: gratis Origin→CDN, günstigerer Egress, Cache bedient wiederholte Abrufe."
+      },
+      "mnemonic": "Eselsbrücke: **Weltweite S3-Auslieferung teuer = CloudFront davor** (gratis Origin-Fetch + Cache).",
+      "examTrap": "CloudFront senkt Egress **doppelt** (kostenloser Origin-Fetch + günstigerer/gecachter Auslieferungs-Egress). Transfer Acceleration (nur Pfad) und Standard-IA (nur Storage) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-254",
+    "explanationStructured": {
+      "verdict": "Die **CloudFront-Preisklassen** steuern, welche Edge-Standorte genutzt werden. **Price Class 100** beschränkt auf die günstigsten Regionen (Nordamerika + Europa) und senkt den Preis pro GB. Da der Nutzerkreis genau dort liegt, entsteht **kein Nachteil**.",
+      "optionAnalysis": {
+        "A": "Falsch — Origin Shield reduziert Origin-Last, senkt aber nicht den **Auslieferungspreis** über teure Edge-Regionen.",
+        "B": "**Richtig** — Price Class 100: nur die günstigsten (EU/NA) Edges nutzen; passt exakt zum Nutzerkreis, senkt Egress-Preis.",
+        "C": "Falsch — Geo Restriction **blockiert** Länder (Zugriffskontrolle), es ist kein Preis-/Edge-Auswahl-Mechanismus.",
+        "D": "Falsch — höhere TTLs verbessern die Hit-Ratio, senken aber nicht den **regionalen Preis pro GB** der genutzten Edges."
+      },
+      "mnemonic": "Eselsbrücke: **Nutzer nur in EU/NA → Price Class 100** (nur günstige Edges).",
+      "examTrap": "Preisklassen ≠ Geo Restriction: **Price Class steuert genutzte Edges/Preis, Geo Restriction blockiert Länder.** „Nutzerkreis nur EU/NA, Egress senken“ → Price Class 100."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-255",
+    "explanationStructured": {
+      "verdict": "Seit dem **1. Februar 2024 berechnet AWS jede öffentliche IPv4-Adresse stündlich** — zugeordnet oder nicht. Dreifacher Hebel: **ungenutzte Elastic IPs freigeben**, Instanzen ohne Internet-Bedarf in **private Subnetze** (keine öffentliche IPv4 mehr), und wo öffentliche Erreichbarkeit nötig ist, konsolidieren.",
+      "optionAnalysis": {
+        "A": "Falsch — die Prämisse „nur nicht zugeordnete EIPs kosten“ ist **seit Feb 2024 überholt**: Auch zugeordnete öffentliche IPv4 kostet stündlich.",
+        "B": "Falsch — Instanzen zu konsolidieren senkt IPs nur begrenzt; der Hebel ist, öffentliche IPv4 dort zu vermeiden, wo sie nicht gebraucht wird.",
+        "C": "Falsch — Instanzen in öffentliche Subnetze zu verschieben **erhöht** die Zahl öffentlicher IPv4, statt sie zu senken.",
+        "D": "**Richtig** — ungenutzte EIPs freigeben + Instanzen ohne Bedarf in private Subnetze: öffentliche IPv4 (und deren Gebühr) reduzieren."
+      },
+      "mnemonic": "Eselsbrücke: **Seit 01.02.2024 kostet JEDE öffentliche IPv4** — ungenutzte freigeben, in private Subnetze.",
+      "examTrap": "Aktualität: **öffentliche IPv4 stündlich berechnet seit 1. Februar 2024**, auch zugeordnete. „Nur nicht zugeordnete EIPs kosten“ ist der überholte Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-256",
+    "explanationStructured": {
+      "verdict": "**Inter-AZ-Datentransfer wird in beiden Richtungen berechnet, Verkehr innerhalb einer AZ nicht.** Mit aktiviertem Cross-Zone Load Balancing verteilt der LB gleichmäßig über alle Ziele — bei drei AZs landen ~2/3 zonenübergreifend. **Cross-Zone deaktivieren** hält den Verkehr in der Ursprungs-AZ.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Cross-Zone am internen LB deaktivieren: Verkehr bleibt in derselben AZ, Inter-AZ-Gebühren entfallen.",
+        "B": "Falsch für Verfügbarkeit — alles in eine AZ zu konsolidieren spart Inter-AZ-Kosten, opfert aber die Multi-AZ-Resilienz.",
+        "C": "Falsch — ein Gateway VPC Endpoint ist für S3/DynamoDB-Verkehr, nicht für internen Worker↔Cache-Traffic.",
+        "D": "Falsch — größere Instanztypen ändern nichts an der **AZ-übergreifenden** Abrechnung des Verkehrs."
+      },
+      "mnemonic": "Eselsbrücke: **Inter-AZ-Traffic-Kosten senken = Cross-Zone am internen LB aus** (Verkehr bleibt zonal).",
+      "examTrap": "**Inter-AZ = beide Richtungen berechnet.** Bei internem LB mit Cross-Zone landet viel Verkehr AZ-übergreifend → Cross-Zone deaktivieren. Single-AZ-Konsolidierung opfert Resilienz (Distraktor)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-257",
+    "explanationStructured": {
+      "verdict": "**VPC Peering ist nicht transitiv**: Vollvermascht wächst die Verbindungszahl **quadratisch** — bei 34 VPCs über 500 Peerings plus Routen in jeder Tabelle. Ein **Transit Gateway** löst das als Hub: jede VPC **ein** Attachment, Routing über die TGW-Tabellen.",
+      "optionAnalysis": {
+        "A": "Falsch — Peering beizubehalten führt bei 34 VPCs in die quadratische Explosion (unwartbar), auch wenn Peering selbst keine Stundengebühr hat.",
+        "B": "Falsch — Site-to-Site-VPN ist für hybride Anbindung, nicht für skalierbare VPC-zu-VPC-Vermaschung; die zentrale Terminierung ersetzt kein transitives Routing.",
+        "C": "**Richtig** — Transit Gateway als Hub: ein Attachment je VPC, transitives Routing, lineares Wachstum bei 34 VPCs.",
+        "D": "Falsch — VPCs zusammenzulegen ist ein massiver, oft unmöglicher Umbau (Isolation/Adressraum); der Hub löst es sauber."
+      },
+      "mnemonic": "Eselsbrücke: **Viele VPCs untereinander, wachsend = Transit Gateway** (Peering skaliert quadratisch).",
+      "examTrap": "Wie q-067: **Peering ist nicht transitiv (quadratisch), TGW ist der Hub (linear).** Bei 30+ VPCs ist Peering-Mesh der Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-258",
+    "explanationStructured": {
+      "verdict": "Nebenbedingung: **Der Paket-Download aus dem Internet muss bleiben — das NAT Gateway darf nicht verschwinden.** Sinnvoll: volumenstarken Verkehr herausnehmen. **(B)** Gateway VPC Endpoint für S3 (gratis) nimmt den S3-Verkehr aus der NAT-Gebühr; **(D)** Interface Endpoint für CloudWatch Logs nimmt den Log-Verkehr heraus.",
+      "optionAnalysis": {
+        "A": "Falsch — das NAT Gateway zu entfernen verletzt die Nebenbedingung (Internet-Paket-Downloads müssen bleiben).",
+        "B": "**Richtig (1/2)** — Gateway VPC Endpoint für S3 (kostenlos): nimmt den größten Posten (S3) aus der NAT-Gebühr.",
+        "C": "Falsch — Instanzen in ein öffentliches Subnet zu verschieben ist ein Sicherheits-Rückschritt und löst das Kostenproblem nicht sauber.",
+        "D": "**Richtig (2/2)** — Interface VPC Endpoint für CloudWatch Logs: nimmt den Log-Verkehr aus dem NAT.",
+        "E": "Falsch — eine NAT-Instanz statt Gateway ist kein sauberer Kostenhebel (EC2-Betrieb) und nimmt den Volumenverkehr nicht wie Endpoints heraus."
+      },
+      "mnemonic": "Eselsbrücke: **NAT behalten, Volumenverkehr per Endpoints herausnehmen (S3-Gateway + Logs-Interface).**",
+      "examTrap": "Trick: NAT muss bleiben (Internet-Downloads) → nur den **teuren Dienst-Verkehr** per Endpoints herausnehmen (S3 gratis Gateway, Logs Interface). NAT entfernen/öffentliches Subnet sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-259",
+    "explanationStructured": {
+      "verdict": "Eine **Site-to-Site-VPN läuft übers Internet** → regulärer Internet-Egress, der bei 150 TB/Monat die Rechnung dominiert. **Direct Connect** stellt eine dedizierte Leitung her, deren Datentransfer zu einer **deutlich niedrigeren Rate** abgerechnet wird; bei stabilem Hochvolumen amortisiert sich die Leitung.",
+      "optionAnalysis": {
+        "A": "Falsch — ein zweiter VPN-Tunnel erhöht die Bandbreite, aber der Verkehr bleibt **Internet-Egress** zum vollen Preis.",
+        "B": "**Richtig** — AWS Direct Connect: dedizierte Leitung mit deutlich niedrigerer Egress-Rate als Internet, ideal für stabiles Hochvolumen.",
+        "C": "Falsch — CloudFront ist für **Auslieferung an Endnutzer** (Content-Egress), nicht für 150 TB in ein eigenes Rechenzentrum.",
+        "D": "Falsch — Kompression senkt Bytes, ändert aber nicht die teure Internet-Egress-Rate der VPN-Strecke; kein struktureller Fix."
+      },
+      "mnemonic": "Eselsbrücke: **Dauerhaft hoher Egress ins eigene RZ = Direct Connect** (niedrigere Rate als Internet).",
+      "examTrap": "**„150 TB/Monat über VPN teuer“** → Direct Connect (niedrigere Egress-Rate). Zweiter VPN-Tunnel (Internet-Preis bleibt) und CloudFront (Endnutzer, nicht RZ) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-260",
+    "explanationStructured": {
+      "verdict": "**Budget Actions** sind der einzige der Mechanismen, der beim Schwellenwert **handelt statt nur zu informieren**: Sie können eine IAM-/Service-Control-Policy anwenden (verhindert neue Ressourcen) und laufende EC2-/RDS-Instanzen **stoppen** — vollautomatisch, genau die geforderte Kombination.",
+      "optionAnalysis": {
+        "A": "Falsch — Cost Anomaly Detection **erkennt und meldet** Anomalien, ergreift aber keine automatische Gegenmaßnahme.",
+        "B": "Falsch — ein CloudWatch-Alarm auf `EstimatedCharges` **benachrichtigt** nur; er stoppt/blockiert nichts automatisch.",
+        "C": "**Richtig** — AWS Budget mit Budget Actions: Deny-Policy anwenden + laufende Instanzen stoppen bei Schwellenwert.",
+        "D": "Falsch — eine SCP verhindert das Starten dauerhaft, reagiert aber nicht **budget-schwellenbasiert**; sie ist keine automatische Kostenaktion."
+      },
+      "mnemonic": "Eselsbrücke: **Bei Budget-Überschreitung automatisch eingreifen = Budget Actions** (Policy anwenden + stoppen).",
+      "examTrap": "Nur **Budget Actions** handeln automatisch (Policy + Stop). Anomaly Detection/CloudWatch-Alarm melden nur; eine SCP ist nicht schwellenbasiert. „Automatisch unterbinden“ → Budget Actions."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-261",
+    "explanationStructured": {
+      "verdict": "**Compute Optimizer** analysiert die tatsächlichen **CloudWatch-Auslastungsdaten** und liefert genau das Geforderte: konkrete **Rightsizing-Empfehlungen** für EC2, ASGs, EBS, Lambda und ECS-auf-Fargate — mit erwarteter Ersparnis. Die Basis-Empfehlungen sind kostenlos, unabhängig vom Support-Plan.",
+      "optionAnalysis": {
+        "A": "**Richtig** — AWS Compute Optimizer: metrikbasierte Rightsizing-Empfehlungen für EC2/EBS/Lambda u. a., gratis.",
+        "B": "Falsch für den vollen Umfang — Trusted Advisor liefert Cost-Checks, aber die **vollständigen** Rightsizing-Checks brauchen Business/Enterprise-Support.",
+        "C": "Falsch für die einfachste Lösung — CUR nach S3 + eigene Auslastungsanalyse ist Eigenbau; Compute Optimizer liefert die Empfehlungen fertig.",
+        "D": "Falsch — Cost Explorer zeigt Kostenverläufe, aber keine **metrikbasierten Rightsizing-Empfehlungen** pro Ressource wie Compute Optimizer."
+      },
+      "mnemonic": "Eselsbrücke: **Rightsizing über alle Ressourcen = Compute Optimizer** (CloudWatch-basiert, gratis).",
+      "examTrap": "**„Überdimensioniert, konkrete Rightsizing-Empfehlungen“** → Compute Optimizer (EC2/EBS/Lambda/ECS). Trusted Advisor (voller Umfang kostenpflichtig) und Cost Explorer (nur Kosten) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-262",
+    "explanationStructured": {
+      "verdict": "**Cost Anomaly Detection** lernt das übliche Ausgabeverhalten je Dienst/Konto/Kostenstelle und meldet **Abweichungen** — auch ohne gerissenen starren Schwellenwert. Ein **schleichender Anstieg über zwei Wochen** ist der Paradefall, den feste Budgets übersehen. Der Dienst ist kostenlos.",
+      "optionAnalysis": {
+        "A": "Falsch — ein festes Budget/enge Schwellen greifen nur, wenn man den richtigen Wert vorher kennt; einen **schleichenden** Anstieg unter dem Schwellenwert übersehen sie.",
+        "B": "Falsch — Compute Optimizer findet überdimensionierte Ressourcen, aber keine **ungewöhnlichen Ausgabemuster** über Zeit.",
+        "C": "Falsch für Früherkennung — der CUR erlaubt **nachträgliche** Ursachenanalyse, warnt aber nicht proaktiv beim schleichenden Anstieg.",
+        "D": "**Richtig** — AWS Cost Anomaly Detection: ML-basiert, meldet Abweichungen vom gelernten Muster, auch ohne festen Schwellenwert."
+      },
+      "mnemonic": "Eselsbrücke: **Schleichender/ungewöhnlicher Kostenanstieg = Cost Anomaly Detection** (ML, kein starrer Schwellenwert).",
+      "examTrap": "Feste Budgets brauchen einen bekannten Schwellenwert und übersehen **schleichende** Anstiege — dafür ist Cost Anomaly Detection (ML) gebaut. CUR (nachträglich) und Compute Optimizer (Rightsizing) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-263",
+    "explanationStructured": {
+      "verdict": "**Consolidated Billing in AWS Organizations** löst beides: RIs und Savings Plans werden standardmäßig **über alle Konten geteilt** (ungenutzte RI in Konto A rabattiert passende Nutzung in Konto B), und der Verbrauch aller Konten wird für **gestaffelte Preisnachlässe zusammengezählt**.",
+      "optionAnalysis": {
+        "A": "Falsch — SPs je Konto separat abzuschließen verhindert das kontoübergreifende Teilen ungenutzter Commitments.",
+        "B": "**Richtig** — AWS Organizations mit Consolidated Billing: RI/SP-Sharing über alle Konten + aggregierte Volumenrabatte.",
+        "C": "Falsch für das eigentliche Problem — ungenutzte RIs zu verkaufen ist Verlustminimierung, nutzt aber das RI-Sharing (die bessere Lösung) nicht.",
+        "D": "Falsch — alle Workloads in ein Konto zu migrieren ist ein massiver, unnötiger Umbau; Consolidated Billing erreicht die Vorteile ohne Migration."
+      },
+      "mnemonic": "Eselsbrücke: **Mehrere Konten, RI/SP teilen + Volumenrabatt = Organizations Consolidated Billing.**",
+      "examTrap": "Consolidated Billing teilt **RIs/SPs org-weit** und aggregiert Volumen für Staffelrabatte. Per-Konto-SPs (kein Sharing) und RI-Marketplace-Verkauf (nur Schadensbegrenzung) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-264",
+    "explanationStructured": {
+      "verdict": "Tags auf Ressourcen sind zunächst nur Metadaten — für die Kostenaufschlüsselung müssen sie in der **Billing-Konsole als Cost Allocation Tags aktiviert** werden. Danach erscheinen sie in Cost Explorer und CUR als Gruppierungsdimension. **Wichtig: Die Aktivierung wirkt nicht rückwirkend.**",
+      "optionAnalysis": {
+        "A": "Falsch — benutzerdefinierte Tags müssen **nicht** als AWS-generierte Tags neu angelegt werden; die eigenen Tags werden aktiviert.",
+        "B": "Falsch — der Cost Explorer **kann** nach Tags aufschlüsseln, sobald sie als Cost Allocation Tags aktiviert sind; CUR ist dafür nicht zwingend.",
+        "C": "**Richtig** — Tags in der Billing-Konsole als Cost Allocation Tags aktivieren; sie wirken ab Aktivierung (nicht rückwirkend).",
+        "D": "Falsch — eine Tag Policy erzwingt/standardisiert Tags, ist aber nicht die Voraussetzung, damit Tags in der Kostenanalyse **erscheinen** (das leistet die Aktivierung als Cost Allocation Tag)."
+      },
+      "mnemonic": "Eselsbrücke: **Tags in der Kostenanalyse sichtbar = als Cost Allocation Tags aktivieren** (nicht rückwirkend).",
+      "examTrap": "Tags sind erst nach **Aktivierung als Cost Allocation Tags** in Cost Explorer/CUR nutzbar — und **nicht rückwirkend**. Tag Policy (erzwingt Tags) ist ein anderer Zweck (Distraktor)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-265",
+    "explanationStructured": {
+      "verdict": "**Cost Explorer** deckt beides ab: Es analysiert die **historische Nutzung** und leitet daraus **Savings-Plans-/RI-Empfehlungen** ab (Plan-Typ, Laufzeit, Stundencommitment, erwartete Ersparnis) und zeigt den Kostenverlauf, gruppierbar nach Dienst/Konto/Region/Cost Allocation Tags.",
+      "optionAnalysis": {
+        "A": "**Richtig** — AWS Cost Explorer: SP/RI-Empfehlungen aus der Historie + Kostenverlaufsanalyse in einem Werkzeug.",
+        "B": "Falsch — ein Savings-Plans-Budget in AWS Budgets **überwacht** die Abdeckung, empfiehlt aber nicht das passende Commitment aus der Historie.",
+        "C": "Falsch — Compute Optimizer macht **Rightsizing**, keine Savings-Plans-/RI-Commitment-Empfehlungen.",
+        "D": "Falsch — der Pricing Calculator schätzt Kosten geplanter Ressourcen im Voraus, analysiert aber keine **historische** Nutzung für SP/RI-Empfehlungen."
+      },
+      "mnemonic": "Eselsbrücke: **Historie analysieren + SP/RI empfehlen = Cost Explorer.**",
+      "examTrap": "Cost Explorer liefert **SP/RI-Empfehlungen aus der Nutzungshistorie** plus Kostenverlauf. Compute Optimizer (Rightsizing) und Pricing Calculator (Vorab-Schätzung) sind die Distraktoren."
+    }
+  }
+]

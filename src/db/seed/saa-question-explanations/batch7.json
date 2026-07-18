@@ -1,0 +1,425 @@
+[
+  {
+    "seedKey": "saa-c03-q-206",
+    "explanationStructured": {
+      "verdict": "Die Symptome sind das **GraphQL-Kernprofil**: Over-Fetching (verworfene Felder) und Under-Fetching (fünf sequentielle Aufrufe) verschwinden, weil der Client in **einer Query** exakt die benötigten Felder anfordert und **AppSync** die Resolver gegen DynamoDB, Aurora und die HTTP-Services **parallel** auflöst. **Subscriptions** liefern Echtzeit-Updates über verwaltete WebSockets gleich mit.",
+      "optionAnalysis": {
+        "A": "**Richtig** — AppSync mit GraphQL-Schema über alle Quellen + Subscriptions: löst Over-/Under-Fetching und Echtzeit in einem.",
+        "B": "Falsch für die beste Lösung — ein BFF auf Lambda bündelt zwar serverseitig, ist aber Eigenbau ohne das native GraphQL-Feldmodell und ohne verwaltete Subscriptions.",
+        "C": "Falsch — HTTP-Langpolling gegen einen Aggregations-Endpunkt ist ineffizient und liefert keine echten Push-Updates.",
+        "D": "Falsch — API-Gateway-Response-Caching cacht statische Antworten, löst aber weder Over-Fetching noch Echtzeit-Updates."
+      },
+      "mnemonic": "Eselsbrücke: **Over-/Under-Fetching + Echtzeit über viele Quellen = AppSync (GraphQL).**",
+      "examTrap": "**„Client holt zu viel/zu oft + mehrere Datenquellen + Echtzeit“** → AppSync/GraphQL. BFF (Eigenbau) und API-Gateway-Cache sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-207",
+    "explanationStructured": {
+      "verdict": "**Origin Groups** sind der eingebaute CloudFront-Failover: primärer und sekundärer Origin. Schlägt der primäre mit einem konfigurierten Statuscode (500/502/503/504, optional 403/404) oder per Timeout fehl, wiederholt CloudFront den Request automatisch gegen den sekundären — kein DNS, kein Mensch (nur für GET/HEAD/OPTIONS).",
+      "optionAnalysis": {
+        "A": "Falsch — zwei gleichberechtigte Origins ohne Origin Group liefern kein definiertes Failover; CloudFront wechselt nicht automatisch bei Fehler.",
+        "B": "**Richtig** — Origin Group mit primärem + sekundärem ALB: automatisches Failover bei definierten Fehlercodes/Timeout.",
+        "C": "Falsch — ein Route-53-Failover-Record als Origin ist nicht das native CloudFront-Muster und fügt eine DNS-Abhängigkeit hinzu.",
+        "D": "Falsch — eine zweite Distribution + CNAME-Wechsel ist manueller/DNS-basierter Umweg statt des eingebauten Origin-Failovers."
+      },
+      "mnemonic": "Eselsbrücke: **CloudFront-Origin-Failover = Origin Group** (primär + sekundär, automatisch).",
+      "examTrap": "Origin Failover wirkt nur für **GET/HEAD/OPTIONS** und definierte Statuscodes. „Automatisches Origin-Failover in CloudFront“ → Origin Group, nicht Route 53 oder eine zweite Distribution."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-208",
+    "explanationStructured": {
+      "verdict": "**Standard-Consumer teilen sich 2 MB/s und 5 GetRecords/s je Shard** — fünf Anwendungen auf demselben Stream bedeuten geteilte Bandbreite und Polling-Latenzen im Sekundenbereich. **Enhanced Fan-out** löst das: jeder registrierte Consumer bekommt **dedizierte 2 MB/s pro Shard**, per HTTP/2 SubscribeToShard gepusht (Latenz ~70 ms statt Polling).",
+      "optionAnalysis": {
+        "A": "**Richtig** — Enhanced-Fan-out-Consumer: dedizierte 2 MB/s je Shard und Push-Zustellung, unabhängig voneinander.",
+        "B": "Falsch — die Shard-Anzahl zu verfünffachen erhöht die Gesamtkapazität, aber die Consumer **teilen sich weiter** den Durchsatz je Shard; die Latenz bleibt.",
+        "C": "Falsch — eigene Streams je Consumer plus Verteiler-Prozess ist erheblicher Eigenbau; Enhanced Fan-out ist die native Lösung.",
+        "D": "Falsch — GetRecords-Aufrufe zeitlich zu versetzen umgeht das geteilte 2-MB/s-Limit nicht; es bleibt ein Standard-Consumer-Engpass."
+      },
+      "mnemonic": "Eselsbrücke: **Mehrere unabhängige Consumer mit voller Bandbreite = Enhanced Fan-out** (2 MB/s je Consumer).",
+      "examTrap": "Standard = **geteilte 2 MB/s je Shard**; Enhanced Fan-out = **dedizierte 2 MB/s pro Consumer**. „Mehrere Consumer, niedrige Latenz“ → Enhanced Fan-out; mehr Shards teilt weiter."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-209",
+    "explanationStructured": {
+      "verdict": "Das ist der **Firehose-Kernfall**: vollständig verwaltete Near-Real-Time-Zustellung nach S3 — **Format-Konvertierung JSON→Parquet, Kompression und Dynamic Partitioning** sind eingebaute Funktionen (konfiguriert statt programmiert). Die Pufferung (Größe/Zeit) passt zur akzeptierten 1–2-min-Verzögerung; kein Consumer-Code.",
+      "optionAnalysis": {
+        "A": "Falsch für die einfachste Lösung — Kinesis Data Streams + Lambda erzwingt selbst geschriebene Konvertierung/Partitionierung statt Firehose-Bordmittel.",
+        "B": "Falsch — MSK + Kafka Connect + S3-Sink ist mächtig, aber erheblicher Betriebs-/Konfigurationsaufwand für einen reinen S3-Ingest.",
+        "C": "**Richtig** — Amazon Data Firehose mit Parquet-Konvertierung, Kompression und Dynamic Partitioning: verwaltet, ohne Code.",
+        "D": "Falsch — Managed Service for Apache Flink ist für **komplexe Stream-Verarbeitung**; für reines Formatieren+Ablegen nach S3 überdimensioniert."
+      },
+      "mnemonic": "Eselsbrücke: **Nach S3 mit Parquet + Kompression + Partitionierung, verwaltet = Data Firehose.**",
+      "examTrap": "**„Kontinuierlich nach S3, Parquet, partitioniert, minimaler Betrieb“** → Firehose (alles eingebaut). Data Streams+Lambda (Eigenbau) und Flink (Overkill) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-210",
+    "explanationStructured": {
+      "verdict": "Zwei Maßnahmen an den zwei Scan-Dimensionen: **(A)** **Partitionierung nach Datum** schneidet Zeilen weg (Partition Pruning liest nur die betroffenen Verzeichnisse). **(D)** **Parquet + Kompression** schneidet Spalten weg (Athena liest nur angefragte Spalten, weniger Bytes). Beides senkt die gescannten Bytes drastisch — und Athena rechnet nach gescannten Bytes.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — nach Datum partitionieren: Datumsfilter liest nur die relevanten Partitionen.",
+        "B": "Falsch — ein höheres Query-Limit der Workgroup erhöht keine Parallelität, die die Kosten (gescannte Bytes) senkt.",
+        "C": "Falsch — eigene Result-Locations je Abfrage betreffen die Ergebnisablage, nicht das teure Scannen der 40 TB.",
+        "D": "**Richtig (2/2)** — nach Parquet konvertieren + komprimieren: spaltenorientiert, nur benötigte Spalten werden gelesen.",
+        "E": "Falsch — Objekte über mehrere Buckets zu verteilen beschleunigt Athena nicht und senkt die gescannten Bytes nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Athena-Kosten senken = Partition Pruning (Zeilen) + Parquet (Spalten).**",
+      "examTrap": "Athena rechnet **nach gescannten Bytes** — Partitionierung (Zeilen) und Spaltenformat (Spalten) sind die zwei Hebel. Query-Limit, Result-Location und Multi-Bucket sind wirkungslose Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-211",
+    "explanationStructured": {
+      "verdict": "Das ist ein **Hot-Shard-Problem, kein Kapazitätsproblem**: Der Partition Key bestimmt per Hash den Shard, zwei dominante Filial-IDs landen immer auf denselben zwei Shards — deren **1 MB/s bzw. 1.000 Records/s** sind der Deckel, egal wie viele Shards leerlaufen. Lösung: feinerer Schlüssel (Suffix `filialId#zufall`) verteilt die Last.",
+      "optionAnalysis": {
+        "A": "Falsch — UpdateShardCount auf 20 Shards hilft nicht: Die heißen Keys landen weiter auf **denselben** überlasteten Shards.",
+        "B": "Falsch — On-Demand skaliert die Gesamtkapazität, aber ein einzelner Hot Key kann weiterhin einen Shard überlasten; das Key-Design bleibt das Problem.",
+        "C": "**Richtig** — Partition Key um ein Zufalls-Suffix erweitern: verteilt die Events der Großfilialen über viele Shards.",
+        "D": "Falsch — Exponential Backoff mildert die Fehler, behebt aber die Hot-Shard-Ursache nicht (die Last bleibt konzentriert)."
+      },
+      "mnemonic": "Eselsbrücke: **ProvisionedThroughputExceeded trotz freier Shards = Hot Shard → Key-Suffix.**",
+      "examTrap": "Wie bei DynamoDB-Hot-Partitions: **mehr Kapazität heilt einen Hot Key nicht**, nur besseres Key-Design (Suffix/Sharding). Mehr Shards/On-Demand sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-212",
+    "explanationStructured": {
+      "verdict": "Die Anforderung **unveränderter Anwendungscode** entscheidet: **Amazon MSK** betreibt echte Apache-Kafka-Broker als verwalteten Dienst — Kafka-APIs, Kafka Streams und Schema-Registry funktionieren weiter, nur die Bootstrap-Adressen ändern sich. Broker-Betrieb/Patching/KRaft übernimmt AWS.",
+      "optionAnalysis": {
+        "A": "Falsch — Kinesis Data Streams ist ein **anderes System mit anderen APIs**; jeder Producer/Consumer müsste umgeschrieben werden.",
+        "B": "**Richtig** — Amazon MSK: Kafka-kompatible verwaltete Broker, bestehende Clients unverändert (nur Bootstrap-Adressen).",
+        "C": "Falsch — Firehose ist ein Zustelldienst, kein Kafka-Ersatz; die bestehenden Kafka-Clients passen nicht dazu.",
+        "D": "Falsch für „verwaltet“ — selbst verwaltetes Kafka auf EC2 behält zwar die APIs, verlagert aber den gesamten Betrieb/Patching zurück zu dir."
+      },
+      "mnemonic": "Eselsbrücke: **Bestehende Kafka-Clients behalten = Amazon MSK** (verwaltete Kafka-Broker).",
+      "examTrap": "**„Kafka-APIs, unveränderter Code“** → MSK. Kinesis (andere API) und Firehose (kein Kafka) sind die Distraktoren; selbst verwaltetes Kafka opfert den „managed“-Vorteil."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-213",
+    "explanationStructured": {
+      "verdict": "**Concurrency Scaling** ist genau für dieses Muster: Läuft die Query-Queue voll, schaltet Redshift automatisch temporäre Cluster-Kapazität dazu, verteilt die wartenden Abfragen dorthin und baut sie nach der Spitze ab — bezahlt wird nur die Nutzung, und je Tag Cluster-Betrieb sammelt sich ein **kostenloses Stundenguthaben** an (deckt Monatsend-Spitzen oft ganz).",
+      "optionAnalysis": {
+        "A": "Falsch — Redshift Spectrum fragt Daten in **S3** ab; es adressiert nicht die Concurrency-Spitze der BI-Abfragen im Cluster.",
+        "B": "Falsch — ein zweiter Cluster per Snapshot-Restore ist manueller Betrieb und Overkill gegenüber der automatischen Zusatzkapazität.",
+        "C": "Falsch — ein Distribution-Style ALL beschleunigt Joins, löst aber kein **Concurrency**-Problem (viele gleichzeitige Abfragen).",
+        "D": "**Richtig** — Concurrency Scaling: automatische temporäre Zusatzkapazität für die Spitzen, mit Gratis-Guthaben."
+      },
+      "mnemonic": "Eselsbrücke: **Redshift-Abfrage-Concurrency-Spitzen = Concurrency Scaling** (auto, mit Gratis-Guthaben).",
+      "examTrap": "**„Viele gleichzeitige Abfragen nur zu Spitzenzeiten“** → Concurrency Scaling. Spectrum (S3-Query) und Distribution Style (Join-Perf) lösen kein Concurrency-Problem."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-214",
+    "explanationStructured": {
+      "verdict": "**Intelligent-Tiering berechnet eine Monitoring-/Automatisierungsgebühr pro Objekt** — bei 800 Mio. Objekten ein erheblicher Posten. **Objekte unter 128 KB werden nicht automatisch getiert** und dauerhaft zum Frequent-Access-Preis berechnet. Ergebnis: gleiche Speicherkosten wie Standard **plus** Gebühr — genau der Anstieg.",
+      "optionAnalysis": {
+        "A": "Falsch — das Problem sind nicht häufige Abrufe; es ist die Monitoring-Gebühr + fehlende Tierung kleiner Objekte.",
+        "B": "**Richtig** — Objekte < 128 KB werden nicht getiert, zahlen aber Monitoring-Gebühr; für so viele Kleinstobjekte ist S3 Standard günstiger.",
+        "C": "Falsch — Intelligent-Tiering hat **keine Abrufgebühren je Tier-Wechsel**; das ist ein erfundener Grund.",
+        "D": "Falsch — die Archive-Access-Tiers ändern nichts an der Kleinstobjekt-Regel (< 128 KB) und der Monitoring-Gebühr."
+      },
+      "mnemonic": "Eselsbrücke: **Millionen Kleinstobjekte (< 128 KB) in Intelligent-Tiering = Gebühr ohne Tiering-Nutzen.**",
+      "examTrap": "Zwei prüfbare Details: **Monitoring-Gebühr pro Objekt** und **kein Auto-Tiering unter 128 KB.** Bei vielen kleinen Objekten ist Standard günstiger — Intelligent-Tiering lohnt bei großen Objekten mit unbekanntem Muster."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-215",
+    "explanationStructured": {
+      "verdict": "**Standard-IA hat 30 Tage Mindestspeicherdauer** — die nach 7 Tagen gelöschten Objekte werden **volle 30 Tage** berechnet. Aus 7 Tagen Standard werden effektiv 30 Tage IA **plus Transition-Gebühr**: teurer statt günstiger. Für Lebensdauer unter 30 Tagen ist **S3 Standard ohne Lifecycle-Regel** richtig.",
+      "optionAnalysis": {
+        "A": "Falsch — der falsche Grenzwert: Die 128-KB-Mindestgröße gilt für Standard-IA nicht als Ursache hier; das Problem ist die 30-Tage-Mindestdauer.",
+        "B": "Falsch — die Transition-Requests sind ein Nebenposten; der Hauptgrund ist die 30-Tage-Mindestspeicherdauer bei 7 Tagen Lebensdauer.",
+        "C": "Falsch — Standard-IA repliziert wie Standard über ≥ 3 AZs, aber es „verdoppelt“ nicht die Kosten; das ist erfunden.",
+        "D": "**Richtig** — 30-Tage-Mindestdauer: früh gelöschte Objekte zahlen 30 Tage → für kurzlebige Daten Standard nutzen."
+      },
+      "mnemonic": "Eselsbrücke: **Kürzer als 30 Tage → S3 Standard** — IA-Mindestdauer macht kurzlebige Daten teurer.",
+      "examTrap": "Die IA-Mindestspeicherdauern sind prüfbar: **Standard-IA/One-Zone-IA 30 Tage, Glacier IR 90, Flexible 90, Deep Archive 180.** Kurzlebige Daten in IA = teurer (voll berechnete Mindestdauer)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-216",
+    "explanationStructured": {
+      "verdict": "**Deep Archive** ist die günstigste S3-Klasse, gebaut für: jahrelange Aufbewahrung, praktisch kein Abruf, **Standard-Retrieval innerhalb 12 h** — exakt das akzeptierte Fenster. Die 180-Tage-Mindestdauer ist bei 10 Jahren irrelevant.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Glacier Deep Archive per Lifecycle: günstigste Aufbewahrung, 12-h-Abruf passt zum Akzeptanzfenster.",
+        "B": "Falsch — Glacier Flexible Retrieval liefert schneller (3–5 h), kostet aber ein **Mehrfaches** pro GB; man zahlt für unnötige Geschwindigkeit.",
+        "C": "Falsch — One Zone-IA ist teurer als Deep Archive und für 10-Jahres-Compliance mit Ein-AZ-Risiko unpassend.",
+        "D": "Falsch — Intelligent-Tiering mit Archive-Tiers ist teurer (Monitoring-Gebühr) als das direkte Deep Archive bei bekanntem Nie-Abruf-Muster."
+      },
+      "mnemonic": "Eselsbrücke: **Jahrelang, quasi nie Abruf, Stunden-RTO ok = Deep Archive** (billigste Klasse).",
+      "examTrap": "Bei bekanntem **„nie/kaum Abruf + Stunden-RTO akzeptabel“** ist Deep Archive die Kostenwahl. Flexible (schneller, teurer) und Intelligent-Tiering (Gebühr) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-217",
+    "explanationStructured": {
+      "verdict": "**One Zone-IA** ist günstiger als Standard-IA, weil es auf **Multi-AZ-Redundanz** verzichtet — beim Verlust einer AZ sind die Daten weg. Genau dieses Risiko ist akzeptabel: Die Vorschaubilder sind **reproduzierbare Ableitungen**, die Originale liegen sicher in Standard. Der Lehrbuchfall.",
+      "optionAnalysis": {
+        "A": "Falsch — Standard-IA bezahlt die Multi-AZ-Redundanz, die man für **reproduzierbare** Bilder nicht braucht.",
+        "B": "Falsch — Glacier Flexible Retrieval hat Abruf-Latenz/Restore; die Vorschaubilder müssen für die Auslieferung sofort verfügbar sein.",
+        "C": "**Richtig** — One Zone-IA: günstig, AZ-Verlust verkraftbar (Bilder aus Originalen neu erzeugbar).",
+        "D": "Falsch für die Kosten — S3 Standard ist teurer als nötig für seltene Zugriffe auf reproduzierbare Ableitungen."
+      },
+      "mnemonic": "Eselsbrücke: **Reproduzierbar + selten abgerufen = One Zone-IA** — Redundanz spart man sich.",
+      "examTrap": "Wie q-098/217: **reproduzierbare Daten + AZ-Verlust verkraftbar** → One Zone-IA. Standard-IA (bezahlt Multi-AZ) ist der sichere, aber teurere Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-218",
+    "explanationStructured": {
+      "verdict": "**gp3 kostet ~20 % weniger pro GB als gp2** und entkoppelt IOPS/Durchsatz von der Größe: **3.000 IOPS und 125 MB/s Baseline** inklusive, unabhängig von der Volume-Größe. Das löst die Verschwendung (niemand muss Volumes aufblähen, um IOPS zu bekommen). Umstellung per **Elastic Volumes** ohne Downtime.",
+      "optionAnalysis": {
+        "A": "Falsch für die Kosten — io2 ist teurer als gp3; für „deutlich unter der gp2-Baseline“ liegende IOPS überdimensioniert.",
+        "B": "**Richtig** — per Elastic Volumes auf gp3 umstellen: günstiger, IOPS/Durchsatz von der Größe entkoppelt, ohne Downtime.",
+        "C": "Falsch — Volumes zu verkleinern (Snapshot/Neuanlage) ist aufwendig, mit Downtime, und löst das Preis-/IOPS-Kopplungsproblem nicht wie gp3.",
+        "D": "Falsch — st1 ist durchsatzoptimiertes HDD; für IOPS-getriebene Instanz-Volumes das falsche Profil."
+      },
+      "mnemonic": "Eselsbrücke: **gp2 → gp3** — ~20 % billiger, IOPS/Durchsatz größenunabhängig, per Elastic Volumes live.",
+      "examTrap": "gp2→gp3 ist die Standard-Kostenoptimierung: **billiger + entkoppelte Baseline (3.000 IOPS/125 MB/s).** io2 (teurer) und st1 (HDD) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-219",
+    "explanationStructured": {
+      "verdict": "Der **EBS Snapshots Archive Tier** ist genau dafür: selten/nie benötigte Snapshots, die aus Compliance vollständig erhalten bleiben. **~75 % günstiger** als Standard; Preis dafür: **90 Tage Mindestdauer** (bei 7 Jahren irrelevant) und **24–72 h Wiederherstellung** (im akzeptierten Fenster).",
+      "optionAnalysis": {
+        "A": "Falsch — Snapshots „in einen S3-Bucket mit Deep Archive kopieren“ ist nicht das native Muster; EBS-Snapshots werden über den Archive Tier verwaltet.",
+        "B": "Falsch — die Frequenz zu reduzieren senkt künftige Snapshots, archiviert aber die bestehenden tausenden nicht günstiger.",
+        "C": "Falsch — eine günstigere Region senkt den GB-Preis kaum und fügt Cross-Region-Komplexität hinzu; der Archive Tier ist der direkte Hebel.",
+        "D": "**Richtig** — Snapshots in den EBS Snapshots Archive Tier: ~75 % günstiger, 90-Tage-Mindestdauer, 24–72 h Restore."
+      },
+      "mnemonic": "Eselsbrücke: **Alte Snapshots selten/nie gebraucht = EBS Snapshots Archive Tier** (~75 % billiger).",
+      "examTrap": "Prüfbare Zahlen: **~75 % günstiger, 90 Tage Mindestdauer, 24–72 h Restore.** „Compliance-Snapshots, kaum Restore, Stunden/Tage ok“ → Archive Tier."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-220",
+    "explanationStructured": {
+      "verdict": "Verwaiste (unattached) Volumes kosten weiter. Der **Recycle Bin** mit einer **Retention Rule** fängt gelöschte EBS-Volumes/Snapshots für eine Frist ab (versehentlich Gelöschtes ist wiederherstellbar); danach die verwaisten Volumes **gefahrlos löschen**, Kosten fallen sofort weg.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Recycle-Bin-Retention-Rule anlegen, dann verwaiste Volumes löschen: sicheres Löschen, sofortige Ersparnis.",
+        "B": "Falsch — verwaiste Volumes zu verkleinern reduziert nur den Posten, beseitigt aber nicht die unnötigen (ungenutzten) Volumes.",
+        "C": "Falsch — von jedem Volume einen Snapshot zu behalten kostet weiter Speicher; die verwaisten Volumes sollen weg, nicht dauerhaft archiviert werden.",
+        "D": "Falsch — AWS Backup Cold Storage auf verwaiste Volumes ist Overhead; die Volumes werden schlicht nicht mehr gebraucht."
+      },
+      "mnemonic": "Eselsbrücke: **Verwaiste EBS-Volumes → Recycle Bin absichern, dann löschen.**",
+      "examTrap": "Konstante Instanzzahl, steigende EBS-Kosten → **unattached Volumes**. Löschen (mit Recycle-Bin-Sicherheitsnetz) ist der Fix; Verkleinern/Snapshotten behält die Kosten."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-221",
+    "explanationStructured": {
+      "verdict": "**EFS Lifecycle Management** verschiebt Dateien, die eine definierte Zeit nicht angefasst wurden, automatisch nach **EFS Infrequent Access** und weiter nach **EFS Archive** — bei erheblich niedrigeren Speicherkosten. Entscheidend: Die Dateien bleiben im selben Dateisystem/Pfad sichtbar, die Anwendung merkt nichts (POSIX bleibt).",
+      "optionAnalysis": {
+        "A": "Falsch — Projekte nach S3 Glacier auszulagern und Verweise zu halten ist Eigenbau; EFS Lifecycle löst es nativ ohne Pfadänderung.",
+        "B": "Falsch — EFS One Zone senkt Kosten über Redundanzverzicht, verschiebt aber inaktive Dateien nicht automatisch in günstige Tiers.",
+        "C": "**Richtig** — EFS Lifecycle Management: inaktive Dateien automatisch nach IA/Archive, gleicher Pfad, transparent.",
+        "D": "Falsch — der Durchsatzmodus (Bursting) betrifft Performance/Abrechnung des Durchsatzes, nicht die Speicherkosten der 37 TB kalter Daten."
+      },
+      "mnemonic": "Eselsbrücke: **Kalte EFS-Dateien automatisch verbilligen = EFS Lifecycle Management (IA/Archive).**",
+      "examTrap": "**„Meiste EFS-Daten selten gelesen, gleicher Zugriffspfad“** → EFS Lifecycle (IA/Archive). Glacier-Auslagerung (Eigenbau) und One Zone (Redundanz) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-222",
+    "explanationStructured": {
+      "verdict": "Abgebrochene Multipart Uploads hinterlassen ihre hochgeladenen **Parts** im Bucket — sie belegen Speicher und werden berechnet, tauchen aber in keiner Objektliste auf (genau die Diskrepanz sichtbar vs. bezahlt). Eine **Lifecycle-Regel mit `AbortIncompleteMultipartUpload`** räumt sie nach einer Frist automatisch ab (AWS-Empfehlung für jeden Bucket).",
+      "optionAnalysis": {
+        "A": "Falsch — Versioning zu deaktivieren adressiert alte Versionen, nicht die unsichtbaren Multipart-Parts (die von abgebrochenen Uploads stammen).",
+        "B": "**Richtig** — Lifecycle-Regel `AbortIncompleteMultipartUpload`: räumt Parts abgebrochener Uploads automatisch ab.",
+        "C": "Falsch — Transfer Acceleration beschleunigt Uploads, entfernt aber keine bereits liegen gebliebenen Parts.",
+        "D": "Falsch — auf Single-PUT umzustellen ist bei großen Videos unpraktisch und beseitigt die bereits vorhandenen Parts nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Bezahlter Speicher ohne sichtbare Objekte = liegen gebliebene Multipart-Parts → AbortIncompleteMultipartUpload.**",
+      "examTrap": "**„Speicherverbrauch > sichtbare Objekte“** bei Multipart → unvollständige Parts. Die `AbortIncompleteMultipartUpload`-Lifecycle-Regel ist der Fix (und generelle Best Practice)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-223",
+    "explanationStructured": {
+      "verdict": "Zwei versteckte Posten, beide über Lifecycle-Regeln: **(A)** In einem versionierten Bucket bleibt jede überschriebene Version als **noncurrent version** liegen und wird bezahlt — **`NoncurrentVersionExpiration`** nach 90 Tagen räumt genau das ab (passt zur Aufbewahrungsfrist). **(D)** **`AbortIncompleteMultipartUpload`** räumt Parts gescheiterter Uploads ab.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — `NoncurrentVersionExpiration` nach 90 Tagen: entfernt die bezahlten alten Objektversionen.",
+        "B": "Falsch — eine Expiration-Regel für **alle** Objekte löscht auch die aktuellen (aktiven) Versionen; das zerstört die aktive Ablage.",
+        "C": "Falsch — eine Transition der **aktuellen** Versionen nach Glacier adressiert nicht die aufgelaufenen **noncurrent** Versionen (der eigentliche Kostenposten).",
+        "D": "**Richtig (2/2)** — `AbortIncompleteMultipartUpload`: räumt Parts gescheiterter Uploads ab.",
+        "E": "Falsch — Versioning zu deaktivieren löscht die bereits vorhandenen alten Versionen **nicht**; sie bleiben und kosten weiter."
+      },
+      "mnemonic": "Eselsbrücke: **Versionierter Bucket zu teuer = NoncurrentVersionExpiration (+ AbortIncompleteMultipartUpload).**",
+      "examTrap": "**„5× so viel Speicher wie sichtbare Objekte, versioniert, häufig überschrieben“** → alte Versionen ablaufen lassen. Versioning-Deaktivieren räumt Altbestände NICHT ab (klassischer Distraktor)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-224",
+    "explanationStructured": {
+      "verdict": "**Requester Pays** ist genau dafür: Die Speicherkosten bleiben beim Eigentümer, aber **Datentransfer und Requests werden dem anfragenden AWS-Konto berechnet**. Anfragende müssen sich authentifizieren und die Kostenübernahme bestätigen — der Standardweg für große, öffentlich geteilte Forschungsdatensätze.",
+      "optionAnalysis": {
+        "A": "Falsch — CloudFront (Price Class 100) senkt den Preis pro GB, aber die **Transferkosten bleiben beim Eigentümer**; das Ziel ist, sie auf die Anfragenden zu verlagern.",
+        "B": "Falsch — Glacier IR senkt Speicherkosten, adressiert aber nicht die **Egress-/Transferkosten** der weltweiten Downloads.",
+        "C": "Falsch — kurze Presigned URLs begrenzen nicht sinnvoll das Downloadvolumen und verlagern keine Transferkosten.",
+        "D": "**Richtig** — Requester Pays: Transfer/Requests zahlt das anfragende Konto, Speicher bleibt beim Eigentümer."
+      },
+      "mnemonic": "Eselsbrücke: **Öffentlich geteilte Daten, Egress soll der Abrufer zahlen = Requester Pays.**",
+      "examTrap": "**„Datensatz kostenlos bereitstellen, aber Transferkosten nicht selbst tragen“** → Requester Pays. CloudFront (senkt nur den Preis, zahlt weiter der Owner) ist der Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-225",
+    "explanationStructured": {
+      "verdict": "Bei **Kleinstobjekten** fressen zwei Posten die Ersparnis: **Transition-Requests** — bei 300 Mio. Objekten ein erheblicher Einmalbetrag, der die GB-Ersparnis über Monate übersteigen kann — und **Glacier-Objekt-Overhead** (32 KB Archiv-Metadaten + 8 KB Index je Objekt), was bei 8-KB-Objekten den bezahlten Speicher vervielfacht.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Transition-Requests + Glacier-Metadaten-Overhead machen die Regel bei 8-KB-Objekten unwirtschaftlich.",
+        "B": "Falsch — es gibt keine „128-KB-Mindestgröße, die Objekte verbietet“; der Grund ist der Overhead/Request-Kosten, nicht ein Verbot.",
+        "C": "Falsch — die 90-Tage-Mindestdauer (Flexible) ist hier nicht der Kern; das Problem sind Requests + Per-Objekt-Overhead bei Kleinstobjekten.",
+        "D": "Falsch — Intelligent-Tiering hilft bei Kleinstobjekten (< 128 KB) gerade nicht (kein Auto-Tiering, Monitoring-Gebühr)."
+      },
+      "mnemonic": "Eselsbrücke: **Millionen 8-KB-Objekte nach Glacier = Request-Kosten + Metadaten-Overhead fressen die Ersparnis.**",
+      "examTrap": "Glacier legt **~40 KB Overhead je Objekt** an — bei Kleinstobjekten katastrophal. Vor dem Archivieren **bündeln** (z. B. zu größeren Archiven). Der 128-KB-„Verbot“-Grund ist erfunden."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-226",
+    "explanationStructured": {
+      "verdict": "Der **EC2 Instance Savings Plan** bietet den **höchsten Rabatt** der SP-Familie (bis 72 %) — Preis: Bindung an **Instance-Familie + Region**. Genau diese Bindung ist hier kostenlos (stabile Umgebung, kein Wechsel geplant). Innerhalb der Familie bleibt man flexibel bei Größe, OS und Tenancy.",
+      "optionAnalysis": {
+        "A": "Falsch für den Maximalrabatt — der Compute Savings Plan ist flexibler, aber **etwas geringerer Rabatt**; die Flexibilität wird hier nicht gebraucht.",
+        "B": "Falsch — Convertible RIs sind flexibler, aber der Wechsel ist bei stabiler Umgebung unnötig und der Rabatt geringer als beim gebundenen Instance SP.",
+        "C": "**Richtig** — EC2 Instance Savings Plan (m6i, Region), 3 Jahre: höchster Rabatt bei stabiler, gleichbleibender Umgebung.",
+        "D": "Falsch — ODCRs sind **Kapazitätsreservierungen ohne (nennenswerten) Rabatt**; kein Instrument zur Kostensenkung stabiler Last."
+      },
+      "mnemonic": "Eselsbrücke: **Stabil, kein Wechsel geplant = EC2 Instance Savings Plan (max. Rabatt).**",
+      "examTrap": "SP-Hierarchie: **EC2 Instance SP (max. Rabatt, gebunden) vs. Compute SP (flexibel, etwas weniger).** Stabile Umgebung → gebunden. ODCR gibt Kapazität, keinen Rabatt."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-227",
+    "explanationStructured": {
+      "verdict": "Der Workload ist der **Spot-Lehrbuchfall**: zustandslos, kurz, checkpointfähig, wiederholbar — bis 90 % Nachlass. Entscheidend sind zwei Details: **viele Instance-Typen** (mehr Kapazitätspools, weniger Unterbrechungen) und die Strategie **`price-capacity-optimized`**, die AWS ausdrücklich als Standard empfiehlt (balanciert Preis und Pool-Stabilität).",
+      "optionAnalysis": {
+        "A": "**Richtig** — Spot-ASG mit vielen Instance-Typen und `price-capacity-optimized`: kosteneffizient und unterbrechungsarm.",
+        "B": "Falsch — Spot auf **einem einzigen** Instance-Typ hat nur einen Kapazitätspool → mehr Unterbrechungen; die Typ-Vielfalt fehlt.",
+        "C": "Falsch für die Kosten — On-Demand per Scheduled Scaling ist deutlich teurer als Spot für einen checkpointfähigen Render-Workload.",
+        "D": "Falsch — RIs für schubweise, unregelmäßige Render-Last verschwenden das Commitment (Grundlast fehlt)."
+      },
+      "mnemonic": "Eselsbrücke: **Zustandslos, checkpointfähig = Spot mit vielen Typen + `price-capacity-optimized`.**",
+      "examTrap": "D4-Kernkorrektur: **`price-capacity-optimized` ist die empfohlene Spot-Strategie** (nicht `lowest-price`). Ein einzelner Instance-Typ ist der Distraktor (nur ein Pool → mehr Unterbrechungen)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-228",
+    "explanationStructured": {
+      "verdict": "Der **Compute Savings Plan** ist für diese Unsicherheit gebaut: ein Commitment in **USD/Stunde**, das **EC2, Fargate und Lambda** gleichermaßen abdeckt — unabhängig von Familie, Größe, Region, OS, Tenancy. Wandert ein Workload nach Fargate/Lambda, greift der Rabatt dort weiter; das Commitment läuft nie ins Leere. Preis: etwas geringerer Rabatt.",
+      "optionAnalysis": {
+        "A": "Falsch — Standard RIs (3 J.) auf die heutigen Familien binden an genau das, was migriert werden soll; das Commitment würde ins Leere laufen.",
+        "B": "Falsch — ein EC2 Instance SP bindet an Familie/Region; nach der Migration zu Fargate/Lambda greift er nicht mehr.",
+        "C": "Falsch für die Kosten — On-Demand bis zum Migrationsende verschenkt 18 Monate Rabatt auf die konstante Grundlast.",
+        "D": "**Richtig** — Compute Savings Plan: deckt EC2/Fargate/Lambda ab, folgt der Migration, Commitment bleibt wirksam."
+      },
+      "mnemonic": "Eselsbrücke: **Migration zu Fargate/Lambda geplant = Compute Savings Plan** (deckt alle drei ab).",
+      "examTrap": "Compute SP deckt **EC2 + Fargate + Lambda** und ist familien-/regionsunabhängig — ideal bei geplanter Architekturänderung. Instance SP/Standard RI (gebunden) laufen nach Migration ins Leere."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-229",
+    "explanationStructured": {
+      "verdict": "Das entscheidende Kriterium ist die **Sichtbarkeit physischer Cores und Sockets**. Nur **Dedicated Hosts** leisten das: Man mietet einen physischen Server, sieht Socket-/Core-Konfiguration und steuert die Instanzplatzierung — Voraussetzung für **BYOL** bei per-Core-/per-Socket-Lizenzierung (Oracle, SQL Server, Windows Server).",
+      "optionAnalysis": {
+        "A": "Falsch — Dedicated **Instances** isolieren die Hardware, machen aber **Sockets/Cores nicht sichtbar/steuerbar**; für per-Core-BYOL unzureichend.",
+        "B": "**Richtig** — Dedicated Hosts: physische Sockets/Cores sichtbar, Platzierung steuerbar → BYOL bei per-Core/-Socket-Lizenzen.",
+        "C": "Falsch — Shared Tenancy in einer Cluster Placement Group bietet keine physische Core-Sichtbarkeit für Lizenzierung.",
+        "D": "Falsch — RIs sind ein Abrechnungsrabatt, keine Lizenz-/Hardware-Sichtbarkeits-Lösung."
+      },
+      "mnemonic": "Eselsbrücke: **Per-Core/-Socket-BYOL = Dedicated Hosts** (Hardware sichtbar) — Dedicated Instances reichen nicht.",
+      "examTrap": "Dedicated **Hosts** (physische Server, Cores/Sockets sichtbar) vs. Dedicated **Instances** (nur isoliert). BYOL nach Cores → nur Hosts. Das ist die klassische Verwechslung."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-230",
+    "explanationStructured": {
+      "verdict": "Der Denkfehler: **Regional Reserved Instances sind ein reiner Abrechnungsrabatt — sie reservieren KEINE Kapazität** in irgendeiner AZ. Nur **zonale RIs und On-Demand Capacity Reservations (ODCR)** tun das. **ODCRs** garantieren Kapazität in der Ziel-AZ und lassen sich mit dem bestehenden Regional-RI-Rabatt (oder SP) kombinieren.",
+      "optionAnalysis": {
+        "A": "Falsch — ein längeres Commitment der Regional RIs ändert nichts: Sie **reservieren nie Kapazität**, nur Rabatt.",
+        "B": "Falsch — ein EC2 Instance SP ist ebenfalls ein Rabatt-, kein Kapazitätsinstrument; er garantiert keine AZ-Kapazität.",
+        "C": "**Richtig** — ODCRs in der Ziel-AZ: garantierte Kapazität, kombinierbar mit dem bestehenden Regional-RI-Rabatt.",
+        "D": "Falsch für die Kosten — Instanzen dauerhaft laufen zu lassen, nur um Kapazität zu „halten“, ist teuer und kein sauberes Reservierungsmuster."
+      },
+      "mnemonic": "Eselsbrücke: **Kapazitätsgarantie in einer AZ = ODCR (oder zonale RI)** — Regional RI/SP geben nur Rabatt.",
+      "examTrap": "D4-Kernkorrektur: **Regional RIs und Savings Plans reservieren KEINE Kapazität** — nur zonale RIs und ODCRs. „Failover-AZ hatte keinen Platz“ → ODCR (kombinierbar mit dem RI-Rabatt)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-231",
+    "explanationStructured": {
+      "verdict": "Die **Mixed Instances Policy** ist für diese Zweiteilung gebaut: **`OnDemandBaseCapacity`** garantiert die 12 On-Demand-Instanzen der Grundlast, **`OnDemandPercentageAboveBaseCapacity`** steuert, dass die Skalierung darüber überwiegend/vollständig aus **Spot** kommt. Kritische Basis unterbrechungssicher, unkritische Spitze billig.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Mixed Instances Policy: 12 On-Demand-Basiskapazität + Spot darüber, in einer ASG.",
+        "B": "Falsch — zwei getrennte ASGs sind unnötiger Betriebsaufwand; die Mixed Instances Policy löst es in einer Gruppe.",
+        "C": "Falsch — eine reine Spot-ASG gefährdet die **unverzichtbare Grundlast** (Unterbrechungen), auch bei breiter Typ-Auswahl.",
+        "D": "Falsch für die Kosten — reines On-Demand + Compute SP ist teurer als die Spot-Spitze der Mixed-Policy."
+      },
+      "mnemonic": "Eselsbrücke: **Feste Basis + billige Spitze = Mixed Instances Policy (OnDemandBaseCapacity + Spot).**",
+      "examTrap": "„Grundlast garantiert, Spitze billig“ → Mixed Instances Policy in **einer** ASG. Zwei ASGs (Aufwand) und reines Spot (Grundlast gefährdet) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-232",
+    "explanationStructured": {
+      "verdict": "Der Geltungsbereich ist die Grenze: **Compute Savings Plans decken EC2, Fargate und Lambda — NICHT** RDS, Aurora, ElastiCache, DynamoDB. Für stabile RDS-/ElastiCache-Last sind **Reserved Instances / Reserved Nodes** der Weg (oder der neuere **Database Savings Plan**).",
+      "optionAnalysis": {
+        "A": "Falsch — der SP ist nicht „zu klein“; er deckt Datenbankdienste **grundsätzlich nicht** ab, egal wie hoch das Commitment.",
+        "B": "Falsch — es gibt keine „Angleichungsphase“, nach der SPs auf Datenbanken greifen; das ist erfunden.",
+        "C": "Falsch — der SP-Scope hängt nicht an Shared/Dedicated Tenancy der Datenbanken; er schließt DB-Dienste per Definition aus.",
+        "D": "**Richtig** — Compute SP deckt nur EC2/Fargate/Lambda; für DBs → Reserved Instances/Nodes (oder Database Savings Plan)."
+      },
+      "mnemonic": "Eselsbrücke: **Compute SP = EC2/Fargate/Lambda** — Datenbanken brauchen RIs/Reserved Nodes.",
+      "examTrap": "Der SP-Scope ist prüfbar: **RDS/Aurora/ElastiCache/DynamoDB sind NICHT im Compute SP.** „SP gesenkt, aber DB-Kosten hoch“ → RI/Reserved Nodes (oder Database Savings Plan)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-233",
+    "explanationStructured": {
+      "verdict": "**Graviton** (z. B. m7g) bietet laut AWS bis **40 % besseres Preis-Leistungs-Verhältnis** als vergleichbare x86-Instanzen. **Java ist idealer Kandidat**: JVM läuft nativ auf ARM, Bytecode plattformunabhängig, gängige Abhängigkeiten liefern arm64-Artefakte. Mit Testumgebung überschaubarer Aufwand, Verfügbarkeit unverändert.",
+      "optionAnalysis": {
+        "A": "Falsch — T-Instanzen mit Unlimited Mode adressieren Burst-Verhalten, nicht die dauerhafte Kostensenkung einer konstant ausgelasteten Flotte.",
+        "B": "**Richtig** — auf Graviton (m7g) migrieren, nach erfolgreichem Test: bis 40 % besseres Preis-Leistungs-Verhältnis für plattformunabhängiges Java.",
+        "C": "Falsch — Spot ist für **unterbrechbare** Workloads; eine dauerhaft laufende Microservice-Flotte mit Verfügbarkeitsanspruch passt nicht.",
+        "D": "Falsch — die Instanzen kleiner + mehr davon ändert das Preis-Leistungs-Verhältnis kaum und bringt keinen Graviton-Vorteil."
+      },
+      "mnemonic": "Eselsbrücke: **Plattformunabhängiges Java, konstante Last → Graviton (m7g), ~40 % Preis-Leistung.**",
+      "examTrap": "**„Plattformunabhängig, aktuelle Abhängigkeiten, Verfügbarkeit halten“** → Graviton. T-Unlimited (Burst), Spot (unterbrechbar) und Downsizing sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-234",
+    "explanationStructured": {
+      "verdict": "**Spot Blocks (definierte Laufzeit) sind abgekündigt** und für neue Nutzung nicht mehr verfügbar — daher scheitert (A/B). Sobald **eine Unterbrechung den ganzen Lauf zerstört und kein Checkpointing existiert**, ist Spot grundsätzlich falsch. **On-Demand** (bei Bedarf mit ODCR für die 6 h) ist die richtige Wahl.",
+      "optionAnalysis": {
+        "A": "Falsch — ein Spot-Maximalpreis über On-Demand verhindert keine **Kapazitäts-Unterbrechung**; Spot kann jederzeit zurückgezogen werden.",
+        "B": "Falsch — auch `capacity-optimized` garantiert **keine** ununterbrochenen 6 Stunden; ohne Checkpointing ist Spot ungeeignet.",
+        "C": "**Richtig** — On-Demand (optional ODCR für die 6 h): garantiert den ununterbrochenen Lauf ohne Checkpointing.",
+        "D": "Falsch für einen Einmal-Lauf — 1-Jahres-RIs sind ein langfristiges Commitment; für einen einzelnen 6-h-Lauf unwirtschaftlich."
+      },
+      "mnemonic": "Eselsbrücke: **Ununterbrochen nötig + kein Checkpoint = On-Demand (ODCR)** — Spot ist raus (Blocks abgekündigt).",
+      "examTrap": "D4-Kernkorrektur: **Spot Blocks/definierte Laufzeit sind abgekündigt.** „Muss ununterbrochen laufen, kein Checkpoint“ → Spot grundsätzlich falsch → On-Demand (+ ODCR)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-235",
+    "explanationStructured": {
+      "verdict": "Lambda rechnet nach **GB-Sekunden** (Speicher × Laufzeit). **(D)** greift an der ersten Größe: 3.008 MB bei 900 MB Bedarf = mehr als das Dreifache bezahlt; **Compute Optimizer** empfiehlt den passenden Wert (Szenario: Laufzeit steigt bei weniger Speicher kaum). **(A)** **arm64** ist pro GB-Sekunde günstiger.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — auf arm64 umstellen: günstiger pro GB-Sekunde bei kompatiblem Code.",
+        "B": "Falsch — Provisioned Concurrency **erhöht** die Kosten (dauerhaft warme Umgebungen); es senkt keine GB-Sekunden.",
+        "C": "Falsch — das Timeout zu senken kappt nur Ausreißer, reduziert aber nicht die reguläre GB-Sekunden-Last (der Speicher bleibt überdimensioniert).",
+        "D": "**Richtig (2/2)** — Speicher per Compute-Optimizer-Empfehlung auf den echten Bedarf senken: direkter GB-Sekunden-Hebel.",
+        "E": "Falsch — ein **Compute SP rabattiert keine Lambda-Request-Gebühren**; er deckt die Compute-Dauer, nicht die per-Request-Kosten."
+      },
+      "mnemonic": "Eselsbrücke: **Lambda-Kosten = Speicher × Zeit → richtig dimensionieren (Compute Optimizer) + arm64.**",
+      "examTrap": "Lambda-Kosten = **GB-Sekunden**. Überdimensionierter Speicher (3.008 vs. 900 MB) ist der Haupthebel (Compute Optimizer + arm64). Provisioned Concurrency (teurer) und SP-auf-Requests (falscher Scope) sind Distraktoren."
+    }
+  }
+]

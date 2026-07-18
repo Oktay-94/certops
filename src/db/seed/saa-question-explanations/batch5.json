@@ -1,0 +1,425 @@
+[
+  {
+    "seedKey": "saa-c03-q-121",
+    "explanationStructured": {
+      "verdict": "Der **Visibility Timeout** steht per Default auf **30 Sekunden**. Läuft er ab, während der Consumer noch arbeitet, wird die Nachricht wieder sichtbar und der nächste Worker beginnt von vorn — bei 2–8 min Verarbeitung mehrfach. **Timeout über die längste Dauer setzen** (max 12 h) oder per `ChangeMessageVisibility` als Heartbeat verlängern.",
+      "optionAnalysis": {
+        "A": "Falsch — die Message Retention (4 → 14 Tage) betrifft nur, **wie lange** unverarbeitete Nachrichten bleiben, nicht die Doppelverarbeitung während der Bearbeitung.",
+        "B": "**Richtig** — Visibility Timeout über die maximale Verarbeitungsdauer, ggf. per Heartbeat verlängern.",
+        "C": "Falsch — FIFO-Deduplication verhindert **doppelt gesendete** Nachrichten, nicht die erneute Zustellung nach abgelaufenem Timeout.",
+        "D": "Falsch — Long Polling senkt leere Receives/Kosten, hat aber mit dem zu kurzen Visibility Timeout nichts zu tun."
+      },
+      "mnemonic": "Eselsbrücke: **Verarbeitung länger als der Timeout = Doppelarbeit** — Timeout hochsetzen oder Heartbeat.",
+      "examTrap": "Doppelverarbeitung im SQS-Szenario = fast immer **Visibility Timeout zu kurz** (Default 30 s, Max 12 h). Retention, FIFO-Dedup und Long Polling sind die themenfremden Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-122",
+    "explanationStructured": {
+      "verdict": "Das kanonische **Fan-out-Muster**: **SNS-Topic mit je einer eigenen SQS-Queue pro Zielsystem**. SNS verteilt jedes Ereignis an alle Subscriptions, jede Queue ist ein eigener dauerhafter Puffer. Analytics darf tagelang stillstehen (Retention bis 14 Tage), ohne Rechnung und Versand zu bremsen.",
+      "optionAnalysis": {
+        "A": "Falsch — eine **gemeinsame Queue** liefert jede Nachricht an **genau einen** Consumer; die drei Systeme würden sich die Ereignisse aufteilen statt jeder alle zu bekommen.",
+        "B": "Falsch für das robusteste Muster — EventBridge direkt an die Systeme puffert nicht; fällt ein System aus, gehen Events nach den Retries verloren.",
+        "C": "Falsch — SNS **direkt** an die Systeme (ohne Queues) verliert den Puffer; ein zeitweise offline System verpasst Nachrichten trotz DLQ-Retries.",
+        "D": "**Richtig** — SNS-Topic → je eine SQS-Queue pro System: Broadcast plus unabhängiger Puffer und Retry je System."
+      },
+      "mnemonic": "Eselsbrücke: **Jeder bekommt alles = SNS-Fan-out auf eigene Queues** — nie eine geteilte Queue.",
+      "examTrap": "Die geteilte Queue ist der Kern-Distraktor: **Eine Queue = ein Consumer pro Nachricht.** „Jedes System muss jede Bestellung erhalten“ → SNS→SQS-Fan-out mit Puffer je System."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-123",
+    "explanationStructured": {
+      "verdict": "**EventBridge ist ein Router, kein Puffer** — bei zu langsamem Target wird mit Backoff bis 24 h wiederholt, aber nichts staut sich auf, das der Consumer im eigenen Tempo abholen könnte. Deshalb eine **SQS-Queue als Target** dazwischen: Sie nimmt den Schub auf, Lambda leert sie mit begrenzter Concurrency im Tempo des Legacy-Systems.",
+      "optionAnalysis": {
+        "A": "Falsch — mehr Lambda-Concurrency macht es **schlimmer**: Sie überflutet das Legacy-System noch stärker.",
+        "B": "Falsch — Archive/Replay hilft, verlorene Events **später** erneut zu senden, glättet aber nicht den Live-Schub.",
+        "C": "**Richtig** — SQS-Queue als Rule-Target puffert den Schub; Lambda mit begrenzter Concurrency schützt das Legacy-System.",
+        "D": "Falsch — eine DLQ fängt **fehlgeschlagene** Events, dämpft aber nicht die Überflutung des langsamen Ziels."
+      },
+      "mnemonic": "Eselsbrücke: **EventBridge routet, SQS puffert** — vor ein langsames Ziel gehört eine Queue.",
+      "examTrap": "„EventBridge + langsames Ziel / Schübe abfedern“ → SQS-Queue dazwischen. EventBridge selbst hat **keine Queue-Semantik** — mehr Concurrency verschärft das Problem."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-124",
+    "explanationStructured": {
+      "verdict": "**Standard-Workflows führen jeden Schritt exactly-once aus** — die Voraussetzung, wenn Aktionen nicht idempotent sind (Karte belasten!). Sie laufen bis zu einem Jahr, bringen Retry/Catch mit und zeigen jede Ausführung visuell.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Step Functions Standard: exactly-once, ideal für den nicht-idempotenten Zahlungsprozess.",
+        "B": "Falsch, die Falle — **Express ist at-least-once**: Bei einem internen Retry würde die Karte zweimal belastet. Günstiger und schnell, aber hier gefährlich.",
+        "C": "Falsch — eine asynchrone Lambda-Kette mit DynamoDB-State ist Eigenbau ohne eingebaute Exactly-once-Garantie und Orchestrierung.",
+        "D": "Falsch — SQS-FIFO-Dedup verhindert doppelt **gesendete** Nachrichten, garantiert aber keine exactly-once-**Ausführung** über drei abhängige Schritte."
+      },
+      "mnemonic": "Eselsbrücke: **Nicht idempotent = Step Functions Standard (exactly-once)** — Express ist at-least-once.",
+      "examTrap": "Der Standard-vs-Express-Unterschied ist der Kern: **exactly-once (Standard) vs. at-least-once (Express).** Nicht-idempotente Geschäftsprozesse → immer Standard."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-125",
+    "explanationStructured": {
+      "verdict": "Zwei Anforderungen, zwei Fixe: **(B)** **FIFO-Queue mit Kunden-ID als `MessageGroupId`** liefert strikte Reihenfolge je Kunde bei Parallelität über Kunden hinweg. **(D)** **DLQ vom selben Typ mit `maxReceiveCount` 5** isoliert Gift-Nachrichten nach dem fünften Fehlversuch.",
+      "optionAnalysis": {
+        "A": "Falsch — ein hoher Visibility Timeout verzögert nur die erneute Zustellung; er löst weder Ordnung noch Gift-Nachricht-Isolation.",
+        "B": "**Richtig (1/2)** — FIFO + `MessageGroupId = Kunden-ID`: Ordnung je Kunde, Parallelität dazwischen.",
+        "C": "Falsch — Long Polling senkt leere Receives, adressiert aber keine der beiden Anforderungen.",
+        "D": "**Richtig (2/2)** — DLQ (gleicher Typ!) mit `maxReceiveCount` 5: fehlerhafte Nachricht wandert nach 5 Versuchen aus dem Weg.",
+        "E": "Falsch — längere Retention hält Nachrichten nur länger vor; sie ordnet nichts und isoliert keine Gift-Nachricht."
+      },
+      "mnemonic": "Eselsbrücke: **Ordnung = FIFO+MessageGroupId, Gift-Nachricht = DLQ+maxReceiveCount.**",
+      "examTrap": "Multi-Select-Muster: zwei getrennte Anforderungen, zwei getrennte Mechanismen. **FIFO-DLQ muss FIFO sein** (gleicher Typ) — ein prüfbares Detail."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-126",
+    "explanationStructured": {
+      "verdict": "SQS begrenzt eine Nachricht auf **1 MiB** (bis August 2025: 256 KB — ältere Materialien nennen den alten Wert). Bei 40-MB-Dokumenten löst die **Extended Client Library** das: Nutzlast nach **S3**, nur eine **Referenz** durch die Queue; der Consumer holt das Objekt transparent nach.",
+      "optionAnalysis": {
+        "A": "Falsch — Dokumente in Blöcke zerlegen und im Consumer zusammensetzen ist fehleranfällige Handarbeit; der Extended Client ist der vorgesehene Weg.",
+        "B": "**Richtig** — Extended Client Library: Payload nach S3, Pointer in der Queue, minimaler Code-Eingriff.",
+        "C": "Falsch — S3-Event direkt an Lambda umgeht die Queue und damit Puffer/DLQ/Backlog-Steuerung, die die Aufgabe behalten will.",
+        "D": "Falsch — Kompression bringt 40 MB nicht zuverlässig unter 1 MiB; kein robuster Fix."
+      },
+      "mnemonic": "Eselsbrücke: **Übergroße SQS-Payloads → Extended Client (S3 + Pointer).**",
+      "examTrap": "Zahlen-Doppelfalle: **1 MiB (neu) / 256 KB (alter Prüfungswert).** „Payload aufteilen/komprimieren“ ist der Distraktor — die Antwort ist der Extended Client."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-127",
+    "explanationStructured": {
+      "verdict": "Eine **Filter Policy** sitzt an der Subscription: SNS wertet Message Attributes (oder Body) aus und stellt gar nicht erst zu, was nicht passt. Kein Producer-Umbau, kein Zusatzdienst, die Fraud-Queue bleibt sauber.",
+      "optionAnalysis": {
+        "A": "Falsch — ein zweites Topic verlagert das Routing in den Producer und schafft eine weitere zu pflegende Ressource.",
+        "B": "Falsch für die einfachste Lösung — EventBridge kann Content-based Routing, ist hier aber unnötiger Zusatzdienst gegenüber der nativen SNS-Filter-Policy.",
+        "C": "Falsch — ein Filter im Lambda-Event-Source-Mapping wirft die Nachrichten erst **nach** der (bezahlten) Zustellung weg; SNS-Filtering verhindert die Zustellung.",
+        "D": "**Richtig** — Filter Policy an der Fraud-Subscription: nur passende Nachrichten werden zugestellt."
+      },
+      "mnemonic": "Eselsbrücke: **Ein Topic, gefilterte Sicht = SNS Filter Policy** — nicht ein zweites Topic.",
+      "examTrap": "**„Nur bestimmte Nachrichten an einen Subscriber“** → Filter Policy an der Subscription. Zweites Topic (Producer-Kopplung) und Consumer-seitiges Filtern (verschwendete Zustellung) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-128",
+    "explanationStructured": {
+      "verdict": "Eine **FIFO-Queue** schafft ohne Batching **300 msg/s**. Mit **`SendMessageBatch`** (bis 10 pro Aufruf) sind es **3.000 msg/s** — das deckt die geforderten 1.500. Die Reihenfolge innerhalb einer `MessageGroupId` bleibt beim Batching erhalten; Eingriff nur im Producer.",
+      "optionAnalysis": {
+        "A": "Falsch — Standard-Queue + Zeitstempel-Rekonstruktion gibt die garantierte Reihenfolge auf und verlagert sie in fehleranfällige Consumer-Logik.",
+        "B": "Falsch — mehr Consumer beschleunigen das **Leeren**, heben aber das Producer-seitige FIFO-Durchsatzlimit nicht an.",
+        "C": "**Richtig** — `SendMessageBatch` (10 je Aufruf) hebt FIFO auf 3.000 msg/s; Ordnung je Gruppe bleibt.",
+        "D": "Falsch für die minimale Änderung — mehrere FIFO-Queues (Sharding) funktionieren, sind aber komplexer als das einfache Batching, das hier schon reicht."
+      },
+      "mnemonic": "Eselsbrücke: **FIFO: 300 ohne, 3.000 mit Batching** — 1.500 schafft der SendMessageBatch.",
+      "examTrap": "Die FIFO-Durchsatzzahlen sind prüfbar: **300 / 3.000 (Batching) / bis 70.000 (High Throughput).** „1.500 msg/s bei erhaltener Ordnung“ → Batching, kein Wechsel auf Standard."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-129",
+    "explanationStructured": {
+      "verdict": "Standard-Queues liefern **at-least-once** — eine Nachricht kann selten mehr als einmal zugestellt werden, auch ohne Fehler. Das ist die Zusage des Dienstes; die Antwort ist **Idempotenz** (z. B. Conditional Write mit `attribute_not_exists` auf die Message-ID).",
+      "optionAnalysis": {
+        "A": "**Richtig** — Consumer idempotent machen: Doppelte Zustellungen werden folgenlos, der 15.000-msg/s-Durchsatz bleibt.",
+        "B": "Falsch — FIFO würde Duplikate unterbinden, deckelt aber bei **3.000 msg/s** (mit Batching); 15.000 sind so unerreichbar.",
+        "C": "Falsch — ein längerer Visibility Timeout **reduziert** Duplikate, eliminiert sie aber nicht (at-least-once bleibt).",
+        "D": "Falsch — „erst löschen, dann verarbeiten“ riskiert Nachrichtenverlust bei einem Fehler nach dem Delete."
+      },
+      "mnemonic": "Eselsbrücke: **Standard-SQS ist at-least-once → Consumer idempotent bauen.**",
+      "examTrap": "Bei hohem Durchsatz ist FIFO (3.000-Deckel) keine Option — die Antwort auf Duplikate ist **immer Idempotenz**, nicht der Wechsel auf FIFO oder Timeout-Tricks."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-130",
+    "explanationStructured": {
+      "verdict": "**EventBridge Scheduler** ist genau dafür gebaut: sehr große Mengen an Schedules (einmalig oder wiederkehrend), beliebiger Zeitpunkt, direkter Lambda-Aufruf, automatische Löschung nach Ausführung. Kein eigener Scheduler, keine Instanz — skaliert auf 50.000 offene Erinnerungen.",
+      "optionAnalysis": {
+        "A": "Falsch — EventBridge-**Rules** je Event Bus sind kontingentiert; 50.000 Cron-Regeln sprengen das Limit.",
+        "B": "**Richtig** — EventBridge Scheduler mit One-Time-Schedule je Erinnerung und Lambda-Target: skaliert massiv, räumt sich selbst auf.",
+        "C": "Falsch — SQS-Delay-Queues verzögern **maximal 15 Minuten**, nicht Tage/Wochen.",
+        "D": "Falsch — eine Step-Functions-Ausführung je Erinnerung mit langem Wait-State ist teuer und unnötig komplex für einfache Timer."
+      },
+      "mnemonic": "Eselsbrücke: **Massenhafte Einmal-Timer = EventBridge Scheduler** — nicht Rules, nicht Delay-Queues.",
+      "examTrap": "SQS-Delay hat die harte **15-Minuten-Grenze**; EventBridge-Rules sind pro Bus kontingentiert. „Sehr viele individuelle Zeitpunkte“ → EventBridge Scheduler."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-131",
+    "explanationStructured": {
+      "verdict": "Ein **CNAME darf laut DNS-Spezifikation nicht am Zone Apex** stehen. Route 53 löst das mit dem **Alias-Record**: für den Resolver wie ein A-Record, intern auf eine AWS-Ressource, Abfragen kostenlos. Der Alias folgt der wechselnden ALB-IP.",
+      "optionAnalysis": {
+        "A": "Falsch — ein ALB hat **keine festen IPs**; ein statischer A-Record zeigt bald ins Leere.",
+        "B": "**Richtig** — Alias-A-Record am Apex direkt auf den ALB: standardkonform, kostenlos, folgt der ALB-IP.",
+        "C": "Falsch — eine EC2-Redirect-Instanz ist unnötige Infrastruktur und ein SPOF für ein reines DNS-Problem.",
+        "D": "Falsch — CloudFront + CNAME auf den Apex scheitert an derselben Apex-Regel und fügt unnötige Komplexität hinzu."
+      },
+      "mnemonic": "Eselsbrücke: **Nackte Domain auf ALB = Alias** — CNAME am Apex ist verboten.",
+      "examTrap": "Identisch zu q-105: **Zone Apex + AWS-Ziel → Alias.** Statischer A-Record (ALB-IP wechselt) und CNAME-am-Apex sind die wiederkehrenden Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-132",
+    "explanationStructured": {
+      "verdict": "**Failover-Routing** ist die einzige Policy mit Primary/Secondary-Verhältnis — und sie funktioniert **nur mit Health Check**: Der Check ist der Motor, der den Umschaltzeitpunkt bestimmt. **(A)** und **(D)** gehören deshalb zwingend zusammen.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — zwei Records mit Failover-Policy (Primary/Secondary): das einzige echte Aktiv/Passiv-Modell.",
+        "B": "Falsch — Weighted 100/0 kennt kein Aktiv/Passiv; ohne Health Check schaltet nichts, mit Health Check baut man Failover nur umständlich nach.",
+        "C": "Falsch — Latency-based optimiert Performance und kann an die tote Region routen; kein DR-Failover-Modell.",
+        "D": "**Richtig (2/2)** — Health Check auf den Primary: der Auslöser, der das Failover überhaupt erst funktionieren lässt.",
+        "E": "Falsch — Multivalue Answer streut über gesunde Endpunkte, modelliert aber kein Primary/Secondary."
+      },
+      "mnemonic": "Eselsbrücke: **Aktiv/Passiv = Failover-Policy + Health Check** — beide oder keins.",
+      "examTrap": "Die zwei richtigen Antworten sind **ein untrennbares Paar**: Failover-Routing ohne Health Check ist wirkungslos. Weighted/Latency/Multivalue sind die Distraktoren ohne Aktiv/Passiv-Semantik."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-133",
+    "explanationStructured": {
+      "verdict": "**Geolocation Routing** entscheidet ausschließlich nach dem **Standort** des Anfragenden (Kontinent/Land/US-Staat) — das Werkzeug für rechtliche Vorgaben und Data Residency. Ein **Default-Record** fängt alles ab, was keiner Regel entspricht (sonst keine Antwort für unzugeordnete Anfragen).",
+      "optionAnalysis": {
+        "A": "Falsch — Latency-based optimiert Performance und kann eine EU-Anfrage in die USA schicken, wenn die Verbindung dorthin gerade schneller ist — verletzt die Rechtsvorgabe.",
+        "B": "Falsch — Geoproximity mit Bias verschiebt Einzugsgebiete, garantiert aber keine harte Kontinent-Zuordnung wie Geolocation.",
+        "C": "**Richtig** — Geolocation mit Europa-Record + Default-Record: harte standortbasierte Zuordnung plus Auffangnetz.",
+        "D": "Falsch — Weighted verteilt nach Anteilen, nicht nach Herkunft; für Data Residency ungeeignet."
+      },
+      "mnemonic": "Eselsbrücke: **Recht/Herkunft = Geolocation, Performance = Latency** — nächste Region ≠ niedrigste Latenz.",
+      "examTrap": "**„Aus rechtlichen Gründen / EU-Nutzer auf EU-Stack“** → Geolocation (mit Default-Record). Latency ist der Köder — es kann die Rechtsvorgabe brechen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-134",
+    "explanationStructured": {
+      "verdict": "**Multivalue Answer** gibt bis zu **acht gesunde Records** in zufälliger Reihenfolge zurück und nimmt ungesunde per Health Check heraus — die geforderte Streuung ohne Load Balancer. Grenze: Route 53 sieht keine Last, kennt keine Verbindungen, terminiert nichts (DNS-Streuung, kein LB).",
+      "optionAnalysis": {
+        "A": "**Richtig** — Multivalue-Answer-Records mit Health Check je Instanz: gesunde Streuung über bis zu 8 Adressen.",
+        "B": "Falsch — Simple Routing liefert alle Adressen, prüft aber **keinen Zustand**: Eine tote Instanz bleibt in Rotation.",
+        "C": "Falsch — Weighted mit einem gemeinsamen Health Check unterscheidet einzelne tote Instanzen nicht; es fehlt die Per-Instance-Prüfung.",
+        "D": "Falsch — Latency-based ist für Regionen-/Latenz-Optimierung gedacht, nicht für die Streuung über acht gleichrangige Instanzen einer App."
+      },
+      "mnemonic": "Eselsbrücke: **DNS-Streuung mit Health Checks = Multivalue Answer** — aber kein Load Balancer.",
+      "examTrap": "**Multivalue ≠ Load Balancer**: keine Lastkenntnis, keine Verbindungssteuerung. Simple Routing (ohne Health Check) ist der Distraktor — es rotiert auch tote Instanzen ein."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-135",
+    "explanationStructured": {
+      "verdict": "Route 53 kennt drei Health-Check-Arten: Endpoint, Calculated und **CloudWatch-Alarm-basiert**. Die dritte passt hier: Die App meldet eine Metrik nach CloudWatch, ein Alarm bewertet sie, der Health Check übernimmt dessen Zustand — die **Health-Checker müssen die private Ressource nie selbst erreichen**.",
+      "optionAnalysis": {
+        "A": "Falsch — Route-53-Health-Checker sitzen im **Internet** und erreichen private IPs grundsätzlich nicht; NACL-Öffnung ändert die fehlende öffentliche Route nicht.",
+        "B": "Falsch für die beste Lösung — ein NAT Gateway ist für **ausgehenden** Traffic; es macht das private Backend nicht für eingehende Health Checks erreichbar.",
+        "C": "Falsch — ein Bastion als Health-Check-Proxy ist fragile Eigenkonstruktion und ein zusätzlicher SPOF.",
+        "D": "**Richtig** — CloudWatch-Alarm-basierter Health Check: bewertet eine Backend-Metrik, ohne die private Ressource direkt zu erreichen."
+      },
+      "mnemonic": "Eselsbrücke: **Privates Backend prüfen = CloudWatch-Alarm-Health-Check** — die Checker bleiben draußen.",
+      "examTrap": "Route-53-Health-Checker sind **public-only**. Für private Ziele führt der Weg über einen **CloudWatch-Alarm-basierten** Health Check, nicht über NAT/Bastion/NACL."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-136",
+    "explanationStructured": {
+      "verdict": "Bei **Alias-Records auf AWS-Ziele** empfiehlt AWS **Evaluate Target Health** statt eines eigenen Health Checks: Route 53 übernimmt den Zielzustand direkt (beim ALB: ob mindestens ein Ziel gesund ist). Kein zusätzlicher Health Check, keine Extrakosten, keine zweite Zustandsquelle.",
+      "optionAnalysis": {
+        "A": "Falsch für die beste Lösung — ein eigener Endpoint-Health-Check auf den ALB-DNS funktioniert, kostet aber je Check und schafft eine zweite Wahrheit neben dem Zielzustand.",
+        "B": "Falsch — ein Health Check je Instanz ist überflüssiger Aufwand; der ALB kennt seinen Target-Zustand bereits.",
+        "C": "**Richtig** — Evaluate Target Health an den Alias-Records: Route 53 nutzt den ALB-Zielzustand direkt.",
+        "D": "Falsch — eine niedrigere TTL beschleunigt nur das Neu-Auflösen, ersetzt aber keine Zustandsbewertung des Ziels."
+      },
+      "mnemonic": "Eselsbrücke: **Alias auf AWS-Ziel → Evaluate Target Health** statt eigenem Check.",
+      "examTrap": "Ergänzt q-104/132: Bei **Alias auf ELB/CloudFront** ist **Evaluate Target Health = Yes** der AWS-empfohlene Weg — spart Kosten und eine widersprüchliche zweite Zustandsquelle."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-137",
+    "explanationStructured": {
+      "verdict": "AWS nennt beide Bausteine im Reliability Pillar gemeinsam: **Exponential Backoff** (C) streckt die Abstände, damit der überlastete Dienst Luft bekommt; **Jitter** (E) würfelt die Wartezeiten auseinander, damit die Clients nicht synchron zurückkehren. Ohne Jitter marschiert die Herde nur im größeren Takt gemeinsam los.",
+      "optionAnalysis": {
+        "A": "Falsch — unbegrenzte Retries verlängern die Überlast und können sie zementieren; eine harte Obergrenze ist Pflicht.",
+        "B": "Falsch — ein längeres Timeout kaschiert nur, es entlastet den überlasteten Downstream-Dienst nicht.",
+        "C": "**Richtig (1/2)** — Exponential Backoff: wachsende Abstände geben dem Dienst Erholung.",
+        "D": "Falsch — dauerhaft dreifache Kapazität ist teuer und behandelt das Symptom, nicht das Thundering-Herd-Muster.",
+        "E": "**Richtig (2/2)** — Jitter: entzerrt die Wiederholungen, verhindert synchrone Retry-Wellen."
+      },
+      "mnemonic": "Eselsbrücke: **Backoff dehnt, Jitter streut** — zusammen gegen die Retry-Herde.",
+      "examTrap": "Backoff **ohne** Jitter synchronisiert die Clients nur im größeren Takt — beide gehören zusammen. Unbegrenzte Retries und längere Timeouts sind die Anti-Pattern-Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-138",
+    "explanationStructured": {
+      "verdict": "Das ist eine **Cell-based Architecture** (Bulkhead-Muster): Jede Zelle ist ein vollständiger, unabhängiger Stack, jeder Kunde lebt in genau einer Zelle. Fällt eine Zelle, trifft es nur deren Kunden — bei zehn Zellen ein Zehntel statt aller. Shuffle Sharding verfeinert das weiter.",
+      "optionAnalysis": {
+        "A": "Falsch — mehr Instanzen erhöhen die Kapazität, nicht die **Isolation**: Der fehlerhafte Request trifft weiter alle.",
+        "B": "**Richtig** — Aufteilung in unabhängige Zellen mit fester Kunden-Zuordnung: begrenzt den Blast Radius auf eine Zelle.",
+        "C": "Falsch für die Isolation — Rate Limiting dämpft einzelne Ausreißer, verhindert aber nicht, dass ein Fehlerklasse den geteilten Stack trifft.",
+        "D": "Falsch — Multi-AZ + Cross-Zone erhöht die Verfügbarkeit, isoliert aber Kunden **nicht** voneinander im geteilten Stack."
+      },
+      "mnemonic": "Eselsbrücke: **Blast Radius verkleinern = Zellen (Bulkhead)** — ein Kunde, eine Zelle.",
+      "examTrap": "„Ein Kunde darf nicht alle anderen mitreißen“ → Cell-based / Bulkhead. Horizontale Skalierung und Multi-AZ erhöhen Kapazität/Verfügbarkeit, liefern aber keine **Kunden-Isolation**."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-139",
+    "explanationStructured": {
+      "verdict": "AWS nennt das **Static Stability**: Ein System, das im Failover **keine neuen Ressourcen erzeugen** muss, hängt nicht von der **Control Plane** ab — genau der Teil, der unter Stress zuerst nachgibt. Konkret: Target Groups vorab anlegen, Kapazität bereits laufen lassen, Route-53-Health-Checks statt API-Änderungen. Der Failover ist dann reine Data-Plane-Operation.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Static Stability: alles vorab bereitstellen, im Ernstfall nur Data-Plane-Aktionen (kein Erstellen neuer Ressourcen).",
+        "B": "Falsch — mehr Retries mit Backoff machen das Skript geduldiger, entfernen aber die Control-Plane-Abhängigkeit nicht.",
+        "C": "Falsch — die Ausführung aus einer dritten Region ändert nichts daran, dass die **Ziel**-Region-Control-Plane unter Last die API-Calls drosselt.",
+        "D": "Falsch — ein Quota-Increase hilft nicht, wenn die Control Plane selbst überlastet/gestört ist; die Abhängigkeit bleibt."
+      },
+      "mnemonic": "Eselsbrücke: **Failover ohne neue Ressourcen = Static Stability** — Control Plane meiden.",
+      "examTrap": "„Im **Failover** keine neuen Ressourcen erzeugen / Control-Plane-Abhängigkeit vermeiden“ → Static Stability. Retry-Tuning und Quota-Anträge behandeln Symptome der Control-Plane-Abhängigkeit."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-140",
+    "explanationStructured": {
+      "verdict": "**Zonal Shift** (Application Recovery Controller) ist genau für eine **graue Beeinträchtigung** gebaut, die Health Checks nicht sauber auslösen: Ein Aufruf zieht den Verkehr für eine gewählte Dauer von der AZ ab, **ohne Konfiguration zu ändern**; das Zurückschalten ist ebenso einfach. Zonal Autoshift überlässt das sogar AWS.",
+      "optionAnalysis": {
+        "A": "Falsch — die AZ aus der LB-Subnetz-Konfiguration zu entfernen ist eine **Konfigurationsänderung**, die später zurückgebaut werden muss.",
+        "B": "Falsch — Instanzen deregistrieren + ASG anpassen ist ebenfalls Handarbeit an der Konfiguration statt eines sauberen, reversiblen Shifts.",
+        "C": "Falsch — ein regionsweites DR-Failover ist überzogen für ein Ein-AZ-Problem.",
+        "D": "**Richtig** — Zonal Shift im ARC: zieht den Verkehr reversibel von der AZ ab, ohne Konfigurationsänderung."
+      },
+      "mnemonic": "Eselsbrücke: **Eine AZ grau, Health Checks unklar → Zonal Shift** (reversibel, ohne Config-Änderung).",
+      "examTrap": "**„Graue AZ-Beeinträchtigung, Health Checks lösen nicht aus“** → Zonal Shift/Autoshift. Config-Änderungen am LB/ASG und ein Regions-Failover sind die schwergewichtigen Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-141",
+    "explanationStructured": {
+      "verdict": "Der **Fault Injection Service (FIS)** ist der Chaos-Engineering-Dienst: Er spielt Störungen kontrolliert ein (Instanz beenden, AZ isolieren, Latenz einfügen) und **bricht bei Stop-Conditions (CloudWatch-Alarm) automatisch ab**. Genau das geforderte Belegen unter kontrollierten Bedingungen.",
+      "optionAnalysis": {
+        "A": "Falsch — CloudWatch Synthetics **misst** nur, ob die App läuft; es verursacht keine Störung.",
+        "B": "Falsch — Resilience Hub **bewertet** die Architektur gegen RTO/RPO-Ziele, injiziert aber keine echten Fehler.",
+        "C": "**Richtig** — FIS: gezielte Fehlerinjektion mit automatischem Abbruch bei Stop-Bedingungen.",
+        "D": "Falsch — Config **erzwingt** eine Multi-AZ-Konfiguration, testet aber nicht, ob der AZ-Ausfall real überstanden wird."
+      },
+      "mnemonic": "Eselsbrücke: **AZ-Ausfall aktiv beweisen = Fault Injection Service** — nicht messen, nicht bewerten, sondern stören.",
+      "examTrap": "**„Belegen/testen, dass ein AZ-Ausfall überstanden wird“** → FIS (Chaos Engineering). Synthetics (misst), Resilience Hub (bewertet) und Config (erzwingt) tun alles außer aktiv stören."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-142",
+    "explanationStructured": {
+      "verdict": "Ein **PITR-Restore erzeugt in DynamoDB immer eine NEUE Tabelle** — die Quelltabelle bleibt unangetastet. Die betriebliche Konsequenz: Der **Cutover muss geplant** werden, und die neue Tabelle braucht eigene Einstellungen (Auto Scaling, TTL, Tags). PITR deckt **35 Tage** sekundengenau ab.",
+      "optionAnalysis": {
+        "A": "Falsch — das beschreibt **Aurora Backtrack** (in-place), das es nur für Aurora MySQL gibt, nicht DynamoDB PITR.",
+        "B": "**Richtig** — PITR legt eine neue Tabelle an; die App muss umgestellt oder die alte ersetzt werden.",
+        "C": "Falsch — PITR stellt einen **vollständigen** Tabellenstand zum Zeitpunkt her, nicht nur die seither veränderten Items.",
+        "D": "Falsch — PITR spielt keine Stream-Änderungen rückwärts in die bestehende Tabelle; es erzeugt einen neuen Stand als neue Tabelle."
+      },
+      "mnemonic": "Eselsbrücke: **DynamoDB-Restore = immer eine neue Tabelle** — Cutover einplanen.",
+      "examTrap": "Die Kern-Betriebsfalle: **PITR überschreibt nie in-place** (das ist Aurora Backtrack). Neue Tabelle → eigene Settings, geplanter Cutover. 35 Tage, sekundengenau."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-143",
+    "explanationStructured": {
+      "verdict": "**AWS Backup** ist der zentrale, dienstübergreifende Dienst: ein Backup Plan für EBS, RDS, DynamoDB, EFS, FSx u. a., **Cross-Region- und Cross-Account-Copy** eingebaut, dazu **organisationsweite Backup Policies** über AWS Organizations und Audit-Nachweise.",
+      "optionAnalysis": {
+        "A": "**Richtig** — AWS Backup mit Backup Plans + org-weiten Policies + Cross-Region/-Account: erfüllt alle Anforderungen zentral.",
+        "B": "Falsch — der **Data Lifecycle Manager deckt nur EBS-Snapshots und AMIs** ab; RDS/DynamoDB/EFS kann er nicht.",
+        "C": "Falsch — Lambda-Snapshot-Skripte je Dienst waren die Vor-AWS-Backup-Bastelei; kein zentraler, auditierbarer Plan.",
+        "D": "Falsch — lokale Backup Pläne je Konto ohne Organizations-Policy sind dezentral und schwer einheitlich zu halten."
+      },
+      "mnemonic": "Eselsbrücke: **Dienst- und account-übergreifend = AWS Backup** — DLM kann nur EBS.",
+      "examTrap": "Wie q-102: **DLM = nur EBS/AMI.** „Einheitlich über viele Dienste + Cross-Region/-Account + org-weit“ → AWS Backup mit Organizations-Policies."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-144",
+    "explanationStructured": {
+      "verdict": "**Replication Time Control** ist die einzige S3-Replikationsvariante mit **SLA** (99,9 % innerhalb 15 min, plus Metriken/Alerts). Normale CRR ist Best Effort ohne Zeitzusage. Weil Replikation nur **NEUE** Objekte erfasst, braucht der **Bestand** zusätzlich einen **S3-Batch-Replication-Job**.",
+      "optionAnalysis": {
+        "A": "Falsch — CRR + CloudWatch-Alarm liefert nur eine **Beobachtung**, kein SLA; die 15-Minuten-Zusage fehlt.",
+        "B": "Falsch — Same-Region Replication erfüllt die **zweite Region** nicht.",
+        "C": "Falsch — eine Lifecycle-Regel ändert Storage-Klassen, sie garantiert keine Replikationszeit.",
+        "D": "**Richtig** — RTC für neue Objekte (SLA) + S3-Batch-Replication für den Bestand: zugesicherte Zeit und vollständige Abdeckung."
+      },
+      "mnemonic": "Eselsbrücke: **Zeit-SLA = RTC, Bestand = Batch Replication** — CRR allein deckt beides nicht.",
+      "examTrap": "Zwei Teilfallen: **nur RTC hat ein SLA** (nicht CRR+Alarm) und **Replikation erfasst nur neue Objekte** (Bestand → Batch Replication). Beides zusammen ist die vollständige Antwort."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-145",
+    "explanationStructured": {
+      "verdict": "**Automatisierte RDS-Backups sind hart auf 35 Tage gedeckelt** — sieben Jahre sind damit ausgeschlossen. **Manuelle Snapshots** bleiben, bis man sie explizit löscht, und lassen sich cross-region kopieren; automatisieren über AWS Backup oder EventBridge.",
+      "optionAnalysis": {
+        "A": "Falsch — die Retention automatisierter Backups **lässt sich nicht über 35 Tage** heben; schlicht unmöglich.",
+        "B": "Falsch — eine Cross-Region Read Replica als Snapshot-Quelle ist ein teurer Dauerbetrieb-Umweg für ein reines Aufbewahrungsproblem.",
+        "C": "**Richtig** — monatlicher manueller Snapshot, cross-region kopiert und langfristig aufbewahrt: erfüllt die 7-Jahres-Vorgabe.",
+        "D": "Falsch — der **Data Lifecycle Manager sichert keine RDS-Instanzen** (nur EBS/AMI); für RDS ungeeignet."
+      },
+      "mnemonic": "Eselsbrücke: **Über 35 Tage aufbewahren = manuelle Snapshots** — automatisierte Backups sind gedeckelt.",
+      "examTrap": "Die 35-Tage-Grenze der automatisierten Backups ist der Kern. Langzeit-/Compliance-Aufbewahrung → **manuelle Snapshots** (bleiben bis zum expliziten Löschen), automatisiert via AWS Backup."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-146",
+    "explanationStructured": {
+      "verdict": "Ein **DynamoDB Stream hält seine Einträge genau 24 Stunden** — danach weg. Er ist ein **Change-Feed** für event-getriebene Verarbeitung, **kein Backup**. Für Langzeit gibt es **On-Demand-Backups** (bleiben bis zum expliziten Löschen); für die jüngsten 35 Tage **PITR**.",
+      "optionAnalysis": {
+        "A": "Falsch — Streams behalten **24 h**, nicht 35 Tage; die 35 Tage gehören zu PITR.",
+        "B": "**Richtig** — Streams 24 h; Langzeit-Aufbewahrung braucht On-Demand-Backups (35 Tage jüngste Stände via PITR).",
+        "C": "Falsch — Streams erfassen **alle** Änderungen (Insert/Modify/Remove), nicht nur Löschungen; Global Tables sind kein Backup.",
+        "D": "Falsch — Streams sind nicht auf eine Region beschränkt als Argument relevant; der Punkt ist die **24-h-Retention**, nicht die Region."
+      },
+      "mnemonic": "Eselsbrücke: **Stream ist ein 24-h-Change-Feed, kein Backup** — Langzeit = On-Demand-Backup, jüngstes = PITR.",
+      "examTrap": "„Stream ersetzt Backup“ ist der Denkfehler: **24 h Retention, Change-Feed-Zweck.** Für echte Aufbewahrung braucht es On-Demand-Backups (+ PITR für die letzten 35 Tage)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-147",
+    "explanationStructured": {
+      "verdict": "**Graceful Degradation**: eine harte Abhängigkeit in eine weiche verwandeln. Die Seite bekommt ein **kurzes Timeout** auf den Empfehlungsdienst und liefert bei Fehler/Verzögerung eine Antwort **ohne Empfehlungen** (ggf. statische/gecachte). Der Kern des Geschäfts — der Kauf — bleibt funktionsfähig.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Produktseite ohne Empfehlungen ausliefern, sobald der Dienst nicht rechtzeitig antwortet: harte Abhängigkeit entschärft.",
+        "B": "Falsch — Multi-AZ macht den Empfehlungsdienst verfügbarer, ändert aber nichts daran, dass die Seite bei dessen Ausfall hängt.",
+        "C": "Falsch — Backoff+Jitter-Retries verlängern nur die Wartezeit der synchronen Seite; sie bleibt abhängig.",
+        "D": "Falsch — eine SQS-Queue passt nicht zu einem **synchronen** Seitenaufruf, der sofort eine Antwort braucht."
+      },
+      "mnemonic": "Eselsbrücke: **Kern liefern, Beiwerk weglassen = Graceful Degradation** — harte Abhängigkeit weich machen.",
+      "examTrap": "„Nebendienst darf die Hauptseite nicht mitreißen“ → Graceful Degradation (kurzes Timeout, Fallback). Verfügbarkeit erhöhen (Multi-AZ) oder Retries lösen die **synchrone Kopplung** nicht."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-148",
+    "explanationStructured": {
+      "verdict": "**MFA Delete** verlangt für das dauerhafte Löschen einer Objektversion **und** für das Abschalten der Versionierung einen gültigen **MFA-Code** — ein gestohlener Access Key allein reicht nicht mehr. Voraussetzung: aktivierte Versionierung; einschaltbar nur vom **Root-User** des Bucket-Besitzers.",
+      "optionAnalysis": {
+        "A": "Falsch — eine Deny-Policy für alle außer der Admin-Rolle hilft nicht, wenn genau die **Admin-Rolle kompromittiert** ist.",
+        "B": "Falsch — eine Lifecycle-Regel **verzögert** das Entfernen alter Versionen, verhindert aber böswilliges Löschen nicht.",
+        "C": "Falsch — SSE mit CMK schützt die **Vertraulichkeit**, nicht vor dem Löschen von Objekten/Versionen.",
+        "D": "**Richtig** — Versionierung + MFA Delete: dauerhaftes Löschen und Versionierung-Abschalten brauchen zusätzlich MFA."
+      },
+      "mnemonic": "Eselsbrücke: **Gestohlener Key soll nicht löschen können → MFA Delete** (setzt Versioning voraus).",
+      "examTrap": "MFA Delete ist der Schutz gegen **kompromittierte Credentials**: zweiter Faktor fürs Löschen. Deny-Policies scheitern am kompromittierten Admin; Lifecycle/SSE lösen das Löschproblem nicht."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-149",
+    "explanationStructured": {
+      "verdict": "**Routing Controls im Application Recovery Controller** sind bewusst **manuelle Schalter**: Ein Mensch entscheidet, kein Health Check. Sie liegen auf einem Cluster aus **fünf redundanten regionalen Endpoints** und bleiben auch bei einer gestörten Region bedienbar. **Safety Rules** verhindern unmögliche Zustände (z. B. beide Regionen gleichzeitig aus).",
+      "optionAnalysis": {
+        "A": "Falsch — strengere/langsamere Health Checks reduzieren Fehlauslösungen nur graduell; das Grundproblem (automatischer Trigger) bleibt.",
+        "B": "Falsch — ein Lambda-Skript, das Route-53-Records umschreibt, ist Eigenbau ohne Safety Rules und ohne den hochverfügbaren 5-Endpoint-Cluster.",
+        "C": "**Richtig** — ARC Routing Controls mit Safety Rules: manuelle, gegen unmögliche Zustände abgesicherte Umschaltung, hochverfügbar bedienbar.",
+        "D": "Falsch — Weighted mit manueller Gewichtsanpassung ist fehleranfällige Handarbeit ohne Safety Rules und ohne garantierte Bedienbarkeit im Störfall."
+      },
+      "mnemonic": "Eselsbrücke: **Manuelles Failover mit Notaus-Regeln = ARC Routing Controls** — Mensch entscheidet, Safety Rules schützen.",
+      "examTrap": "„Fehlerhafte Health Checks lösten Fehl-Failover aus“ → weg vom automatischen Trigger, hin zu **manuellen Routing Controls mit Safety Rules** (5-Endpoint-Cluster, hochverfügbar)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-150",
+    "explanationStructured": {
+      "verdict": "Der Befund ist eindeutig: **BurstBalance = 0** heißt, die I/O-Credits des **gp2**-Volumes sind aufgebraucht, die Performance fällt auf die Baseline (3 IOPS/GiB). **gp3** kennt kein Credit-System — es hält **3.000 IOPS dauerhaft**, mehr IOPS unabhängig von der Größe buchbar, bei niedrigerem GB-Preis.",
+      "optionAnalysis": {
+        "A": "Falsch für die beste Lösung — ein größeres gp2-Volume hebt die Baseline, man **bezahlt aber Kapazität, um IOPS zu bekommen**; gp3 entkoppelt beides günstiger.",
+        "B": "Falsch für kosteneffizient — io2 mit provisionierten IOPS löst es, ist aber teurer als das ausreichende gp3.",
+        "C": "**Richtig** — auf gp3 migrieren und IOPS unabhängig von der Größe konfigurieren: Credit-Problem weg, günstiger.",
+        "D": "Falsch — die Batch-Verarbeitung zu zerstückeln kuriert nur das Symptom (Credits erholen sich), löst die Dauerlast-IOPS nicht."
+      },
+      "mnemonic": "Eselsbrücke: **BurstBalance = 0 → gp3** — dauerhafte Baseline statt leerlaufender gp2-Credits.",
+      "examTrap": "**BurstBalance = 0** ist die verratende Metrik. „Dauerhaft/sustained IOPS“ schließt gp2-Bursting aus → gp3 (Baseline ab Werk, entkoppelt, günstiger). io2 ist die teurere Überlösung."
+    }
+  }
+]

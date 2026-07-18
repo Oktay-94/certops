@@ -1,0 +1,424 @@
+[
+  {
+    "seedKey": "saa-c03-q-091",
+    "explanationStructured": {
+      "verdict": "**Nur der Switchover garantiert RPO = 0.** Aurora synchronisiert die Regionen **vorab vollständig**, bevor die Rollen getauscht werden — kein Datensatz geht verloren. Das ist das Verfahren für **geplante** Umschaltungen (Wartung, DR-Übung, Region-Rotation).",
+      "optionAnalysis": {
+        "A": "Falsch, der stärkste Distraktor — das **Unplanned Failover (Detach and Promote)** funktioniert und ist richtig im **echten Notfall**, verliert aber den Replikations-Lag (**RPO ≠ 0**). Für geplante Wartung ist es die falsche Wahl.",
+        "B": "**Richtig** — der managed **Switchover** synchronisiert vorab und tauscht dann die Rollen: null Datenverlust.",
+        "C": "Falsch — die Secondary eigenständig zu promoten löst die Global-Database-Verbindung auf und verliert die koordinierte Synchronisation.",
+        "D": "Falsch — Snapshot + Restore ist langsam und liefert einen veralteten Stand; für RPO 0 völlig ungeeignet."
+      },
+      "mnemonic": "Eselsbrücke: **Geplant = Switchover (RPO 0), Notfall = Failover (RPO ≠ 0).**",
+      "examTrap": "Das Begriffspaar **Switchover vs. Failover** ist der Kern: „geplante Umschaltung ohne Datenverlust“ → Switchover. Das Unplanned Failover ist richtig, aber für den Notfall — hier der Köder."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-092",
+    "explanationStructured": {
+      "verdict": "**Aurora Serverless v2 unterstützt seit dem 20.11.2024 das Skalieren auf 0 ACUs.** Bei Inaktivität fallen dann **keine Compute-Kosten** mehr an (Storage läuft weiter), Wiederanlauf typisch unter 15 Sekunden — ideal für eine nur tagsüber genutzte Dev-DB.",
+      "optionAnalysis": {
+        "A": "Falsch — die kleinste Provisioned-Instanz kostet trotzdem **24/7**; ungenutzte Nächte und Wochenenden werden voll berechnet.",
+        "B": "Falsch — Serverless **v1** mit Auto-Pause war jahrelang die Antwort, ist aber **abgekündigt (EOL 31.12.2024)**; die aktuelle Lösung ist v2 mit Scale-to-Zero.",
+        "C": "**Richtig** — Aurora Serverless v2 mit Minimum 0 ACUs: bei Inaktivität nur Storage-Kosten, Sekunden-Resume.",
+        "D": "Falsch für die beste Lösung — eine EventBridge-Stop/Start-Regel funktioniert, ist aber Eigenbau mit fester Zeitlogik; Serverless skaliert bedarfsgetrieben und automatisch."
+      },
+      "mnemonic": "Eselsbrücke: **Dev-DB schläft auf 0 ACU** — Serverless v2, nicht das abgekündigte v1.",
+      "examTrap": "Aktualitätsfalle: **v1 ist EOL, Scale-to-Zero gibt es in v2 seit Nov 2024.** Und: Ein **RDS Proxy verhindert Scale-to-Zero** (hält die DB wach) — ein beliebtes Detail."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-093",
+    "explanationStructured": {
+      "verdict": "**Backtrack spult den Cluster in place zurück** — kein neuer Cluster, kein Restore, die Anwendung muss **nicht umgestellt** werden. Das ist der Geschwindigkeitsvorteil gegenüber PITR. Einschränkungen: nur **Aurora MySQL**, Fenster max **72 Stunden**, vorher aktiviert (hier gegeben).",
+      "optionAnalysis": {
+        "A": "Falsch für „am schnellsten“ — Point-in-Time Recovery **erzeugt einen neuen Cluster** und verlangt eine App-Umstellung; langsamer als das In-Place-Backtrack.",
+        "B": "Falsch — ein manueller Snapshot ist ein separater Cluster-Restore und meist älter als der Fehlerzeitpunkt.",
+        "C": "Falsch — ein Aurora Clone erzeugt ebenfalls einen neuen Cluster; kein schnelles In-Place-Zurückspulen.",
+        "D": "**Richtig** — Aurora Backtrack rollt den bestehenden Cluster in Sekunden auf einen Zeitpunkt vor dem `DELETE` zurück."
+      },
+      "mnemonic": "Eselsbrücke: **Backtrack = Rückspultaste am selben Cluster** — kein Restore, kein Umzug.",
+      "examTrap": "Backtrack ist **Aurora-MySQL-only**, Fenster **72 h**, und **kein Ersatz für Backups**. „Schnellster Weg, in place, ohne App-Umstellung“ → Backtrack; PITR ist der langsamere Restore-Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-094",
+    "explanationStructured": {
+      "verdict": "**RDS Proxy poolt und teilt Datenbankverbindungen** — genau für das Lambda-Problem gebaut: Tausende kurzlebige Aufrufe teilen sich wenige echte DB-Verbindungen. Zweiter Vorteil: Er **reduziert die Aurora-Failover-Zeit um bis zu 66 %**, weil er Client-DNS-Caching umgeht und selbst auf den neuen Writer schwenkt.",
+      "optionAnalysis": {
+        "A": "**Richtig** — RDS Proxy zwischen Lambda und DB: Connection Pooling löst die Verbindungsflut an der Wurzel.",
+        "B": "Falsch für die beste Lösung — Reserved Concurrency **drosselt** die Funktion (weniger Aufrufe), statt das Verbindungsproblem zu lösen; Durchsatz leidet.",
+        "C": "Falsch — eine größere Instanz erhöht nur das Limit und verschiebt das Problem; teuer statt strukturell.",
+        "D": "Falsch — Pooling **innerhalb** einer Lambda-Instanz hilft nicht: Jede der vielen gleichzeitigen Instanzen öffnet weiter eigene Verbindungen."
+      },
+      "mnemonic": "Eselsbrücke: **Lambda + DB-Verbindungsflut → RDS Proxy** — pooled statt gedrosselt.",
+      "examTrap": "**„Größere Instanz“** und „Reserved Concurrency“ sind die Distraktoren (Symptom bzw. Drosselung). Der 66-%-Failover-Bonus ist ein prüfbares Zusatzdetail des RDS Proxy."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-095",
+    "explanationStructured": {
+      "verdict": "Zwei korrekte Multi-AZ-Aussagen: **(A)** Der Standby eines **klassischen** Multi-AZ-Deployments ist **unsichtbar** — kein Read, kein Write bis zur Promotion. **(B)** Nach dem Failover bleibt die Verbindungs-URL gleich; AWS schwenkt den **DNS-CNAME** um.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — klassischer Multi-AZ-Standby bedient **keine** Lesezugriffe; er existiert nur fürs Failover.",
+        "B": "**Richtig (2/2)** — der Endpoint bleibt konstant, der DNS-CNAME zeigt nach dem Schwenk auf die neue Instanz. Niedrige Client-DNS-TTL ist deshalb wichtig.",
+        "C": "Falsch — dreht das Kernmerkmal um: Multi-AZ repliziert **synchron** (Preis: etwas höhere Schreiblatenz), nicht asynchron.",
+        "D": "Falsch — das **Multi-AZ DB Cluster** Deployment gibt es **nur für MySQL und PostgreSQL**, nicht für alle Engines.",
+        "E": "Falsch — eine Read Replica **kann** zu einer eigenständigen DB promoted werden (genau das ist ihr DR-Nutzen)."
+      },
+      "mnemonic": "Eselsbrücke: **Standby liest nie, Endpoint bleibt gleich, Replikation ist synchron.**",
+      "examTrap": "Multi-AZ-Fallen im Bündel: **Standby unlesbar** (nicht read-scaling), **synchron** (nicht asynchron), **DB-Cluster nur MySQL/PostgreSQL**. Der DNS-Schwenk erklärt, warum die Client-TTL zählt."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-096",
+    "explanationStructured": {
+      "verdict": "**Global Tables sind multi-active**: Jede Region ist ein vollwertiger Writer. Frankfurt schreibt lokal, Virginia schreibt lokal — AWS repliziert *typically within a second or less* und löst Konflikte per **Last Writer Wins**. SLA 99,999 %. Genau die Anforderung „beide Regionen lokal lesen UND schreiben“.",
+      "optionAnalysis": {
+        "A": "Falsch, der stärkste Distraktor — die manuelle Streams+Lambda-Replikation ist die **Nachbildung** von Global Tables: funktioniert, aber man baut Konfliktauflösung, Retry und Monitoring selbst.",
+        "B": "**Richtig** — DynamoDB Global Tables mit einem Replikat je Region: aktiv-aktiv, lokale Lese- und Schreiblatenz.",
+        "C": "Falsch — DAX ist ein **Lese-Cache pro Region**, er ermöglicht keine regionsübergreifenden lokalen **Schreibvorgänge**.",
+        "D": "Falsch — Aurora Global Database ist **relational und single-writer** (eine Primary-Region); „beide Regionen lokal schreiben“ kann sie nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Beide Regionen schreiben lokal (NoSQL) = Global Tables** — Aurora Global hat nur einen Writer.",
+      "examTrap": "Signalwort **„in mehreren Regionen gleichzeitig schreiben“** → Global Tables. Aurora Global (single-writer) und die Streams+Lambda-Eigenbaulösung sind die Standard-Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-097",
+    "explanationStructured": {
+      "verdict": "**EFS Regional** repliziert über mehrere AZs und ist aus **allen** AZs mountbar — das einzige native **Multi-AZ-Shared-POSIX-Dateisystem** in AWS. Genau die Anforderung (drei AZs, gemeinsame Dateien, AZ-Ausfall überstehen).",
+      "optionAnalysis": {
+        "A": "Falsch, die klassische Falle — **EBS Multi-Attach ist AZ-gebunden**: Ein Volume lebt in **einer** AZ, Instanzen anderer AZs können es nicht anhängen. Löst „mehrere Instanzen“, nie „mehrere AZs“.",
+        "B": "Falsch, der Kostenfallen-Distraktor — EFS **One Zone** ist günstiger, liegt aber in **einer AZ**; der AZ-Ausfall macht die Daten unerreichbar.",
+        "C": "**Richtig** — EFS im Regional-Modus über alle drei AZs: shared, POSIX, Multi-AZ-resilient.",
+        "D": "Falsch — Mountpoint for S3 bietet **keine vollständige POSIX-Semantik** (u. a. kein In-Place-Random-Write) und ist für „gemeinsam lesend UND schreibend mit POSIX“ ungeeignet."
+      },
+      "mnemonic": "Eselsbrücke: **Shared Files über AZs mit POSIX = EFS Regional** — Multi-Attach bleibt in einer AZ.",
+      "examTrap": "Zwei Fallen: **Multi-Attach ist AZ-gebunden** (nicht Multi-AZ) und **One Zone-IA** opfert genau die geforderte AZ-Resilienz. POSIX + Multi-AZ + shared = nur EFS Regional."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-098",
+    "explanationStructured": {
+      "verdict": "**One Zone-IA speichert in genau einer AZ** und ist dafür **20 % günstiger als Standard-IA**. Der Preis: Zerstört ein Ereignis die AZ, sind die Daten weg. Genau richtig, weil der Aufgabensatz „ließen sich bei Verlust neu erzeugen“ die Multi-AZ-Redundanz überflüssig macht.",
+      "optionAnalysis": {
+        "A": "Falsch für „am günstigsten“ — S3 Standard ist teurer als nötig; die Zwischenergebnisse sind reproduzierbar, also braucht es keine maximale Verfügbarkeit.",
+        "B": "Falsch — Standard-IA (≥ 3 AZs) zahlt für Redundanz, die man bei reproduzierbaren Daten nicht braucht.",
+        "C": "Falsch — Glacier Instant Retrieval ist Archiv-Storage mit Abrufgebühren; für **mehrfach im Job gelesene** Zwischenergebnisse unpassend und teuer im Zugriff.",
+        "D": "**Richtig** — One Zone-IA: billigste passende Wahl für reproduzierbare, häufig gelesene Zwischendaten."
+      },
+      "mnemonic": "Eselsbrücke: **Reproduzierbar = One Zone-IA reicht** — den AZ-Verlust rechnet man neu, statt ihn zu bezahlen.",
+      "examTrap": "Der Schaltbegriff ist **„bei Verlust neu erzeugbar“**. Fehlt er, wäre One Zone-IA die Falle (eine AZ = Datenverlustrisiko). Mit ihm ist es die kosteneffiziente richtige Antwort."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-099",
+    "explanationStructured": {
+      "verdict": "**Multi-AZ mit Automatic Failover** promotet bei einem AZ-Ausfall automatisch eine Replica in einer anderen AZ zum Primary. Der **Endpoint bleibt gleich** — keine Codeänderung. Ohne Replica gibt es nichts zu promoten.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Multi-AZ + Automatic Failover mit Replica in zweiter AZ: automatischer Schwenk, konstanter Endpoint, kein Session-Verlust.",
+        "B": "Falsch — ein zweiter Cluster mit Code-Umschaltung ist manueller Eigenbau statt des eingebauten Failovers.",
+        "C": "Falsch — DynamoDB-Spiegelung ist ein aufwendiger Umbau, der das eigentliche Cache-HA-Problem nicht sauber löst.",
+        "D": "Falsch, der raffinierteste Distraktor — **Cluster Mode ist Sharding (Skalierung), nicht HA**: Es verteilt Daten auf Shards, ersetzt aber keinen ausgefallenen Knoten automatisch."
+      },
+      "mnemonic": "Eselsbrücke: **Cache-HA = Multi-AZ + Auto-Failover** — Cluster Mode ist Skalierung, keine Verfügbarkeit.",
+      "examTrap": "Die Cluster-Mode-Verwechslung ist der Kern: **Sharding ≠ Hochverfügbarkeit.** „AZ-Ausfall überstehen, ohne Ausloggen“ → Multi-AZ mit Automatic Failover und Replica."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-100",
+    "explanationStructured": {
+      "verdict": "**Replication Time Control (RTC)** ist die **einzige** Option mit echtem **SLA**: AWS sichert vertraglich zu, dass **99,9 % der Objekte innerhalb von 15 Minuten** repliziert sind, plus Metriken und Benachrichtigungen bei Überschreitung. Genau die Compliance-Vorgabe.",
+      "optionAnalysis": {
+        "A": "Falsch, der entscheidende Distraktor — Standard-CRR repliziert zuverlässig, aber **best effort ohne Zeitgarantie**; die 15-Minuten-Zusage fehlt.",
+        "B": "**Richtig** — CRR **mit RTC**: vertragliche 15-Minuten-SLA plus Replikations-Metriken.",
+        "C": "Falsch — Same-Region Replication erfüllt die **zweite Region** nicht; die Vorgabe verlangt Cross-Region.",
+        "D": "Falsch — eine EventBridge+Lambda-Kopie ist Eigenbau ohne SLA, mit eigener Fehler- und Retry-Last."
+      },
+      "mnemonic": "Eselsbrücke: **Nur RTC verspricht die 15 Minuten** — Standard-CRR ist schnell, aber ohne Garantie.",
+      "examTrap": "**„Zugesicherte Replikationszeit / SLA / innerhalb X Minuten“** → RTC, immer. Standard-CRR (best effort) ist der Köder — es ist meist schnell, garantiert aber nichts."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-101",
+    "explanationStructured": {
+      "verdict": "**DynamoDB PITR** erlaubt sekundengenaue Wiederherstellung bis **35 Tage** zurück (frühestens 5 min vor jetzt) — hier aktiviert, der Zeitpunkt vor dem Batch-Job ist exakt treffbar. Wichtig: Der Restore erzeugt immer eine **NEUE Tabelle**; die App muss umgestellt werden.",
+      "optionAnalysis": {
+        "A": "Falsch für die sauberste Lösung — Streams+Lambda-Rückschreiben ist fehleranfällig und deckt nur 24 h Stream-Retention ab; PITR trifft den Zeitpunkt exakt.",
+        "B": "Falsch — das letzte On-Demand-Backup ist meist älter als „vor drei Stunden“ und nicht sekundengenau.",
+        "C": "**Richtig** — PITR auf einen Zeitpunkt unmittelbar vor dem Batch-Job: präzise, in eine neue Tabelle.",
+        "D": "Falsch, der wichtigste Distraktor — **Global Tables sind KEIN Backup**: Sie replizieren die fehlerhaften Writes brav in die zweite Region."
+      },
+      "mnemonic": "Eselsbrücke: **Punktgenau zurück = PITR (35 Tage)** — Global Tables replizieren den Fehler mit.",
+      "examTrap": "Zwei Kernpunkte: **Global Tables ≠ Backup** (replizieren auch Fehler) und **PITR erzeugt eine neue Tabelle** (Cutover planen). „Vor X Stunden, sekundengenau“ → PITR."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-102",
+    "explanationStructured": {
+      "verdict": "**AWS Backup** ist der zentrale, dienstübergreifende Dienst: **Backup Plans** (Zeitplan, Retention, Lifecycle), **Vaults**, **Cross-Region- und Cross-Account-Kopien** und über AWS Organizations **organisationsweite Backup Policies**, die automatisch in allen (auch neuen) Accounts greifen. Deckt EC2/EBS, RDS, Aurora, DynamoDB, EFS, FSx u. a.",
+      "optionAnalysis": {
+        "A": "Falsch, der beste falsche Kandidat — der **Data Lifecycle Manager deckt nur EBS-Snapshots und AMIs** ab, nicht RDS/EFS/DynamoDB und nicht org-weit.",
+        "B": "Falsch — StackSet + Backup-Lambdas ist Eigenbau statt des nativen zentralen Dienstes.",
+        "C": "Falsch — RDS-Automated-Backups + eigene Skripte je Account ist genau die dezentrale Bastelei, die die Aufgabe vermeiden will.",
+        "D": "**Richtig** — AWS Backup mit org-weiten Backup Policies: zentral, dienstübergreifend, cross-account/-region."
+      },
+      "mnemonic": "Eselsbrücke: **Service-übergreifend + org-weit = AWS Backup** — DLM kann nur EBS.",
+      "examTrap": "Die DLM-Falle: **nur EBS/AMI**, kein RDS/EFS/DynamoDB, nicht organisationsweit. „Viele Accounts, viele Dienste, zentral“ → AWS Backup mit Organizations-Policies."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-103",
+    "explanationStructured": {
+      "verdict": "**Sticky Sessions sind ein Anti-Pattern in elastischen Architekturen** — sie binden Nutzer an eine **flüchtige** Instanz. Das Problem ist der **State auf der Instanz**. Lösung: **Statelessness** — Session-Daten in einen externen Store (**ElastiCache** oder **DynamoDB**) auslagern (Well-Architected Reliability Pillar).",
+      "optionAnalysis": {
+        "A": "**Richtig** — Session-State nach ElastiCache/DynamoDB auslagern: jede Instanz wird austauschbar, Scale-In verliert nichts.",
+        "B": "Falsch — ein hoher Deregistration Delay lässt laufende Requests ausatmen, rettet aber die **auf der Instanz liegende** Session beim Terminieren nicht.",
+        "C": "Falsch — Scale-In zu unterbinden opfert die Elastizität und ist ein Workaround, kein Fix.",
+        "D": "Falsch — Source-IP-Affinität am NLB ist nur eine andere Form von Stickiness; das State-Problem bleibt."
+      },
+      "mnemonic": "Eselsbrücke: **State raus aus der Instanz** — dann darf Scale-In jede Instanz wegwerfen.",
+      "examTrap": "„Beste/dauerhafte Lösung“ bei Session-Verlust → **stateless machen**. Alle Stickiness-Varianten (Cookie, Source-IP) und Deregistration-Tricks sind Distraktoren, die den State auf der Instanz lassen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-104",
+    "explanationStructured": {
+      "verdict": "**Failover Routing (Active/Passive) plus Health Check** ist das Muster: Route 53 liefert den Primary-Record, solange der Health Check grün ist; schlägt er fehl, kommt der Secondary. Der Health Check ist der **Motor**, nicht optional.",
+      "optionAnalysis": {
+        "A": "Falsch — Weighted 100/0 kennt **kein Aktiv/Passiv-Verhältnis**; ohne Health Check schaltet nichts automatisch um.",
+        "B": "**Richtig** — Failover Routing mit Health Check auf die Primärregion: automatischer Schwenk auf DR bei Ausfall.",
+        "C": "Falsch — Latency-based Routing optimiert Performance, nicht DR-Failover; es kann sogar an die tote Region routen, wenn deren Latenz gemessen niedrig war.",
+        "D": "Falsch — Multivalue Answer streut über gesunde Endpunkte, modelliert aber kein Primary/Secondary-Failover."
+      },
+      "mnemonic": "Eselsbrücke: **Aktiv/Passiv-DR = Failover Routing + Health Check** — der Check ist der Motor.",
+      "examTrap": "Ohne Health Check kein Failover — das ist der Prüfpunkt. Bei ELB-Alias-Zielen empfiehlt AWS **Evaluate Target Health = Yes** statt eines separaten Checks (siehe q-136)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-105",
+    "explanationStructured": {
+      "verdict": "**Ein CNAME am Zone Apex ist durch die DNS-Spezifikation verboten** (der Apex trägt bereits SOA/NS; ein CNAME duldet keine Geschwister). Route 53 löst das mit dem **Alias-Record**: nach außen wie ein A-Record, intern auf eine AWS-Ressource (ALB, CloudFront, S3-Website, API Gateway), Abfragen kostenlos.",
+      "optionAnalysis": {
+        "A": "Falsch — ein CNAME am Apex ist per DNS-Standard **unzulässig**.",
+        "B": "Falsch — ein ALB hat **keine feste IP**; ein statischer A-Record zeigt bald ins Leere.",
+        "C": "**Richtig** — Route 53 Alias-Record am Apex direkt auf den ALB: standardkonform, kostenlos, folgt der wechselnden ALB-IP.",
+        "D": "Falsch — ein Redirect-Server ist unnötige Infrastruktur und löst das Apex-Problem nicht sauber."
+      },
+      "mnemonic": "Eselsbrücke: **Nackte Domain auf AWS-Ziel = Alias** — CNAME verbietet der Apex.",
+      "examTrap": "**„Zone Apex / nackte Domain + AWS-Ressource“** → Alias. CNAME-am-Apex und statischer A-Record auf den ALB sind die zwei klassischen Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-106",
+    "explanationStructured": {
+      "verdict": "Beim NLB ist **Cross-Zone Load Balancing standardmäßig deaktiviert**: Jeder zonale Knoten bekommt ~1/3 des Traffics und verteilt nur an Ziele **seiner** AZ — vier Instanzen tragen so dieselbe Last wie zwölf. **Cross-Zone aktivieren** hebt die Trennung auf; der Preis sind Inter-AZ-Transferkosten (beim NLB in beide Richtungen).",
+      "optionAnalysis": {
+        "A": "Falsch — feste gleiche Instanzzahl je AZ opfert die Elastizität und muss bei jeder Kapazitätsänderung nachgezogen werden.",
+        "B": "Falsch für die minimale Änderung — ein ALB-Wechsel (dort Cross-Zone immer an) ist ein größerer Umbau als die vorhandene NLB-Einstellung zu ändern.",
+        "C": "**Richtig** — Cross-Zone am NLB aktivieren; ungleiche AZ-Verteilung wird ausgeglichen, Inter-AZ-Kosten in Kauf genommen.",
+        "D": "Falsch — Route-53-Weighted auf zonale DNS-Namen ist fragile Handarbeit und kein sauberer Lastausgleich."
+      },
+      "mnemonic": "Eselsbrücke: **NLB verteilt zonal — Cross-Zone macht alle AZs gleich.**",
+      "examTrap": "Default-Asymmetrie: **ALB Cross-Zone an (gratis), NLB aus (kostet)**. Ungleiche Last trotz gesunder Ziele → Cross-Zone am NLB aktivieren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-107",
+    "explanationStructured": {
+      "verdict": "Bei der Deregistrierung stoppt der ALB **neue** Requests ans Ziel und lässt bestehende nur noch für die Dauer der **Deregistration Delay** laufen — danach hart geschlossen. 30 s trifft jeden längeren Upload. **Wert wieder über die längste Verarbeitungsdauer** setzen (Default 300, Max 3.600).",
+      "optionAnalysis": {
+        "A": "**Richtig** — Deregistration Delay über die längste Requestdauer anheben: laufende Uploads dürfen sauber zu Ende laufen.",
+        "B": "Falsch — Sticky Sessions helfen nicht: Die Instanz **verschwindet**, egal worauf das Cookie zeigt.",
+        "C": "Falsch — ein kürzeres Health-Check-Intervall erkennt Ausfälle früher, rettet aber keine gekappte laufende Verbindung.",
+        "D": "Falsch — ein Terminating:Wait-Hook pausiert die **Instanz-Terminierung**, nicht das Kappen am Load Balancer; die falsche Ebene."
+      },
+      "mnemonic": "Eselsbrücke: **Zu kurzer Deregistration Delay kappt laufende Requests** — Wert über die längste Dauer setzen.",
+      "examTrap": "Prüfbare Zahlen: **Default 300 s, Max 3.600 s.** Abgebrochene Requests beim Scale-In/Deploy → Deregistration Delay, nicht Sticky Sessions oder Lifecycle Hook (andere Ebene)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-108",
+    "explanationStructured": {
+      "verdict": "Der **NLB** arbeitet auf **Layer 4**, verkraftet Millionen Verbindungen bei niedrigster Latenz und ist der **einzige ELB, dem sich je AZ eine Elastic IP zuweisen lässt** — genau, was die Firewall-Freigabe der Partnerbanken (proprietäres TCP, feste IP) braucht.",
+      "optionAnalysis": {
+        "A": "Falsch — ein ALB hat **keine feste IP**; ein Alias-Record ändert das nicht, und L7 versteht kein proprietäres TCP.",
+        "B": "Falsch — Global Accelerator liefert statische Anycast-IPs, aber der **ALB dahinter spricht nur HTTP/HTTPS** und kann das proprietäre TCP-Protokoll nicht bedienen.",
+        "C": "Falsch — ein GWLB ist für **Security-Appliance-Einschleifung** (GENEVE), kein allgemeiner L4-Endpunkt für Partner-TCP mit fester IP.",
+        "D": "**Richtig** — NLB mit je einer Elastic IP pro AZ: L4, feste IPs zum Whitelisten, proprietäres TCP."
+      },
+      "mnemonic": "Eselsbrücke: **Proprietäres TCP + feste IP = NLB mit Elastic IPs.**",
+      "examTrap": "Der ALB ist chancenlos (keine feste IP, nur HTTP). **Global Accelerator** liefert statische IPs, aber ein ALB-Origin bleibt HTTP-only — die Kombination ist der clevere Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-109",
+    "explanationStructured": {
+      "verdict": "Warenkorb im lokalen RAM + Stickiness ist das Anti-Pattern: Fällt die Instanz, ist der Korb weg. Lösung: **Session-State nach ElastiCache** auslagern und die Instanzen **zustandslos** betreiben (Reliability Pillar). Danach ist jede Instanz austauschbar.",
+      "optionAnalysis": {
+        "A": "Falsch — Scale-In-Protection kostet die Elastizität, die die ASG haben soll, und löst den State-auf-Instanz nicht.",
+        "B": "**Richtig** — State nach ElastiCache, Instanzen stateless: Instanzverlust kostet keinen Warenkorb mehr.",
+        "C": "Falsch — ein längeres Stickiness-Cookie verlängert nur die Bindung; beim Instanzausfall ist die Session trotzdem verloren.",
+        "D": "Falsch — Deregistration Delay lässt Verbindungen auslaufen, rettet aber den lokal gehaltenen State nicht."
+      },
+      "mnemonic": "Eselsbrücke: **Warenkorb gehört in ElastiCache, nicht in den Instanz-RAM.**",
+      "examTrap": "Wieder das Stateless-Prinzip: Alle Stickiness-/Protection-/Delay-Optionen behandeln Symptome. **„Beste Lösung“** = State auslagern, Instanzen austauschbar machen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-110",
+    "explanationStructured": {
+      "verdict": "Ein Health-Check, der eine **gemeinsame Abhängigkeit** mitprüft, verwandelt jede DB-Störung in einen **Totalausfall**: Alle Ziele fallen gleichzeitig durch, der LB nimmt sie raus, die ASG ersetzt eine gesunde Flotte. Lösung: **Health-Check auf lokale Prozessgesundheit** umstellen; die DB separat per CloudWatch-Alarm überwachen.",
+      "optionAnalysis": {
+        "A": "Falsch — eine längere Grace Period hilft nur beim **Start**, nicht gegen den laufenden Kaskadenausfall über die geteilte DB.",
+        "B": "Falsch — ein höherer Unhealthy Threshold verzögert nur; bei anhaltender DB-Störung fällt am Ende trotzdem die ganze Flotte durch.",
+        "C": "**Richtig** — Health-Check auf reine Prozessgesundheit trennt die Belange; die DB überwacht ein CloudWatch-Alarm getrennt.",
+        "D": "Falsch — Health-Check-Typ auf EC2 zurückstellen blendet echte App-Ausfälle aus (Instanz „gesund“ trotz toter App) und ist die falsche Richtung."
+      },
+      "mnemonic": "Eselsbrücke: **Health-Check prüft DICH, nicht deine Datenbank** — sonst reißt die DB die ganze Flotte mit.",
+      "examTrap": "Deep Health Checks über geteilte Abhängigkeiten sind das Anti-Pattern: Sie erzeugen korrelierte Ausfälle. Trenne **Liveness (lokal)** von **Dependency-Monitoring (CloudWatch)**."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-111",
+    "explanationStructured": {
+      "verdict": "**Global Accelerator** gibt zwei **statische Anycast-IPs**, die sich nie ändern; das Umschalten passiert im **AWS-Backbone** hinter diesen IPs — die Geräte müssen nichts neu auflösen, ihr DNS-Cache ist irrelevant. Genau richtig für Firmware, die DNS nicht neu auflöst.",
+      "optionAnalysis": {
+        "A": "**Richtig** — GA mit zwei statischen Anycast-IPs und je einer Endpoint-Group pro Region: Cross-Region-Failover ohne DNS-Abhängigkeit.",
+        "B": "Falsch — Route-53-Failover wirkt **erst beim Neu-Auflösen**; genau das tut die IoT-Firmware nicht (fester DNS-Cache).",
+        "C": "Falsch — Target Groups/NLB-Ziele sind **regional**; ein NLB kann keine Ziele einer anderen Region über Peering bedienen.",
+        "D": "Falsch — CloudFront ist für **HTTP-Content**, nicht für persistente TCP-Verbindungen einer IoT-Flotte."
+      },
+      "mnemonic": "Eselsbrücke: **Feste IPs, Failover im Backbone = Global Accelerator** — DNS-Cache der Geräte egal.",
+      "examTrap": "Signalwort **„Clients lösen DNS nicht neu auf“** disqualifiziert Route-53-Failover und zeigt auf GA (statische IPs, Backbone-Failover). NLB-Ziele sind regional — ein häufiger Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-112",
+    "explanationStructured": {
+      "verdict": "Zwei richtige Fixe: **(A)** Health-Check-Typ der ASG von **EC2 auf ELB** — beim Typ EC2 gilt eine laufende Instanz mit **toter App** als gesund und wird nicht ersetzt; erst ELB übernimmt das LB-Urteil. **(B)** **Deregistration Delay** über die längste Requestdauer, damit abgebrochene Requests beim Scale-In vermieden werden.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — Health-Check-Typ ELB: Die ASG ersetzt Instanzen, deren **Anwendung** (nicht nur das OS) ausgefallen ist.",
+        "B": "**Richtig (2/2)** — Deregistration Delay über die längste Dauer: laufende Requests dürfen beim Deregistrieren zu Ende laufen.",
+        "C": "Falsch — Cross-Zone ist beim **ALB ohnehin immer aktiv**; hier wirkungslos.",
+        "D": "Falsch — eine höhere Grace Period betrifft nur die **Startphase**, nicht die beiden genannten Probleme.",
+        "E": "Falsch — Sticky Sessions lösen weder die Health-Check-Blindheit noch das Request-Kappen; sie bringen eher neue State-Probleme."
+      },
+      "mnemonic": "Eselsbrücke: **Health-Check ELB erkennt tote Apps, Deregistration Delay rettet laufende Requests.**",
+      "examTrap": "Der EC2-Health-Check-Typ ist die Falle: Er sieht nur „Instanz läuft“, nicht „App antwortet“. Für App-Level-Ersetzung braucht die ASG **Health-Check-Typ ELB**."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-113",
+    "explanationStructured": {
+      "verdict": "Der **Gateway Load Balancer** ist genau dafür gebaut: Er kapselt den Traffic in **GENEVE**, verteilt ihn über eine skalierbare, health-gecheckte **Third-Party-Appliance-Flotte** und hält die **Flow-Symmetrie** (Hin- und Rückweg auf derselben Appliance). Einstieg über **GWLB-Endpoints** als Routen-Ziel.",
+      "optionAnalysis": {
+        "A": "Falsch — ein NLB vor der Appliance-Flotte war das Vor-GWLB-Muster, verlangt SNAT/aufwendiges Routing und **garantiert die Flow-Symmetrie nicht**.",
+        "B": "**Richtig** — GWLB mit GWLB-Endpoint je AZ: GENEVE-Kapselung, skalierbare Appliance-Flotte, symmetrische Flows.",
+        "C": "Falsch — AWS Network Firewall ist ein **AWS-eigener** Filter (Suricata), nicht der Weg, eine **lizenzierte Drittanbieter-Appliance** einzuschleifen.",
+        "D": "Falsch — eine Route auf die ENI **einer** Appliance-Instanz ist ein SPOF ohne Skalierung, Health Checks oder Symmetrie."
+      },
+      "mnemonic": "Eselsbrücke: **Third-Party-Appliance transparent einschleifen = Gateway Load Balancer (GENEVE).**",
+      "examTrap": "**„Lizenzierte Drittanbieter-Firewall einschleifen, Traffic-Symmetrie“** → GWLB. Network Firewall (AWS-eigen) und NLB-vor-Appliance (keine Symmetrie) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-114",
+    "explanationStructured": {
+      "verdict": "Die **Health-Check-Grace-Period** (Default **300 s**) ist der Zeitraum nach dem Start, in dem die ASG das Health-Check-Ergebnis **ignoriert**. Ist sie kürzer als der 8-minütige Bootstrap, wird jede Instanz getötet, bevor sie fertig ist — die Startschleife. **Grace Period über die Bootstrap-Dauer** heben.",
+      "optionAnalysis": {
+        "A": "Falsch — Deregistration Delay betrifft das **Abmelden**, nicht das Starten.",
+        "B": "Falsch — ein höherer Unhealthy Threshold + längeres Intervall verzögert nur und stumpft dauerhaft die Fehlererkennung ab.",
+        "C": "Falsch — der Cooldown steuert **Scaling-Abstände**, nicht die Schonfrist einer bootenden Instanz.",
+        "D": "**Richtig** — Health-Check-Grace-Period über die 8 Minuten Bootstrap: die Instanz wird nicht vorzeitig als unhealthy ersetzt."
+      },
+      "mnemonic": "Eselsbrücke: **Lange Bootzeit → Grace Period verlängern** — sonst tötet die ASG die Instanz beim Aufwärmen.",
+      "examTrap": "**„Instanzen sterben kurz nach dem Start / Startschleife“** → Grace Period (Default 300 s). Cooldown (Scaling-Abstände) und Deregistration Delay (Abmelden) sind die falschen Regler."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-115",
+    "explanationStructured": {
+      "verdict": "Der **Cooldown** ist eine Eigenheit von **Simple Scaling**: Nach jeder Aktivität blockiert er weitere Skalierungen — auch bei weiter steigender Last. **Target Tracking** kennt keinen Cooldown; es nutzt den **Instance Warmup**, rechnet startende Instanzen bereits in die Metrik ein und darf währenddessen weiter skalieren.",
+      "optionAnalysis": {
+        "A": "Falsch — kürzerer Cooldown + größere Schrittweite ist ein Notbehelf, der überschießt und weiter hinterherläuft.",
+        "B": "Falsch — Predictive Scaling hilft bei **wiederkehrenden** Mustern, nicht beim strukturellen Cooldown-Problem plötzlicher Spitzen.",
+        "C": "**Richtig** — auf Target Tracking mit Instance Warmup umstellen: kein blockierender Cooldown, kontinuierliches Nachskalieren.",
+        "D": "Falsch — Scheduled Scaling setzt bekannte Zeiten voraus; ungeplante Lastanstiege deckt es nicht ab."
+      },
+      "mnemonic": "Eselsbrücke: **Cooldown blockiert (Simple), Warmup skaliert weiter (Target Tracking).**",
+      "examTrap": "AWS empfiehlt heute Target Tracking / Step Scaling statt Simple Scaling. „Skaliert nicht weiter, obwohl Last steigt“ bei Simple Scaling → auf Target Tracking mit **DefaultInstanceWarmup** umstellen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-116",
+    "explanationStructured": {
+      "verdict": "AWS dokumentiert für Queue-Worker genau dieses Muster: **`ApproximateNumberOfMessagesVisible` geteilt durch InService-Instanzen** = Rückstand pro Instanz. Diese **Rate** skaliert mit der Flottengröße — Voraussetzung, damit Target Tracking sinnvoll arbeitet. CPU ist bei I/O-gebundenen Workern nutzlos.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Target Tracking auf die Custom-Metrik „Backlog pro Instance“: die richtige, flottengrößen-normierte Steuergröße.",
+        "B": "Falsch für die beste Wahl — Step Scaling auf `ApproximateAgeOfOldestMessage` mit **absoluten** Schwellen muss bei jeder Kapazitätsänderung nachgezogen werden; die Rate-Metrik ist robuster.",
+        "C": "Falsch — Scheduled Scaling deckt nur bekannte Spitzenzeiten ab, nicht die tatsächliche Queue-Tiefe.",
+        "D": "Falsch — Netzwerk-I/O ist ein indirekter Proxy; die Queue-Tiefe pro Instanz ist das direkte Maß der offenen Arbeit."
+      },
+      "mnemonic": "Eselsbrücke: **Queue-Worker skalieren auf Backlog pro Instance, nie auf CPU.**",
+      "examTrap": "I/O-gebundene Worker + niedrige CPU → **Custom Metric Queue-Tiefe/Instances** mit Target Tracking. CPU-basiertes Scaling ist der Standard-Distraktor bei Queue-Consumern."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-117",
+    "explanationStructured": {
+      "verdict": "Ein **Lifecycle Hook vom Typ Terminating:Wait** pausiert die Terminierung: Die Instanz geht in `Terminating:Wait`, der Worker beendet den laufenden Auftrag und meldet `CompleteLifecycleAction` — erst dann wird terminiert. Genau dafür ist der Hook da (Aufträge bis 10 min).",
+      "optionAnalysis": {
+        "A": "Falsch — Scale-In-Protection schaltet Scale-In faktisch ab und macht die Gruppe unelastisch.",
+        "B": "**Richtig** — Terminating:Wait-Hook: laufender Auftrag wird sauber beendet, dann `CompleteLifecycleAction`, dann Terminierung.",
+        "C": "Falsch — die Termination Policy bestimmt nur, **welche** Instanz es trifft, nicht **wann** sie sterben darf.",
+        "D": "Falsch — ein langer Visibility Timeout kuriert das Symptom in die falsche Richtung (Nachricht bleibt länger unsichtbar), rettet aber den abgebrochenen Auftrag nicht sauber."
+      },
+      "mnemonic": "Eselsbrücke: **Auftrag zu Ende arbeiten vor dem Terminieren = Lifecycle Hook (Terminating:Wait).**",
+      "examTrap": "**„Scale-In bricht laufende Verarbeitung ab“** → Lifecycle Hook. Scale-In-Protection (unelastisch) und Termination Policy (nur welche, nicht wann) sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-118",
+    "explanationStructured": {
+      "verdict": "**Launch Configurations sind abgekündigt** und bekommen keine neuen Funktionen. **Mixed Instances, Instance Refresh und Warm Pools setzen alle ein Launch Template voraus.** Der Weg: **Launch Configuration in ein Launch Template überführen** und der Gruppe eine Mixed-Instances-Policy geben (Konsole bietet die Migration direkt an).",
+      "optionAnalysis": {
+        "A": "Falsch — eine Launch **Configuration** kennt **weder Mixed-Instances-Policy noch Instance Refresh**; die Erweiterung ist unmöglich.",
+        "B": "Falsch — zwei ASGs an einer Target Group war die alte Umgehung, verdoppelt aber Verwaltung und ist nicht der vorgesehene Weg.",
+        "C": "Falsch — eine kopierte Launch Configuration bleibt eine Launch Configuration; Spot-Mix über eine Instanztyp-Liste kann sie nicht.",
+        "D": "**Richtig** — auf Launch Template überführen und Mixed-Instances-Policy setzen: der native, unterstützte Weg."
+      },
+      "mnemonic": "Eselsbrücke: **Alles Moderne braucht Launch Templates** — Launch Configurations sind Vergangenheit.",
+      "examTrap": "Launch Configurations sind EOL. Mixed Instances / Instance Refresh / Warm Pools → **immer Launch Template**. „Launch Configuration erweitern“ ist per Definition falsch."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-119",
+    "explanationStructured": {
+      "verdict": "Ein **Warm Pool** hält bereits initialisierte Instanzen im Zustand **Stopped** (oder Hibernated) vor: Bei Scale-Out werden sie nur noch **gestartet** statt neu gebootet — die 12 min Bootstrap entfallen, und im Zustand Stopped fallen **keine Instanzstunden** an.",
+      "optionAnalysis": {
+        "A": "Falsch für die beste Wahl — Mindestkapazität dauerhaft auf Spitzenlast ist sicher, aber **teuerste** Variante (voll laufende Idle-Kapazität).",
+        "B": "Falsch — Predictive Scaling braucht **wiederkehrende** Muster; unvorhersehbare Spitzen kann es nicht vorwegnehmen.",
+        "C": "**Richtig** — Warm Pool mit vorinitialisierten, gestoppten Instanzen: sofortiger Scale-out ohne Bootstrap, günstig (Stopped).",
+        "D": "Falsch — vorgehaltene Stopped-Instanzen per Lambda/Alarm zu starten ist ein **selbstgebauter Warm Pool**; der native Mechanismus ist einfacher und integriert."
+      },
+      "mnemonic": "Eselsbrücke: **Lange Bootzeit + Spitzen → Warm Pool** — vorgewärmt, gestoppt, sofort startbar.",
+      "examTrap": "**„12 min Aufwärmzeit, schneller Scale-out, kostengünstig“** → Warm Pool. Predictive Scaling (nur Muster) und die Lambda-Eigenbaulösung sind die Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-120",
+    "explanationStructured": {
+      "verdict": "**Instance Refresh** ersetzt die Instanzen einer Gruppe batchweise, wartet auf gesunde Ziele und respektiert die **Minimum Healthy Percentage** — die Kapazität fällt nie unter die Schwelle. **Checkpoints** erlauben Anhalten und Rollback. Genau der sichere, native Weg für AMI-Rollouts.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Instance Refresh mit Minimum Healthy Percentage + Checkpoints je Batch: kontrolliert, ohne Kapazitätseinbruch, mit Rollback.",
+        "B": "Falsch — Kapazität verdoppeln und alte terminieren ist manuelles Blue/Green: verdoppelt Kosten, komplett Handarbeit.",
+        "C": "Falsch — zweite ASG + Route-53-Umschaltung erlaubt zwar Canary, hängt aber an DNS-Umschaltung und mehr Betriebsaufwand.",
+        "D": "Falsch — eine Termination Policy steuert nur, welche Instanz zuerst geht, nicht den kontrollierten, gesundheitsgeprüften Rollout."
+      },
+      "mnemonic": "Eselsbrücke: **AMI-Rollout ohne Handarbeit = Instance Refresh (Min Healthy % + Checkpoints).**",
+      "examTrap": "Manuelles Ein-für-Ein-Ersetzen ist der Anti-Pattern-Ausgangspunkt. Für rollierende, gesundheitsgeprüfte Updates mit Rollback → **Instance Refresh**; die Blue/Green- und Route-53-Optionen sind teurere Handarbeit."
+    }
+  }
+]

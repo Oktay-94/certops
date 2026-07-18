@@ -1,0 +1,426 @@
+[
+  {
+    "seedKey": "saa-c03-q-061",
+    "explanationStructured": {
+      "verdict": "**Session Manager** erfüllt alle vier Anforderungen auf einen Schlag: **kein Inbound-Port** (der SSM-Agent baut die Verbindung **ausgehend** auf), **kein Bastion**, **kein SSH-Client** (Browser oder CLI genügen), **kein SSH-Key**. Zugriffskontrolle über **IAM**, jede Sitzung in **CloudTrail**, das komplette Protokoll nach **S3 oder CloudWatch Logs**.",
+      "optionAnalysis": {
+        "A": "Falsch — ein Bastion Host verletzt sofort zwei Anforderungen: Er **öffnet einen Inbound-Port** und braucht **SSH-Keys**. Genau das soll wegfallen.",
+        "B": "**Richtig** — Session Manager: ausgehende Verbindung, IAM-Zugriff, Session-Logging nach S3, null offene Ports.",
+        "C": "Falsch — Instanzen in ein öffentliches Subnet zu schieben, macht sie **exponierter**, nicht sicherer, und öffnet weiterhin einen Port für den Zugang.",
+        "D": "Falsch — Site-to-Site VPN baut zwar einen privaten Pfad, aber der Zugang läuft **weiter über SSH mit Key und offenem Port** auf der Instanz. Die Kernanforderungen bleiben verletzt."
+      },
+      "mnemonic": "Eselsbrücke: **Session Manager = Fernzugriff ohne Tür** — der Agent ruft raus, niemand klopft rein.",
+      "examTrap": "Signalwortkette **„kein Bastion + kein offener Port + kein SSH-Key“** → Session Manager, immer. VPN- und Bastion-Optionen klingen sicher, lassen aber Port oder Key bestehen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-062",
+    "explanationStructured": {
+      "verdict": "Zwei harte Endpoint-Fakten: **(A)** Gateway Endpoints gibt es **ausschließlich für S3 und DynamoDB** — und sie sind **kostenlos**. **(B)** Interface Endpoints sind **ENIs mit privater IP** und tragen daher **Security Groups**; Gateway Endpoints sind reine **Route-Table-Einträge** (Prefix List) und haben nichts, woran eine SG hängen könnte.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — Gateway Endpoints: nur S3 + DynamoDB, kostenlos. Die zwei Kern-Eigenschaften in einem Satz.",
+        "B": "**Richtig (2/2)** — Interface Endpoint = ENI mit SG; Gateway Endpoint = Routing-Eintrag ohne SG. Die Architektur erklärt den Unterschied.",
+        "C": "Falsch — die zentrale Falle: Gateway Endpoints sind von **on-prem, VPN, Peering und Transit Gateway grundsätzlich nicht erreichbar**. Für hybriden Zugriff braucht es Interface Endpoints (PrivateLink).",
+        "D": "Falsch — die Mechanik ist vertauscht: Der **Route-Table-Eintrag gehört zum Gateway** Endpoint. Interface Endpoints werden über ihre **private IP / DNS** angesprochen, nicht per Route.",
+        "E": "Falsch — nur Gateway Endpoints sind kostenlos; **Interface Endpoints kosten pro ENI-Stunde und GB**, auch bei Traffic innerhalb der Region."
+      },
+      "mnemonic": "Eselsbrücke: **Gateway = Gratis-Route für S3/DynamoDB, Interface = ENI mit SG für alles andere.**",
+      "examTrap": "Die on-prem-Erreichbarkeit ist der Dauer-Distraktor: **Gateway Endpoints erreicht man NIE von außerhalb der VPC** — hybride Szenarien verlangen zwingend Interface Endpoints."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-063",
+    "explanationStructured": {
+      "verdict": "**Security Groups kennen keine Deny-Regeln — ausschließlich Allow.** Ein explizites Blockieren ist dort strukturell unmöglich. **NACLs** dagegen kennen **Allow und Deny**, wirken auf **Subnet-Ebene** (also automatisch für alle aktuellen und künftigen Instanzen) und arbeiten auf **Layer 3/4** — unabhängig vom Protokoll.",
+      "optionAnalysis": {
+        "A": "Falsch — Security Groups haben **keine Deny-Regeln**; man kann eine IP dort nicht blockieren, nur Ports/Quellen erlauben.",
+        "B": "Falsch — die WAF-IP-Set-Regel blockiert nur **HTTP-Traffic hinter ALB/CloudFront**, nicht den gesamten Subnet-Verkehr auf L3/4.",
+        "C": "**Richtig** — Deny-Regel in der Network ACL: subnetweit, protokollunabhängig, greift automatisch für alle Instanzen des Subnets.",
+        "D": "Falsch — eine Prefix List ist eine **Adressliste zur Verwendung** in Regeln, kein Blockier-Mechanismus. Ohne eine Deny-fähige NACL bewirkt sie nichts."
+      },
+      "mnemonic": "Eselsbrücke: **SG sagt nur Ja, NACL kann auch Nein** — Blockieren geht nur eine Ebene höher.",
+      "examTrap": "Die Allow-only-Natur der Security Groups ist Kern-Prüfstoff. „Eine bestimmte IP subnetweit blockieren“ → **immer NACL** (stateless, Layer 3/4). WAF ist der HTTP-only-Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-064",
+    "explanationStructured": {
+      "verdict": "**VPC Flow Logs haben eine dokumentierte Ausschlussliste.** Nicht erfasst wird u. a. Traffic zum **Amazon-DNS-Server**, zur Instance Metadata (`169.254.169.254`), Time Sync (`169.254.169.123`), Windows-Lizenzaktivierung und DHCP. Nutzt die Instanz einen **eigenen** DNS-Server, wird dieser Traffic sehr wohl geloggt.",
+      "optionAnalysis": {
+        "A": "Falsch — Flow Logs erfassen **TCP und UDP** (und ICMP). Das Protokoll ist nicht der Grund; die DNS-Lücke liegt an der Ausschlussliste.",
+        "B": "Falsch — das Aggregation Interval (Default 10 min, auch 1 min) **fasst Flows zusammen**, verwirft aber keine kurzen Flows. DNS würde bei normalem Verhalten trotzdem erscheinen.",
+        "C": "Falsch — Flow Logs sind von CloudTrail Data Events unabhängig; DNS taucht nicht dank oder trotz Data Events auf.",
+        "D": "**Richtig** — Traffic zum Amazon-DNS-Server steht auf der Flow-Logs-Ausschlussliste und wird grundsätzlich nicht erfasst."
+      },
+      "mnemonic": "Eselsbrücke: **Flow Logs sehen den AWS-eigenen DNS nicht** — für DNS-Analyse gehört Route 53 Resolver Query Logging her.",
+      "examTrap": "Die Ausschlussliste (Amazon-DNS, 169.254.x, DHCP, Windows-Activation) ist ein beliebtes Detail. Für DNS-Bedrohungsanalyse ist **Resolver Query Logging** oder **GuardDuty** die richtige Antwort — nicht Flow Logs."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-065",
+    "explanationStructured": {
+      "verdict": "**VPC Flow Logs enthalten nur Metadaten** — IPs, Ports, Protokoll, Bytes, ACCEPT/REJECT — **niemals den Paketinhalt**. Für Deep Packet Inspection gibt es **VPC Traffic Mirroring**: Es kopiert den tatsächlichen Netzwerkverkehr einer ENI an ein Analyse-Ziel (Appliance, NLB, GWLB), wo er gegen Signaturen geprüft werden kann.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Traffic Mirroring liefert den vollständigen Paketinhalt als Kopie an ein Analyse-Ziel. Das einzige Werkzeug für Payload-Inspektion.",
+        "B": "Falsch, der stärkste Distraktor — das Custom Format (v5) fügt **zusätzliche Felder** hinzu (`flow-direction`, `traffic-path` …), macht aus Metadaten aber **niemals Paketinhalt**.",
+        "C": "Falsch — GuardDuty Runtime Monitoring beobachtet **Prozess-/Systemverhalten** auf der Instanz, nicht rohe Netzwerk-Pakete gegen Malware-Signaturen.",
+        "D": "Falsch — CloudTrail Data Events protokollieren **API-Aufrufe** auf Ressourcen, keinen Netzwerk-Paketinhalt."
+      },
+      "mnemonic": "Eselsbrücke: **Flow Logs zählen Pakete, Traffic Mirroring kopiert sie** — Payload gibt es nur beim Spiegeln.",
+      "examTrap": "„Vollständiger Paketinhalt / Deep Packet Inspection / gegen Signaturen prüfen“ → **Traffic Mirroring**. Das Flow-Logs-Custom-Format ist der Köder — mehr Felder, aber nie der Inhalt."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-066",
+    "explanationStructured": {
+      "verdict": "Ein **NAT Gateway ist ein Managed Service** — er unterstützt **kein Port-Forwarding** und trägt **keine Security Group** (nur die Subnet-NACL wirkt). Beide Zusatzanforderungen kann er nicht erfüllen. Eine **NAT Instance** ist eine normale EC2-Instanz: Sie **hat eine SG**, kann **Port-Forwarding** und sogar als **Bastion** dienen — auf Kosten von Eigenbetrieb (Patchen, HA).",
+      "optionAnalysis": {
+        "A": "Falsch — das NAT Gateway kann weder Port-Forwarding noch eine SG tragen; die NACL löst diese Sonderwünsche nicht.",
+        "B": "**Richtig** — die NAT Instance (EC2) bietet SG-Anbindung und Port-Forwarding, genau die beiden geforderten Extras.",
+        "C": "Falsch — ein Internet Gateway macht die privaten Subnets **öffentlich erreichbar** (kein NAT), das Gegenteil der Anforderung.",
+        "D": "Falsch — ein Egress-Only IGW ist **IPv6-only** und bietet weder Port-Forwarding noch Security Groups."
+      },
+      "mnemonic": "Eselsbrücke: **NAT Gateway ist bequem, NAT Instance ist flexibel** — Sonderwünsche (SG, Port-Forward) kann nur die Instanz.",
+      "examTrap": "Die Prüfung fragt die NAT-Instance selten — hier ist sie richtig, weil **SG + Port-Forwarding** verlangt sind, die das Managed Gateway nicht kann. Der Preis (Eigenbetrieb/HA) gehört zur Antwort."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-067",
+    "explanationStructured": {
+      "verdict": "**VPC Peering ist nicht transitiv** — jede VPC muss mit jeder direkt gepeert werden. Bei 20 VPCs sind das **190 Verbindungen** (20×19/2) plus Routen in jeder VPC, quadratisch wachsend und unwartbar. Das **Transit Gateway** ist der vorgesehene Hub: **ein Attachment pro VPC**, transitives Routing, eine zentrale Route Table — eine neue VPC = ein Attachment.",
+      "optionAnalysis": {
+        "A": "Falsch — das Full-Mesh-Peering skaliert quadratisch (190 Verbindungen bei 20 VPCs) und wird mit jeder neuen VPC schlimmer.",
+        "B": "Falsch — ein zentrales VPN ist für VPC-zu-VPC-Kommunikation das falsche Werkzeug (gedacht für hybride On-prem-Anbindung), langsamer und ohne natives transitives VPC-Routing.",
+        "C": "**Richtig** — Transit Gateway als Hub: ein Attachment je VPC, transitives Routing, lineares Wachstum.",
+        "D": "Falsch — PrivateLink Endpoint Services exponieren **einzelne Services** unidirektional, nicht volle VPC-zu-VPC-Konnektivität im Mesh."
+      },
+      "mnemonic": "Eselsbrücke: **Peering ist nicht transitiv, Transit Gateway schon** — der Name sagt es.",
+      "examTrap": "**„Viele VPCs, alle untereinander, wächst weiter“** → Transit Gateway. Das Peering-Mesh ist der Skalierungs-Distraktor (funktioniert für wenige VPCs, explodiert quadratisch)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-068",
+    "explanationStructured": {
+      "verdict": "**AWS WAF ist ein Layer-7-Dienst und lässt sich nicht an einen NLB hängen.** Unterstützt werden CloudFront, ALB, API Gateway (REST), AppSync, Cognito User Pool, App Runner, Amplify und Verified Access. Der NLB arbeitet auf **Layer 4** — er sieht keine HTTP-Requests. Lösung: App **hinter ALB oder CloudFront** stellen, dann WAF (oder Network Firewall einsetzen).",
+      "optionAnalysis": {
+        "A": "Falsch — WAFv2 unterstützt **keinen NLB**; die Behauptung ist frei erfunden.",
+        "B": "Falsch — Shield Advanced schützt gegen **DDoS**, nicht gegen SQL-Injection; einen L7-App-Schutz am NLB liefert es nicht.",
+        "C": "Falsch — eine NACL arbeitet auf **L3/4** und kann keine SQL-Injection-Muster in HTTP-Payloads erkennen.",
+        "D": "**Richtig** — WAF geht nicht an den NLB; die App muss hinter ALB oder CloudFront, dann greift WAF (Alternative: Network Firewall)."
+      },
+      "mnemonic": "Eselsbrücke: **WAF spricht nur HTTP** — ein L4-NLB hat nichts, das WAF lesen könnte.",
+      "examTrap": "Die WAF-Zielliste ist prüfbar: **ALB/CloudFront/API Gateway ja, NLB nie.** „SQL-Injection-Schutz am NLB“ ist strukturell unmöglich — der häufigste WAF-Distraktor."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-069",
+    "explanationStructured": {
+      "verdict": "Zwei Anforderungen zeigen eindeutig auf **Shield Advanced**: **Cost Protection** (Service-Credits für Skalierungskosten aus einem dokumentierten DDoS-Angriff) und der Zugang zum **Shield Response Team (SRT)**. Preis: **3.000 USD/Monat**, 1-Jahres-Commitment, Business-/Enterprise-Support vorausgesetzt.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Shield Advanced liefert exakt die zwei geforderten Dinge: DDoS-Kostenschutz und SRT-Zugang.",
+        "B": "Falsch — Shield **Standard** (automatisch, kostenlos) bietet **weder Cost Protection noch SRT**; CloudWatch-Alarme ändern daran nichts.",
+        "C": "Falsch — WAF Rate-Based Rules dämpfen L7-Fluten, liefern aber **keine DDoS-Kostenerstattung** und kein SRT.",
+        "D": "Falsch — Budgets-Aktionen könnten die ASG deckeln, machen aber die Anwendung **selbst zum Opfer** (kein Scaling = Ausfall) und erstatten nichts."
+      },
+      "mnemonic": "Eselsbrücke: **DDoS-Kostenschutz + Response-Team = Shield Advanced** — sonst nichts.",
+      "examTrap": "Signalwörter **„Cost Protection“ und „SRT“** gibt es nur bei Shield Advanced. Der 3.000-USD-Preis ist prüfbar; Budgets/WAF sind die Distraktoren, die das Kostenproblem nicht an der Wurzel lösen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-070",
+    "explanationStructured": {
+      "verdict": "**Rate-Based Rules** zählen Requests **pro IP** in einem Evaluation Window und blockieren automatisch alles oberhalb eines Schwellwerts — genau das Muster bei wechselnden Angreifer-IPs mit hoher Frequenz. Das Fenster ist konfigurierbar (60/120/300/600 s, Default 300); das Minimum-Limit wurde im August 2024 von 100 auf **10 Requests** gesenkt.",
+      "optionAnalysis": {
+        "A": "Falsch — ein statisches IP-Set greift nur gegen **bekannte** IPs; bei laufend wechselnden Adressen läuft man der Liste ewig hinterher.",
+        "B": "**Richtig** — Rate-Based Rule: zählt pro IP, blockiert über Schwellwert automatisch, unabhängig davon, welche IP gerade angreift.",
+        "C": "Falsch — Shield Advanced adressiert **DDoS auf L3/4**, nicht gezielte L7-Brute-Force mit moderater Rate pro IP.",
+        "D": "Falsch — das Core Rule Set filtert **bekannte Exploit-Muster** (SQLi, XSS), erkennt aber keine reine Anfrage-Häufung eines Logins."
+      },
+      "mnemonic": "Eselsbrücke: **Wechselnde IPs, hohe Frequenz → nach Rate blocken, nicht nach Adresse.**",
+      "examTrap": "**„IPs wechseln laufend + viele Requests pro IP“** → Rate-Based Rule. Das statische IP-Set ist der Distraktor — es funktioniert nur gegen feste Adressen."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-071",
+    "explanationStructured": {
+      "verdict": "Zwei korrekte Aussagen zur **AWS Network Firewall**: **(A)** Sie nutzt für Stateful Inspection **Suricata-kompatible Regeln** (seit Nov 2024 Suricata 7.0) — das erlaubt Domain-Allowlists, 5-Tuple-Regeln und IPS-Signaturen. **(B)** Das Deployment erfordert ein **eigenes Firewall-Subnet je AZ**, in dem der Endpoint liegt; die Route Tables leiten den Traffic durch ihn.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — Suricata-kompatible Stateful-Regeln ermöglichen genau die geforderte Domain-Allowlist und die IPS-Funktion.",
+        "B": "**Richtig (2/2)** — dediziertes Firewall-Subnet pro AZ ist Pflicht; die Firewall arbeitet über Routing, nicht über ENI-Anbindung.",
+        "C": "Falsch — Network Firewall wird **nicht wie eine SG an Instanzen gehängt**; sie wirkt VPC-weit über die Route Tables.",
+        "D": "Falsch, inhaltlich gefährlich — Network Firewall **ersetzt WAF nicht**: Sie ist L3–7-Netzwerkfilter/IPS, kein spezialisierter Web-Application-Firewall gegen SQLi/XSS.",
+        "E": "Falsch — sie erfordert **symmetrisches Routing**; asymmetrisches Routing zwischen AZs wird nicht unterstützt."
+      },
+      "mnemonic": "Eselsbrücke: **Network Firewall = Suricata im eigenen Subnet** — VPC-weit über Routing, nicht an der ENI.",
+      "examTrap": "Die Verwechslung **Network Firewall vs. WAF** ist der Kern: netzwerkweite Egress-/IPS-Kontrolle (Network Firewall) vs. HTTP-App-Schutz (WAF). Das Firewall-Subnet-je-AZ ist ein prüfbares Deployment-Detail."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-072",
+    "explanationStructured": {
+      "verdict": "**AWS Firewall Manager** ist exakt dafür gebaut: Er verteilt WAF-Regeln, Shield Advanced, Security Groups, Network Firewall und DNS Firewall **organisationsweit** — und wendet sie **automatisch auf neu erstellte Ressourcen** an. Voraussetzung: Organizations (All Features), ein Firewall-Manager-Admin-Account und aktiviertes AWS Config.",
+      "optionAnalysis": {
+        "A": "Falsch — eine SCP kann keine **Web-ACL-Zuordnung** erzwingen; sie kann höchstens API-Aktionen deny-en, aber nicht „ALB muss WAF tragen“ durchsetzen.",
+        "B": "Falsch für „automatisch an neuen ALBs“ — Config-Rule + Remediation **funktioniert**, ist aber reaktiv (erkennt-dann-repariert) und Eigenbau statt des nativen org-weiten Dienstes.",
+        "C": "**Richtig** — Firewall Manager mit org-weiter WAF-Policy: hängt die Web ACL automatisch an bestehende UND neue ALBs, auch account-übergreifend.",
+        "D": "Falsch — ein StackSet **rollt die Web ACL aus**, verknüpft sie aber nicht automatisch mit künftig erstellten ALBs; die kontinuierliche Durchsetzung fehlt."
+      },
+      "mnemonic": "Eselsbrücke: **Org-weit Firewall-Regeln erzwingen und auto-anhängen = Firewall Manager.**",
+      "examTrap": "**„Über viele Accounts + auch an neu erstellten Ressourcen + zentral“** → Firewall Manager. Config-Rule-Remediation ist der stärkste Distraktor (funktioniert, aber reaktiv und selbstgebaut)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-073",
+    "explanationStructured": {
+      "verdict": "Drei Dienste, drei klar getrennte Aufgaben: **WAF** (L7, HTTP-Requests: SQLi/XSS/Bot/Rate) für **(1)**, **Shield Advanced** (DDoS L3/4 + L7 auf geschützten Ressourcen, Cost Protection, SRT) für **(2)**, **Network Firewall** (L3–7 in der VPC, Suricata, Egress-Filterung, IPS) für **(3)**. Die richtige Zuordnung ist die vollständige Kombination.",
+      "optionAnalysis": {
+        "A": "Falsch — Network Firewall deckt **weder gezielten SQLi-Schutz** (das ist WAF) **noch DDoS-Kostenschutz** (das ist Shield Advanced) ab.",
+        "B": "Falsch — WAF ist **nicht** für Egress-Filterung zuständig; (3) gehört zur Network Firewall, nicht zu WAF.",
+        "C": "Falsch — Shield Advanced macht **keinen SQL-Injection-Schutz**; (1) ist WAF-Aufgabe.",
+        "D": "**Richtig** — WAF (1) + Shield Advanced (2) + Network Firewall (3): jede Anforderung dem zuständigen Dienst zugeordnet."
+      },
+      "mnemonic": "Eselsbrücke: **WAF für Web, Shield für DDoS, Network Firewall fürs Netz** — drei Aufgaben, drei Dienste.",
+      "examTrap": "Die Frage testet genau die drei Verwechslungen: SQLi→**WAF** (nicht Shield), DDoS-Kostenschutz→Shield (nicht WAF), Egress→Network Firewall (nicht WAF). Merke die Layer/Zuständigkeit jedes Dienstes."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-074",
+    "explanationStructured": {
+      "verdict": "**GuardDuty benötigt keine aktivierten Logs.** Es greift auf **unabhängige, duplizierte Datenströme** von CloudTrail Management Events, VPC Flow Logs und Route 53 Resolver DNS Query Logs zu — direkt aus der AWS-Infrastruktur. Ein Klick, keine Vorarbeit, keine zusätzlichen Log-Kosten. Genau das „so schnell wie möglich“.",
+      "optionAnalysis": {
+        "A": "**Richtig** — GuardDuty aus eigenen Datenströmen aktivieren: sofort einsatzbereit, ohne Log-Setup.",
+        "B": "Falsch, die beliebteste Fehlwahl — klingt logisch, ist aber **unnötig**: GuardDuty **braucht** die Logs nicht (man kann sie für eigene Analysen aktivieren, muss aber nicht).",
+        "C": "Falsch — Config prüft **Konfigurationszustände** gegen Regeln, es ist kein Threat-Detection-Dienst für Verhaltensanomalien.",
+        "D": "Falsch — Inspector ist **Vulnerability-Scanning** (CVEs), nicht kontinuierliche Bedrohungserkennung aus Aktivitätsdaten."
+      },
+      "mnemonic": "Eselsbrücke: **GuardDuty zapft eigene Ströme an** — kein CloudTrail/Flow-Log-Setup nötig.",
+      "examTrap": "Die Falle ist die vermeintliche Voraussetzung: „erst Logs, dann GuardDuty“ ist **falsch**. GuardDuty ist One-Click. Config (Compliance) und Inspector (CVEs) sind die themenfremden Distraktoren."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-075",
+    "explanationStructured": {
+      "verdict": "Die kanonische Abgrenzung: **CloudTrail = WER** (welche Identität hat wann von welcher IP welchen API-Call gemacht) beantwortet Frage 1; **AWS Config = WAS** (wie sah die Ressource vorher/nachher aus — die Configuration Timeline mit jedem Configuration Item) beantwortet Frage 2.",
+      "optionAnalysis": {
+        "A": "Falsch — CloudTrail zeigt den `AuthorizeSecurityGroupIngress`-Call inkl. neuer Regel, aber **nicht den vollständigen Vorher-/Nachher-Zustand** der SG.",
+        "B": "**Richtig** — CloudTrail für „wer“ (die Identität hinter dem API-Call), Config für „was genau sich änderte“ (Zustandsvergleich über die Timeline).",
+        "C": "Falsch — Config zeigt die **Zustandsänderung**, aber **nicht die handelnde Identität**; „wer“ bleibt offen.",
+        "D": "Falsch — Flow Logs zeigen Netzwerk-Metadaten, nicht die Änderungs-Identität; GuardDuty erkennt Bedrohungen, dokumentiert aber keine Konfigurations-Historie."
+      },
+      "mnemonic": "Eselsbrücke: **CloudTrail sagt WER, Config sagt WAS** — Täter und Tatbestand aus zwei Quellen.",
+      "examTrap": "Beide Einzel-Distraktoren sind je zur Hälfte richtig — das macht sie stark. „Wer geändert hat“ UND „wie es vorher aussah“ verlangt **beide** Dienste; eine Quelle allein reicht nie."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-076",
+    "explanationStructured": {
+      "verdict": "**Macie ist S3-spezifisch und der einzige Dienst, der den Inhalt von Objekten auf sensible Daten untersucht** — per Machine Learning und Pattern Matching. Es bringt **Managed Data Identifiers** für gängige PII (Kreditkarten, Ausweis-/Sozialversicherungsnummern, Credentials) mit und erlaubt **Custom Data Identifiers** per Regex. Ein Sensitive-Data-Discovery-Job liefert den geforderten Nachweis.",
+      "optionAnalysis": {
+        "A": "Falsch — Inspector scannt **Software-Schwachstellen (CVEs)** auf EC2/ECR/Lambda, nicht den Inhalt von S3-Objekten.",
+        "B": "Falsch, der stärkste Distraktor — GuardDuty S3 Protection erkennt **verdächtige Zugriffe** auf Buckets, sieht aber **nie den Objektinhalt** und findet daher keine PII.",
+        "C": "**Richtig** — Macie mit Sensitive-Data-Discovery-Job: der einzige Dienst, der S3-Inhalte klassifiziert.",
+        "D": "Falsch — eine Config-Rule mit Custom-Lambda wäre Eigenbau, skaliert schlecht auf große Buckets und ist nicht der native Klassifizierungsdienst."
+      },
+      "mnemonic": "Eselsbrücke: **Macie liest, was IN den S3-Objekten steht** — GuardDuty sieht nur, WER zugreift.",
+      "examTrap": "**„Welche Buckets enthalten PII / Inhalt klassifizieren“** → Macie. GuardDuty S3 Protection (Zugriffsanomalien) und Inspector (CVEs) sind die Distraktoren, die den Objektinhalt nie betrachten."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-077",
+    "explanationStructured": {
+      "verdict": "**Amazon Inspector ist der Vulnerability-Management-Dienst**: Er scannt **EC2** (per SSM Agent oder agentless über EBS-Snapshots), **ECR-Container-Images** und **Lambda** kontinuierlich gegen **CVE-Datenbanken** und bewertet zusätzlich die **Network Reachability**. Genau die Frage nach bekannten CVEs in installierten Paketen.",
+      "optionAnalysis": {
+        "A": "Falsch — GuardDuty Runtime Monitoring erkennt **Laufzeit-Bedrohungen/Verhalten**, nicht den CVE-Stand installierter Pakete.",
+        "B": "Falsch, der stärkste Distraktor — eine Config-Patch-Compliance-Regel prüft, ob **Patches fehlen** (Patch-Manager-Sicht), aber sie mappt **keine konkreten CVEs** auf Pakete.",
+        "C": "Falsch — Detective macht **Root-Cause-Analyse** bestehender Findings, es scannt keine Software auf Schwachstellen.",
+        "D": "**Richtig** — Inspector mit EC2-Scanning: kontinuierlicher CVE-Abgleich installierter Pakete, plus Reachability-Kontext.",
+        "E": "Falsch — Security Hub **aggregiert** Findings anderer Dienste und prüft Benchmarks; die CVE-Erkennung selbst liefert Inspector, dessen Ergebnisse Security Hub nur einsammelt."
+      },
+      "mnemonic": "Eselsbrücke: **CVE in Software → Inspector** — er kennt die Schwachstellen-Datenbank.",
+      "examTrap": "**„Bekannte CVEs in Paketen“** ist die Inspector-Signatur. Config-Patch-Compliance (fehlende Patches ≠ konkrete CVEs) ist der beste Distraktor; Security Hub sammelt nur ein, findet nicht selbst."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-078",
+    "explanationStructured": {
+      "verdict": "**Amazon Detective** ist der Root-Cause-Analyse-Dienst: Es baut aus **CloudTrail, VPC Flow Logs und GuardDuty-Findings** automatisch einen **Verhaltensgraphen** und beantwortet, welche API-Calls vorausgingen, welche Identität beteiligt war und welche Ressourcen im Zeitfenster berührt wurden. Der Dienst **nach** GuardDuty, nicht statt ihm.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Detective wertet den Verhaltensgraphen aus und rekonstruiert Herkunft und Umfang des Vorfalls.",
+        "B": "Falsch — Inspector scannt **Schwachstellen**, es erklärt keinen laufenden Vorfall (wer, wann, was zuvor).",
+        "C": "Falsch — die Config-Timeline zeigt **Konfigurationsänderungen** der Instanz, nicht die Angriffskette über Identitäten und Netzwerkflüsse.",
+        "D": "Falsch — CloudTrail Insights erkennt **ungewöhnliche API-Raten**, liefert aber nicht den korrelierten Verhaltensgraphen zur Root-Cause-Analyse."
+      },
+      "mnemonic": "Eselsbrücke: **GuardDuty findet, Detective ermittelt** — der Graph erzählt die Vorgeschichte.",
+      "examTrap": "Detective ist **rein reaktiv** und braucht ein bestehendes Finding. „Ursache/Umfang eines gemeldeten Vorfalls untersuchen“ → Detective; „Bedrohung erkennen“ → GuardDuty. Die Reihenfolge ist der Prüfpunkt."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-079",
+    "explanationStructured": {
+      "verdict": "Cross-Account-Zugriff auf ein Secret braucht **drei** Bausteine — der dritte wird fast immer übersehen: (1) **Resource-Policy** am Secret in A für den Principal aus B, (2) **IAM-Policy** an der Lambda-Rolle in B mit `secretsmanager:GetSecretValue`, und (3) ein **Customer Managed KMS Key** — denn der Standard-Key `aws/secretsmanager` ist ein **AWS Managed Key**, dessen Key Policy sich nicht ändern lässt und der daher **niemals** Cross-Account-Zugriff gewähren kann.",
+      "optionAnalysis": {
+        "A": "Falsch für „am günstigsten/direkt“ — Replikation kopiert das Secret unnötig; die eigentliche Frage (Entschlüsselung cross-account) bleibt ohne CMK ungelöst.",
+        "B": "**Richtig** — Resource-Policy + IAM-Policy + **Customer Managed KMS Key**: die vollständige, oft unvollständig beantwortete Kombination.",
+        "C": "Falsch — eine SCP **gewährt keine Rechte**; sie kann Cross-Account-Zugriff nicht ermöglichen, nur begrenzen.",
+        "D": "Falsch — Duplizieren erzeugt Sync-Aufwand und umgeht das Grundproblem; es ist keine saubere Cross-Account-Lösung."
+      },
+      "mnemonic": "Eselsbrücke: **Cross-Account-Secret braucht einen eigenen Schlüssel** — der AWS-Managed-Key öffnet keine fremde Tür.",
+      "examTrap": "Der übersehene dritte Baustein ist der CMK: **`aws/secretsmanager` kann per Definition kein Cross-Account** (unveränderliche Key Policy). Merke die Dreier-Kombination — zwei Policies reichen nicht."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-080",
+    "explanationStructured": {
+      "verdict": "**Nur die DNS-Validierung erlaubt vollautomatische Erneuerung.** Bei der **E-Mail-Validierung** verschickt AWS zu jeder Erneuerung eine Bestätigungsmail, die ein Mensch anklicken muss — keine Automatik. Umstellen auf **DNS-Validierung** und den **CNAME-Record dauerhaft** in der Zone belassen macht das Auto-Renewal möglich.",
+      "optionAnalysis": {
+        "A": "Falsch — ACM erneuert **nicht bedingungslos** automatisch: E-Mail-validierte Zertifikate brauchen bei jeder Erneuerung manuelle Bestätigung.",
+        "B": "Falsch — extern erneuern und **importieren** verlagert die Arbeit dauerhaft zurück zum Menschen (importierte Zertifikate erneuert ACM gar nicht automatisch).",
+        "C": "**Richtig** — auf DNS-Validierung umstellen, CNAME dauerhaft belassen, Zertifikat an einem integrierten Service in Nutzung: dann läuft die Erneuerung von selbst.",
+        "D": "Falsch — „Mails automatisch bestätigen“ ist kein von AWS vorgesehener Mechanismus und bleibt fehleranfällig (Postfächer, die niemand liest)."
+      },
+      "mnemonic": "Eselsbrücke: **Auto-Renewal spricht DNS, nicht E-Mail** — der CNAME bleibt, der Mensch bleibt draußen.",
+      "examTrap": "Drei Bedingungen fürs Auto-Renewal: **DNS-Validierung, CNAME dauerhaft, Zertifikat in Nutzung** an einem integrierten Service. „ACM erneuert immer automatisch“ ist die verbreitetste Fehlannahme."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-081",
+    "explanationStructured": {
+      "verdict": "**Der Unterschied zwischen Pilot Light und Warm Standby ist genau eine Frage: Läuft der Compute?** Pilot Light: **nein** — Daten repliziert, DB läuft, Compute **nicht deployed**. AWS: *RPO in minutes, RTO in tens of minutes*, weil im Ernstfall erst Server hochgefahren werden. Exakt die Vorgabe (RTO einige zehn Minuten, knappes Budget).",
+      "optionAnalysis": {
+        "A": "**Richtig** — Pilot Light: repliziert Daten, kein laufender Compute, RTO in tens of minutes, günstig.",
+        "B": "Falsch — Warm Standby hält den Compute **laufend** (verkleinert) und ist teurer; für „einige zehn Minuten RTO bei knappem Budget“ überdimensioniert.",
+        "C": "Falsch — Multi-Site Active/Active ist die teuerste Stufe (Vollbetrieb in beiden Regionen), weit jenseits des Budgets.",
+        "D": "Falsch — Backup & Restore erreicht typisch **Stunden**, nicht zehn Minuten, und die DB soll ja kontinuierlich repliziert werden."
+      },
+      "mnemonic": "Eselsbrücke: **Pilot Light — Zündflamme brennt, Motor aus** — Daten heiß, Compute kalt.",
+      "examTrap": "„Daten repliziert, Compute NICHT deployed, RTO tens of minutes“ ist die wörtliche Pilot-Light-Definition. Warm Standby ist der Nachbar-Distraktor — dort **läuft** der Compute bereits."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-082",
+    "explanationStructured": {
+      "verdict": "**Warm Standby** hält eine **verkleinerte, aber laufende** Kopie bereit: Sie verarbeitet **sofort** Traffic und muss beim Failover **nur noch hochskaliert** werden — nicht erst gestartet. AWS: *warm standby only requires you to scale up*. Genau die Vorgabe (RTO in Minuten, sofortige Übernahme).",
+      "optionAnalysis": {
+        "A": "Falsch, der stärkste Distraktor — eine ASG mit **Desired = 0** heißt: **keine Instanz läuft**. Das ist **Pilot Light**; beim Failover müsste erst gestartet werden.",
+        "B": "**Richtig** — Warm Standby: dauerhaft laufende, verkleinerte Kapazität, sofortige Traffic-Übernahme, dann Scale-up.",
+        "C": "Falsch — Backup & Restore erreicht **Stunden**, keine Minuten, und übernimmt nicht sofort.",
+        "D": "Falsch — Multi-Site Active/Active erfüllt die Anforderung über, kostet aber unnötig (volle Kapazität in beiden Regionen)."
+      },
+      "mnemonic": "Eselsbrücke: **Warm Standby läuft schon klein** — Pilot Light muss erst anspringen.",
+      "examTrap": "Der Test ist ein Satz: **Verarbeitet die DR-Umgebung JETZT Traffic?** Ja (reduziert) = Warm Standby. Die „ASG Desired = 0“-Option ist die klassische Pilot-Light-Falle im Warm-Standby-Kostüm."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-083",
+    "explanationStructured": {
+      "verdict": "Nur der **Compliance Mode** ist wirklich immutable. Nach Ablauf der **Grace Period** (min. 3 Tage) gilt: Vault und Lock sind unveränderlich und **kein Nutzer — auch nicht Root — kann Backups löschen**; AWS Backup verweigert die Operation. Die einzige „Umgehung“ wäre die Schließung des gesamten Accounts.",
+      "optionAnalysis": {
+        "A": "Falsch — der **Governance Mode** sieht fast identisch aus, kann aber von Nutzern mit ausreichenden Rechten (`BypassGovernanceRetention`) **aufgehoben** werden — kein Schutz gegen einen böswilligen Admin.",
+        "B": "Falsch — S3 Versioning + MFA Delete schützt S3-Objekte, ist aber nicht der Mechanismus für **AWS-Backup-Recovery-Points** und nicht Root-fest im geforderten Sinn.",
+        "C": "**Richtig** — Vault Lock im **Compliance Mode mit abgelaufener Grace Period**: unlöschbar für jeden, inklusive Root.",
+        "D": "Falsch — eine IAM-Policy lässt sich von einem Admin **ändern oder entfernen**; sie ist kein immutabler Schutz gegen genau diesen Admin."
+      },
+      "mnemonic": "Eselsbrücke: **Compliance Mode sperrt sogar Root aus** — Governance Mode nur die Braven.",
+      "examTrap": "Die Falle ist **Governance vs. Compliance**: Governance ist per Bypass-Recht umgehbar, nur Compliance (nach Grace Period) ist absolut. „Auch für Admin/Root unlöschbar“ → Compliance Mode."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-084",
+    "explanationStructured": {
+      "verdict": "**Alle vier Optionen funktionieren** — deshalb testet die Frage nicht die beste Technik, sondern die **gerade ausreichende**. Die Vorgabe RTO in Stunden, RPO in Stunden ist die **exakte Definition von Backup & Restore**: die günstigste, am wenigsten komplexe Strategie mit praktisch nur Speicherkosten.",
+      "optionAnalysis": {
+        "A": "Falsch für DIESE Anforderung — Pilot Light (kontinuierliche DB-Replikation) liefert **bessere** Werte als nötig und kostet dauerhaft mehr.",
+        "B": "Falsch — Warm Standby ist noch teurer (laufende Kapazität) und für eine unkritische Reporting-App überdimensioniert.",
+        "C": "Falsch — Aurora Global Database ist die teuerste, leistungsfähigste Variante; völlig übers Ziel hinaus.",
+        "D": "**Richtig** — Backup & Restore mit Cross-Region-Kopien: erfüllt RTO/RPO in Stunden am günstigsten."
+      },
+      "mnemonic": "Eselsbrücke: **Nimm die billigste Stufe, die die Vorgabe gerade schafft** — nicht die stärkste.",
+      "examTrap": "Klassisches „alle funktionieren“-Muster: Gefragt ist die **kosteneffizienteste** Strategie, die RTO/RPO **noch** erfüllt. „Stunden/Stunden + nicht kritisch + günstig“ = Backup & Restore, immer."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-085",
+    "explanationStructured": {
+      "verdict": "**AWS Elastic Disaster Recovery (DRS)** — Nachfolger von CloudEndure — repliziert **kontinuierlich auf Block-Ebene** in eine günstige Staging-Area. AWS: *RPOs of seconds and RTOs of minutes*. Lift-and-Shift-DR ohne App-Änderung; die reale RTO hängt am Boot (Linux ~5 min, Windows ~20).",
+      "optionAnalysis": {
+        "A": "**Richtig** — DRS mit kontinuierlicher Block-Level-Replikation: einziger Dienst, der RPO Sekunden / RTO Minuten für on-prem-Server liefert.",
+        "B": "Falsch, der stärkste Distraktor — AWS Backup (via Backup Gateway) arbeitet in **Backup-Fenstern**, nicht kontinuierlich; RPO Sekunden ist damit unerreichbar.",
+        "C": "Falsch — DataSync repliziert **Dateien/Objekte nach S3**, nicht bootfähige Server-Volumes für schnelles DR-Failover.",
+        "D": "Falsch — nächtliche VM-Images bedeuten RPO **bis zu 24 h**, weit jenseits der Sekunden-Vorgabe."
+      },
+      "mnemonic": "Eselsbrücke: **On-prem-Server mit RPO Sekunden → Elastic Disaster Recovery.**",
+      "examTrap": "Signalwortkette **„on-prem + RPO Sekunden + RTO Minuten + Lift-and-Shift“** → DRS. AWS Backup (Fenster) und DataSync (Files nach S3) sind die Distraktoren, die die kontinuierliche Block-Replikation nicht leisten."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-086",
+    "explanationStructured": {
+      "verdict": "Zwei korrekte Grundlagen: **(A)** RPO = *Recovery Point Objective* = tolerierbarer **Datenverlust**, gemessen als Zeit **rückwärts** vom Ausfall. **(B)** RTO = *Recovery Time Objective* = tolerierbare **Wiederherstellungszeit**, gemessen **vorwärts** vom Ausfall.",
+      "optionAnalysis": {
+        "A": "**Richtig (1/2)** — RPO als maximal tolerierbarer Datenverlust (Zeit vor dem Ausfall). Korrekte Definition.",
+        "B": "**Richtig (2/2)** — RTO als maximal tolerierbare Zeit bis zur Wiederherstellung. Korrekte Definition.",
+        "C": "Falsch — stündliche Snapshots ergeben RPO **bis zu einer Stunde**; RPO null verlangt **synchrone Replikation**.",
+        "D": "Falsch, der lehrreichste Distraktor — RTO und RPO sind **unabhängig**: Man kann niedrigen RPO mit hohem RTO kombinieren (Pilot Light: Daten aktuell, Wiederanlauf dauert).",
+        "E": "Falsch — Backup & Restore erreicht typisch RPO in **Stunden**, nicht Sekunden."
+      },
+      "mnemonic": "Eselsbrücke: **RP**O = **P**unkt in den Daten (rückwärts), **RT**O = **T**ime bis zurück (vorwärts).",
+      "examTrap": "Die Unabhängigkeit von RTO und RPO (D) ist der Kern-Distraktor: Niedriger RPO erzwingt **keinen** niedrigen RTO. Und RPO 0 braucht synchrone Replikation, nie Snapshots."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-087",
+    "explanationStructured": {
+      "verdict": "**Der Multi-AZ-Standby bedient keinerlei Traffic — auch keine Lesezugriffe.** AWS: *You do not interact directly with the standby at any point prior to promotion.* Er existiert nur fürs Failover. Read-Last lagert man auf eine **Read Replica** aus (asynchron, eigener Endpoint, bis 15 Stück, promotable).",
+      "optionAnalysis": {
+        "A": "Falsch — der Multi-AZ-Standby ist **nicht lesbar**; Reporting-Traffic kann nicht dorthin.",
+        "B": "**Richtig** — Read Replica anlegen und den Reporting-Traffic dorthin umleiten: entlastet die Primary, ohne HA zu berühren.",
+        "C": "Falsch für die Anforderung — eine größere Instanz hilft kurzfristig, löst aber die **Trennung** von OLTP und Analytics nicht und skaliert teuer statt gezielt.",
+        "D": "Falsch — ElastiCache hilft bei wiederholten Reads, aber schwere Ad-hoc-Analyse-Queries profitieren kaum vom Cache; die Read Replica ist die passende Antwort."
+      },
+      "mnemonic": "Eselsbrücke: **Multi-AZ = Verfügbarkeit, Read Replica = Leselast** — der Standby liest nie.",
+      "examTrap": "Die #1-RDS-Verwechslung der Prüfung: Optionen, die den **Multi-AZ-Standby zum Lesen** nutzen, sind beim klassischen Deployment immer falsch (Ausnahme: Multi-AZ DB Cluster)."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-088",
+    "explanationStructured": {
+      "verdict": "Das **Multi-AZ DB Cluster** Deployment liefert **beides nativ**: einen Writer und **zwei lesbare Standbys** über drei AZs mit Reader-Endpoint. AWS: *Failover times are typically under 35 seconds* — deutlich schneller als klassisches Multi-AZ, weil kein Crash-Recovery-Schritt nötig ist. Einschränkung: nur MySQL/PostgreSQL — hier passend.",
+      "optionAnalysis": {
+        "A": "Falsch für die Anforderung — Multi-AZ Instance + Read Replicas gibt Lesekapazität, aber das **Failover bleibt langsam** (60–120 s) und der Standby unlesbar.",
+        "B": "Falsch als beste Wahl — Aurora-Migration löst es zwar, ist aber ein größerer Umbau als nötig; der DB Cluster erfüllt beide Anforderungen ohne Engine-Wechsel.",
+        "C": "**Richtig** — Multi-AZ DB Cluster: lesbare Standbys + Failover unter 35 s, exakt die zwei Vorgaben.",
+        "D": "Falsch — Single-AZ + Cross-Region-Replicas bietet **kein schnelles lokales Failover** und keine synchrone HA."
+      },
+      "mnemonic": "Eselsbrücke: **Schnelles Failover UND lesbare Standbys ohne Aurora = Multi-AZ DB Cluster.**",
+      "examTrap": "Der DB Cluster bricht die alte Regel „Standby ist nie lesbar“. Prüfbare Marker: **unter 35 s, zwei lesbare Standbys, nur MySQL/PostgreSQL.** Aurora ist der überdimensionierte Distraktor, wenn kein Engine-Wechsel gefordert ist."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-089",
+    "explanationStructured": {
+      "verdict": "Aurora verteilt **6 Kopien über 3 Availability Zones** (2 pro AZ). Das **Write-Quorum liegt bei 4/6**, das **Read-Quorum bei 3/6**. Beim Verlust einer kompletten AZ fallen 2 Kopien aus — 4 bleiben, das Write-Quorum ist **weiterhin erfüllt**, Aurora schreibt ohne Unterbrechung weiter.",
+      "optionAnalysis": {
+        "A": "Falsch — es sind **6** Kopien (nicht 3), und kein Schreibvorgang braucht **alle** Bestätigungen; das wäre nicht ausfalltolerant.",
+        "B": "Falsch — die Zahlen stimmen nicht: Aurora nutzt 6 Kopien über 3 AZs mit 4/6-Write-Quorum, nicht 4 Kopien über 2 AZs.",
+        "C": "Falsch, der lehrreichste Distraktor — das beschreibt **RDS Multi-AZ** (synchroner Standby), nicht Auroras quorum-basierten verteilten Storage.",
+        "D": "**Richtig** — 6 Kopien / 3 AZs, Write-Quorum 4/6, Read-Quorum 3/6: überlebt einen kompletten AZ-Ausfall ohne Datenverlust."
+      },
+      "mnemonic": "Eselsbrücke: **6 Kopien, 3 Zonen, 4 zum Schreiben, 3 zum Lesen** — eine ganze AZ darf ausfallen.",
+      "examTrap": "Die Quorum-Zahlen (6/3, 4/6, 3/6) sind direkt prüfbar. Distraktor C beschreibt korrekt RDS Multi-AZ — richtig für die falsche Frage. **Aurora** ist quorum-basiert, kein synchroner Einzel-Standby."
+    }
+  },
+  {
+    "seedKey": "saa-c03-q-090",
+    "explanationStructured": {
+      "verdict": "**Aurora Global Database** nutzt eine **dedizierte Replikations-Infrastruktur auf Storage-Ebene** (nicht die Engine). Cross-Region-Latenz *typically under a second*, Ergebnis *effective RPO typically less than 1 second, RTO less than 1 minute*, bis zu **10 Secondary Regions** mit lokalen Reads. Exakt die relationale Vorgabe.",
+      "optionAnalysis": {
+        "A": "**Richtig** — Aurora Global Database mit Secondary Region: Sub-Sekunden-RPO, Sub-Minuten-RTO, storage-basierte Replikation.",
+        "B": "Falsch für die Vorgabe — ein Aurora **Cross-Region Read Replica** repliziert über die Engine (größerer Lag) und erreicht die Sub-Sekunden-Werte nicht zuverlässig.",
+        "C": "Falsch — RDS PostgreSQL Multi-AZ + Cross-Region-Replica ist langsamer im Failover und im Cross-Region-Lag als Global Database.",
+        "D": "Falsch — DynamoDB Global Tables sind **NoSQL**; die Anforderung nennt ausdrücklich eine **relationale** PostgreSQL-Datenbank."
+      },
+      "mnemonic": "Eselsbrücke: **Relationale globale DB mit RPO < 1 s → Aurora Global Database.**",
+      "examTrap": "Signalwortkette **„relational + Cross-Region + RPO < 1 s / RTO < 1 min“** → Aurora Global Database. DynamoDB Global Tables ist der Distraktor für alle, die „global“ ohne „relational“ lesen."
+    }
+  }
+]
