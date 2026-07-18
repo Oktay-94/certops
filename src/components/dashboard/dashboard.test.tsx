@@ -45,7 +45,7 @@ describe("AreaTiles", () => {
     expect(screen.getAllByText("GETEILT")).toHaveLength(2);
   });
 
-  it("SAA renders quiz, cards, skript and stats (Dienste/Übersicht stay CLF-only)", () => {
+  it("SAA renders quiz, cards, skript, stats and szenarien (Dienste/Übersicht stay CLF-only)", () => {
     render(<AreaTiles exam="saa" />);
     const hrefs = screen
       .getAllByRole("link")
@@ -55,6 +55,9 @@ describe("AreaTiles", () => {
       "/saa/cards",
       "/saa/skript",
       "/saa/stats",
+      "/saa/szenarien",
     ]);
+    // The former non-clickable teaser is gone.
+    expect(screen.queryByText("NEU")).toBeNull();
   });
 });

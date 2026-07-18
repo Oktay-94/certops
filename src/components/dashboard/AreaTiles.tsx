@@ -45,42 +45,6 @@ function AreaTile({
   );
 }
 
-// Non-clickable teaser (SAA "Szenarien"): same tile look, NEU pill instead of
-// GETEILT, no hover preview, no link — mockup .saa-only placeholder.
-function TeaserTile({
-  glyph,
-  title,
-  desc,
-}: {
-  glyph: string;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <div
-      aria-disabled
-      className="relative block cursor-default rounded-xl border border-dashed border-line bg-surface p-[18px] opacity-80"
-    >
-      <span
-        className="absolute right-3.5 top-3.5 rounded-full border px-[7px] py-[2px] font-mono text-[8.5px] tracking-[0.12em]"
-        style={{
-          color: "var(--accent)",
-          borderColor: "color-mix(in srgb, var(--accent) 40%, transparent)",
-        }}
-      >
-        NEU
-      </span>
-      <h3 className="flex items-center gap-2.5 text-[14.5px] font-semibold text-ink">
-        <span className="text-[30px] leading-none" aria-hidden>
-          {glyph}
-        </span>
-        {title}
-      </h3>
-      <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">{desc}</p>
-    </div>
-  );
-}
-
 function QuizPreview() {
   return (
     <div aria-hidden className="space-y-1.5">
@@ -201,8 +165,8 @@ function SkriptPreview() {
 
 export function AreaTiles({ exam }: { exam: ExamSlug }) {
   if (exam === "saa") {
-    // SAA track: Quiz, Karten, Skript, Statistik plus the Szenarien teaser.
-    // Dienste and Übersicht are CLF-only and deliberately absent here.
+    // SAA track: Quiz, Karten, Skript, Statistik plus Szenarien (battle
+    // cards). Dienste and Übersicht are CLF-only and deliberately absent.
     return (
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
         <AreaTile
@@ -233,10 +197,11 @@ export function AreaTiles({ exam }: { exam: ExamSlug }) {
           desc="Trends, Schwachstellen, Verlauf pro Runde."
           preview={<StatistikPreview />}
         />
-        <TeaserTile
+        <AreaTile
+          href="/saa/szenarien"
           glyph="🧩"
           title="Szenarien"
-          desc="Interaktive Architektur-Diagramme mit Lücken-Slots."
+          desc="25 Battle Cards: Architektur-Diagramm, Signalwörter, Fallen."
         />
       </div>
     );

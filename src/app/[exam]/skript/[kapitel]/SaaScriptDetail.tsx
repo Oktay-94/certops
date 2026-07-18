@@ -2,14 +2,13 @@
 // slugs 404. Accent = PRIMARY domain (first frontmatter entry, order kept by
 // the seed loader), fed through the same CSS custom properties the CLF reader
 // uses so SkriptMarkdown draws identically for both tracks.
-import type { CSSProperties } from "react";
 import { cache } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { db } from "@/db";
 import { getScriptBySlug, getScriptsByCert } from "@/db/repository";
-import { getDomainColor } from "@/lib/domain-colors";
+import { domainColorVars, getDomainColor } from "@/lib/domain-colors";
 import { splitChapter } from "@/lib/skript-content";
 import { SkriptMarkdown } from "@/components/skript/SkriptMarkdown";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
@@ -19,16 +18,6 @@ export const fetchScript = cache(async (slug: string) => {
   await connection();
   return getScriptBySlug(db, "SAA-C03", slug);
 });
-
-/** Same var recipe as chapterColorVars(), accent from the primary domain. */
-function domainColorVars(domain: string): CSSProperties {
-  const accent = getDomainColor(domain).solid;
-  return {
-    "--accent": accent,
-    "--accent-soft": `color-mix(in srgb, ${accent} 16%, transparent)`,
-    "--tint": "var(--canvas)",
-  } as CSSProperties;
-}
 
 export async function SaaScriptDetail({ slug }: { slug: string }) {
   const script = await fetchScript(slug);

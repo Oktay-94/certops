@@ -1,5 +1,6 @@
 // Explicit class strings per domain so Tailwind's content scanner keeps them.
 // Do not concatenate `bg-${color}-100` — purge will drop unseen variants.
+import type { CSSProperties } from "react";
 
 export type FallbackIconName = "Cloud" | "Shield" | "Server" | "DollarSign";
 
@@ -147,4 +148,18 @@ const MAP: Record<string, DomainColor> = {
 
 export function getDomainColor(domain: string): DomainColor {
   return MAP[domain] ?? FALLBACK;
+}
+
+/**
+ * Accent CSS custom properties from a domain — same var recipe as
+ * chapterColorVars(), so SkriptMarkdown and the reader shells draw
+ * identically wherever a page is tinted by its primary domain.
+ */
+export function domainColorVars(domain: string): CSSProperties {
+  const accent = getDomainColor(domain).solid;
+  return {
+    "--accent": accent,
+    "--accent-soft": `color-mix(in srgb, ${accent} 16%, transparent)`,
+    "--tint": "var(--canvas)",
+  } as CSSProperties;
 }
