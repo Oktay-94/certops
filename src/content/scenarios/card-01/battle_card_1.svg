@@ -1,0 +1,97 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrPk" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#E7157B"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 1 — API Gateway · Lambda · DynamoDB</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Startup-REST-API ohne Server: Pay-per-Request, Skalierung in Millisekunden auf viralen Traffic</text>
+
+  <!-- Rückantwort (Schritt 4), oberhalb der Boxen -->
+  <path d="M 1400 377 L 1400 300 L 175 300 L 175 377" fill="none" stroke="#2E6BE6" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrB)"/>
+  <circle cx="790" cy="300" r="15" fill="#2E6BE6"/>
+  <text x="790" y="306" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="900" y="288" font-size="16" fill="#1B3E86" text-anchor="middle">JSON-Antwort in Millisekunden</text>
+
+  <!-- Client -->
+  <rect x="50" y="380" width="250" height="180" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="175" y="418" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Web / Mobile App</text>
+  <text x="175" y="450" font-size="15" fill="#444444" text-anchor="middle">TicketWave-Kunden</text>
+  <text x="175" y="476" font-size="15" fill="#444444" text-anchor="middle">kaufen Konzert-Tickets</text>
+  <text x="175" y="514" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Launch-Tag: 10 auf</text>
+  <text x="175" y="536" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">100.000 req/min (viral)</text>
+
+  <!-- API Gateway -->
+  <rect x="430" y="380" width="280" height="180" rx="10" fill="#FDEDF4" stroke="#E7157B" stroke-width="2.5"/>
+  <text x="570" y="418" font-size="22" font-weight="bold" fill="#B01059" text-anchor="middle">Amazon API Gateway</text>
+  <text x="570" y="450" font-size="15" fill="#444444" text-anchor="middle">REST API · HTTPS</text>
+  <text x="570" y="476" font-size="15" fill="#444444" text-anchor="middle">Auth, Throttling, Routing</text>
+  <text x="570" y="514" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">managed „Front Door"</text>
+  <text x="570" y="536" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">der Anwendung</text>
+
+  <!-- Lambda -->
+  <rect x="840" y="380" width="280" height="180" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="980" y="418" font-size="22" font-weight="bold" fill="#B25400" text-anchor="middle">AWS Lambda</text>
+  <text x="980" y="450" font-size="15" fill="#444444" text-anchor="middle">Business-Logik als Funktion</text>
+  <text x="980" y="476" font-size="15" fill="#444444" text-anchor="middle">skaliert pro Request</text>
+  <text x="980" y="514" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Server, kein Patching,</text>
+  <text x="980" y="536" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Abrechnung pro ms</text>
+
+  <!-- DynamoDB -->
+  <rect x="1250" y="380" width="300" height="180" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="1400" y="418" font-size="22" font-weight="bold" fill="#232082" text-anchor="middle">Amazon DynamoDB</text>
+  <text x="1400" y="450" font-size="15" fill="#444444" text-anchor="middle">NoSQL Key-Value-Tabelle</text>
+  <text x="1400" y="476" font-size="15" fill="#444444" text-anchor="middle">einstellige ms-Latenz</text>
+  <text x="1400" y="514" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">On-Demand Capacity Mode:</text>
+  <text x="1400" y="536" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">skaliert automatisch mit Last</text>
+
+  <!-- Schritt 1 -->
+  <line x1="300" y1="470" x2="427" y2="470" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="365" cy="470" r="15" fill="#2E6BE6"/>
+  <text x="365" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="365" y="444" font-size="15" fill="#1B3E86" text-anchor="middle">HTTPS-Request</text>
+
+  <!-- Schritt 2 -->
+  <line x1="710" y1="470" x2="837" y2="470" stroke="#E7157B" stroke-width="3" marker-end="url(#arrPk)"/>
+  <circle cx="773" cy="470" r="15" fill="#E7157B"/>
+  <text x="773" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="773" y="444" font-size="15" fill="#B01059" text-anchor="middle">Proxy-Event</text>
+
+  <!-- Schritt 3 -->
+  <line x1="1120" y1="470" x2="1247" y2="470" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="1183" cy="470" r="15" fill="#ED7100"/>
+  <text x="1183" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="1183" y="444" font-size="15" fill="#B25400" text-anchor="middle">PutItem/Query</text>
+
+  <!-- Kosten-Anmerkungen (Gold) -->
+  <line x1="570" y1="560" x2="570" y2="625" stroke="#A16E00" stroke-width="2" stroke-dasharray="4,4"/>
+  <line x1="980" y1="560" x2="980" y2="625" stroke="#A16E00" stroke-width="2" stroke-dasharray="4,4"/>
+  <line x1="1400" y1="560" x2="1400" y2="625" stroke="#A16E00" stroke-width="2" stroke-dasharray="4,4"/>
+
+  <rect x="430" y="628" width="280" height="80" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="570" y="661" font-size="17" font-weight="bold" fill="#7A5300" text-anchor="middle">$ pro API-Aufruf</text>
+  <text x="570" y="689" font-size="15" fill="#444444" text-anchor="middle">keine Grundgebühr</text>
+
+  <rect x="840" y="628" width="280" height="80" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="980" y="661" font-size="17" font-weight="bold" fill="#7A5300" text-anchor="middle">$ pro ms Laufzeit + GB RAM</text>
+  <text x="980" y="689" font-size="15" fill="#444444" text-anchor="middle">keine Idle-Kosten</text>
+
+  <rect x="1250" y="628" width="300" height="80" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1400" y="661" font-size="17" font-weight="bold" fill="#7A5300" text-anchor="middle">$ pro Read/Write</text>
+  <text x="1400" y="689" font-size="15" fill="#444444" text-anchor="middle">On-Demand statt Provisioned</text>
+
+  <text x="175" y="661" font-size="17" font-weight="bold" fill="#7A5300" text-anchor="middle">Pay-per-Request</text>
+  <text x="175" y="689" font-size="15" fill="#7A5300" text-anchor="middle">auf allen 3 Ebenen:</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Serverless-API = API Gateway + Lambda + DynamoDB · Pay-per-Request auf allen Ebenen · „unvorhersehbarer/viraler Traffic" = Signalwort für Serverless</text>
+</svg>
