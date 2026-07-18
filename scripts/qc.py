@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-# Aufruf: python3 scripts/qc.py <datei.svg>   —   benoetigt Pillow
 """QC fuer Battle-Card-SVGs. Geometrie wird DIREKT aus dem SVG geparst.
+
+Aufruf: python3 scripts/qc.py <datei.svg>   (benoetigt Pillow + DejaVu-Fonts)
 
 Pruefungen:
   (a) Textbreiten (PIL getlength) gegen die umgebende Box, 8 px Padding
@@ -17,9 +18,10 @@ import os, sys, re, xml.etree.ElementTree as ET
 from PIL import ImageFont
 
 NS = "{http://www.w3.org/2000/svg}"
+
 # Die SVGs sind in DejaVu Sans gesetzt. Mit einem anderen Font gemessen waeren
 # alle Breiten falsch und das Skript wuerde still gruen melden -> lieber
-# abbrechen als raten.
+# abbrechen als raten. Suchpfade fuer Linux (Container) und macOS.
 FONT_FILES = {
     ("normal", "normal"): "DejaVuSans.ttf",
     ("bold", "normal"):   "DejaVuSans-Bold.ttf",
@@ -43,11 +45,15 @@ def font_path(weight, style):
             return os.path.join(d, name)
     sys.exit(
         f"ABBRUCH: {name} nicht gefunden.\n"
+        "  Die Battle-Card-SVGs sind in DejaVu Sans gesetzt; mit einem anderen\n"
+        "  Font waeren alle Messwerte falsch.\n"
         "  macOS : brew install --cask font-dejavu\n"
         "  Linux : apt-get install fonts-dejavu\n"
-        "  Sonst : QC_FONT_DIR=<pfad> setzen.\n"
+        "  Sonst : Verzeichnis per QC_FONT_DIR=<pfad> angeben.\n"
         f"  Durchsucht: {[d for d in FONT_DIRS if d]}"
     )
+
+
 _cache = {}
 
 
@@ -103,7 +109,8 @@ def collect(root):
             for i in range(len(pts) - 1):
                 segs.append((pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1]))
         elif tag == "circle":
-            circles.append({"cx": num(el, "cx"), "cy": num(el, "cy"), "r": num(el, "r")})
+            circles.append({"cx": num(el, "cx"), "cy": num(el, "cy"), "r": num(el, "r"),
+                            "fill": el.get("fill", ""), "stroke": el.get("stroke", "")})
     return rects, texts, segs, circles
 
 
@@ -187,8 +194,12 @@ def main(path):
                     f"(c) Segment {s} laeuft durch Box "
                     f"[{b['x0']:.0f}..{b['x1']:.0f} x {b['y0']:.0f}..{b['y1']:.0f}]")
 
-    # (d) Badges
-    for c in circles:
+    # (d) Badges. Nummern-Badges sind laut Stil-Guide randlos und in der
+    # Linienfarbe gefuellt. Weiss gefuellte Kreise mit Rand sind das rote X
+    # des verworfenen Pfades und keine Badges.
+    badges = [c for c in circles
+              if not c["stroke"] and c["fill"].upper() not in ("#FFFFFF", "WHITE", "NONE", "")]
+    for c in badges:
         hit = [i for i in badge_texts
                if abs(texts[i]["x"] - c["cx"]) < 1 and abs(texts[i]["y"] - (c["cy"] + 6)) < 1]
         if not hit:
@@ -212,7 +223,7 @@ def main(path):
             findings.append(f"(d) Badge ({c['cx']:.0f},{c['cy']:.0f}) liegt auf keinem Segment")
 
     print(f"== {path}")
-    print(f"   {len(boxes)} Boxen, {len(texts)} Texte, {len(segs)} Segmente, {len(circles)} Badges")
+    print(f"   {len(boxes)} Boxen, {len(texts)} Texte, {len(segs)} Segmente, {len(badges)} Badges")
     if findings:
         for f in findings:
             print("   ! " + f)
