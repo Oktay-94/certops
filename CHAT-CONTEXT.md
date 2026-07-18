@@ -2,7 +2,7 @@
 
 > **Zweck:** Diese Datei macht jeden neuen Chat sofort arbeitsfähig, ohne den alten Verlauf. Sie ist die **Single Source of Truth** für den Projektstand.
 > **Zielort:** Project Knowledge **und** Repo-Root auf Oktays Mac (`~/Projekte/certops/`).
-> **Letzte große Änderung:** **Strukturierte Karten-Rückseiten (`back_structured`)** — Migration 0013 lokal + remote, Sektions-Boxen-UI mit finaler v4-Palette, Backfill-Tooling, Batch 1 (30/207) lokal + live (§3b). Sieben Commits `252d17e`…`692b830` auf main (verifiziert via `git log --oneline -10`, origin synchron). Davor: SAA-Skript-Track komplett (Migration 0012, 137 Skripte, Schema-B-Navigation) — alle drei SAA-Content-Stränge lokal UND live komplett (§3).
+> **Letzte große Änderung:** **Strukturierte Quiz-Erklärungen komplett** — Migration 0014, zustandsgefärbte Ergebnis-UI, generalisiertes Backfill-Tooling, Batches 1–8 (265/265) lokal + remote (§3c). Commits bis `ce78eb2` auf main, origin synchron. Davor: strukturierte Karten-Rückseiten 207/207 komplett (§3b), SAA-Skript-Track komplett (§3) — alle drei SAA-Content-Stränge lokal UND live komplett.
 
 ---
 
@@ -46,12 +46,12 @@
 
 ---
 
-## 3c. Strukturierte Quiz-Erklärungen (`explanation_structured`) — Content komplett 265/265 ✅
+## 3c. Strukturierte Quiz-Erklärungen (`explanation_structured`) — komplett 265/265 lokal + remote ✅
 
 - **Spalte:** additiv `explanation_structured` (TEXT/JSON, nullable) auf `questions` via Migration **0014** (`0014_sturdy_thor.sql`), lokal + remote angewendet. CLF bleibt NULL, UI-Fallback aufs flache `explanation`.
 - **Format:** Keys `verdict` / `optionAnalysis` (Record der Choice-IDs A–E) / `mnemonic` / `examTrap` (Typ `QuestionExplanationStructured` in `src/lib/question-explanation.ts`, Runtime-Guard, null-Stripping zentral im Parser). Bolding-Regel wie bei den Karten (§3b).
 - **Tooling generalisiert:** `src/db/structured-backfill.ts` mit `BackfillTarget`-Configs (FLASHCARD_BACKS / QUESTION_EXPLANATIONS), gemeinsamer CLI-Runner; `pnpm db:backfill-explanation-structured` / `:remote` (Dual-Gate + `--dry-run` wie gehabt). Gleiche Garantien: raw UPDATE nur auf die Spalte, idempotent, kein INSERT.
-- **Batches:** `src/db/seed/saa-question-explanations/batch1–8.json` = q-001–265 lückenlos (batch1–5 je 30, batch6 = 55, batch7/8 je 30). **Lokal 265/265 backfilled + verifiziert** (0 CLF, 0 SAA-Lücken), Gate + Smoke (q-001/004/031/181/258 inkl. Multi-Select-Färbung) grün. **Remote: Batch 1 (30) live seit 17.07.; q-031–265 = Oktays anstehender manueller Lauf** (Batches 2–8, danach hier auf „remote komplett" heben).
+- **Batches:** `src/db/seed/saa-question-explanations/batch1–8.json` = q-001–265 lückenlos (batch1–5 je 30, batch6 = 55, batch7/8 je 30). **Lokal + remote 265/265 komplett** (0 CLF, 0 SAA-Lücken): lokal backfilled + verifiziert am 17.07., Gate + Smoke (q-001/004/031/181/258 inkl. Multi-Select-Färbung) grün; Remote-Lauf Oktay 18.07. (Batch 1 bereits 17.07. live, Batches 2–8 = 235 Updates).
 - **Quiz-Ergebnis-UI:** Verdict-Box zustandsabhängig (success-/danger-Tint + Streifen + Ring-Glow, dark gedämpft), Eselsbrücke (Rosé + rote Border) und Prüfungsfalle (Amber-Fläche) nebeneinander (mobil gestapelt), Options-Zeilen: richtige grün, ALLE falschen rot getönt, gewählte falsche kräftiger + Border. Token-basiert, AA-verifiziert light/dark.
 - **Commits:** `0e65cac` (Migration 0014 + UI + Tooling + Batch 1) · `767e74f` (state-colored verdict + option rows) · Batches 2–8 im Folge-Commit.
 
@@ -102,7 +102,7 @@ Restpunkt „Cross-Exam-Round-Cookie → 404" besteht weiter (§5); ReadinessRin
 
 > **Skript-Integration ist NICHT mehr offen** — komplett erledigt (§4). Ebenso erledigt: ReadinessRing-Hydration.
 
-1. **Deploy:** Der Live-Stand auf Vercel ist noch ohne die Commits seit `db30c21` — main pushen/Deploy prüfen. Remote-DB: Migrationen 0012–0014 + alle Seeds/Card-Backfills durch; **einzig offener DB-Schritt: Quiz-Erklärungen q-031–265 remote** (§3c, Batches 2–8, Oktays manueller Lauf) — erst danach zeigt das Live-Quiz überall strukturierte Erklärungen (Fallback deckt die Lücke ab, kein Breakage).
+1. **Deploy:** Der Live-Stand auf Vercel ist noch ohne die Commits seit `db30c21` — **Vercel-Deploy-Check ist der einzige offene Infrastruktur-Schritt.** Remote-DB vollständig vorbereitet (Migrationen 0012–0014, alle Seeds, Card- + Quiz-Backfills 207/207 + 265/265), Reihenfolge-Regel (§7) erfüllt — Deploy kann jederzeit.
 2. **SAA-TTS = dokumentierte Schuld** (bewusst verschoben; Nachrüst-Skizze in CLAUDE.md: Resolver-DB-Zweig, Cache-Pfad `tts/saa/{slug}/{section}-{hash}.mp3`, Abuse-Guard-Semantik unverändert).
 3. **CLF-topic-Backfill** weiter optional (live überall NULL, coalesce-Upsert schützt Backfills).
 4. **Header-Pill Tap-Höhe:** Pills im Sticky-Header sind 27–28px hoch (bewusst = Desktop-Höhe, Komponente geteilt). Optionaler Folge-Task: unsichtbarer Hit-Slop (z. B. `before:-inset-y-2`) für echte ≥40px-Tap-Ziele mobil.
@@ -173,4 +173,4 @@ Restpunkt „Cross-Exam-Round-Cookie → 404" besteht weiter (§5); ReadinessRin
 
 ---
 
-*Ende CHAT-CONTEXT. Ein neuer Chat startet mit: alle drei SAA-Content-Stränge lokal + live komplett (529 Fragen / 357 Karten / 137 Skripte), strukturierte Karten-Rückseiten **207/207 komplett** (§3b), strukturierte Quiz-Erklärungen **265/265 lokal** (§3c; remote fehlen q-031–265 = Oktays Lauf). Nächste Schritte = Remote-Backfill Quiz-Batches 2–8 + Push + Vercel-Deploy, dann Kür (Szenarien, TTS-Schuld, topic-Backfill).*
+*Ende CHAT-CONTEXT. Ein neuer Chat startet mit: alle drei SAA-Content-Stränge lokal + live komplett (529 Fragen / 357 Karten / 137 Skripte), strukturierte Karten-Rückseiten **207/207** (§3b) und Quiz-Erklärungen **265/265** (§3c) jeweils lokal + remote komplett. Einziger offener Infrastruktur-Schritt = **Vercel-Deploy-Check**, danach Kür (Szenarien, TTS-Schuld, topic-Backfill).*
