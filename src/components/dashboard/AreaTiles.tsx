@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { ExamSlug } from "@/lib/exam";
+import { SCENARIO_COUNT } from "@/lib/scenario-content";
 
 // Six area tiles (mockup .areas, extended from 4 to 6 — decision 2026-07-12).
 // Since the 2b polish ALL six carry a CSS-only hover mini-preview with STATIC
@@ -201,7 +202,7 @@ export function AreaTiles({ exam }: { exam: ExamSlug }) {
           href="/saa/szenarien"
           glyph="🧩"
           title="Szenarien"
-          desc="25 Battle Cards: Architektur-Diagramm, Signalwörter, Fallen."
+          desc={`${SCENARIO_COUNT} Battle Cards: Architektur-Diagramm, Signalwörter, Fallen.`}
         />
       </div>
     );

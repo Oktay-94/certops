@@ -1,0 +1,106 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/></marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 28 &#8212; RDS Proxy &#183; AWS Lambda</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Der Lambda-Schwarm ersch&#246;pft die Datenbankverbindungen &#8212; ein Pool davor entkoppelt beide Zahlen</text>
+
+  <!-- ZONE A -->
+  <rect x="40" y="150" width="1510" height="310" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="795" y="182" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">OHNE PROXY &#8212; jede Lambda-Instanz &#246;ffnet ihre eigene Verbindung</text>
+
+  <!-- ZONE B -->
+  <rect x="40" y="490" width="1510" height="310" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="795" y="522" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">MIT RDS PROXY &#8212; der Pool entkoppelt Lambda-Zahl von Verbindungszahl</text>
+
+  <!-- A1 Lastspitze -->
+  <rect x="80" y="225" width="250" height="160" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="205" y="265" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Bestell-Ansturm</text>
+  <text x="205" y="300" font-size="15" fill="#444444" text-anchor="middle">9.000 Requests/s</text>
+  <text x="205" y="322" font-size="15" fill="#444444" text-anchor="middle">Black Friday</text>
+  <text x="205" y="355" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">20 Minuten Spitze</text>
+
+  <!-- A2 Lambda -->
+  <rect x="410" y="225" width="300" height="160" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="560" y="265" font-size="21" font-weight="bold" fill="#B25400" text-anchor="middle">AWS Lambda</text>
+  <text x="560" y="300" font-size="16" fill="#444444" text-anchor="middle">900 gleichzeitige</text>
+  <text x="560" y="324" font-size="16" fill="#444444" text-anchor="middle">Ausf&#252;hrungen</text>
+  <text x="560" y="357" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">jede &#246;ffnet 1 Verbindung</text>
+
+  <!-- A3 RDS ueberlastet -->
+  <rect x="1180" y="225" width="310" height="160" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1335" y="265" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">RDS PostgreSQL</text>
+  <text x="1335" y="300" font-size="16" fill="#444444" text-anchor="middle">max_connections 200</text>
+  <text x="1335" y="324" font-size="16" fill="#9E1015" text-anchor="middle">too many clients</text>
+  <text x="1335" y="357" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Anwendung f&#228;llt aus</text>
+
+  <!-- B1 Lastspitze -->
+  <rect x="80" y="565" width="250" height="160" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="205" y="605" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Bestell-Ansturm</text>
+  <text x="205" y="640" font-size="15" fill="#444444" text-anchor="middle">9.000 Requests/s</text>
+  <text x="205" y="662" font-size="15" fill="#444444" text-anchor="middle">dieselbe Last</text>
+  <text x="205" y="695" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">nichts ge&#228;ndert</text>
+
+  <!-- B2 Lambda -->
+  <rect x="410" y="565" width="300" height="160" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="560" y="605" font-size="21" font-weight="bold" fill="#B25400" text-anchor="middle">AWS Lambda</text>
+  <text x="560" y="640" font-size="16" fill="#444444" text-anchor="middle">900 gleichzeitige</text>
+  <text x="560" y="664" font-size="16" fill="#444444" text-anchor="middle">Ausf&#252;hrungen</text>
+  <text x="560" y="697" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Proxy-Endpoint statt DB</text>
+
+  <!-- B3 RDS Proxy -->
+  <rect x="790" y="565" width="310" height="160" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="945" y="605" font-size="21" font-weight="bold" fill="#5B2BAF" text-anchor="middle">RDS Proxy</text>
+  <text x="945" y="640" font-size="16" fill="#444444" text-anchor="middle">b&#252;ndelt auf 40</text>
+  <text x="945" y="664" font-size="16" fill="#444444" text-anchor="middle">IAM + Secrets Manager</text>
+  <text x="945" y="697" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Failover bis 66 % schneller</text>
+
+  <!-- B4 RDS entspannt -->
+  <rect x="1180" y="565" width="310" height="160" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1335" y="605" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">RDS PostgreSQL</text>
+  <text x="1335" y="640" font-size="16" fill="#444444" text-anchor="middle">40 von 200 belegt</text>
+  <text x="1335" y="664" font-size="16" fill="#444444" text-anchor="middle">Luft f&#252;r Spitzen</text>
+  <text x="1335" y="697" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">unver&#228;ndert konfiguriert</text>
+
+  <!-- Zone A: Ansturm -> Lambda -->
+  <line x1="330" y1="305" x2="406" y2="305" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+
+  <!-- Zone A: Lambda -> RDS, scheitert -->
+  <line x1="710" y1="305" x2="1176" y2="305" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="945" cy="305" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="932" y1="292" x2="958" y2="318" stroke="#C7161D" stroke-width="4"/>
+  <line x1="958" y1="292" x2="932" y2="318" stroke="#C7161D" stroke-width="4"/>
+  <text x="740" y="283" font-size="15" fill="#9E1015">900 Verbindungen</text>
+  <text x="740" y="340" font-size="15" fill="#9E1015">eine pro Instanz</text>
+
+  <!-- 1 Zone B: Ansturm -> Lambda -->
+  <line x1="330" y1="645" x2="406" y2="645" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="368" cy="645" r="15" fill="#2E6BE6"/>
+  <text x="368" y="651" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2 Zone B: Lambda -> Proxy -->
+  <line x1="710" y1="645" x2="786" y2="645" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="748" cy="645" r="15" fill="#ED7100"/>
+  <text x="748" y="651" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="716" y="605" font-size="15" fill="#B25400">900</text>
+  <text x="716" y="623" font-size="15" fill="#B25400">offen</text>
+
+  <!-- 3 Zone B: Proxy -> RDS -->
+  <line x1="1100" y1="645" x2="1176" y2="645" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <circle cx="1138" cy="645" r="15" fill="#7A3FE0"/>
+  <text x="1138" y="651" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="1106" y="605" font-size="15" fill="#5B2BAF">40</text>
+  <text x="1106" y="623" font-size="15" fill="#5B2BAF">gepoolt</text>
+
+  <text x="790" y="765" font-size="15" font-style="italic" fill="#666666">Zielkonflikt Karte 23: der offene Pool verhindert Auroras Auto-Pause</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  Der Pool entkoppelt Lambda-Zahl von Verbindungszahl &#183; ein SET pinnt und hebelt ihn aus &#183; offener Pool verhindert Auto-Pause</text>
+</svg>

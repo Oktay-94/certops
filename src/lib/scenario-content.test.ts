@@ -48,6 +48,32 @@ describe("listScenarios", () => {
     }
   });
 
+  it("multi-domain cards appear under every one of their domains (filter invariant)", () => {
+    // ScenarioGrid filters via s.domains.includes(domain) — a card counts
+    // once per domain it belongs to, so the per-domain totals overlap.
+    const perDomain = SAA_C03_DOMAINS.map(
+      (d) => scenarios.filter((s) => s.domains.includes(d)).length,
+    );
+    const memberships = perDomain.reduce((a, b) => a + b, 0);
+    expect(memberships).toBeGreaterThan(SCENARIO_COUNT);
+    expect(memberships).toBe(
+      scenarios.reduce((a, s) => a + s.domains.length, 0),
+    );
+
+    // Explicit multi-domain samples from batch 6.
+    const card27 = scenarios.find((s) => s.nr === 27)!;
+    expect(card27.domainCodes).toEqual(["D3", "D4"]);
+    const card30 = scenarios.find((s) => s.nr === 30)!;
+    expect(card30.domainCodes).toEqual(["D1", "D2"]);
+    for (const card of [card27, card30]) {
+      for (const d of card.domains) {
+        expect(
+          scenarios.filter((s) => s.domains.includes(d)).map((s) => s.nr),
+        ).toContain(card.nr);
+      }
+    }
+  });
+
   it("frontmatter carries no legacy domain keys (normalization guard)", () => {
     for (const s of scenarios) {
       const file = path.join(
@@ -76,7 +102,7 @@ describe("getScenario", () => {
     expect(getScenario("1")).toBeNull();
     expect(getScenario("001")).toBeNull();
     expect(getScenario("00")).toBeNull();
-    expect(getScenario("26")).toBeNull();
-    expect(getScenario("25")).not.toBeNull();
+    expect(getScenario("31")).toBeNull();
+    expect(getScenario("30")).not.toBeNull();
   });
 });

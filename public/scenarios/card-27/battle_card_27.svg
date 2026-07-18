@@ -1,0 +1,134 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/></marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 27 &#8212; Amazon Timestream</text>
+  <text x="60" y="106" font-size="21" fill="#555555">IoT-Zeitreihen: Millionen Messwerte pro Minute, Abfragen nach Zeitfenstern &#8212; Pr&#252;fungsstand und Produktstand</text>
+
+  <!-- ZONE A -->
+  <rect x="300" y="150" width="1250" height="310" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="925" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">PR&#220;FUNGSREALIT&#196;T &#8212; was die SAA-C03-Pr&#252;fung abfragt</text>
+
+  <!-- ZONE B -->
+  <rect x="300" y="500" width="1250" height="300" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="925" y="530" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">PRODUKTREALIT&#196;T &#8212; f&#252;r Neukunden geschlossen seit 20.06.2025</text>
+
+  <!-- Sensoren -->
+  <rect x="40" y="200" width="230" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="155" y="236" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Sensoren</text>
+  <text x="155" y="266" font-size="15" fill="#444444" text-anchor="middle">40.000 Maschinen</text>
+  <text x="155" y="288" font-size="15" fill="#444444" text-anchor="middle">3 Mio. Werte/min</text>
+  <text x="155" y="316" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Temperatur &#183; Druck</text>
+
+  <!-- IoT Core -->
+  <rect x="40" y="420" width="230" height="150" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="155" y="456" font-size="20" font-weight="bold" fill="#B25400" text-anchor="middle">AWS IoT Core</text>
+  <text x="155" y="486" font-size="15" fill="#444444" text-anchor="middle">MQTT-Ingestion</text>
+  <text x="155" y="508" font-size="15" fill="#444444" text-anchor="middle">Rule Action leitet</text>
+  <text x="155" y="536" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein eigener Code</text>
+
+  <!-- Memory Store -->
+  <rect x="350" y="215" width="330" height="190" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="515" y="252" font-size="21" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Memory Store</text>
+  <text x="515" y="284" font-size="16" fill="#444444" text-anchor="middle">hoher Schreibdurchsatz</text>
+  <text x="515" y="308" font-size="16" fill="#444444" text-anchor="middle">Punktabfragen in ms</text>
+  <text x="515" y="332" font-size="16" fill="#444444" text-anchor="middle">Retention 1&#8211;8.766 Stunden</text>
+  <text x="515" y="364" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">teuer pro GB-Stunde</text>
+  <text x="515" y="388" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">h&#228;lt die letzten Stunden</text>
+
+  <!-- Magnetic Store -->
+  <rect x="760" y="215" width="330" height="190" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="925" y="252" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">Magnetic Store</text>
+  <text x="925" y="284" font-size="16" fill="#444444" text-anchor="middle">analytische Abfragen</text>
+  <text x="925" y="308" font-size="16" fill="#444444" text-anchor="middle">Langzeitspeicher</text>
+  <text x="925" y="332" font-size="16" fill="#444444" text-anchor="middle">bis 73.000 Tage</text>
+  <text x="925" y="364" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">g&#252;nstig pro GB-Monat</text>
+  <text x="925" y="388" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">&#220;bergang automatisch</text>
+
+  <!-- Abfrage -->
+  <rect x="1170" y="215" width="330" height="190" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1335" y="252" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">SQL-Abfrage</text>
+  <text x="1335" y="284" font-size="16" fill="#444444" text-anchor="middle">adaptive Query-Engine</text>
+  <text x="1335" y="308" font-size="16" fill="#444444" text-anchor="middle">liest beide Stufen</text>
+  <text x="1335" y="332" font-size="16" fill="#444444" text-anchor="middle">ohne Ortsangabe</text>
+  <text x="1335" y="364" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Zahlung pro GB Scan</text>
+  <text x="1335" y="388" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Grafana-Dashboard</text>
+
+  <!-- Timestream for InfluxDB -->
+  <rect x="350" y="565" width="330" height="190" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="515" y="602" font-size="21" font-weight="bold" fill="#B25400" text-anchor="middle">Timestream InfluxDB</text>
+  <text x="515" y="636" font-size="16" fill="#444444" text-anchor="middle">managed InfluxDB 3</text>
+  <text x="515" y="660" font-size="16" fill="#444444" text-anchor="middle">Instanzen statt Serverless</text>
+  <text x="515" y="692" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Core und Enterprise</text>
+  <text x="515" y="716" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Empfehlung f&#252;r Neukunden</text>
+
+  <!-- SQL / InfluxQL -->
+  <rect x="760" y="565" width="330" height="190" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="925" y="602" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">SQL &#183; InfluxQL</text>
+  <text x="925" y="636" font-size="16" fill="#444444" text-anchor="middle">einstellige ms-Latenz</text>
+  <text x="925" y="660" font-size="16" fill="#444444" text-anchor="middle">Grafana</text>
+  <text x="925" y="692" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">andere Abfragesprache</text>
+  <text x="925" y="716" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">als LiveAnalytics</text>
+
+  <!-- Bestandskunden -->
+  <rect x="1170" y="565" width="330" height="190" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1335" y="602" font-size="21" font-weight="bold" fill="#555555" text-anchor="middle">Bestandskunden</text>
+  <text x="1335" y="636" font-size="16" fill="#444444" text-anchor="middle">LiveAnalytics l&#228;uft</text>
+  <text x="1335" y="660" font-size="16" fill="#444444" text-anchor="middle">unver&#228;ndert weiter</text>
+  <text x="1335" y="692" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">neue Linked Accounts</text>
+  <text x="1335" y="716" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">unter demselben Payer</text>
+
+  <!-- 1 Sensoren -> IoT Core -->
+  <line x1="155" y1="340" x2="155" y2="414" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="155" cy="377" r="15" fill="#2E6BE6"/>
+  <text x="155" y="383" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="180" y="383" font-size="15" fill="#1B3E86">MQTT</text>
+
+  <!-- 2 IoT Core -> Memory Store -->
+  <path d="M 270,470 L 310,470 L 310,310 L 346,310" fill="none" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="310" cy="390" r="15" fill="#ED7100"/>
+  <text x="310" y="396" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="274" y="492" font-size="15" fill="#B25400">Rule Action</text>
+
+  <!-- 3 IoT Core -> Timestream InfluxDB -->
+  <path d="M 270,540 L 310,540 L 310,660 L 346,660" fill="none" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="310" cy="620" r="15" fill="#ED7100"/>
+  <text x="310" y="626" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4 Memory -> Magnetic -->
+  <line x1="680" y1="310" x2="756" y2="310" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <circle cx="718" cy="310" r="15" fill="#7A3FE0"/>
+  <text x="718" y="316" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="684" y="288" font-size="15" fill="#5B2BAF">Retention</text>
+  <text x="686" y="344" font-size="15" fill="#5B2BAF">l&#228;uft ab</text>
+
+  <!-- 5 Magnetic -> Abfrage -->
+  <line x1="1090" y1="310" x2="1166" y2="310" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="1128" cy="310" r="15" fill="#3F8624"/>
+  <text x="1128" y="316" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1096" y="288" font-size="15" fill="#2E6318">Scan</text>
+  <text x="1098" y="344" font-size="15" fill="#2E6318">SQL</text>
+
+  <!-- 6 Memory -> Abfrage (adaptive) -->
+  <path d="M 515,405 L 515,435 L 1335,435 L 1335,409" fill="none" stroke="#7A3FE0" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrP)"/>
+  <circle cx="900" cy="435" r="15" fill="#7A3FE0"/>
+  <text x="900" y="441" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="560" y="425" font-size="15" fill="#5B2BAF">dieselbe Abfrage erreicht beide Stufen</text>
+
+  <!-- 7 InfluxDB -> SQL -->
+  <line x1="680" y1="660" x2="756" y2="660" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="718" cy="660" r="15" fill="#ED7100"/>
+  <text x="718" y="666" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+  <text x="684" y="638" font-size="15" fill="#B25400">Query</text>
+  <text x="688" y="694" font-size="15" fill="#B25400">API</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  Zeitreihe = die Zeit ist der Index &#183; Memory Store schnell und teuer, Magnetic Store g&#252;nstig und analytisch &#183; Neukunden bekommen nur InfluxDB</text>
+</svg>

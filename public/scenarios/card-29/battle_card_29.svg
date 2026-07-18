@@ -1,0 +1,109 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 29 &#8212; Amazon DocumentDB</text>
+  <text x="60" y="106" font-size="21" fill="#555555">MongoDB-Workload managed betreiben &#8212; der Treiber bleibt, der Betrieb verschwindet</text>
+
+  <!-- ZONE Rechenzentrum -->
+  <rect x="40" y="160" width="310" height="290" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="195" y="192" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">RECHENZENTRUM</text>
+
+  <!-- M1 MongoDB -->
+  <rect x="70" y="220" width="250" height="200" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="195" y="260" font-size="21" font-weight="bold" fill="#555555" text-anchor="middle">MongoDB</text>
+  <text x="195" y="296" font-size="16" fill="#444444" text-anchor="middle">Replica Set, 3 Knoten</text>
+  <text x="195" y="320" font-size="16" fill="#444444" text-anchor="middle">1,4 TB Bestelldaten</text>
+  <text x="195" y="344" font-size="16" fill="#444444" text-anchor="middle">Version 5.0</text>
+  <text x="195" y="378" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">eigene Patches</text>
+  <text x="195" y="402" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">eigene Backups</text>
+
+  <!-- D1 DMS -->
+  <rect x="430" y="255" width="250" height="130" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="555" y="295" font-size="21" font-weight="bold" fill="#B25400" text-anchor="middle">AWS DMS</text>
+  <text x="555" y="330" font-size="16" fill="#444444" text-anchor="middle">Full Load + CDC</text>
+  <text x="555" y="362" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Umstellung im Betrieb</text>
+
+  <!-- P1 Primary -->
+  <rect x="790" y="195" width="290" height="125" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="935" y="232" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">Primary Instance</text>
+  <text x="935" y="266" font-size="16" fill="#444444" text-anchor="middle">schreibt und liest</text>
+  <text x="935" y="298" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Cluster-Endpoint</text>
+
+  <!-- R1 Read Replicas -->
+  <rect x="790" y="365" width="290" height="125" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="935" y="402" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">Read Replicas</text>
+  <text x="935" y="436" font-size="16" fill="#444444" text-anchor="middle">bis zu 15</text>
+  <text x="935" y="468" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Reader-Endpoint</text>
+
+  <!-- V1 Cluster-Volume -->
+  <rect x="1170" y="250" width="330" height="185" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1335" y="290" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">Cluster-Volume</text>
+  <text x="1335" y="325" font-size="16" fill="#444444" text-anchor="middle">6 Kopien &#252;ber 3 AZs</text>
+  <text x="1335" y="349" font-size="16" fill="#444444" text-anchor="middle">10-GiB-Schritte</text>
+  <text x="1335" y="373" font-size="16" fill="#444444" text-anchor="middle">bis 128 TiB</text>
+  <text x="1335" y="406" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">geteilt von allen Instanzen</text>
+
+  <!-- A1 App -->
+  <rect x="430" y="560" width="290" height="175" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="575" y="600" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">Bestell-App</text>
+  <text x="575" y="636" font-size="16" fill="#444444" text-anchor="middle">unver&#228;nderter</text>
+  <text x="575" y="660" font-size="16" fill="#444444" text-anchor="middle">MongoDB-Treiber</text>
+  <text x="575" y="694" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">nur der Connection-</text>
+  <text x="575" y="716" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">String &#228;ndert sich</text>
+
+  <!-- V8 Version -->
+  <rect x="790" y="560" width="290" height="175" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="935" y="600" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">DocumentDB 8.0</text>
+  <text x="935" y="636" font-size="16" fill="#444444" text-anchor="middle">MongoDB-API 6, 7, 8</text>
+  <text x="935" y="660" font-size="16" fill="#444444" text-anchor="middle">In-place-Upgrade</text>
+  <text x="935" y="694" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Serverless verf&#252;gbar</text>
+  <text x="935" y="716" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Elastic Clusters: Sharding</text>
+
+  <!-- K1 Kompatibilitaet -->
+  <rect x="1170" y="560" width="330" height="175" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1335" y="600" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">API, nicht Engine</text>
+  <text x="1335" y="636" font-size="16" fill="#444444" text-anchor="middle">manche Operatoren fehlen</text>
+  <text x="1335" y="660" font-size="16" fill="#444444" text-anchor="middle">8.0.1 erg&#228;nzte 46 davon</text>
+  <text x="1335" y="694" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Kompatibilit&#228;t pr&#252;fen,</text>
+  <text x="1335" y="716" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">nicht annehmen</text>
+
+  <!-- 1 MongoDB -> DMS -->
+  <line x1="320" y1="320" x2="426" y2="320" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="373" cy="320" r="15" fill="#ED7100"/>
+  <text x="373" y="326" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="330" y="296" font-size="15" fill="#B25400">Migration</text>
+
+  <!-- 2 DMS -> Primary -->
+  <path d="M 680,320 L 730,320 L 730,255 L 786,255" fill="none" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="730" cy="292" r="15" fill="#ED7100"/>
+  <text x="730" y="298" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="686" y="345" font-size="15" fill="#B25400">Full Load</text>
+
+  <!-- 3 Primary -> Volume -->
+  <line x1="1080" y1="257" x2="1166" y2="257" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="1123" cy="257" r="15" fill="#232F3E"/>
+  <text x="1123" y="263" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="1086" y="233" font-size="15" fill="#232F3E">schreibt</text>
+
+  <!-- Volume -> Replicas (kein Ablaufschritt) -->
+  <line x1="1166" y1="400" x2="1086" y2="400" stroke="#3F8624" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrGr)"/>
+  <text x="1092" y="378" font-size="15" fill="#2E6318">geteilt</text>
+
+  <!-- 4 App -> Cluster-Endpoint -->
+  <path d="M 720,645 L 758,645 L 758,290 L 786,290" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="758" cy="500" r="15" fill="#2E6BE6"/>
+  <text x="758" y="506" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="766" y="530" font-size="15" fill="#1B3E86">Cluster-Endpoint</text>
+  <text x="766" y="550" font-size="15" fill="#1B3E86">derselbe Treiber</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  Dokument = Struktur im Datensatz, Graph = Verbindung zwischen Datens&#228;tzen &#183; DocumentDB spricht die MongoDB-API, ist aber nicht MongoDB</text>
+</svg>

@@ -1,0 +1,125 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/></marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrPk" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#B0084D"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 26 &#8212; Amazon Neptune &#183; Neptune Analytics</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Betrugsringe erkennen: wer teilt Ger&#228;t, Adresse und Empf&#228;ngerkonto mit wem &#8212; Traversal statt Self-Joins</text>
+
+  <!-- A3  Amazon S3 -->
+  <rect x="40" y="150" width="220" height="115" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="150" y="186" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">Amazon S3</text>
+  <text x="150" y="216" font-size="15" fill="#444444" text-anchor="middle">Altbestand, CSV</text>
+  <text x="150" y="242" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Neptune Bulk Loader</text>
+
+  <!-- A1  Kontoeroeffnung -->
+  <rect x="40" y="320" width="220" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="150" y="356" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Konto&#246;ffnung</text>
+  <text x="150" y="386" font-size="15" fill="#444444" text-anchor="middle">3,1 Mio. Kunden</text>
+  <text x="150" y="408" font-size="15" fill="#444444" text-anchor="middle">240 Mio. Kanten</text>
+  <text x="150" y="436" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Ger&#228;t &#183; IP &#183; Adresse</text>
+
+  <!-- A2  Fraud-Service -->
+  <rect x="40" y="510" width="220" height="145" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="150" y="546" font-size="20" font-weight="bold" fill="#B25400" text-anchor="middle">Fraud-Service</text>
+  <text x="150" y="576" font-size="15" fill="#444444" text-anchor="middle">AWS Lambda</text>
+  <text x="150" y="598" font-size="15" fill="#444444" text-anchor="middle">pr&#252;ft jeden Antrag</text>
+  <text x="150" y="628" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Budget unter 50 ms</text>
+
+  <!-- B  Neptune Database -->
+  <rect x="430" y="190" width="390" height="320" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="625" y="232" font-size="23" font-weight="bold" fill="#0B5A66" text-anchor="middle">Amazon Neptune Database</text>
+  <text x="625" y="268" font-size="16" fill="#444444" text-anchor="middle">Property Graph + RDF</text>
+  <text x="625" y="292" font-size="16" fill="#444444" text-anchor="middle">Gremlin &#183; openCypher &#183; SPARQL</text>
+  <text x="625" y="332" font-size="16" fill="#444444" text-anchor="middle">1 Writer + bis zu 15 Read Replicas</text>
+  <text x="625" y="356" font-size="16" fill="#444444" text-anchor="middle">6 Kopien &#252;ber 3 AZs &#183; Failover ~30 s</text>
+  <text x="625" y="380" font-size="16" fill="#444444" text-anchor="middle">Serverless: 1&#8211;128 NCU (1 NCU &#8776; 2 GB)</text>
+  <text x="625" y="418" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">VPC-only, kein &#246;ffentlicher Endpoint</text>
+  <text x="625" y="442" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Traversal in Millisekunden</text>
+  <text x="625" y="466" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Storage w&#228;chst in 10-GiB-Segmenten</text>
+
+  <!-- C  Neptune Analytics -->
+  <rect x="930" y="190" width="330" height="290" rx="10" fill="#FDF0F5" stroke="#B0084D" stroke-width="2.5"/>
+  <text x="1095" y="232" font-size="23" font-weight="bold" fill="#8A0A3F" text-anchor="middle">Neptune Analytics</text>
+  <text x="1095" y="268" font-size="16" fill="#444444" text-anchor="middle">In-Memory-Analytik-Engine</text>
+  <text x="1095" y="292" font-size="16" fill="#444444" text-anchor="middle">nur openCypher</text>
+  <text x="1095" y="332" font-size="16" fill="#444444" text-anchor="middle">Community Detection</text>
+  <text x="1095" y="356" font-size="16" fill="#444444" text-anchor="middle">PageRank &#183; Vektorsuche</text>
+  <text x="1095" y="394" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">eigene Kopie des Graphen</text>
+  <text x="1095" y="418" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">aus Snapshot oder S3 geladen</text>
+  <text x="1095" y="442" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Ersatz f&#252;r die Database</text>
+
+  <!-- D  Ermittlung -->
+  <rect x="1360" y="250" width="210" height="170" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1465" y="292" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">Ermittlung</text>
+  <text x="1465" y="322" font-size="15" fill="#444444" text-anchor="middle">Fallakte je Ring</text>
+  <text x="1465" y="344" font-size="15" fill="#444444" text-anchor="middle">Konten sperren</text>
+  <text x="1465" y="374" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Risiko-Label</text>
+  <text x="1465" y="396" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">zur&#252;ck in den Graph</text>
+
+  <!-- E  verworfen: relationale DB -->
+  <rect x="430" y="620" width="390" height="140" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="625" y="658" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Relationale DB</text>
+  <text x="625" y="688" font-size="15" fill="#444444" text-anchor="middle">4 Self-Joins f&#252;r 4 Hops</text>
+  <text x="625" y="710" font-size="15" fill="#444444" text-anchor="middle">Laufzeit: Minuten</text>
+  <text x="625" y="738" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Hop-Tiefe vorab unbekannt</text>
+
+  <!-- 1  Bulk Load  S3 -> Neptune Database -->
+  <line x1="260" y1="207" x2="426" y2="207" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="310" cy="207" r="15" fill="#3F8624"/>
+  <text x="310" y="213" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="336" y="182" font-size="15" fill="#2E6318">Bulk Load</text>
+  <text x="336" y="238" font-size="15" fill="#2E6318">einmalig</text>
+
+  <!-- 2  Antrag  Kontooeffnung -> Fraud-Service -->
+  <line x1="150" y1="450" x2="150" y2="504" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="150" cy="477" r="15" fill="#2E6BE6"/>
+  <text x="150" y="483" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="178" y="483" font-size="15" fill="#1B3E86">Neuer Antrag</text>
+
+  <!-- 3  Echtzeit-Query  Fraud-Service -> Neptune Database -->
+  <path d="M 260,560 L 345,560 L 345,430 L 426,430" fill="none" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="345" cy="500" r="15" fill="#ED7100"/>
+  <text x="345" y="506" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="268" y="586" font-size="15" fill="#B25400">openCypher /</text>
+  <text x="268" y="604" font-size="15" fill="#B25400">Gremlin &#183; 3 Hops</text>
+
+  <!-- 4  Graph laden  Neptune Database -> Neptune Analytics -->
+  <line x1="820" y1="300" x2="926" y2="300" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrT)"/>
+  <circle cx="873" cy="300" r="15" fill="#0F7C8C"/>
+  <text x="873" y="306" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="826" y="272" font-size="15" fill="#0B5A66">Graph laden</text>
+  <text x="826" y="338" font-size="15" fill="#0B5A66">Snapshot</text>
+
+  <!-- 5  Befund  Neptune Analytics -> Ermittlung -->
+  <line x1="1260" y1="300" x2="1356" y2="300" stroke="#B0084D" stroke-width="3" marker-end="url(#arrPk)"/>
+  <circle cx="1308" cy="300" r="15" fill="#B0084D"/>
+  <text x="1308" y="306" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1266" y="272" font-size="15" fill="#8A0A3F">Befund</text>
+  <text x="1266" y="338" font-size="15" fill="#8A0A3F">je Ring</text>
+
+  <!-- 6  Risiko-Label zurueck  Ermittlung -> Neptune Database -->
+  <path d="M 1465,420 L 1465,570 L 625,570 L 625,514" fill="none" stroke="#232F3E" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrN)"/>
+  <circle cx="1100" cy="570" r="15" fill="#232F3E"/>
+  <text x="1100" y="576" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="800" y="550" font-size="15" fill="#232F3E">Risiko-Label zur&#252;ck in den Graph</text>
+
+  <!-- verworfener Pfad  Fraud-Service -> relationale DB -->
+  <path d="M 150,655 L 150,690 L 426,690" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="290" cy="690" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="277" y1="677" x2="303" y2="703" stroke="#C7161D" stroke-width="4"/>
+  <line x1="303" y1="677" x2="277" y2="703" stroke="#C7161D" stroke-width="4"/>
+  <text x="320" y="672" font-size="15" fill="#9E1015">verworfen</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  Graph = Beziehungen als Datentyp, jede Hop-Tiefe ohne Self-Join &#183; Database: Gremlin/openCypher/SPARQL &#183; Analytics: nur openCypher</text>
+</svg>
