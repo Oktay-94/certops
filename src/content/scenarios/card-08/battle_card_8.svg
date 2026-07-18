@@ -1,0 +1,79 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrDb" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E27AD"/></marker>
+    <marker id="arrGy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 8 — Elastic Beanstalk · RDS</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Web-App „einfach hochladen": Plattform provisioniert, deployt, Load-balanced und skaliert automatisch</text>
+
+  <!-- DEVELOPER -->
+  <rect x="40" y="380" width="200" height="120" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="140" y="422" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Developer</text>
+  <text x="140" y="452" font-size="16" fill="#444444" text-anchor="middle">eb deploy / .zip</text>
+  <text x="140" y="478" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">nur Code, keine Infra</text>
+
+  <!-- ENVIRONMENT ZONE -->
+  <rect x="300" y="200" width="720" height="470" rx="12" fill="none" stroke="#3F8624" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="660" y="232" font-size="18" font-weight="bold" fill="#2E6318" text-anchor="middle">ELASTIC BEANSTALK ENVIRONMENT  (managed · AL2023-Plattform)</text>
+  <text x="660" y="257" font-size="15" font-style="italic" fill="#2E6318" text-anchor="middle">EB provisioniert ELB + ASG + EC2 via CloudFormation · Deployment · Health · Skalierung</text>
+
+  <!-- ELB -->
+  <rect x="340" y="290" width="280" height="120" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="480" y="330" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">Application LB</text>
+  <text x="480" y="360" font-size="16" fill="#444444" text-anchor="middle">Traffic verteilen</text>
+  <text x="480" y="388" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">von EB angelegt</text>
+
+  <!-- ASG / EC2 -->
+  <rect x="340" y="460" width="280" height="170" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="480" y="500" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">Auto Scaling Group</text>
+  <text x="480" y="530" font-size="16" fill="#444444" text-anchor="middle">EC2 Web-Instances</text>
+  <text x="480" y="556" font-size="16" fill="#444444" text-anchor="middle">App-Code laeuft hier</text>
+  <text x="480" y="584" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">skaliert nach Last</text>
+  <text x="480" y="610" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Health-Checks · Rolling Deploy</text>
+
+  <!-- COUPLED RDS (rejected) -->
+  <rect x="700" y="380" width="290" height="250" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="845" y="420" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">RDS in der Environment</text>
+  <text x="845" y="454" font-size="15" fill="#444444" text-anchor="middle">an den Lebenszyklus gekoppelt</text>
+  <text x="845" y="484" font-size="15" fill="#9E1015" text-anchor="middle">Environment terminiert → DB weg</text>
+  <text x="845" y="520" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">nur fur Dev/Test</text>
+  <text x="845" y="548" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Datenverlust-Falle</text>
+
+  <!-- EXTERNAL RDS (correct) -->
+  <rect x="1120" y="410" width="440" height="190" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="1340" y="452" font-size="22" font-weight="bold" fill="#232082" text-anchor="middle">RDS — separat provisioniert</text>
+  <text x="1340" y="484" font-size="16" fill="#444444" text-anchor="middle">Multi-AZ · eigener Lebenszyklus</text>
+  <text x="1340" y="512" font-size="16" fill="#444444" text-anchor="middle">uberlebt EB-Neuaufbau</text>
+  <text x="1340" y="542" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Endpoint via Umgebungsvariable</text>
+  <text x="1340" y="570" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Security Group: EB → RDS</text>
+
+  <!-- ARROW 1: DEV -> ELB (upload into env) -->
+  <line x1="240" y1="440" x2="340" y2="350" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="292" y="415" font-size="15" fill="#1B3E86" text-anchor="middle">upload</text>
+  <circle cx="290" cy="395" r="15" fill="#2E6BE6"/><text x="290" y="401" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- ARROW 2: ELB -> ASG -->
+  <line x1="480" y1="410" x2="480" y2="460" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <text x="545" y="440" font-size="15" fill="#2E6318" text-anchor="middle">Traffic</text>
+  <circle cx="480" cy="435" r="15" fill="#3F8624"/><text x="480" y="441" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- ARROW 3: ASG -> EXTERNAL RDS (routed under boxes) -->
+  <path d="M 480 630 L 480 700 L 1340 700 L 1340 600" fill="none" stroke="#2E27AD" stroke-width="3" marker-end="url(#arrDb)"/>
+  <text x="910" y="688" font-size="15" fill="#232082" text-anchor="middle">DB-Query → externe RDS (Endpoint via Env-Var)</text>
+  <circle cx="910" cy="700" r="15" fill="#2E27AD"/><text x="910" y="706" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- REJECTED: coupled RDS stub with red X -->
+  <line x1="620" y1="505" x2="700" y2="505" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGy)"/>
+  <text x="660" y="478" font-size="15" fill="#9E1015" text-anchor="middle">nicht koppeln</text>
+  <circle cx="660" cy="505" r="18" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="649" y1="494" x2="671" y2="516" stroke="#C7161D" stroke-width="4"/>
+  <line x1="671" y1="494" x2="649" y2="516" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- FOOTER -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Beanstalk = PaaS: Code rein, Plattform baut ELB+ASG+EC2 · RDS IMMER separat provisionieren (sonst stirbt die DB mit der Environment)</text>
+</svg>

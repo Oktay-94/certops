@@ -1,0 +1,97 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 3 — EC2 Auto Scaling · ALB · CloudWatch</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Webshop mit Tageszyklus: nachts 2 Instanzen, mittags 40 — automatisch nach Metrik</text>
+
+  <!-- Nutzer -->
+  <rect x="50" y="400" width="210" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="155" y="438" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Nutzer</text>
+  <text x="155" y="470" font-size="15" fill="#444444" text-anchor="middle">DailyDeals-Webshop</text>
+  <text x="155" y="500" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Last schwankt</text>
+  <text x="155" y="522" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">im Tagesverlauf</text>
+
+  <!-- ALB -->
+  <rect x="350" y="400" width="230" height="140" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="465" y="438" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Application</text>
+  <text x="465" y="464" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Load Balancer</text>
+  <text x="465" y="496" font-size="15" fill="#444444" text-anchor="middle">verteilt auf alle</text>
+  <text x="465" y="518" font-size="15" fill="#444444" text-anchor="middle">gesunden Instanzen</text>
+
+  <!-- ASG Zone -->
+  <rect x="670" y="360" width="490" height="230" rx="12" fill="none" stroke="#888888" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="915" y="388" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Auto Scaling Group (min 2 · max 40)</text>
+
+  <rect x="700" y="410" width="120" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="760" y="448" font-size="18" font-weight="bold" fill="#2E6318" text-anchor="middle">EC2</text>
+  <text x="760" y="474" font-size="15" fill="#444444" text-anchor="middle">Instanz</text>
+  <text x="760" y="522" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">nachts:</text>
+  <text x="760" y="542" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">min = 2</text>
+
+  <rect x="840" y="410" width="120" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="900" y="448" font-size="18" font-weight="bold" fill="#2E6318" text-anchor="middle">EC2</text>
+  <text x="900" y="474" font-size="15" fill="#444444" text-anchor="middle">Instanz</text>
+
+  <rect x="980" y="410" width="150" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1055" y="448" font-size="18" font-weight="bold" fill="#2E6318" text-anchor="middle">EC2 …</text>
+  <text x="1055" y="474" font-size="15" fill="#444444" text-anchor="middle">bei Bedarf</text>
+  <text x="1055" y="522" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">mittags:</text>
+  <text x="1055" y="542" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">bis max = 40</text>
+
+  <!-- CloudWatch -->
+  <rect x="670" y="160" width="490" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="915" y="198" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Amazon CloudWatch</text>
+  <text x="915" y="228" font-size="15" fill="#444444" text-anchor="middle">misst Metrik (z. B. Ø CPU-Auslastung / Requests je Target)</text>
+  <text x="915" y="252" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Target-Tracking-Policy verwaltet ihre Alarme selbst</text>
+
+  <!-- Schritt 1: Nutzer -> ALB -->
+  <line x1="260" y1="470" x2="347" y2="470" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="303" cy="470" r="15" fill="#2E6BE6"/>
+  <text x="303" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="303" y="443" font-size="15" fill="#1B3E86" text-anchor="middle">HTTPS</text>
+
+  <!-- Schritt 2: ALB -> Instanzen -->
+  <line x1="580" y1="470" x2="697" y2="470" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="638" cy="470" r="15" fill="#232F3E"/>
+  <text x="638" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="638" y="443" font-size="15" fill="#232F3E" text-anchor="middle">Routing</text>
+
+  <!-- Schritt 3: Instanzen -> CloudWatch (Metrik hoch) -->
+  <path d="M 915 407 L 915 283" fill="none" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrT)"/>
+  <circle cx="915" cy="345" r="15" fill="#0F7C8C"/>
+  <text x="915" y="351" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="1050" y="335" font-size="15" fill="#0B5A66" text-anchor="middle">Metriken publizieren</text>
+
+  <!-- Schritt 4: CloudWatch -> ASG (Skalier-Aktion) rechtsherum -->
+  <path d="M 1160 220 L 1240 220 L 1240 475 L 1163 475" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="1240" cy="345" r="15" fill="#0F7C8C"/>
+  <text x="1240" y="351" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="1330" y="338" font-size="15" fill="#0B5A66" text-anchor="middle">Alarm &#8594;</text>
+  <text x="1330" y="358" font-size="15" fill="#0B5A66" text-anchor="middle">desired capacity</text>
+  <text x="1330" y="378" font-size="15" fill="#0B5A66" text-anchor="middle">anpassen</text>
+
+  <!-- Merkbox proaktiv -->
+  <rect x="50" y="620" width="1100" height="150" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="70" y="655" font-size="18" font-weight="bold" fill="#7A5300">Reaktiv vs. proaktiv — die Prüfungsfalle</text>
+  <text x="70" y="686" font-size="16" fill="#444444"><tspan font-weight="bold">Target Tracking</tspan> (hier gezeigt): reagiert auf Live-Metrik, AWS baut/verwaltet die Alarme selbst — Default für die meisten Workloads.</text>
+  <text x="70" y="714" font-size="16" fill="#444444"><tspan font-weight="bold">Scheduled / Predictive Scaling</tspan>: skaliert VOR der bekannten Spitze (z. B. jeden Tag 11 Uhr hoch) — vermeidet den Reaktions-Lag.</text>
+  <text x="70" y="742" font-size="16" fill="#444444"><tspan font-weight="bold">Merke:</tspan> „vorhersehbares Tagesmuster" &#8594; Scheduled/Predictive; „unregelmäßige Last" &#8594; Target Tracking.</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  ASG hält desired capacity zwischen min/max · CloudWatch misst, Policy skaliert · Target Tracking = Thermostat, Scheduled = Wecker</text>
+</svg>

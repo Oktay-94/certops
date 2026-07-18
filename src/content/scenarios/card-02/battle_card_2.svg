@@ -1,0 +1,87 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 2 — ECS Fargate · ALB · ECR</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Container-App betreiben ohne Cluster-Verwaltung: kein EC2-Provisioning, kein Host-Patching</text>
+
+  <!-- Client -->
+  <rect x="50" y="380" width="230" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="418" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Nutzer</text>
+  <text x="165" y="450" font-size="15" fill="#444444" text-anchor="middle">ShopFlow-Web-App</text>
+  <text x="165" y="476" font-size="15" fill="#444444" text-anchor="middle">(Docker-Container)</text>
+  <text x="165" y="508" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">HTTPS-Traffic</text>
+
+  <!-- ALB -->
+  <rect x="380" y="380" width="250" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="505" y="418" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Application</text>
+  <text x="505" y="444" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Load Balancer</text>
+  <text x="505" y="476" font-size="15" fill="#444444" text-anchor="middle">verteilt auf Tasks</text>
+  <text x="505" y="502" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Target Group = Tasks</text>
+
+  <!-- ECS Fargate Zone -->
+  <rect x="730" y="330" width="470" height="360" rx="12" fill="none" stroke="#888888" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="965" y="358" font-size="17" font-weight="bold" fill="#888888" text-anchor="middle">Amazon ECS — Launch Type Fargate (serverless)</text>
+
+  <!-- Task 1 -->
+  <rect x="760" y="390" width="180" height="130" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="850" y="428" font-size="20" font-weight="bold" fill="#B25400" text-anchor="middle">Fargate Task</text>
+  <text x="850" y="456" font-size="15" fill="#444444" text-anchor="middle">1 Container</text>
+  <text x="850" y="480" font-size="15" fill="#444444" text-anchor="middle">eigene ENI + IP</text>
+  <text x="850" y="504" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">awsvpc-Modus</text>
+
+  <!-- Task 2 -->
+  <rect x="990" y="390" width="180" height="130" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="1080" y="428" font-size="20" font-weight="bold" fill="#B25400" text-anchor="middle">Fargate Task</text>
+  <text x="1080" y="456" font-size="15" fill="#444444" text-anchor="middle">skaliert per</text>
+  <text x="1080" y="480" font-size="15" fill="#444444" text-anchor="middle">Service Auto Scaling</text>
+  <text x="1080" y="504" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">nur genutzte vCPU/GB</text>
+
+  <!-- Kein-Server-Hinweis in der Zone -->
+  <rect x="760" y="560" width="410" height="106" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="965" y="592" font-size="17" font-weight="bold" fill="#2E6318" text-anchor="middle">AWS managt die Compute-Ebene</text>
+  <text x="965" y="618" font-size="15" fill="#444444" text-anchor="middle">kein EC2 provisionieren · keine AMIs · kein Kernel-/</text>
+  <text x="965" y="640" font-size="15" fill="#444444" text-anchor="middle">Host-Patching · kein Cluster-Capacity-Management</text>
+
+  <!-- ECR -->
+  <rect x="760" y="140" width="410" height="120" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="965" y="178" font-size="22" font-weight="bold" fill="#232082" text-anchor="middle">Amazon ECR</text>
+  <text x="965" y="208" font-size="15" fill="#444444" text-anchor="middle">privates Container-Image-Registry</text>
+  <text x="965" y="232" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Task zieht Image beim Start (docker pull)</text>
+
+  <!-- Schritt 1: Nutzer -> ALB -->
+  <line x1="280" y1="455" x2="377" y2="455" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="328" cy="455" r="15" fill="#2E6BE6"/>
+  <text x="328" y="461" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="328" y="428" font-size="15" fill="#1B3E86" text-anchor="middle">HTTPS</text>
+
+  <!-- Schritt 2: ALB -> Task1 -->
+  <line x1="630" y1="445" x2="757" y2="445" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="693" cy="445" r="15" fill="#232F3E"/>
+  <text x="693" y="451" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="693" y="418" font-size="15" fill="#232F3E" text-anchor="middle">Routing</text>
+
+  <!-- Schritt 3: ECR -> Task1 (Image pull) -->
+  <path d="M 850 260 L 850 387" fill="none" stroke="#2E27AD" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrO)"/>
+  <circle cx="850" cy="325" r="15" fill="#2E27AD"/>
+  <text x="850" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="700" y="320" font-size="15" fill="#232082" text-anchor="middle">Image-Pull</text>
+  <text x="700" y="340" font-size="15" fill="#232082" text-anchor="middle">beim Task-Start</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  ECS = Orchestrator, Fargate = serverless Launch-Type · „Container ohne Server/Cluster verwalten" = Fargate · Image liegt in ECR, ALB verteilt auf Tasks</text>
+</svg>

@@ -1,0 +1,108 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrGy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 9 — Outposts · Local Zones</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Fabrik braucht &lt; 10 ms zur Maschine: AWS-Hardware im Werk statt Compute in der entfernten Region</text>
+
+  <!-- MACHINES -->
+  <rect x="40" y="360" width="210" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="145" y="402" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Fertigungs-</text>
+  <text x="145" y="430" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">strasse</text>
+  <text x="145" y="460" font-size="16" fill="#444444" text-anchor="middle">SPS · Kameras</text>
+  <text x="145" y="486" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Echtzeit-Steuerung</text>
+
+  <!-- FACTORY ZONE -->
+  <rect x="310" y="200" width="640" height="410" rx="12" fill="none" stroke="#ED7100" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="630" y="232" font-size="18" font-weight="bold" fill="#B25400" text-anchor="middle">FABRIKHALLE — AWS OUTPOSTS RACK</text>
+  <text x="630" y="256" font-size="15" font-style="italic" fill="#B25400" text-anchor="middle">AWS-eigene Hardware, von AWS betrieben, im Werk des Kunden</text>
+
+  <!-- EC2 ON OUTPOSTS -->
+  <rect x="350" y="280" width="250" height="140" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="475" y="320" font-size="21" font-weight="bold" fill="#B25400" text-anchor="middle">EC2 auf Outposts</text>
+  <text x="475" y="350" font-size="16" fill="#444444" text-anchor="middle">Steuerungs-App</text>
+  <text x="475" y="376" font-size="16" fill="#444444" text-anchor="middle">Bildverarbeitung</text>
+  <text x="475" y="404" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">gleiche APIs wie Region</text>
+
+  <!-- LOCAL GATEWAY -->
+  <rect x="660" y="280" width="250" height="140" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="785" y="320" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">Local Gateway</text>
+  <text x="785" y="350" font-size="16" fill="#444444" text-anchor="middle">Traffic bleibt lokal</text>
+  <text x="785" y="378" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Umweg uber Region</text>
+
+  <!-- LOCAL STORAGE -->
+  <rect x="350" y="480" width="250" height="110" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="475" y="518" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">EBS / S3 on Outposts</text>
+  <text x="475" y="548" font-size="16" fill="#444444" text-anchor="middle">Rohdaten lokal</text>
+  <text x="475" y="574" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Data Residency erfullt</text>
+
+  <!-- LOCAL SURVIVES -->
+  <rect x="660" y="480" width="250" height="110" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="785" y="518" font-size="18" font-weight="bold" fill="#2E6318" text-anchor="middle">Betrieb bei WAN-Ausfall</text>
+  <text x="785" y="548" font-size="16" fill="#444444" text-anchor="middle">Produktion laeuft weiter</text>
+  <text x="785" y="574" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">lokale Workloads autark</text>
+
+  <!-- REGION -->
+  <rect x="1010" y="280" width="550" height="200" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1285" y="322" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">AWS Region eu-central-1</text>
+  <text x="1285" y="356" font-size="16" fill="#444444" text-anchor="middle">Control Plane · Verwaltung des Outpost</text>
+  <text x="1285" y="386" font-size="16" fill="#444444" text-anchor="middle">Analytics · Langzeit-Archiv · Backup</text>
+  <text x="1285" y="418" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">30–100 ms — fur Echtzeit-Steuerung zu weit</text>
+  <text x="1285" y="448" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Outpost braucht die Region als Anker</text>
+
+  <!-- REJECTED 1: LOCAL ZONE -->
+  <rect x="40" y="700" width="460" height="100" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="270" y="736" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Local Zone</text>
+  <text x="270" y="764" font-size="15" fill="#444444" text-anchor="middle">AWS-Standort in der Metro-Region</text>
+  <text x="270" y="788" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">nah bei Endnutzern — aber nicht im Werk</text>
+
+  <!-- REJECTED 2: REGION ONLY -->
+  <rect x="560" y="700" width="460" height="100" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="790" y="736" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Nur Region + Direct Connect</text>
+  <text x="790" y="764" font-size="15" fill="#444444" text-anchor="middle">stabile Leitung, aber Entfernung bleibt</text>
+  <text x="790" y="788" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Physik: &lt; 10 ms nicht erreichbar</text>
+
+  <!-- ARROW 1: MACHINES -> EC2 -->
+  <line x1="250" y1="420" x2="350" y2="380" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="292" y="352" font-size="15" fill="#1B3E86" text-anchor="middle">&lt; 10 ms</text>
+  <circle cx="300" cy="400" r="15" fill="#2E6BE6"/><text x="300" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- ARROW 2: EC2 -> LGW -->
+  <line x1="600" y1="330" x2="660" y2="330" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="630" cy="330" r="15" fill="#ED7100"/><text x="630" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- ARROW 3: EC2 -> LOCAL STORAGE -->
+  <line x1="475" y1="420" x2="475" y2="480" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <text x="620" y="456" font-size="15" fill="#0B5A66" text-anchor="middle">lokal ablegen</text>
+  <circle cx="475" cy="450" r="15" fill="#0F7C8C"/><text x="475" y="456" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- ARROW 4: LGW -> REGION (service link) -->
+  <line x1="910" y1="330" x2="1010" y2="330" stroke="#232F3E" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrN)"/>
+  <text x="960" y="298" font-size="15" fill="#232F3E" text-anchor="middle">Service Link</text>
+  <text x="960" y="278" font-size="15" fill="#232F3E" text-anchor="middle">(Mgmt · Sync)</text>
+  <circle cx="960" cy="330" r="15" fill="#232F3E"/><text x="960" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- REJECTED STUB 1 -->
+  <line x1="200" y1="500" x2="200" y2="700" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGy)"/>
+  <text x="120" y="646" font-size="15" fill="#9E1015" text-anchor="middle">zu weit</text>
+  <circle cx="200" cy="600" r="18" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="189" y1="589" x2="211" y2="611" stroke="#C7161D" stroke-width="4"/>
+  <line x1="211" y1="589" x2="189" y2="611" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- REJECTED STUB 2 -->
+  <line x1="790" y1="610" x2="790" y2="700" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGy)"/>
+  <text x="880" y="660" font-size="15" fill="#9E1015" text-anchor="middle">loest Latenz nicht</text>
+  <circle cx="790" cy="655" r="18" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="779" y1="644" x2="801" y2="666" stroke="#C7161D" stroke-width="4"/>
+  <line x1="801" y1="644" x2="779" y2="666" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- FOOTER -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Outposts = AWS-Hardware IM Werk (sub-10 ms lokal, Data Residency) · Local Zone = AWS-Standort in der Metro · Wavelength = 5G-Edge</text>
+</svg>

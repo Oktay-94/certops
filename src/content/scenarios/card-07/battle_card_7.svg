@@ -1,0 +1,87 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/></marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 7 — Lambda · SQS · DLQ</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Bestell-Verarbeitung entkoppeln: Lastspitzen puffern, fehlgeschlagene Nachrichten in die Dead-Letter-Queue</text>
+
+  <!-- PRODUCER -->
+  <rect x="40" y="360" width="220" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="150" y="402" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Bestell-Service</text>
+  <text x="150" y="432" font-size="16" fill="#444444" text-anchor="middle">Producer</text>
+  <text x="150" y="458" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Lastspitzen zur Peak-Zeit</text>
+
+  <!-- SQS MAIN QUEUE -->
+  <rect x="360" y="360" width="250" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="485" y="400" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">SQS Order Queue</text>
+  <text x="485" y="430" font-size="16" fill="#444444" text-anchor="middle">Buffer · entkoppelt</text>
+  <text x="485" y="456" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">maxReceiveCount = 5 → DLQ</text>
+
+  <!-- LAMBDA -->
+  <rect x="710" y="360" width="250" height="130" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="835" y="400" font-size="22" font-weight="bold" fill="#B25400" text-anchor="middle">Lambda</text>
+  <text x="835" y="430" font-size="16" fill="#444444" text-anchor="middle">Event Source Mapping</text>
+  <text x="835" y="456" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">pollt Batches · idempotent</text>
+
+  <!-- DOWNSTREAM / DB -->
+  <rect x="1060" y="360" width="250" height="130" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="1185" y="402" font-size="22" font-weight="bold" fill="#232082" text-anchor="middle">DynamoDB</text>
+  <text x="1185" y="432" font-size="16" fill="#444444" text-anchor="middle">Order-Tabelle</text>
+  <text x="1185" y="458" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Bestellung persistiert</text>
+
+  <!-- DLQ -->
+  <rect x="360" y="620" width="250" height="140" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="485" y="662" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">Dead-Letter Queue</text>
+  <text x="485" y="692" font-size="16" fill="#444444" text-anchor="middle">Poison-Pill-Nachrichten</text>
+  <text x="485" y="718" font-size="15" fill="#444444" text-anchor="middle">Retention 14 Tage</text>
+  <text x="485" y="742" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Alarm auf Queue-Depth</text>
+
+  <!-- LAMBDA ASYNC DLQ (REJECTED CONCEPT) -->
+  <rect x="1040" y="620" width="300" height="140" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1190" y="658" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Lambda Async-DLQ</text>
+  <text x="1190" y="686" font-size="15" fill="#444444" text-anchor="middle">nur fur asynchrone Invokes</text>
+  <text x="1190" y="710" font-size="15" fill="#444444" text-anchor="middle">(SNS/EventBridge/direkt)</text>
+  <text x="1190" y="740" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">greift bei SQS-Trigger NICHT</text>
+
+  <!-- ARROW 1: PRODUCER -> SQS -->
+  <line x1="260" y1="425" x2="360" y2="425" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="310" y="412" font-size="15" fill="#1B3E86" text-anchor="middle">send</text>
+  <circle cx="310" cy="425" r="15" fill="#2E6BE6"/><text x="310" y="431" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- ARROW 2: SQS -> LAMBDA (poll) -->
+  <line x1="610" y1="425" x2="710" y2="425" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <text x="660" y="412" font-size="15" fill="#0B5A66" text-anchor="middle">poll Batch</text>
+  <circle cx="660" cy="425" r="15" fill="#0F7C8C"/><text x="660" y="431" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- ARROW 3: LAMBDA -> DYNAMODB -->
+  <line x1="960" y1="425" x2="1060" y2="425" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="1010" y="412" font-size="15" fill="#B25400" text-anchor="middle">write</text>
+  <circle cx="1010" cy="425" r="15" fill="#ED7100"/><text x="1010" y="431" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- ARROW 4: LAMBDA fail -> back to SQS (dashed) -->
+  <path d="M 760 490 L 760 540 L 500 540 L 500 490" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <text x="632" y="530" font-size="15" fill="#9E1015" text-anchor="middle">Fehler → zuruck in Queue (Visibility Timeout)</text>
+  <circle cx="760" cy="520" r="15" fill="#C7161D"/><text x="760" y="526" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- ARROW 5: SQS -> DLQ after maxReceiveCount -->
+  <line x1="485" y1="490" x2="485" y2="620" stroke="#C7161D" stroke-width="3" marker-end="url(#arrR)"/>
+  <text x="700" y="565" font-size="15" fill="#9E1015" text-anchor="middle">nach 5 Fehl-Zustellungen</text>
+  <circle cx="485" cy="565" r="15" fill="#C7161D"/><text x="485" y="571" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- REJECTED: Lambda async DLQ path (red X) -->
+  <line x1="960" y1="460" x2="1150" y2="620" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGr)"/>
+  <circle cx="1055" cy="540" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="1042" y1="527" x2="1068" y2="553" stroke="#C7161D" stroke-width="4"/>
+  <line x1="1068" y1="527" x2="1042" y2="553" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- FOOTER -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  DLQ an Source-Queue-RedrivePolicy · Lambda-Async-DLQ greift bei SQS-Trigger NICHT · ReportBatchItemFailures = nur Fehler zuruck</text>
+</svg>

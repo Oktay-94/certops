@@ -1,0 +1,84 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrPk" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#E7157B"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="68" font-size="34" font-weight="bold" fill="#111111">Battle Card 4 — Lambda Cold Start: SnapStart vs. Provisioned Concurrency</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Java-API leidet unter Cold Starts — Latenz-SLA von 200 ms einhalten</text>
+
+  <!-- Client -->
+  <rect x="50" y="330" width="200" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="150" y="368" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">Client</text>
+  <text x="150" y="400" font-size="15" fill="#444444" text-anchor="middle">PayFast-API</text>
+  <text x="150" y="426" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">SLA: p99 &#8804; 200 ms</text>
+
+  <!-- API Gateway -->
+  <rect x="330" y="330" width="220" height="130" rx="10" fill="#FDEDF4" stroke="#E7157B" stroke-width="2.5"/>
+  <text x="440" y="368" font-size="21" font-weight="bold" fill="#B01059" text-anchor="middle">API Gateway</text>
+  <text x="440" y="400" font-size="15" fill="#444444" text-anchor="middle">REST-Endpunkt</text>
+  <text x="440" y="426" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">29 s Integr.-Timeout</text>
+
+  <!-- Lambda (Java) -->
+  <rect x="630" y="330" width="240" height="130" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="750" y="368" font-size="21" font-weight="bold" fill="#B25400" text-anchor="middle">AWS Lambda (Java)</text>
+  <text x="750" y="400" font-size="15" fill="#444444" text-anchor="middle">JVM-Init dauert</text>
+  <text x="750" y="426" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Cold Start bis ~2 s</text>
+
+  <!-- Problem-Box (rot) -->
+  <rect x="950" y="330" width="220" height="130" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1060" y="368" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Problem</text>
+  <text x="1060" y="400" font-size="15" fill="#444444" text-anchor="middle">1. Request nach Pause</text>
+  <text x="1060" y="424" font-size="15" fill="#444444" text-anchor="middle">reißt 200-ms-SLA</text>
+
+  <!-- Schritt 1 -->
+  <line x1="250" y1="395" x2="327" y2="395" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="288" cy="395" r="14" fill="#2E6BE6"/>
+  <text x="288" y="401" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- Schritt 2 -->
+  <line x1="550" y1="395" x2="627" y2="395" stroke="#E7157B" stroke-width="3" marker-end="url(#arrPk)"/>
+  <circle cx="588" cy="395" r="14" fill="#E7157B"/>
+  <text x="588" y="401" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- Schritt 3 (Problem) -->
+  <line x1="870" y1="395" x2="947" y2="395" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="908" cy="395" r="14" fill="#C7161D"/>
+  <text x="908" y="401" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- Zwei Lösungen -->
+  <text x="60" y="540" font-size="22" font-weight="bold" fill="#111111">Zwei Lösungen — je nach Traffic-Profil:</text>
+
+  <!-- Lösung A: SnapStart -->
+  <rect x="50" y="565" width="720" height="205" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="70" y="600" font-size="20" font-weight="bold" fill="#2E6318">A · Lambda SnapStart</text>
+  <text x="70" y="632" font-size="16" fill="#444444">Snapshot der initialisierten Umgebung, Restore statt Neustart</text>
+  <text x="70" y="658" font-size="16" fill="#444444">(Java 11+, Python 3.12+, .NET 8). Cold Start ~2 s &#8594; einige Dutzend ms.</text>
+  <text x="70" y="690" font-size="16" fill="#444444"><tspan font-weight="bold">Kosten:</tspan> keine Standing-Kosten &#8594; ideal bei spikey / schwankendem</text>
+  <text x="70" y="714" font-size="16" fill="#444444">Traffic. <tspan font-style="italic" fill="#666666">Kleiner Restore-Overhead bleibt; Snapshot-sichere Init nötig.</tspan></text>
+  <text x="70" y="748" font-size="16" fill="#2E6318"><tspan font-weight="bold">Merke:</tspan> unregelmäßiger Traffic + Kosten sparen &#8594; SnapStart</text>
+
+  <!-- Lösung B: Provisioned Concurrency -->
+  <rect x="790" y="565" width="760" height="205" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="810" y="600" font-size="20" font-weight="bold" fill="#232082">B · Provisioned Concurrency</text>
+  <text x="810" y="632" font-size="16" fill="#444444">Hält N Umgebungen dauerhaft vorgewärmt &#8594; 0 ms Cold Start,</text>
+  <text x="810" y="658" font-size="16" fill="#444444">sofort antwortbereit für die konfigurierte Concurrency.</text>
+  <text x="810" y="690" font-size="16" fill="#444444"><tspan font-weight="bold">Kosten:</tspan> zahlt 24/7 pro vorgehaltener Umgebung (Standing Cost).</text>
+  <text x="810" y="714" font-size="16" fill="#444444"><tspan font-style="italic" fill="#666666">Per Application Auto Scaling nach Zeitplan/Metrik anpassbar.</tspan></text>
+  <text x="810" y="748" font-size="16" fill="#232082"><tspan font-weight="bold">Merke:</tspan> planbare Dauerlast + härtestes SLA (0 ms) &#8594; Provisioned</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Cold Start = JVM-Init-Strafe · SnapStart = Snapshot/Restore, keine Standing-Kosten · Provisioned Concurrency = dauerhaft warm, 0 ms, 24/7-Kosten</text>
+</svg>

@@ -1,0 +1,106 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/></marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrGy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 10 — AWS Batch · EC2 GPU · S3</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Naechtliches 3D-Rendering: GPU-Jobs laufen in einer Queue, Input und Output liegen in S3</text>
+
+  <!-- ARTIST / SUBMIT -->
+  <rect x="40" y="330" width="200" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="140" y="372" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">Render-Team</text>
+  <text x="140" y="402" font-size="16" fill="#444444" text-anchor="middle">submit-job</text>
+  <text x="140" y="428" font-size="16" fill="#444444" text-anchor="middle">nachts, gebundelt</text>
+  <text x="140" y="454" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Server-Setup</text>
+
+  <!-- S3 INPUT -->
+  <rect x="40" y="560" width="200" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="140" y="600" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Input</text>
+  <text x="140" y="630" font-size="16" fill="#444444" text-anchor="middle">Szenen · Texturen</text>
+  <text x="140" y="658" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">zentraler Datenspeicher</text>
+
+  <!-- JOB QUEUE -->
+  <rect x="320" y="330" width="250" height="140" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="445" y="372" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">Batch Job Queue</text>
+  <text x="445" y="402" font-size="16" fill="#444444" text-anchor="middle">Jobs + Prioritaet</text>
+  <text x="445" y="428" font-size="16" fill="#444444" text-anchor="middle">Retry · Dependencies</text>
+  <text x="445" y="454" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">wartet auf Kapazitaet</text>
+
+  <!-- COMPUTE ENVIRONMENT ZONE -->
+  <rect x="650" y="230" width="620" height="440" rx="12" fill="none" stroke="#ED7100" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="960" y="262" font-size="18" font-weight="bold" fill="#B25400" text-anchor="middle">MANAGED COMPUTE ENVIRONMENT (Typ EC2)</text>
+  <text x="960" y="286" font-size="15" font-style="italic" fill="#B25400" text-anchor="middle">Batch startet und stoppt die Instanzen selbst — minvCpus 0</text>
+
+  <!-- GPU INSTANCES -->
+  <rect x="690" y="320" width="250" height="150" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="815" y="360" font-size="21" font-weight="bold" fill="#B25400" text-anchor="middle">EC2 GPU (p-Familie)</text>
+  <text x="815" y="390" font-size="16" fill="#444444" text-anchor="middle">NVIDIA GPUs</text>
+  <text x="815" y="416" font-size="16" fill="#444444" text-anchor="middle">Container-Job rendert</text>
+  <text x="815" y="444" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">GPU-optimiertes AMI noetig</text>
+
+  <!-- SPOT OPTION -->
+  <rect x="990" y="320" width="250" height="150" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1115" y="360" font-size="21" font-weight="bold" fill="#7A5300" text-anchor="middle">Spot-Kapazitaet</text>
+  <text x="1115" y="390" font-size="16" fill="#444444" text-anchor="middle">Rendering ist</text>
+  <text x="1115" y="416" font-size="16" fill="#444444" text-anchor="middle">unterbrechbar</text>
+  <text x="1115" y="444" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Batch retryt den Job</text>
+
+  <!-- SCALE TO ZERO -->
+  <rect x="690" y="520" width="550" height="110" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="965" y="558" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">Nach dem letzten Job: Scale-down auf 0</text>
+  <text x="965" y="588" font-size="16" fill="#444444" text-anchor="middle">tagsuber keine GPU-Kosten</text>
+  <text x="965" y="614" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Dauer-Cluster noetig</text>
+
+  <!-- S3 OUTPUT -->
+  <rect x="1340" y="330" width="220" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1450" y="372" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Output</text>
+  <text x="1450" y="402" font-size="16" fill="#444444" text-anchor="middle">gerenderte Frames</text>
+  <text x="1450" y="430" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Lifecycle → Glacier</text>
+  <text x="1450" y="456" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">langfristig guenstig</text>
+
+  <!-- REJECTED: FARGATE -->
+  <rect x="320" y="700" width="480" height="110" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="560" y="738" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Fargate Compute Environment</text>
+  <text x="560" y="768" font-size="15" fill="#9E1015" text-anchor="middle">Fargate unterstuetzt KEINE GPUs</text>
+  <text x="560" y="794" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">ok fur CPU-Jobs, nicht fur Rendering</text>
+
+  <!-- ARROW 1: TEAM -> QUEUE -->
+  <line x1="240" y1="400" x2="320" y2="400" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="280" y="388" font-size="15" fill="#1B3E86" text-anchor="middle">submit</text>
+  <circle cx="280" cy="400" r="15" fill="#2E6BE6"/><text x="280" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- ARROW 2: QUEUE -> GPU -->
+  <line x1="570" y1="390" x2="690" y2="390" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <text x="630" y="378" font-size="15" fill="#0B5A66" text-anchor="middle">dispatch</text>
+  <circle cx="630" cy="390" r="15" fill="#0F7C8C"/><text x="630" y="396" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- ARROW 3: S3 INPUT -> GPU (routed under queue) -->
+  <path d="M 240 625 L 445 625 L 445 490 L 815 490 L 815 470" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <text x="640" y="512" font-size="15" fill="#2E6318" text-anchor="middle">Input laden</text>
+  <circle cx="345" cy="625" r="15" fill="#3F8624"/><text x="345" y="631" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- ARROW 4: GPU -> SPOT (option) -->
+  <line x1="940" y1="390" x2="990" y2="390" stroke="#ED7100" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrO)"/>
+  <circle cx="965" cy="390" r="15" fill="#ED7100"/><text x="965" y="396" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- ARROW 5: SPOT/GPU -> S3 OUTPUT -->
+  <line x1="1240" y1="400" x2="1340" y2="400" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <text x="1290" y="388" font-size="15" fill="#2E6318" text-anchor="middle">write</text>
+  <circle cx="1290" cy="400" r="15" fill="#3F8624"/><text x="1290" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- REJECTED STUB -->
+  <line x1="490" y1="470" x2="490" y2="700" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGy)"/>
+  <text x="580" y="660" font-size="15" fill="#9E1015" text-anchor="middle">kein GPU-Support</text>
+  <circle cx="490" cy="600" r="18" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="479" y1="589" x2="501" y2="611" stroke="#C7161D" stroke-width="4"/>
+  <line x1="501" y1="589" x2="479" y2="611" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- FOOTER -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Batch = Queue + managed Scaling fuer Stapel-Jobs · GPU nur im EC2-Compute-Environment (Fargate kann kein GPU) · minvCpus 0 = keine Leerlaufkosten</text>
+</svg>
