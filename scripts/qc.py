@@ -13,23 +13,48 @@ Ausnahmen: gestrichelte Zonen (dasharray 4,4) sind keine Text-Container und
 keine Kollisionsobjekte; Badge-Ziffern sind von (a)/(b) ausgenommen; das
 Hintergrund-Rect (x=0,y=0) wird ignoriert.
 """
-import sys, re, xml.etree.ElementTree as ET
+import os, sys, re, xml.etree.ElementTree as ET
 from PIL import ImageFont
 
 NS = "{http://www.w3.org/2000/svg}"
-FONTS = {
-    ("normal", "normal"): "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    ("bold", "normal"):   "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-    ("normal", "italic"): "/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf",
-    ("bold", "italic"):   "/usr/share/fonts/truetype/dejavu/DejaVuSans-BoldOblique.ttf",
+# Die SVGs sind in DejaVu Sans gesetzt. Mit einem anderen Font gemessen waeren
+# alle Breiten falsch und das Skript wuerde still gruen melden -> lieber
+# abbrechen als raten.
+FONT_FILES = {
+    ("normal", "normal"): "DejaVuSans.ttf",
+    ("bold", "normal"):   "DejaVuSans-Bold.ttf",
+    ("normal", "italic"): "DejaVuSans-Oblique.ttf",
+    ("bold", "italic"):   "DejaVuSans-BoldOblique.ttf",
 }
+FONT_DIRS = [
+    os.environ.get("QC_FONT_DIR", ""),
+    "/usr/share/fonts/truetype/dejavu",
+    "/opt/homebrew/share/fonts",
+    "/usr/local/share/fonts",
+    os.path.expanduser("~/Library/Fonts"),
+    "/Library/Fonts",
+]
+
+
+def font_path(weight, style):
+    name = FONT_FILES[(weight, style)]
+    for d in FONT_DIRS:
+        if d and os.path.isfile(os.path.join(d, name)):
+            return os.path.join(d, name)
+    sys.exit(
+        f"ABBRUCH: {name} nicht gefunden.\n"
+        "  macOS : brew install --cask font-dejavu\n"
+        "  Linux : apt-get install fonts-dejavu\n"
+        "  Sonst : QC_FONT_DIR=<pfad> setzen.\n"
+        f"  Durchsucht: {[d for d in FONT_DIRS if d]}"
+    )
 _cache = {}
 
 
 def font(size, weight="normal", style="normal"):
     key = (round(size), weight, style)
     if key not in _cache:
-        _cache[key] = ImageFont.truetype(FONTS[(weight, style)], round(size))
+        _cache[key] = ImageFont.truetype(font_path(weight, style), round(size))
     return _cache[key]
 
 
