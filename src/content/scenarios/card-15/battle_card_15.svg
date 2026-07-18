@@ -1,0 +1,129 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 15 — S3 Versioning · Object Lock · MFA Delete</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Ransomware-Schutz für Backups: unlöschbar auch für den, der die Admin-Zugangsdaten hat</text>
+
+  <!-- ============ Quelle ============ -->
+
+  <rect x="40" y="210" width="250" height="145" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="246" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Backup-Job</text>
+  <text x="56" y="279" font-size="15" fill="#444444">nächtlich, ERP und</text>
+  <text x="56" y="301" font-size="15" fill="#444444">Abrechnung der</text>
+  <text x="56" y="323" font-size="15" fill="#444444">Stadtwerke Lippetal</text>
+  <text x="56" y="347" font-size="15" font-style="italic" fill="#666666">schreibt ganz normal per PUT</text>
+
+  <!-- ============ Bucket ============ -->
+
+  <rect x="350" y="155" width="700" height="415" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="700" y="181" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">S3 Bucket (eigener Backup-Account)</text>
+
+  <rect x="380" y="210" width="640" height="145" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="700" y="248" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Versioning — die Voraussetzung</text>
+  <text x="396" y="283" font-size="15" fill="#444444">Jeder PUT erzeugt eine neue Version mit eigener versionId</text>
+  <text x="396" y="306" font-size="15" fill="#444444">DELETE ohne versionId löscht nichts — es setzt nur einen Delete Marker</text>
+  <text x="396" y="336" font-size="15" font-style="italic" fill="#666666">Object Lock schützt Versionen, nicht Schlüssel</text>
+
+  <rect x="380" y="395" width="640" height="160" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="700" y="433" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">S3 Object Lock — Compliance Mode</text>
+  <text x="396" y="468" font-size="15" fill="#444444">Retain Until Date je Objektversion, hier + 7 Jahre</text>
+  <text x="396" y="491" font-size="15" fill="#444444">Bis dahin kann niemand löschen oder überschreiben: kein Admin,</text>
+  <text x="396" y="514" font-size="15" fill="#444444">kein Bucket-Owner, kein Root-Benutzer</text>
+  <text x="396" y="542" font-size="15" font-style="italic" fill="#666666">Legal Hold: derselbe Schutz ohne Ablaufdatum, bis ihn jemand entfernt</text>
+
+  <line x1="292" y1="282" x2="376" y2="282" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="334" y="259" font-size="15" fill="#1B3E86" text-anchor="middle">PUT</text>
+  <circle cx="334" cy="282" r="15" fill="#2E6BE6"/>
+  <text x="334" y="288" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <line x1="700" y1="357" x2="700" y2="391" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="722" y="380" font-size="15" fill="#232F3E">Default Retention pro Objekt</text>
+  <circle cx="700" cy="374" r="15" fill="#232F3E"/>
+  <text x="700" y="380" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- ============ Wiederherstellung + Modi ============ -->
+
+  <line x1="1022" y1="285" x2="1086" y2="285" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)"/>
+  <circle cx="1054" cy="285" r="15" fill="#3F8624"/>
+  <text x="1054" y="291" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <rect x="1090" y="210" width="460" height="145" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1320" y="248" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">Wiederherstellung</text>
+  <text x="1106" y="283" font-size="15" fill="#444444">GET mit der versionId der letzten sauberen</text>
+  <text x="1106" y="306" font-size="15" fill="#444444">Version, oder Delete Marker entfernen</text>
+  <text x="1106" y="336" font-size="15" font-style="italic" fill="#666666">Der Angriff hat die Daten nie erreicht</text>
+
+  <rect x="1090" y="395" width="460" height="175" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1320" y="433" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">Governance vs. Compliance</text>
+  <text x="1106" y="468" font-size="15" fill="#444444">Governance: aufhebbar mit dem Recht</text>
+  <text x="1106" y="491" font-size="15" fill="#444444">s3:BypassGovernanceRetention</text>
+  <text x="1106" y="514" font-size="15" fill="#444444">Compliance: von niemandem aufhebbar</text>
+  <text x="1106" y="537" font-size="15" fill="#444444">und nicht verkürzbar</text>
+  <text x="1106" y="560" font-size="15" font-style="italic" fill="#666666">Erst mit einem Test-Bucket üben</text>
+
+  <!-- ============ Angriff ============ -->
+
+  <rect x="40" y="615" width="310" height="190" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="195" y="653" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Angreifer</text>
+  <text x="56" y="687" font-size="15" fill="#444444">hat gültige Admin-Credentials</text>
+  <text x="56" y="710" font-size="15" fill="#444444">erbeutet — Ransomware oder</text>
+  <text x="56" y="733" font-size="15" fill="#444444">Innentäter</text>
+  <text x="56" y="762" font-size="15" font-style="italic" fill="#666666">kein Exploit nötig,</text>
+  <text x="56" y="782" font-size="15" font-style="italic" fill="#666666">nur gestohlene Rechte</text>
+
+  <path d="M195,613 L195,500 L376,500" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <text x="205" y="490" font-size="15" fill="#9E1015">DeleteObjectVersion</text>
+  <text x="205" y="524" font-size="15" fill="#9E1015">PutObjectRetention</text>
+  <circle cx="300" cy="500" r="15" fill="#C7161D"/>
+  <text x="300" y="506" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="195" cy="565" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="181" y1="551" x2="209" y2="579" stroke="#C7161D" stroke-width="4"/>
+  <line x1="209" y1="551" x2="181" y2="579" stroke="#C7161D" stroke-width="4"/>
+
+  <path d="M280,613 L280,592 L600,592 L600,626" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="360" cy="592" r="15" fill="#C7161D"/>
+  <text x="360" y="598" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <circle cx="470" cy="592" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="456" y1="578" x2="484" y2="606" stroke="#C7161D" stroke-width="4"/>
+  <line x1="484" y1="578" x2="456" y2="606" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- ============ MFA Delete ============ -->
+
+  <rect x="430" y="630" width="400" height="175" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="630" y="668" font-size="20" font-weight="bold" fill="#5B2BAF" text-anchor="middle">MFA Delete</text>
+  <text x="446" y="703" font-size="15" fill="#444444">blockt PutBucketVersioning (Suspend)</text>
+  <text x="446" y="726" font-size="15" fill="#444444">und das endgültige Löschen von Versionen</text>
+  <text x="446" y="749" font-size="15" fill="#444444">ohne gültigen MFA-Code</text>
+  <text x="446" y="778" font-size="15" font-style="italic" fill="#666666">nur der Bucket-Owner (Root) schaltet es ein,</text>
+  <text x="446" y="798" font-size="15" font-style="italic" fill="#666666">und nur per CLI oder API — nicht in der Konsole</text>
+
+  <!-- ============ Weitere Schichten ============ -->
+
+  <rect x="870" y="630" width="680" height="175" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1210" y="668" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Zusätzliche Schichten</text>
+  <text x="886" y="703" font-size="15" fill="#444444">Backups in einen separaten AWS-Account, auf den der Angreifer keinen Zugriff hat</text>
+  <text x="886" y="726" font-size="15" fill="#444444">S3 Replication funktioniert auch mit Object-Lock-Buckets und repliziert die Sperren mit</text>
+  <text x="886" y="749" font-size="15" fill="#444444">AWS Backup Vault Lock ist das Gegenstück für AWS Backup</text>
+  <text x="886" y="778" font-size="15" font-style="italic" fill="#666666">CloudTrail Data Events protokollieren jeden Löschversuch —</text>
+  <text x="886" y="798" font-size="15" font-style="italic" fill="#666666">der abgewehrte Angriff wird dadurch überhaupt erst sichtbar</text>
+
+  <!-- ============ Footer ============ -->
+
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Object Lock schützt Versionen, nicht Schlüssel · Compliance = niemand, auch nicht Root · MFA Delete: nur Root, nur per CLI</text>
+</svg>

@@ -1,0 +1,122 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 12 — S3 Intelligent-Tiering</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Zugriffsmuster unbekannt und wechselnd: automatisch in die günstigste Klasse — ohne Abrufgebühr, ohne Code-Änderung</text>
+
+  <!-- ============ Quelle ============ -->
+
+  <rect x="40" y="200" width="270" height="175" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="175" y="238" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Asset-Plattform</text>
+  <text x="56" y="272" font-size="15" fill="#444444">40 Mio. Objekte, 900 TB</text>
+  <text x="56" y="295" font-size="15" fill="#444444">PUT mit StorageClass =</text>
+  <text x="56" y="318" font-size="15" fill="#444444">INTELLIGENT_TIERING</text>
+  <text x="56" y="348" font-size="15" font-style="italic" fill="#666666">Muster pro Objekt unbekannt</text>
+  <text x="56" y="368" font-size="15" font-style="italic" fill="#666666">und über die Zeit wechselnd</text>
+
+  <!-- ============ Automatische Tiers ============ -->
+
+  <rect x="400" y="200" width="280" height="175" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="540" y="238" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Frequent Access</text>
+  <text x="416" y="272" font-size="15" fill="#444444">Landezone für jedes</text>
+  <text x="416" y="295" font-size="15" fill="#444444">neue Objekt</text>
+  <text x="416" y="318" font-size="15" fill="#444444">Millisekunden, wie Standard</text>
+  <text x="416" y="352" font-size="15" font-style="italic" fill="#666666">≈ 0,023 $/GB-Monat</text>
+
+  <rect x="770" y="200" width="280" height="175" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="910" y="238" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Infrequent Access</text>
+  <text x="786" y="272" font-size="15" fill="#444444">nach 30 Tagen ohne</text>
+  <text x="786" y="295" font-size="15" fill="#444444">Zugriff — automatisch</text>
+  <text x="786" y="318" font-size="15" fill="#444444">Millisekunden, keine Gebühr</text>
+  <text x="786" y="352" font-size="15" font-style="italic" fill="#666666">≈ 0,0125 $/GB-Monat</text>
+
+  <rect x="1140" y="200" width="310" height="175" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1295" y="238" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">Archive Instant Access</text>
+  <text x="1156" y="272" font-size="15" fill="#444444">nach 90 Tagen ohne Zugriff</text>
+  <text x="1156" y="295" font-size="15" fill="#444444">trotz „Archive“: Millisekunden</text>
+  <text x="1156" y="318" font-size="15" fill="#444444">kein Restore nötig</text>
+  <text x="1156" y="352" font-size="15" font-style="italic" fill="#666666">≈ 0,004 $/GB-Monat</text>
+
+  <line x1="312" y1="287" x2="396" y2="287" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="354" y="182" font-size="15" fill="#1B3E86" text-anchor="middle">PUT</text>
+  <circle cx="354" cy="287" r="15" fill="#2E6BE6"/>
+  <text x="354" y="293" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <line x1="682" y1="287" x2="766" y2="287" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="724" y="182" font-size="15" fill="#A85A05" text-anchor="middle">30 Tage inaktiv</text>
+  <circle cx="724" cy="287" r="15" fill="#D97706"/>
+  <text x="724" y="293" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <line x1="1052" y1="287" x2="1136" y2="287" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="1094" y="182" font-size="15" fill="#A85A05" text-anchor="middle">90 Tage inaktiv</text>
+  <circle cx="1094" cy="287" r="15" fill="#D97706"/>
+  <text x="1094" y="293" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- ============ Rueckstufung nach Zugriff ============ -->
+
+  <path d="M1300,377 L1300,462 L540,462 L540,379" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="920" y="450" font-size="15" fill="#1B3E86" text-anchor="middle">Zugriff auf ein Objekt: sofort zurück in Frequent Access — keine Abrufgebühr, kein Restore</text>
+  <circle cx="920" cy="462" r="15" fill="#2E6BE6"/>
+  <text x="920" y="468" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- ============ Verworfene Alternative ============ -->
+
+  <path d="M175,377 L175,546" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="175" cy="462" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="161" y1="448" x2="189" y2="476" stroke="#C7161D" stroke-width="4"/>
+  <line x1="189" y1="448" x2="161" y2="476" stroke="#C7161D" stroke-width="4"/>
+  <text x="205" y="468" font-size="15" fill="#9E1015">verworfen</text>
+
+  <rect x="40" y="550" width="430" height="195" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+  <text x="255" y="588" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">Alternative: fester Lifecycle</text>
+  <text x="56" y="622" font-size="15" fill="#444444">Regel „Tag 30 → S3 Standard-IA“ rät ein Muster,</text>
+  <text x="56" y="645" font-size="15" fill="#444444">das niemand kennt.</text>
+  <text x="56" y="674" font-size="15" fill="#444444">Problem 1: Abrufgebühr pro GB, sobald ein altes</text>
+  <text x="56" y="697" font-size="15" fill="#444444">Asset wieder oft gelesen wird</text>
+  <text x="56" y="726" font-size="15" font-style="italic" fill="#666666">Problem 2: 30 Tage Mindestdauer je Objekt</text>
+
+  <!-- ============ Kosten der Automatik ============ -->
+
+  <rect x="540" y="550" width="380" height="195" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="730" y="588" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Monitoring &amp; Automation</text>
+  <text x="556" y="622" font-size="15" fill="#444444">0,0025 $ je 1.000 Objekte und Monat</text>
+  <text x="556" y="645" font-size="15" fill="#444444">— pro Objekt, nicht pro GB</text>
+  <text x="556" y="674" font-size="15" fill="#444444">40 Mio. Objekte ≈ 100 $/Monat</text>
+  <text x="556" y="703" font-size="15" font-style="italic" fill="#666666">Objekte &lt; 128 KB: nicht überwacht,</text>
+  <text x="556" y="726" font-size="15" font-style="italic" fill="#666666">immer zur Frequent-Access-Rate</text>
+
+  <!-- ============ Opt-in-Archivstufen ============ -->
+
+  <path d="M1370,377 L1370,546" fill="none" stroke="#232F3E" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrN)"/>
+  <circle cx="1370" cy="470" r="15" fill="#232F3E"/>
+  <text x="1370" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1392" y="476" font-size="15" fill="#232F3E">nur nach Opt-in</text>
+
+  <rect x="990" y="550" width="460" height="195" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1220" y="588" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Opt-in-Archivstufen</text>
+  <text x="1006" y="622" font-size="15" fill="#444444">Archive Access: ab 90 Tagen, Abruf 3–5 h</text>
+  <text x="1006" y="645" font-size="15" fill="#444444">Deep Archive Access: ab 180 Tagen, Abruf bis 12 h</text>
+  <text x="1006" y="674" font-size="15" fill="#444444">Schwellen frei wählbar bis 730 Tage</text>
+  <text x="1006" y="703" font-size="15" font-style="italic" fill="#666666">asynchron — RestoreObject ist Pflicht.</text>
+  <text x="1006" y="726" font-size="15" font-style="italic" fill="#666666">Nur aktivieren, wenn die App warten kann.</text>
+
+  <!-- ============ Footer ============ -->
+
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Intelligent-Tiering misst, Lifecycle rät · drei Auto-Tiers, alle Millisekunden, keine Abrufgebühr · Gebühr pro Objekt, nicht pro GB</text>
+</svg>
