@@ -1,0 +1,103 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 23 &#8212; Aurora Serverless v2</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Dev/Test-Datenbanken mit schwankender Last &#8212; die Kapazit&#228;t atmet, bis hinunter auf null</text>
+
+  <!-- Box A: Dev-Teams -->
+  <rect x="40" y="170" width="210" height="220" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="145" y="210" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">14 Dev-Teams</text>
+  <text x="145" y="242" font-size="15" fill="#444444" text-anchor="middle">je eine eigene DB</text>
+  <text x="145" y="264" font-size="15" fill="#444444" text-anchor="middle">CI + Feature-Branches</text>
+  <text x="145" y="286" font-size="15" fill="#444444" text-anchor="middle">9&#8211;18 Uhr, sporadisch</text>
+  <text x="145" y="318" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">nachts und am</text>
+  <text x="145" y="338" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Wochenende: nichts</text>
+  <text x="145" y="370" font-size="15" fill="#444444" text-anchor="middle">85 % Leerlauf bisher</text>
+
+  <!-- Box B: Aurora Serverless v2 -->
+  <rect x="360" y="170" width="360" height="220" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="540" y="210" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Aurora Serverless v2</text>
+  <text x="540" y="242" font-size="15" fill="#444444" text-anchor="middle">Instanzklasse db.serverless</text>
+  <text x="540" y="264" font-size="15" fill="#444444" text-anchor="middle">1 ACU &#8776; 2 GiB RAM + CPU</text>
+  <text x="540" y="286" font-size="15" fill="#444444" text-anchor="middle">Bereich 0 &#8211; 256 ACU</text>
+  <text x="540" y="308" font-size="15" fill="#444444" text-anchor="middle">Abrechnung pro Sekunde</text>
+  <text x="540" y="340" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">skaliert in 0,5-ACU-Schritten,</text>
+  <text x="540" y="360" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">ohne Verbindungsabbruch</text>
+
+  <!-- Box C: Cluster Volume -->
+  <rect x="830" y="170" width="260" height="220" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="960" y="210" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">Cluster Volume</text>
+  <text x="960" y="242" font-size="15" fill="#444444" text-anchor="middle">6 Kopien, 3 AZs</text>
+  <text x="960" y="264" font-size="15" fill="#444444" text-anchor="middle">w&#228;chst in 10-GB-Schritten</text>
+  <text x="960" y="286" font-size="15" fill="#444444" text-anchor="middle">bis 128 TiB</text>
+  <text x="960" y="318" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">wird auch im</text>
+  <text x="960" y="338" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Pause-Zustand berechnet</text>
+  <text x="960" y="370" font-size="15" fill="#444444" text-anchor="middle">Compute &#8800; Storage</text>
+
+  <!-- Box D: Falle -->
+  <rect x="1200" y="170" width="350" height="220" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1375" y="210" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Was die Pause verhindert</text>
+  <text x="1375" y="242" font-size="15" fill="#444444" text-anchor="middle">RDS Proxy h&#228;lt Verbindungen</text>
+  <text x="1375" y="264" font-size="15" fill="#444444" text-anchor="middle">offene Nutzer-Verbindungen</text>
+  <text x="1375" y="286" font-size="15" fill="#444444" text-anchor="middle">logische Replikation / Binlog</text>
+  <text x="1375" y="318" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Min 0 ACU n&#252;tzt nichts,</text>
+  <text x="1375" y="338" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">wenn etwas dranh&#228;ngt</text>
+  <text x="1375" y="370" font-size="15" fill="#444444" text-anchor="middle">Signal: &#8222;Proxy&#8220; im Text</text>
+
+  <!-- 1: Teams -> Aurora -->
+  <line x1="250" y1="270" x2="360" y2="270" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="305" y="235" font-size="15" fill="#1B3E86" text-anchor="middle">Verbindung</text>
+  <text x="305" y="253" font-size="15" fill="#1B3E86" text-anchor="middle">aus der CI</text>
+  <circle cx="305" cy="270" r="15" fill="#2E6BE6"/>
+  <text x="305" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2: Aurora -> Volume -->
+  <line x1="720" y1="270" x2="830" y2="270" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="775" y="235" font-size="15" fill="#232F3E" text-anchor="middle">Compute</text>
+  <text x="775" y="253" font-size="15" fill="#232F3E" text-anchor="middle">auf Volume</text>
+  <circle cx="775" cy="270" r="15" fill="#232F3E"/>
+  <text x="775" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- Chart-Zone -->
+  <rect x="40" y="430" width="1510" height="360" rx="10" fill="none" stroke="#B8B8B8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="795" y="458" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Kapazit&#228;tsverlauf eines Werktags &#8212; dieselbe Datenbank, gemessen in ACU</text>
+
+  <!-- Achsen (polyline = Datenachse, kein Pfeil) -->
+  <polyline points="140,505 140,750 1490,750" fill="none" stroke="#AAAAAA" stroke-width="2"/>
+  <text x="128" y="526" font-size="14" fill="#888888" text-anchor="end">8 ACU</text>
+  <text x="128" y="727" font-size="14" fill="#888888" text-anchor="end">1</text>
+  <text x="128" y="756" font-size="14" fill="#888888" text-anchor="end">0</text>
+  <text x="140" y="772" font-size="13" fill="#888888" text-anchor="middle">0:00</text>
+  <text x="586" y="772" font-size="13" fill="#888888" text-anchor="middle">8:00</text>
+  <text x="810" y="772" font-size="13" fill="#888888" text-anchor="middle">12:00</text>
+  <text x="1173" y="772" font-size="13" fill="#888888" text-anchor="middle">18:30</text>
+  <text x="1480" y="772" font-size="13" fill="#888888" text-anchor="middle">24:00</text>
+
+  <!-- Kapazitaetskurve -->
+  <path d="M140,750 L586,750 L586,736 L642,736 L642,520 L654,520 L654,721 L866,721 L866,520 L878,520 L878,721 L1090,721 L1090,578 L1102,578 L1102,721 L1173,721 L1173,750 L1480,750" fill="none" stroke="#3F8624" stroke-width="3"/>
+
+  <text x="300" y="720" font-size="15" fill="#2E6318" text-anchor="middle">Nacht + Wochenende: 0 ACU</text>
+  <text x="760" y="495" font-size="15" fill="#2E6318" text-anchor="middle">CI-Lauf: in Sekunden auf Spitzenlast</text>
+  <text x="890" y="560" font-size="15" fill="#2E6318" text-anchor="start">in-place, kein Failover</text>
+  <text x="1310" y="700" font-size="15" fill="#2E6318" text-anchor="middle">Idle-Timeout, dann Pause</text>
+
+  <circle cx="586" cy="743" r="15" fill="#3F8624"/>
+  <text x="586" y="749" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="866" cy="620" r="15" fill="#3F8624"/>
+  <text x="866" y="626" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="1173" cy="735" r="15" fill="#3F8624"/>
+  <text x="1173" y="741" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <text x="170" y="615" font-size="15" fill="#555555" text-anchor="start">3  Resume ~15 s bei der ersten Verbindung</text>
+  <text x="170" y="637" font-size="15" fill="#555555" text-anchor="start">4  Skalierung im laufenden Betrieb, 0,5-ACU-Schritte</text>
+  <text x="170" y="659" font-size="15" fill="#555555" text-anchor="start">5  Auto-Pause nach 300 s bis 86.400 s ohne Verbindung</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  Serverless v2 regelt Kapazit&#228;t, nicht Verf&#252;gbarkeit  &#183;  0 ACU + Auto-Pause seit Nov. 2024  &#183;  Storage l&#228;uft weiter  &#183;  offene Verbindungen blockieren die Pause</text>
+</svg>

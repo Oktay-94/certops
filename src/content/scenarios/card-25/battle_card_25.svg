@@ -1,0 +1,120 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrDb" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E27AD"/></marker>
+    <marker id="arrDbS" markerWidth="10" markerHeight="10" refX="0" refY="4" orient="auto"><path d="M8,0 L0,4 L8,8 z" fill="#2E27AD"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 25 &#8212; DynamoDB Global Tables</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Weltweite App: Schreibzugriffe in jeder Region &#8212; jede Replica ist vollwertig, keine ist die Zentrale</text>
+
+  <!-- Region-Zonen -->
+  <rect x="40" y="160" width="460" height="320" rx="10" fill="none" stroke="#B8B8B8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="270" y="190" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Region eu-central-1</text>
+  <rect x="560" y="160" width="460" height="320" rx="10" fill="none" stroke="#B8B8B8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="790" y="190" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Region sa-east-1</text>
+  <rect x="1080" y="160" width="460" height="320" rx="10" fill="none" stroke="#B8B8B8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="1310" y="190" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Region ap-southeast-1</text>
+
+  <!-- Apps -->
+  <rect x="80" y="215" width="380" height="90" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="270" y="250" font-size="19" font-weight="bold" fill="#1B3E86" text-anchor="middle">App Berlin</text>
+  <text x="270" y="282" font-size="15" fill="#444444" text-anchor="middle">Fahrten starten, Profile</text>
+
+  <rect x="600" y="215" width="380" height="90" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="790" y="250" font-size="19" font-weight="bold" fill="#1B3E86" text-anchor="middle">App S&#227;o Paulo</text>
+  <text x="790" y="282" font-size="15" fill="#444444" text-anchor="middle">1,2 Mio. Nutzer</text>
+
+  <rect x="1120" y="215" width="380" height="90" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1310" y="250" font-size="19" font-weight="bold" fill="#1B3E86" text-anchor="middle">App Singapur</text>
+  <text x="1310" y="282" font-size="15" fill="#444444" text-anchor="middle">vorher 180 ms pro Write</text>
+
+  <!-- Replicas -->
+  <rect x="80" y="345" width="380" height="110" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="270" y="382" font-size="19" font-weight="bold" fill="#232082" text-anchor="middle">Replica eu-central-1</text>
+  <text x="270" y="412" font-size="15" fill="#444444" text-anchor="middle">nimmt Reads UND Writes</text>
+  <text x="270" y="434" font-size="15" fill="#444444" text-anchor="middle">vollwertige Kopie</text>
+
+  <rect x="600" y="345" width="380" height="110" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="790" y="382" font-size="19" font-weight="bold" fill="#232082" text-anchor="middle">Replica sa-east-1</text>
+  <text x="790" y="412" font-size="15" fill="#444444" text-anchor="middle">nimmt Reads UND Writes</text>
+  <text x="790" y="434" font-size="15" fill="#444444" text-anchor="middle">vollwertige Kopie</text>
+
+  <rect x="1120" y="345" width="380" height="110" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="1310" y="382" font-size="19" font-weight="bold" fill="#232082" text-anchor="middle">Replica ap-southeast-1</text>
+  <text x="1310" y="412" font-size="15" fill="#444444" text-anchor="middle">nimmt Reads UND Writes</text>
+  <text x="1310" y="434" font-size="15" fill="#444444" text-anchor="middle">vollwertige Kopie</text>
+
+  <!-- 1: App Berlin -> Replica -->
+  <line x1="270" y1="305" x2="270" y2="345" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="292" y="330" font-size="15" fill="#1B3E86" text-anchor="start">PutItem lokal</text>
+  <circle cx="270" cy="325" r="15" fill="#2E6BE6"/>
+  <text x="270" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 4: App Sao Paulo -> Replica -->
+  <line x1="790" y1="305" x2="790" y2="345" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="812" y="330" font-size="15" fill="#1B3E86" text-anchor="start">PutItem lokal</text>
+  <circle cx="790" cy="325" r="15" fill="#2E6BE6"/>
+  <text x="790" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 3: Replica Singapur -> App -->
+  <line x1="1310" y1="345" x2="1310" y2="305" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="1332" y="330" font-size="15" fill="#1B3E86" text-anchor="start">GetItem lokal</text>
+  <circle cx="1310" cy="325" r="15" fill="#2E6BE6"/>
+  <text x="1310" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 2: Replikation 1 <-> 2 -->
+  <line x1="460" y1="400" x2="600" y2="400" stroke="#2E27AD" stroke-width="3" marker-end="url(#arrDb)" marker-start="url(#arrDbS)"/>
+  <text x="530" y="375" font-size="15" fill="#232082" text-anchor="middle">asynchron</text>
+  <circle cx="530" cy="400" r="15" fill="#2E27AD"/>
+  <text x="530" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- Replikation 2 <-> 3 -->
+  <line x1="980" y1="400" x2="1120" y2="400" stroke="#2E27AD" stroke-width="3" marker-end="url(#arrDb)" marker-start="url(#arrDbS)"/>
+  <text x="1050" y="375" font-size="15" fill="#232082" text-anchor="middle">unter 1 s</text>
+
+  <!-- 5: Replikation 1 <-> 3 unten herum -->
+  <path d="M270,455 L270,505 L1310,505 L1310,455" fill="none" stroke="#2E27AD" stroke-width="3" marker-end="url(#arrDb)" marker-start="url(#arrDbS)"/>
+  <text x="600" y="497" font-size="15" fill="#232082" text-anchor="middle">Berlin &#8596; Singapur direkt</text>
+  <circle cx="900" cy="505" r="15" fill="#2E27AD"/>
+  <text x="900" y="511" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- Box: Last Writer Wins -->
+  <rect x="40" y="530" width="460" height="260" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="270" y="568" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Konflikt: Last Writer Wins</text>
+  <text x="270" y="600" font-size="15" fill="#444444" text-anchor="middle">zwei Regionen schreiben dasselbe Item</text>
+  <text x="270" y="622" font-size="15" fill="#444444" text-anchor="middle">der j&#252;ngste Zeitstempel gewinnt</text>
+  <text x="270" y="644" font-size="15" fill="#444444" text-anchor="middle">der andere Schreibvorgang ist weg</text>
+  <text x="270" y="676" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">kein Fehler, keine Meldung</text>
+  <text x="270" y="710" font-size="15" fill="#444444" text-anchor="middle">Gegenmittel: Items regional trennen</text>
+  <text x="270" y="732" font-size="15" fill="#444444" text-anchor="middle">oder Konflikte fachlich ausschlie&#223;en</text>
+  <text x="270" y="764" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">z. B. Region als Teil des Schl&#252;ssels</text>
+
+  <!-- Box: MRSC -->
+  <rect x="560" y="530" width="460" height="260" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="790" y="568" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">MRSC &#8212; seit 30.06.2025</text>
+  <text x="790" y="600" font-size="15" fill="#444444" text-anchor="middle">multi-Region strong consistency</text>
+  <text x="790" y="622" font-size="15" fill="#444444" text-anchor="middle">genau drei Regionen:</text>
+  <text x="790" y="644" font-size="15" fill="#444444" text-anchor="middle">3 Replicas oder 2 + 1 Witness</text>
+  <text x="790" y="676" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Witness h&#228;lt Daten, liest nicht</text>
+  <text x="790" y="710" font-size="15" fill="#444444" text-anchor="middle">Konflikt wirft eine Exception</text>
+  <text x="790" y="732" font-size="15" fill="#444444" text-anchor="middle">RPO 0, aber keine Transactions</text>
+  <text x="790" y="764" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Modus sp&#228;ter nicht mehr &#228;nderbar</text>
+
+  <!-- Box: Nicht verwechseln -->
+  <rect x="1080" y="530" width="460" height="260" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1310" y="568" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Nicht verwechseln</text>
+  <text x="1310" y="600" font-size="15" fill="#444444" text-anchor="middle">Read Replica (Karte 22):</text>
+  <text x="1310" y="622" font-size="15" fill="#444444" text-anchor="middle">eine Schreibquelle, Lesekopien</text>
+  <text x="1310" y="644" font-size="15" fill="#444444" text-anchor="middle">Global Table: jede Region schreibt</text>
+  <text x="1310" y="676" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Promotion gibt es hier nicht</text>
+  <text x="1310" y="710" font-size="15" fill="#444444" text-anchor="middle">DAX (Karte 21): Replikations-</text>
+  <text x="1310" y="732" font-size="15" fill="#444444" text-anchor="middle">Writes umgehen den Cache</text>
+  <text x="1310" y="764" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">stale bis zum Ablauf des TTL</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  multi-active: jede Region liest und schreibt  &#183;  asynchron, Last Writer Wins per Zeitstempel  &#183;  starke Konsistenz &#252;ber Regionen nur mit MRSC</text>
+</svg>

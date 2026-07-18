@@ -1,0 +1,143 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/></marker>
+    <marker id="arrDb" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E27AD"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 21 &#8212; DynamoDB &#183; DAX</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Gaming-Leaderboard: 900.000 Reads/s auf dieselben Top-Eintr&#228;ge &#8212; Mikrosekunden ohne eigene Cache-Logik</text>
+
+  <!-- VPC-Zone -->
+  <rect x="300" y="190" width="800" height="390" rx="10" fill="none" stroke="#B8B8B8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="700" y="218" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">VPC &#183; private Subnets</text>
+
+  <!-- Box A: Game-Clients -->
+  <rect x="40" y="300" width="180" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="130" y="340" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Game-Clients</text>
+  <text x="130" y="372" font-size="15" fill="#444444" text-anchor="middle">4,2 Mio. DAU</text>
+  <text x="130" y="394" font-size="15" fill="#444444" text-anchor="middle">HUD: Top 100</text>
+  <text x="130" y="416" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">nach jedem Match</text>
+
+  <!-- Box B: Game Backend -->
+  <rect x="330" y="270" width="230" height="230" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="445" y="308" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">Game Backend</text>
+  <text x="445" y="340" font-size="15" fill="#444444" text-anchor="middle">ECS Fargate &#183; privat</text>
+  <text x="445" y="362" font-size="15" fill="#444444" text-anchor="middle">DAX-Client-SDK</text>
+  <text x="445" y="384" font-size="15" fill="#444444" text-anchor="middle">daxs://&#8230; Port 8111</text>
+  <text x="445" y="416" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">gleiche API-Aufrufe,</text>
+  <text x="445" y="438" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">nur der Client ist neu</text>
+  <text x="445" y="470" font-size="15" fill="#444444" text-anchor="middle">keine Invalidierung</text>
+
+  <!-- Box C: DAX Cluster -->
+  <rect x="690" y="240" width="380" height="300" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="880" y="278" font-size="22" font-weight="bold" fill="#5B2BAF" text-anchor="middle">DAX Cluster</text>
+  <text x="880" y="310" font-size="15" fill="#444444" text-anchor="middle">Primary + 2 Read Replicas</text>
+  <text x="880" y="332" font-size="15" fill="#444444" text-anchor="middle">Item Cache &#183; TTL 5 Min &#183; LRU</text>
+  <text x="880" y="354" font-size="15" fill="#444444" text-anchor="middle">Query Cache getrennt davon</text>
+  <text x="880" y="384" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">ConsistentRead=true wird</text>
+  <text x="880" y="406" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">durchgereicht, nicht gecacht</text>
+  <rect x="706" y="430" width="110" height="70" rx="8" fill="#FFFFFF" stroke="#7A3FE0" stroke-width="2"/>
+  <text x="761" y="458" font-size="13" font-weight="bold" fill="#5B2BAF" text-anchor="middle">AZ-a</text>
+  <text x="761" y="480" font-size="13" fill="#444444" text-anchor="middle">Primary</text>
+  <rect x="830" y="430" width="110" height="70" rx="8" fill="#FFFFFF" stroke="#7A3FE0" stroke-width="2"/>
+  <text x="885" y="458" font-size="13" font-weight="bold" fill="#5B2BAF" text-anchor="middle">AZ-b</text>
+  <text x="885" y="480" font-size="13" fill="#444444" text-anchor="middle">Replica</text>
+  <rect x="954" y="430" width="110" height="70" rx="8" fill="#FFFFFF" stroke="#7A3FE0" stroke-width="2"/>
+  <text x="1009" y="458" font-size="13" font-weight="bold" fill="#5B2BAF" text-anchor="middle">AZ-c</text>
+  <text x="1009" y="480" font-size="13" fill="#444444" text-anchor="middle">Replica</text>
+
+  <!-- Box D: DynamoDB -->
+  <rect x="1200" y="270" width="360" height="240" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="1380" y="308" font-size="22" font-weight="bold" fill="#232082" text-anchor="middle">DynamoDB</text>
+  <text x="1380" y="340" font-size="15" fill="#444444" text-anchor="middle">Table: leaderboard-s7</text>
+  <text x="1380" y="362" font-size="15" fill="#444444" text-anchor="middle">On-Demand Capacity</text>
+  <text x="1380" y="384" font-size="15" fill="#444444" text-anchor="middle">PK seasonId &#183; SK score</text>
+  <text x="1380" y="416" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">dieselben Top-Items</text>
+  <text x="1380" y="438" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">millionenfach gelesen</text>
+  <text x="1380" y="470" font-size="15" fill="#444444" text-anchor="middle">nur eine Region</text>
+
+  <!-- 1: Clients -> Backend -->
+  <line x1="220" y1="370" x2="330" y2="370" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="275" y="335" font-size="15" fill="#1B3E86" text-anchor="middle">Top 100</text>
+  <text x="275" y="353" font-size="15" fill="#1B3E86" text-anchor="middle">abrufen</text>
+  <circle cx="275" cy="370" r="15" fill="#2E6BE6"/>
+  <text x="275" y="376" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2: Backend -> DAX -->
+  <line x1="560" y1="330" x2="690" y2="330" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <text x="625" y="295" font-size="15" fill="#5B2BAF" text-anchor="middle">GetItem / Query</text>
+  <text x="625" y="313" font-size="15" fill="#5B2BAF" text-anchor="middle">Cluster-Endpoint</text>
+  <circle cx="600" cy="330" r="15" fill="#7A3FE0"/>
+  <text x="600" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3: Cache Hit zurueck -->
+  <line x1="690" y1="420" x2="560" y2="420" stroke="#7A3FE0" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrP)"/>
+  <text x="625" y="450" font-size="15" fill="#5B2BAF" text-anchor="middle">Cache Hit</text>
+  <text x="625" y="468" font-size="15" fill="#5B2BAF" text-anchor="middle">Antwort in &#181;s</text>
+  <circle cx="650" cy="420" r="15" fill="#7A3FE0"/>
+  <text x="650" y="426" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4: Cache Miss -> DynamoDB -->
+  <line x1="1070" y1="310" x2="1200" y2="310" stroke="#2E27AD" stroke-width="3" marker-end="url(#arrDb)"/>
+  <text x="1135" y="275" font-size="15" fill="#232082" text-anchor="middle">Cache Miss</text>
+  <text x="1135" y="293" font-size="15" fill="#232082" text-anchor="middle">eventual read</text>
+  <circle cx="1105" cy="310" r="15" fill="#2E27AD"/>
+  <text x="1105" y="316" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 5: Antwort -> Item Cache -->
+  <line x1="1200" y1="440" x2="1070" y2="440" stroke="#2E27AD" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrDb)"/>
+  <text x="1135" y="460" font-size="15" fill="#232082" text-anchor="middle">in Item Cache</text>
+  <text x="1135" y="478" font-size="15" fill="#232082" text-anchor="middle">TTL 5 Min</text>
+  <circle cx="1165" cy="440" r="15" fill="#2E27AD"/>
+  <text x="1165" y="446" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- 6: Write-through Backend -> DAX -->
+  <path d="M450,500 L450,605 L830,605 L830,540" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="640" y="590" font-size="15" fill="#A85A05" text-anchor="middle">PutItem &#252;ber DAX</text>
+  <circle cx="640" cy="605" r="15" fill="#D97706"/>
+  <text x="640" y="611" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <!-- 7: Write-through DAX -> DynamoDB -->
+  <line x1="1070" y1="500" x2="1200" y2="500" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="1135" y="530" font-size="15" fill="#A85A05" text-anchor="middle">1. Tabelle</text>
+  <text x="1135" y="548" font-size="15" fill="#A85A05" text-anchor="middle">2. Item Cache</text>
+  <circle cx="1135" cy="500" r="15" fill="#D97706"/>
+  <text x="1135" y="506" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+
+  <!-- 8: Bypass-Writes -->
+  <line x1="1300" y1="620" x2="1300" y2="510" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <text x="1280" y="570" font-size="15" fill="#9E1015" text-anchor="end">schreibt direkt</text>
+  <text x="1280" y="588" font-size="15" fill="#9E1015" text-anchor="end">an DAX vorbei</text>
+  <circle cx="1300" cy="565" r="15" fill="#C7161D"/>
+  <text x="1300" y="571" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">8</text>
+
+  <!-- Box G: Kostenlogik -->
+  <rect x="40" y="620" width="470" height="150" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="275" y="658" font-size="20" font-weight="bold" fill="#7A5300" text-anchor="middle">Kostenlogik</text>
+  <text x="275" y="690" font-size="15" fill="#444444" text-anchor="middle">DAX kostet Node-Stunden, nicht Requests</text>
+  <text x="275" y="712" font-size="15" fill="#444444" text-anchor="middle">DynamoDB kostet pro Read Request</text>
+  <text x="275" y="742" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">lohnt bei hoher Trefferquote auf hei&#223;en Items</text>
+
+  <!-- Box E: Was DAX nicht beschleunigt -->
+  <rect x="550" y="620" width="470" height="150" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="785" y="658" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">Was DAX nicht beschleunigt</text>
+  <text x="785" y="690" font-size="15" fill="#444444" text-anchor="middle">ConsistentRead=true &#183; TransactGetItems</text>
+  <text x="785" y="712" font-size="15" fill="#444444" text-anchor="middle">DAX reicht durch, cacht das Ergebnis nicht</text>
+  <text x="785" y="742" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">wieder Millisekunden statt Mikrosekunden</text>
+
+  <!-- Box F: Bypass-Writes -->
+  <rect x="1060" y="620" width="470" height="150" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1295" y="658" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Writes an DAX vorbei</text>
+  <text x="1295" y="690" font-size="15" fill="#444444" text-anchor="middle">Admin-Skript, Lambda ohne DAX-Client,</text>
+  <text x="1295" y="712" font-size="15" fill="#444444" text-anchor="middle">Global-Table-Replikation</text>
+  <text x="1295" y="742" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Cache bleibt stale, bis der TTL abl&#228;uft</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  DAX = Cache mit DynamoDB-API  &#183;  gecacht wird nur eventually consistent  &#183;  write-through: erst Tabelle, dann Cache  &#183;  Bypass bleibt stale bis TTL</text>
+</svg>

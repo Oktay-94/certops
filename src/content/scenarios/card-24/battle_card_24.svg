@@ -1,0 +1,128 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 24 &#8212; ElastiCache &#183; RDS &#183; Cache-Aside</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Produktkatalog mit 95 % Lesezugriffen &#8212; der Cache entlastet die Datenbank, die Logik dazu steht im Code</text>
+
+  <!-- Nutzer -->
+  <rect x="40" y="290" width="200" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="140" y="330" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Einkäufer</text>
+  <text x="140" y="362" font-size="15" fill="#444444" text-anchor="middle">B2B-Katalog</text>
+  <text x="140" y="384" font-size="15" fill="#444444" text-anchor="middle">240.000 Artikel</text>
+  <text x="140" y="410" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">95 % nur Lesen</text>
+
+  <!-- App -->
+  <rect x="330" y="230" width="280" height="330" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="470" y="270" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">Katalog-Anwendung</text>
+  <text x="470" y="302" font-size="15" fill="#444444" text-anchor="middle">ECS Fargate</text>
+  <text x="470" y="324" font-size="15" fill="#444444" text-anchor="middle">Redis-Client + JDBC</text>
+  <text x="470" y="346" font-size="15" fill="#444444" text-anchor="middle">zwei Verbindungen</text>
+  <text x="470" y="382" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">Cache-Aside lebt hier</text>
+  <text x="470" y="414" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">1. Cache fragen</text>
+  <text x="470" y="434" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">2. bei Miss: DB fragen</text>
+  <text x="470" y="454" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">3. Ergebnis zurückschreiben</text>
+  <text x="470" y="474" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">4. TTL setzen</text>
+  <text x="470" y="510" font-size="15" fill="#444444" text-anchor="middle">der Dienst tut nichts davon</text>
+  <text x="470" y="538" font-size="15" fill="#444444" text-anchor="middle">von allein</text>
+
+  <!-- ElastiCache -->
+  <rect x="880" y="150" width="400" height="270" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="1080" y="190" font-size="22" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Amazon ElastiCache</text>
+  <text x="1080" y="222" font-size="15" fill="#444444" text-anchor="middle">Engine: Valkey (oder Redis OSS)</text>
+  <text x="1080" y="244" font-size="15" fill="#444444" text-anchor="middle">Primary + Replica, Multi-AZ</text>
+  <text x="1080" y="266" font-size="15" fill="#444444" text-anchor="middle">Key-Value im Arbeitsspeicher</text>
+  <text x="1080" y="288" font-size="15" fill="#444444" text-anchor="middle">eigene Befehle: GET / SET / DEL</text>
+  <text x="1080" y="322" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">weiß nichts von der Datenbank</text>
+  <text x="1080" y="342" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">dahinter &#8212; und nichts von SQL</text>
+  <text x="1080" y="378" font-size="15" fill="#444444" text-anchor="middle">500 heiße Artikel = 60 % Abrufe</text>
+  <text x="1080" y="400" font-size="15" fill="#444444" text-anchor="middle">TTL 300 s je Eintrag</text>
+
+  <!-- RDS -->
+  <rect x="880" y="540" width="400" height="240" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1080" y="580" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">RDS for MySQL</text>
+  <text x="1080" y="612" font-size="15" fill="#444444" text-anchor="middle">Single-Writer, Multi-AZ</text>
+  <text x="1080" y="634" font-size="15" fill="#444444" text-anchor="middle">Quelle der Wahrheit</text>
+  <text x="1080" y="656" font-size="15" fill="#444444" text-anchor="middle">CPU vorher 90 % mittags</text>
+  <text x="1080" y="690" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">sieht nur noch die Misses</text>
+  <text x="1080" y="710" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">und die Schreibvorgänge</text>
+  <text x="1080" y="746" font-size="15" fill="#444444" text-anchor="middle">Antwort 40 ms statt 800 ms</text>
+
+  <!-- Preis-Batch -->
+  <rect x="1330" y="440" width="230" height="150" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1445" y="478" font-size="19" font-weight="bold" fill="#B25400" text-anchor="middle">Preis-Import</text>
+  <text x="1445" y="508" font-size="15" fill="#444444" text-anchor="middle">täglich 6:00 Uhr</text>
+  <text x="1445" y="530" font-size="15" fill="#444444" text-anchor="middle">muss beides bedienen</text>
+  <text x="1445" y="560" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">auch das ist Code</text>
+
+  <!-- 1: Nutzer -> App -->
+  <line x1="240" y1="350" x2="330" y2="350" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="285" y="315" font-size="15" fill="#1B3E86" text-anchor="middle">Katalog-</text>
+  <text x="285" y="333" font-size="15" fill="#1B3E86" text-anchor="middle">Anfrage</text>
+  <circle cx="285" cy="350" r="15" fill="#2E6BE6"/>
+  <text x="285" y="356" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2: GET -->
+  <line x1="610" y1="280" x2="880" y2="280" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <text x="775" y="265" font-size="15" fill="#5B2BAF" text-anchor="middle">GET produkt:4711</text>
+  <circle cx="660" cy="280" r="15" fill="#7A3FE0"/>
+  <text x="660" y="286" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3: Hit -->
+  <line x1="880" y1="340" x2="610" y2="340" stroke="#7A3FE0" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrP)"/>
+  <text x="775" y="325" font-size="15" fill="#5B2BAF" text-anchor="middle">Cache Hit: Antwort in ms</text>
+  <circle cx="830" cy="340" r="15" fill="#7A3FE0"/>
+  <text x="830" y="346" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 5: SET -->
+  <line x1="610" y1="400" x2="880" y2="400" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <text x="775" y="385" font-size="15" fill="#5B2BAF" text-anchor="middle">SET mit TTL 300 s</text>
+  <circle cx="660" cy="400" r="15" fill="#7A3FE0"/>
+  <text x="660" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- 4: Miss -> RDS -->
+  <path d="M610,480 L700,480 L700,650 L880,650" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="715" y="570" font-size="15" fill="#232F3E" text-anchor="start">Cache Miss: SELECT</text>
+  <circle cx="700" cy="545" r="15" fill="#232F3E"/>
+  <text x="700" y="551" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 6: Batch -> RDS -->
+  <path d="M1400,590 L1400,680 L1280,680" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="1385" y="612" font-size="15" fill="#A85A05" text-anchor="end">UPDATE</text>
+  <circle cx="1400" cy="640" r="15" fill="#D97706"/>
+  <text x="1400" y="646" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <!-- 7: Batch -> Cache -->
+  <path d="M1400,440 L1400,300 L1280,300" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <text x="1385" y="340" font-size="15" fill="#A85A05" text-anchor="end">DEL / SET</text>
+  <circle cx="1400" cy="380" r="15" fill="#D97706"/>
+  <text x="1400" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+
+  <!-- Falle 1: Abgrenzung DAX -->
+  <rect x="40" y="610" width="300" height="180" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="190" y="648" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">DAX &#8800; ElastiCache</text>
+  <text x="190" y="680" font-size="15" fill="#444444" text-anchor="middle">DAX: DynamoDB-API,</text>
+  <text x="190" y="702" font-size="15" fill="#444444" text-anchor="middle">Cache-Logik im Dienst</text>
+  <text x="190" y="732" font-size="15" fill="#444444" text-anchor="middle">ElastiCache: generisch,</text>
+  <text x="190" y="754" font-size="15" fill="#444444" text-anchor="middle">Cache-Aside im Code</text>
+  <text x="190" y="778" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">siehe Karte 21</text>
+
+  <!-- Falle 2 -->
+  <rect x="380" y="610" width="300" height="180" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="530" y="648" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Was schiefgeht</text>
+  <text x="530" y="680" font-size="15" fill="#444444" text-anchor="middle">Invalidierung vergessen</text>
+  <text x="530" y="702" font-size="15" fill="#444444" text-anchor="middle">&#8594; veraltete Preise</text>
+  <text x="530" y="732" font-size="15" fill="#444444" text-anchor="middle">alle TTLs gleichzeitig fällig</text>
+  <text x="530" y="754" font-size="15" fill="#444444" text-anchor="middle">&#8594; Ansturm auf die DB</text>
+  <text x="530" y="778" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">TTL streuen (Jitter)</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  Cache-Aside: erst fragen, bei Miss nachladen, selbst zur&#252;ckschreiben  &#183;  TTL ist die Notbremse gegen alte Daten  &#183;  der Cache kennt die Datenbank nicht</text>
+</svg>

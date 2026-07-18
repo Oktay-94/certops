@@ -1,0 +1,119 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 22 &#8212; RDS Multi-AZ &#183; Read Replicas</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Berichtslast fernhalten UND einen AZ-Ausfall &#252;berleben &#8212; zwei Probleme, zwei verschiedene Werkzeuge</text>
+
+  <!-- AZ-Zonen -->
+  <rect x="400" y="175" width="350" height="255" rx="10" fill="none" stroke="#B8B8B8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="575" y="205" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AZ eu-central-1a</text>
+  <rect x="790" y="175" width="350" height="255" rx="10" fill="none" stroke="#B8B8B8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="965" y="205" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AZ eu-central-1b</text>
+  <rect x="1180" y="175" width="350" height="255" rx="10" fill="none" stroke="#B8B8B8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="1355" y="205" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AZ eu-central-1c</text>
+
+  <!-- Box A: Sachbearbeitung -->
+  <rect x="40" y="210" width="250" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="250" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Sachbearbeitung</text>
+  <text x="165" y="282" font-size="15" fill="#444444" text-anchor="middle">1.400 Nutzer, OLTP</text>
+  <text x="165" y="304" font-size="15" fill="#444444" text-anchor="middle">lesen + schreiben</text>
+  <text x="165" y="332" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Timeouts, sobald das</text>
+  <text x="165" y="352" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Reporting l&#228;uft</text>
+
+  <!-- Primary -->
+  <rect x="430" y="225" width="290" height="170" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="575" y="265" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">RDS Primary</text>
+  <text x="575" y="297" font-size="15" fill="#444444" text-anchor="middle">PostgreSQL, r6g.2xlarge</text>
+  <text x="575" y="319" font-size="15" fill="#444444" text-anchor="middle">Writer-Endpoint (DNS)</text>
+  <text x="575" y="349" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">einziger Schreibpunkt</text>
+  <text x="575" y="375" font-size="15" fill="#444444" text-anchor="middle">400 Mio. Schadensf&#228;lle</text>
+
+  <!-- Standby -->
+  <rect x="820" y="225" width="290" height="170" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="965" y="265" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">Standby</text>
+  <text x="965" y="297" font-size="15" fill="#444444" text-anchor="middle">synchrone Kopie</text>
+  <text x="965" y="319" font-size="15" fill="#444444" text-anchor="middle">kein Leseverkehr</text>
+  <text x="965" y="349" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">wartet, bis er gebraucht wird</text>
+  <text x="965" y="375" font-size="15" fill="#444444" text-anchor="middle">kein eigener Endpoint</text>
+
+  <!-- Read Replica -->
+  <rect x="1210" y="225" width="290" height="170" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1355" y="265" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">Read Replica</text>
+  <text x="1355" y="297" font-size="15" fill="#444444" text-anchor="middle">asynchrone Kopie</text>
+  <text x="1355" y="319" font-size="15" fill="#444444" text-anchor="middle">eigener Endpoint</text>
+  <text x="1355" y="349" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">bis 15 pro Quell-Instanz</text>
+  <text x="1355" y="375" font-size="15" fill="#444444" text-anchor="middle">kann selbst Multi-AZ sein</text>
+
+  <!-- 1: Sachbearbeitung -> Primary -->
+  <line x1="290" y1="280" x2="430" y2="280" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="360" y="245" font-size="15" fill="#1B3E86" text-anchor="middle">Writer-Endpoint</text>
+  <text x="360" y="263" font-size="15" fill="#1B3E86" text-anchor="middle">lesen + schreiben</text>
+  <circle cx="360" cy="280" r="15" fill="#2E6BE6"/>
+  <text x="360" y="286" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2: Primary -> Standby -->
+  <line x1="720" y1="300" x2="820" y2="300" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <text x="770" y="258" font-size="15" fill="#232F3E" text-anchor="middle">synchron</text>
+  <text x="770" y="276" font-size="15" fill="#232F3E" text-anchor="middle">RPO = 0</text>
+  <circle cx="770" cy="300" r="15" fill="#232F3E"/>
+  <text x="770" y="306" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3: Primary -> Read Replica (asynchron, unten herum) -->
+  <path d="M575,395 L575,450 L1260,450 L1260,395" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <text x="915" y="475" font-size="15" fill="#2E6318" text-anchor="middle">asynchron</text>
+  <text x="915" y="493" font-size="15" fill="#2E6318" text-anchor="middle">Replica Lag in Sekunden</text>
+  <circle cx="700" cy="450" r="15" fill="#3F8624"/>
+  <text x="700" y="456" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4: Controlling -> Read Replica -->
+  <line x1="1355" y1="555" x2="1355" y2="395" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <text x="1335" y="478" font-size="15" fill="#1B3E86" text-anchor="end">Reader-Endpoint</text>
+  <text x="1335" y="496" font-size="15" fill="#1B3E86" text-anchor="end">nur SELECT</text>
+  <circle cx="1355" cy="480" r="15" fill="#2E6BE6"/>
+  <text x="1355" y="486" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 5: Failover -->
+  <path d="M1075,225 L1075,155 L470,155 L470,225" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <text x="770" y="140" font-size="15" fill="#9E1015" text-anchor="middle">Failover 60&#8211;120 s, Endpoint bleibt gleich</text>
+  <circle cx="770" cy="155" r="15" fill="#C7161D"/>
+  <text x="770" y="161" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- Box G: Multi-AZ -->
+  <rect x="40" y="555" width="340" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="210" y="593" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">Multi-AZ = Verf&#252;gbarkeit</text>
+  <text x="210" y="625" font-size="15" fill="#444444" text-anchor="middle">automatisches Failover, RPO 0</text>
+  <text x="210" y="647" font-size="15" fill="#444444" text-anchor="middle">Endpoint bleibt, Verbindung nicht</text>
+  <text x="210" y="677" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">skaliert keine einzige Leseabfrage</text>
+
+  <!-- Box H: Read Replica -->
+  <rect x="410" y="555" width="340" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="580" y="593" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">Replica = Lesekapazit&#228;t</text>
+  <text x="580" y="625" font-size="15" fill="#444444" text-anchor="middle">eigener Endpoint, nur SELECT</text>
+  <text x="580" y="647" font-size="15" fill="#444444" text-anchor="middle">Promotion nur manuell</text>
+  <text x="580" y="677" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">kein automatisches Failover</text>
+
+  <!-- Box I: Falle -->
+  <rect x="780" y="555" width="360" height="150" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="960" y="593" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Multi-AZ DB cluster</text>
+  <text x="960" y="625" font-size="15" fill="#444444" text-anchor="middle">nur MySQL / PostgreSQL:</text>
+  <text x="960" y="647" font-size="15" fill="#444444" text-anchor="middle">2 lesbare Standbys, 3 AZs</text>
+  <text x="960" y="677" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">die Ausnahme von der Regel oben</text>
+
+  <!-- Box B: Controlling -->
+  <rect x="1180" y="555" width="320" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1340" y="593" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Controlling / BI</text>
+  <text x="1340" y="625" font-size="15" fill="#444444" text-anchor="middle">Quartalsberichte, 8&#8211;10 Uhr</text>
+  <text x="1340" y="647" font-size="15" fill="#444444" text-anchor="middle">Full Scans, 400 Mio. Zeilen</text>
+  <text x="1340" y="677" font-size="15" fill="#666666" text-anchor="middle" font-style="italic">Sekunden Lag sind ok</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merks&#228;tze:</tspan>  Multi-AZ = Verf&#252;gbarkeit, synchron, automatisch  &#183;  Read Replica = Lesekapazit&#228;t, asynchron, manuell  &#183;  lesbare Standbys nur im DB cluster</text>
+</svg>
