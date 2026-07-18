@@ -174,3 +174,415 @@ Restpunkt „Cross-Exam-Round-Cookie → 404" besteht weiter (§5); ReadinessRin
 ---
 
 *Ende CHAT-CONTEXT. Ein neuer Chat startet mit: alle drei SAA-Content-Stränge lokal + live komplett (529 Fragen / 357 Karten / 137 Skripte), strukturierte Karten-Rückseiten **207/207** (§3b) und Quiz-Erklärungen **265/265** (§3c) jeweils lokal + remote komplett. Einziger offener Infrastruktur-Schritt = **Vercel-Deploy-Check**, danach Kür (Szenarien, TTS-Schuld, topic-Backfill).*
+
+---
+---
+
+# ⬆️ ORIGINAL-STAND (17.07.2026) ENDET OBERHALB — NACHTRAG 18.07.2026 AB HIER
+
+> **Lesehinweis für jeden neuen Chat:** Oberhalb dieser Linie wurde **kein einziges Zeichen** geändert oder entfernt. Alles ab hier ist Nachtrag der Session vom **18.07.2026** (Battle Cards / Szenarien). **Wo Nachtrag und Original sich widersprechen, gilt der Nachtrag** — die betroffenen Stellen sind unten in §10.6 einzeln benannt.
+>
+> **Reihenfolge beim Einlesen:** §10.1 (Begriffe) → §10.2 (wo liegt was) → §10.9 (nächster Schritt) → Rest bei Bedarf.
+
+---
+
+## 10. Session 18.07.2026 — Battle Cards / Szenarien (Batch 2 = Karten 6–10)
+
+### 10.1 ⚠️ BEGRIFFSKLÄRUNG — dreimal „Karten", drei verschiedene Dinge
+
+Diese Verwechslung hat in dieser Session real Zeit gekostet. **Jeder neue Chat muss diese drei Begriffe sauber trennen:**
+
+| Oktays Wort | Was es bedeutet | Menge | Wo es lebt | Status |
+|---|---|---|---|---|
+| **Quiz** / **Fragen** | Prüfungsfragen mit Antwortoptionen | 265 SAA + 264 CLF | DB-Tabelle `questions` | live ✅ |
+| **Karten** / **Karteikarten** | Flashcards (Vorder-/Rückseite) | 207 SAA + 150 CLF | DB-Tabelle `flashcards` | live ✅ |
+| **Szenarien** / **Battle Cards** | Von Chat-Claude **gezeichnete** Architektur-Diagramme (SVG) + Erklärtext | 10 von geplant 100 | **Dateien** unter `src/content/scenarios/` | **im Repo, aber in der App UNSICHTBAR** ❌ |
+
+**Merksatz:** Sagt Oktay „Szenarien" oder „Battle Cards", geht es **immer** um die gezeichneten Diagramme — **nie** um Quiz oder Flashcards. Umgekehrt: Zahlen wie „265/265" oder „207/207" betreffen **nie** die Szenarien.
+
+**Fehler dieser Session:** Chat-Claude hat auf Oktays Frage nach den Szenarien mit dem Quiz-Backfill-Stand („265/265 komplett") geantwortet. Oktay musste zweimal korrigieren. Ursache: zwei Baustellen liefen parallel, Chat-Claude hat den Kontextwechsel nicht mitgemacht.
+
+---
+
+### 10.2 WO LIEGEN DIE BATTLE CARDS — vollständig und exakt
+
+#### a) Im Repo (Single Source of Truth, gepusht)
+
+```
+~/Projekte/certops/src/content/scenarios/
+├── card-01/  battle_card_1.png  battle_card_1.pdf  battle_card_1.svg  battle_card_1.md
+├── card-02/  battle_card_2.png  battle_card_2.pdf  battle_card_2.svg  battle_card_2.md
+├── card-03/  battle_card_3.png  battle_card_3.pdf  battle_card_3.svg  battle_card_3.md
+├── card-04/  battle_card_4.png  battle_card_4.pdf  battle_card_4.svg  battle_card_4.md
+├── card-05/  battle_card_5.png  battle_card_5.pdf  battle_card_5.svg  battle_card_5.md
+├── card-06/  battle_card_6.png  battle_card_6.pdf  battle_card_6.svg  battle_card_6.md
+├── card-07/  battle_card_7.png  battle_card_7.pdf  battle_card_7.svg  battle_card_7.md
+├── card-08/  battle_card_8.png  battle_card_8.pdf  battle_card_8.svg  battle_card_8.md
+├── card-09/  battle_card_9.png  battle_card_9.pdf  battle_card_9.svg  battle_card_9.md
+└── card-10/  battle_card_10.png battle_card_10.pdf battle_card_10.svg battle_card_10.md
+```
+
+- **Ordner-Konvention:** `card-NN` **zweistellig mit führender Null** (`card-01`…`card-09`, dann `card-10`).
+- **Dateiname-Konvention:** `battle_card_<nr>` **ohne** führende Null (`battle_card_6`, nicht `battle_card_06`). Ordner und Datei sind also unterschiedlich formatiert — das ist so gewollt, nicht „reparieren".
+- **Vier Dateien pro Karte** = 10 Karten × 4 = **40 Dateien**. (Diese „40" hat in der Session für Verwirrung gesorgt — es sind nicht 40 Karten.)
+- **Verifiziert am 18.07.:** jeder Ordner enthält genau 4 Dateien, Gesamtsumme 40.
+
+#### b) Die ZIPs in `~/Downloads` (Rohquelle, NICHT im Repo)
+
+Chat-Claude liefert die Karten über `present_files` aus; Oktay lädt sie im Browser herunter — der Browser packt Mehrfach-Downloads **als ZIP**. Diese ZIPs liegen weiterhin unter `~/Downloads` und sind **außerhalb des Repos** die einzige Zweitkopie:
+
+| ZIP-Datei | Größe | Datum | Inhalt |
+|---|---|---|---|
+| `battlecard1.zip` | 239.501 B | 17.07. 19:50 | Karte 1 — **nur 3 Dateien** (png/pdf/svg, **keine .md**) |
+| `battlecard2.zip` | 212.626 B | 17.07. 20:13 | Karte 2 (4 Dateien) |
+| `battlecard3.zip` | 254.588 B | 17.07. 20:16 | Karte 3 (4 Dateien) |
+| `battlecard4.zip` | 265.669 B | 17.07. 20:22 | Karte 4 (4 Dateien) |
+| `battlecard5.zip` | 258.245 B | 17.07. 20:27 | Karte 5 (4 Dateien) |
+| `battlecard 6 + 7.zip` | 485.055 B | 18.07. 09:33 | Karten 6 **und** 7 (8 Dateien) — **Leerzeichen im Namen!** |
+| `battlecard8.zip` | 259.896 B | 18.07. 09:33 | Karte 8 (4 Dateien) |
+| `Battlecard 9 + 10.zip` | 584.818 B | 18.07. 09:52 | Karten 9 **und** 10 (8 Dateien) — **großes B + Leerzeichen!** |
+
+**Wichtig für jeden künftigen Batch:**
+- Die ZIP-Namen sind **uneinheitlich**: mal `battlecard5.zip`, mal `battlecard 6 + 7.zip`, mal `Battlecard 9 + 10.zip` (Groß-/Kleinschreibung, Leerzeichen, Pluszeichen, teils zwei Karten pro ZIP).
+- Deshalb **niemals** ein starres Dateinamen-Pattern annehmen. Erst schauen:
+  ```bash
+  ls -la ~/Downloads | grep -iE "battle|card"
+  ```
+- Entpackt wurde nach `/tmp/bc-stage` — **`/tmp` ist flüchtig und beim nächsten Reboot weg.** Das Staging-Verzeichnis ist **kein** Ablageort.
+- `battlecard1.zip` enthält **keine** `battle_card_1.md`; die `.md` von Karte 1 lag bereits aus einer früheren Session im Repo und wurde am 18.07. mitcommittet. Karte 1 ist damit im Repo vollständig (4 Dateien), das ZIP aber nicht.
+- **card-01 wurde bit-verglichen** (`cmp`) gegen das ZIP: png/pdf/svg identisch. Kein Versionskonflikt.
+
+**Reproduzierbarer Entpack-Block (funktioniert mit Leerzeichen im Namen):**
+```bash
+rm -rf /tmp/bc-stage && mkdir -p /tmp/bc-stage
+find ~/Downloads -maxdepth 1 -iname "battlecard*.zip" -print0 | while IFS= read -r -d '' z; do
+  echo "== $z"
+  unzip -o -q "$z" -d /tmp/bc-stage
+done
+find /tmp/bc-stage -type f | sort
+```
+
+**Einsortier-Block (nach dem Entpacken):**
+```bash
+cd ~/Projekte/certops
+for n in 2 3 4 5 6 7 8 9 10; do
+  d=$(printf "src/content/scenarios/card-%02d" $n)
+  mkdir -p "$d"
+  cp /tmp/bc-stage/battle_card_${n}.{png,pdf,svg,md} "$d"/
+done
+for d in src/content/scenarios/card-*; do printf "%s  %s\n" "$d" "$(ls "$d" | wc -l | tr -d ' ')"; done
+find src/content/scenarios -type f | wc -l
+```
+**Erwartung: jeder Ordner „4", Gesamtsumme = Anzahl Karten × 4. Stimmt eine Zahl nicht → NICHT committen.**
+
+#### c) ❌ NICHT ausgeliefert — der eigentliche offene Punkt
+
+**`src/content/scenarios/` wird von Next.js nicht als statisches Verzeichnis serviert.** Die PNG/SVG sind über keine URL erreichbar. Für eine Anzeige müssen sie entweder nach `public/scenarios/` kopiert/gespiegelt oder im Code importiert werden. Das gilt **unabhängig** davon, wie die Szenarien-Seite gebaut wird.
+
+Die `.md`-Frontmatter (`nr`, `title`, `services`, `signalwords`, `domain`, `assets`, optional `status_note`) wird **von niemandem geparst**. Sie ist bewusst für spätere Filterung/Sortierung angelegt (gray-matter ist als devDependency bereits im Projekt, siehe §4/Skript-Track).
+
+---
+
+### 10.3 Die Karten im Einzelnen
+
+#### Karten 1–5 (Batch 1, erstellt 17.07., Themen laut Masterplan)
+
+| Nr | Services | Szenario-Kern |
+|---|---|---|
+| 1 | Lambda, API Gateway, DynamoDB | REST-API ohne Server, Pay-per-Request, viraler Traffic |
+| 2 | ECS Fargate, ALB, ECR | Container ohne Cluster-Verwaltung, kein EC2-Patching |
+| 3 | EC2 Auto Scaling, ALB, CloudWatch | Webshop-Tageszyklus, nachts 2 / mittags 40 Instanzen |
+| 4 | Lambda SnapStart / Provisioned Concurrency, API Gateway | Java-Cold-Starts, 200-ms-Latenz-SLA |
+| 5 | App Runner, ECR | Container-Webservice ohne ALB/VPC/Scaling anzufassen |
+
+#### Karten 6–10 (Batch 2, erstellt 18.07. — diese Session)
+
+**Karte 6 — EKS · Karpenter · Spot** (Domain D4 primär, D3 Compute)
+Streaming-Plattform, Nodes laufen halb leer. Ablauf: Deploy → Pods Pending → Karpenter liest Requirements → On-Demand-NodePool für kritische/stateful Pods, Spot-NodePool für unkritische/stateless → Spot-Interruption via EventBridge → SQS Interruption Queue → cordon+drain+Ersatz-Node.
+*Kernsatz:* Karpenter provisioniert EC2 direkt aus Pending Pods (kein Node-Group-Denken); CAS skaliert nur vordefinierte ASGs.
+*Fallen:* Karpenter vs. CAS (entweder/oder, nie beide) · Spot braucht SQS+EventBridge · Fargate kann kein Spot/GPU.
+*Vereinfachung im Diagramm:* Consolidation nur als Footer-Merksatz, nicht als Pfeil.
+
+**Karte 7 — Lambda · SQS · DLQ** (Domain D2)
+Bestell-Service mit Lastspitzen. Ablauf: Producer → SQS Order Queue → Lambda Event Source Mapping pollt Batches → DynamoDB → Fehler zurück in Queue nach Visibility Timeout → nach `maxReceiveCount` (5) in die DLQ.
+*Kernsatz:* Die DLQ hängt an der **RedrivePolicy der Source-Queue** — **nicht** an Lambdas Async-DLQ.
+*Fallen:* Lambda-Async-DLQ greift bei SQS-Trigger **nie** (im Diagramm ausgegraut mit rotem X) · SNS puffert nicht (Fan-out) · ohne `ReportBatchItemFailures` kommt der ganze Batch zurück · Visibility Timeout ≥ 6× Function-Timeout · Idempotenz wegen at-least-once.
+
+**Karte 8 — Elastic Beanstalk · RDS** (Domain D2/D3)
+Kleines Team, klassische Web-App, kein Ops-Team. Ablauf: Code-Upload → EB provisioniert via CloudFormation ALB + ASG + EC2 → Rolling Deployments + Health-Checks → App spricht **separat provisionierte** RDS an (Endpoint via Umgebungsvariable, Security Group EB → RDS).
+*Kernsatz:* Beanstalk = PaaS (Code rein, Plattform baut ELB+ASG+EC2) — **RDS gehört immer außerhalb der Environment**.
+*Fallen:* RDS *in* der Environment stirbt mit ihr (Datenverlust, nur Dev/Test) · Beanstalk vs. CloudFormation (Plattform vs. Werkzeug darunter) · **AL2-Plattformbranches laufen zum 30.06.2026 aus → AL2023 wählen**.
+*Vereinfachung:* CloudFormation nicht als eigene Box gezeichnet.
+
+**Karte 9 — Outposts · Local Zones** (Domain D3, D1 Data Residency)
+Automobilzulieferer, SPS + Kamera-Qualitätsprüfung, < 10 ms nötig, Daten dürfen das Werk nicht verlassen, Produktion muss WAN-Ausfall überstehen. Ablauf: Maschine → EC2 auf Outposts (Rack **in der Fabrikhalle**) → Local Gateway (Traffic bleibt lokal) → EBS/S3 on Outposts → Service Link zur Parent Region für Control Plane/Backup/Analytics.
+*Kernsatz:* Outposts = AWS-Hardware im eigenen Gebäude; Local Zones = AWS-Standort in der Metro, nah bei **Endnutzern**, nicht im Werk.
+*Fallen:* Direct Connect macht die Leitung stabil, ändert die Entfernung nicht · Wavelength = 5G-Edge · CloudFront cacht, regelt keine Maschine · Outpost ist **nicht** autark, er braucht die Parent Region.
+*Vereinfachung:* Latenzen sind Größenordnungen, keine SLA-Werte.
+
+**Karte 10 — AWS Batch · EC2 GPU · S3** (Domain D4/D3)
+Animationsstudio, nächtliches Rendering hunderter unabhängiger Szenen. Ablauf: `submit-job` → Batch Job Queue (Priorität/Retry/Dependencies) → Managed Compute Environment **Typ EC2** → Input aus S3 → GPU-Rendering auf p-Familie (NVIDIA, GPU-optimiertes AMI), Kapazität auf Spot → Output nach S3 mit Lifecycle ins Archiv → Scale-down auf 0.
+*Kernsatz:* Batch = Job-Queue + managed Scaling; **GPUs nur im EC2-Compute-Environment — Fargate kann kein GPU**.
+*Fallen:* Fargate ohne GPU · Lambda 15-min-Timeout · Dauer-Cluster verletzt Kostenziel (`minvCpus 0`) · Spot nur mit Retry-Denken · EFS statt S3 nur bei echter POSIX-Anforderung.
+*Vereinfachung:* Job Definition und ECR-Image nicht gezeichnet.
+
+**Faktencheck-Stand:** Alle fünf Karten wurden am 18.07. per Web-Search gegen aktuelle AWS-Doku geprüft (Karpenter/EKS Auto Mode, Beanstalk-Plattform-Releases + AL2-EOL, Lambda-SQS-Event-Source-Mapping-Semantik, Outposts/Local-Zones-Abgrenzung, Batch-GPU-Instanztypen + Fargate-Einschränkung).
+
+---
+
+### 10.4 Qualitätsprüfung der Diagramme — was gemacht wurde und was nicht
+
+**Gemacht (rechnerisch, pro Karte):**
+- **Textbreiten mit PIL gemessen** (`ImageFont.truetype` auf DejaVuSans/-Bold, `getLength`) gegen die jeweilige Box-Breite. Überschreitungen wurden korrigiert (Karte 6: SQS-Titel 21→19px · Karte 7: Footer gekürzt, SQS-Zeile gekürzt, DLQ-Titel gekürzt · Karte 9: „Betrieb bei WAN-Ausfall" 20→18px).
+- **Kollisionsprüfung aller Pfeilsegmente** gegen alle Boxen (Liang-Barsky-Segment/Rechteck-Test mit 6px-Inset, damit Pfeile ihre Quell-/Zielbox berühren dürfen). Ergebnis überall 0 Kollisionen. Bei Karte 8 wurde das Layout **vor** dem Zeichnen umgebaut, weil der DB-Query-Pfeil sonst durch die „gekoppelte RDS"-Box gelaufen wäre.
+- **Render** nach PNG (2400px breit) und PDF via `cairosvg`.
+- **PNG-Sanity:** Nicht-Weiß-Anteil und Präsenz aller Palettenfarben geprüft.
+
+**NICHT gemacht:**
+- **Sichtprüfung durch Chat-Claude bei den Karten 8, 9 und 10.** Das `view`-Tool auf die gerenderten PNGs lieferte leere Ergebnisse. Chat-Claude hat das offengelegt und Oktay um die Sichtprüfung gebeten; **Oktay hat 8–10 selbst geprüft und freigegeben** („die bilder sind zu sehen"). Karten 6 und 7 hat Chat-Claude selbst gesehen.
+- **Regel für künftige Batches:** Wenn `view` auf das PNG nichts liefert, **nicht so tun, als sei sichtgeprüft**. Offenlegen und Oktay prüfen lassen. Der Masterplan nennt „sichtprüfen" als Pflichtschritt — er ist dann durch Oktay erfüllt, nicht durch Chat-Claude.
+
+**Das QC-Skript lebt nur im Chat-Container**, nicht im Repo. Es wird pro Session neu geschrieben (`qc.py`: `check_texts()` + `check_collisions()`). **Kandidat für die Repo-Übernahme** nach `scripts/`, analog zu den Ops-Skripten aus §5.6 — dann wäre die Prüfung reproduzierbar statt jedes Mal neu erfunden.
+
+---
+
+### 10.5 Git-Historie 18.07. — inklusive der Fehlgriffe
+
+| Commit | Inhalt | Status | Anmerkung |
+|---|---|---|---|
+| `ce78eb2` | aus der Claude-Code-Session der Nacht (Quiz-Erklärungen) | gepusht 18.07. | lag lokal, ging mit dem ersten Push mit |
+| `c33ea26` | Message „add battle cards 6-10", **enthielt nur card-01** | **per `git reset --soft HEAD~1` rückgängig**, nie gepusht | Ursache: `git add` lief, obwohl der Datei-Check 0 ergab |
+| `85cd0c7` | Message „add battle cards 1 and 6-10", **enthält nur card-01** (4 Dateien, 126 Zeilen) | **gepusht — Message ist falsch** | derselbe Fehler ein zweites Mal; Historie bewusst nicht per force-push umgeschrieben |
+| `9d23a6d` | **Karten 2–10** (36 Dateien, 1327 Zeilen) | gepusht | Message nennt den Fehler explizit: „(85cd0c7 contained card-01 only)" |
+
+**Push-Volumen:** `9d23a6d` = 2,21 MiB für 9 Karten. Hochgerechnet **~25 MB Binaries im Git bei 100 Karten**.
+**Offene Architektur-Entscheidung (§10.10):** PNG/PDF im Repo behalten oder nur SVG+MD versionieren und PNG/PDF im Build erzeugen. Wird mit jeder Karte teurer.
+
+---
+
+### 10.6 ⚠️ KORREKTUREN AM ORIGINAL-STAND OBERHALB
+
+**a) Der Quiz-Backfill war nie offen — §3c und §5.1 oben sind in diesem Punkt überholt.**
+
+Die Notiz „remote fehlen q-031–265 = Oktays Lauf" war **falsch**. Am 18.07. gemessen:
+
+- Remote `explanation_structured`: **SAA-C03 265/265 befüllt**, CLF-C02 264/0 (korrekt NULL).
+- Alle acht Batch-Dateien wurden **zeichengenau** gegen die Remote-DB verglichen (JSON-Parse + Deep-Equal über `seedKey`/`explanationStructured`): **batch1–8 = 265 Einträge, 265 identisch, 0 abweichend, 0 fehlend.**
+- Da batch3–8 am 18.07. **nicht** geschrieben wurden und trotzdem identisch sind, war remote bereits **vor** dieser Session vollständig.
+- Der am 18.07. gefahrene `batch2`-Write hat folglich **identische Werte überschrieben** — folgenlos, aber unnötig.
+
+**Ursache des Irrtums:** Der lokale Stand wurde dokumentiert und der Remote-Stand daraus **geschlossen statt gemessen**.
+**Regel:** Remote-Stände werden **gemessen**, nie aus dem lokalen Stand abgeleitet. Ein Satz wie „remote fehlt noch X" gehört nur in den Handoff, wenn eine Query dahintersteht.
+
+**b) Die Backup-Konvention aus §7 hat KEINE Implementierung.**
+
+§7 oben beschreibt ein read-only Mirror-Backup-Skript mit Selbstverifikation. Am 18.07. geprüft:
+- `pnpm run | grep -iE "backup|mirror"` → **nichts**
+- `ls scripts/` → `apply-icons.ts`, `fetch-icons.ts`, `gen-pwa-icons.ts`, `generate-skript-refs.ts`, `map-icons.ts`, `markdown-answers.ts`, `markdown-marks.ts`, `verify-fk.ts` — **kein Backup-Skript**
+- `grep -rln "integrity_check"` über `*.ts`/`*.sh`/`*.mjs` (ohne node_modules) → **keine Treffer**
+
+Die Skripte aus §7 lagen nur im Session-Scratchpad und sind mit der Session verschwunden (in §5.6 als Restpunkt vermerkt, bis heute nicht erledigt).
+
+**Bis ein Skript existiert, gilt diese manuelle Prozedur:**
+```bash
+mkdir -p ~/certops-backups
+STAMP=$(date +%Y%m%d-%H%M)
+turso db shell certops ".dump" > ~/certops-backups/certops-$STAMP.sql
+ls -lh ~/certops-backups/certops-$STAMP.sql      # muss MB-Größe haben, nicht 0 B
+sqlite3 /tmp/certops-mirror.db < ~/certops-backups/certops-$STAMP.sql
+sqlite3 /tmp/certops-mirror.db "PRAGMA integrity_check;"   # muss "ok" sein
+```
+
+**c) Der Turso-Datenbankname ist `certops` — nicht `certops-oktay-94`.**
+
+`turso db list` liefert: Name `certops`, Group `default`, URL `libsql://certops-oktay-94.aws-eu-west-1.turso.io`. Das `oktay-94` in der URL ist die **Organisation**, nicht Teil des DB-Namens. `turso db shell certops-oktay-94` scheitert mit „database not found" — und erzeugt trotzdem eine **0-Byte-Datei**, wenn man in eine Datei umleitet.
+
+**d) Der bash-guard blockt `turso db shell` NICHT mehr.**
+
+§8 oben notiert „blockt `turso db shell` (Workaround: read-only Scratchpad-Skripte)". Am 18.07. lief `turso db shell certops ".dump"` **problemlos** im normalen Terminal. Der Workaround ist damit nicht mehr nötig.
+
+**e) Vorhandene Backups (Stand 18.07.):**
+
+| Datei | Größe | Inhalt |
+|---|---|---|
+| `~/certops-backups/certops-pre-backfill-2026-07-12.sql` | 385 KB | Stand 12.07. — **kennt die Spalte `explanation_structured` noch nicht** (Migration 0014 kam später) |
+| `~/certops-backups/certops-20260718-1008.sql` | 2,3 MB | Stand 18.07. 10:08 — **nach** dem batch2-Write, schützt also batch3–8, nicht batch2 |
+
+Verifiziert: `PRAGMA integrity_check` = ok; Tabellen `__drizzle_migrations`, `flashcards`, `flashcard_views`, `questions`, `question_attempts`; Spalten von `questions`: `id, cert, domain, type, prompt, choices, correct, explanation, difficulty, source_ref, created_at, updated_at, seed_key, topic, explanation_structured`.
+
+---
+
+### 10.7 🚨 FEHLERPROTOKOLL 18.07. — damit sich das nie wiederholt
+
+Alle Fehler dieser Session, mit Ursache und Regel. **Die meisten gehen auf Chat-Claude.**
+
+#### F1 — Masterplan „nicht gefunden", obwohl er da war *(Chat-Claude)*
+
+**Was passierte:** Chat-Claude erklärte zu Beginn, `certops_100_szenarien_masterplan.md` liege nicht im Project Knowledge, und ließ Oktay die fünf Themen manuell pasten. Die Datei lag die ganze Zeit unter **`/mnt/project/certops_100_szenarien_masterplan.md`** und stand in der Dateiliste am Anfang des Kontexts.
+**Ursache:** Chat-Claude hat ausschließlich die semantische Suche (`project_knowledge_search`) benutzt. Die gab die Datei nicht zurück. Aus „Suche findet nichts" wurde fälschlich „Datei existiert nicht" — **ohne den Dateipfad zu öffnen, der direkt im Kontext stand.**
+**Folge:** Oktay musste Themen manuell tippen; am Ende der Session dieselbe Fehldiagnose ein zweites Mal für Karten 11+.
+
+> **REGEL F1 — verbindlich für jeden Chat:**
+> Projektwissen-Dateien liegen **als echte Dateien** unter `/mnt/project/`. Bevor irgendein Chat behauptet, eine Datei fehle:
+> ```
+> view /mnt/project/           →  Verzeichnis auflisten
+> view /mnt/project/<datei>.md →  Datei direkt öffnen
+> ```
+> **`project_knowledge_search` ist eine Suche, kein Existenzbeweis.** Ein leeres Suchergebnis heißt „nicht gefunden", nicht „nicht vorhanden". Erst wenn `view` auf den Pfad scheitert, fehlt die Datei wirklich.
+> **Die beiden Steuerdateien für Battle Cards sind:**
+> `/mnt/project/certops_battle_card_workflow.md` (Stil & Arbeitsweise) und
+> `/mnt/project/certops_100_szenarien_masterplan.md` (Themenliste 1–100, Batch-Prompt, Fortschritt).
+
+#### F2 — Erfundener Dry-run-Aufruf → Remote-Write ohne Backup *(Chat-Claude)*
+
+**Was passierte:** Chat-Claude gab als „Dry-run" den Befehl **ohne** `--confirm` an (nur Dateipfad). Das Skript hat aber keinen impliziten Dry-run-Modus — es **verweigert** ohne `--confirm` komplett. Der Verifikationsschritt fiel dadurch aus, und weil parallel kein Backup-Skript gefunden wurde, ging `batch2` **ohne frisches Backup** remote raus.
+**Der echte Aufruf steht im Skript-Header** (`src/db/backfill-explanation-structured-remote.ts`, Zeilen 1–8):
+```
+dry-run: pnpm db:backfill-explanation-structured:remote --dry-run          (read-only)
+write  : ALLOW_PROD_SEED=1 pnpm db:backfill-explanation-structured:remote --confirm
+```
+`--dry-run` ist ein **Flag**, kein weggelassenes `--confirm`.
+
+> **REGEL F2:** Vor jeder CLI-Anweisung an Oktay den **Skript-Header lesen** (`sed -n '1,60p' <pfad>`), statt den Aufruf aus dem Gedächtnis zu rekonstruieren. Ein falsch angegebener Befehl kostet nicht nur einen Fehlversuch — er kann eine Sicherheitsstufe (Backup, Dry-run) stillschweigend überspringen.
+
+#### F3 — `2>&1 | wc -l` zählte Fehlermeldungen als Treffer *(Chat-Claude)*
+
+**Was passierte:** Der Prüfbefehl
+```bash
+ls -1 ~/Downloads/battle_card_{6,7,8,9,10}.{png,pdf,svg,md} 2>&1 | wc -l
+```
+lieferte **20** — aber das waren 20× „No such file or directory", nicht 20 Dateien. Die Prüfung, die den nächsten Schritt absichern sollte, meldete falsch grün.
+
+> **REGEL F3:** Bei Zählprüfungen **`2>/dev/null`**, niemals `2>&1`. Sonst zählt man seine eigenen Fehlermeldungen.
+
+#### F4 — Downloads waren ZIPs, kein Dateiname-Pattern passte *(Chat-Claude)*
+
+**Was passierte:** Chat-Claude suchte nach `battle_card_6.png` usw. Der Browser hatte aber ZIP-Archive abgelegt (`battlecard 6 + 7.zip`, `Battlecard 9 + 10.zip`, …). Mehrere Runden gingen dafür drauf.
+
+> **REGEL F4:** Erst **lose** schauen, dann Pattern bauen:
+> ```bash
+> ls -la ~/Downloads | grep -iE "battle|card"
+> ```
+> Nie ein Dateinamen-Schema annehmen, ohne es gesehen zu haben.
+
+#### F5 — `git add` lief trotz Null-Ergebnis der Prüfung *(gemeinsam)*
+
+**Was passierte:** Die Datei-Zählung stand auf **0**. Trotzdem wurden `git add` + `commit` ausgeführt — `git add src/content/scenarios` fand das, was zufällig da war (card-01), und beschriftete es mit „battle cards 6-10". **Zweimal hintereinander** (`c33ea26`, dann `85cd0c7`), der zweite gepusht.
+
+> **REGEL F5:** Eine Zählprüfung ist nur dann eine Prüfung, wenn ein falsches Ergebnis **stoppt**. Vor `git add`:
+> ```bash
+> find src/content/scenarios -type f | wc -l    # Soll: Karten × 4
+> git status --short src/content/scenarios | wc -l
+> ```
+> Stimmt eine Zahl nicht → **nicht committen**. Und: `git add <verzeichnis>` nimmt alles Untracked mit, nicht nur das Gemeinte — Commit-Message erst schreiben, wenn `git status` bestätigt hat, was wirklich drin ist.
+
+#### F6 — Glob `certops-*.sql` machte eine Backup-Verifikation wertlos *(Chat-Claude)*
+
+**Was passierte:** Der `.dump` scheiterte (falscher DB-Name, siehe §10.6c) und hinterließ eine **0-Byte-Datei**. Der Restore-Befehl nutzte `~/certops-backups/certops-*.sql` — der Glob matchte **beide** Dateien, geladen wurde faktisch das alte Backup vom 12.07. `PRAGMA integrity_check` meldete **ok** — für den falschen Stand. Um ein Haar wäre ein sechs Tage altes Backup als frisch verbucht worden.
+
+> **REGEL F6:** Backups **immer mit explizitem Dateinamen** (Variable `$STAMP`/`$BK`) restoren und verifizieren, nie über Glob. Und: **Dateigröße prüfen, bevor** man einen Dump als gültig behandelt — 0 B ist der häufigste stille Fehlschlag.
+
+#### F7 — Inline-Kommentare hinter Befehlen brechen in interaktivem zsh *(Chat-Claude)*
+
+**Was passierte:** `find ... | wc -l   # erwartet: 24` → `zsh: number expected`. Interaktives zsh behandelt `#` standardmäßig nicht als Kommentar.
+
+> **REGEL F7:** Keine `# …`-Kommentare in Befehlszeilen, die Oktay kopiert. Erwartungswerte gehören in den Fließtext davor.
+
+#### F8 — Kontextwechsel nicht mitgemacht (Szenarien vs. Quiz) *(Chat-Claude)*
+
+**Was passierte:** Oktay fragte nach den **Szenarien**; Chat-Claude antwortete mit dem Quiz-Backfill-Stand („265/265 komplett"). Oktay musste zweimal korrigieren („es geht um die karten claude nicht quizfragen").
+
+> **REGEL F8:** Siehe Begriffstabelle §10.1. Bei Zahlen im Kontext immer dazusagen, **worauf** sie sich beziehen („265 Fragen", nie nur „265"). Wenn zwei Baustellen parallel laufen, in jeder Antwort benennen, um welche es geht.
+
+#### F9 — Sichtprüfung nicht möglich, aber Prüfpflicht bestand fort *(technisch)*
+
+Siehe §10.4. Kein Fehler im engeren Sinn, aber ein dokumentierter Bruch der Pflicht-Kette: Chat-Claude konnte die PNGs von Karte 8–10 nicht sehen. Offengelegt, Oktay hat geprüft.
+
+> **REGEL F9:** Wenn ein Pflicht-Prüfschritt technisch nicht durchführbar ist: **sagen**, nicht überspringen und nicht behaupten, er sei erfolgt.
+
+---
+
+### 10.8 Der Masterplan — wie Battle Cards produziert werden
+
+**Datei:** `/mnt/project/certops_100_szenarien_masterplan.md` (208 Zeilen)
+**Stil-Guide:** `/mnt/project/certops_battle_card_workflow.md` (195 Zeilen)
+
+- **Zählung 1–100**, unabhängig von den Kalibrier-/Referenzkarten **26–32** aus dem Workflow-Footer. Ebenfalls **nicht** zu verwechseln mit der `00-content-blueprint.md` §(f)-Liste (15 Diagramm-Quiz-Szenarien) — andere Liste, anderer Zweck.
+- **Genau 5 Karten pro Chat.** Mehr geht laut Masterplan nicht ohne Qualitätsverlust (SVG-Handarbeit + Mess-/Kollisionsprüfung + 4 Dateien + Erklärung pro Karte).
+- **Batch-Zuordnung:** Batch 1 = 1–5 · Batch 2 = 6–10 · **Batch 3 = 11–15** · Batch 4 = 16–20 · … · Batch 20 = 96–100.
+- **Batch-Prompt** steht im Masterplan (Abschnitt „Batch-Prompt") und wird mit eingetragenem Nummernbereich kopiert.
+- **Fortschritt im Masterplan (Zeilen 200–202) ist NICHT aktuell:** dort ist nur Batch 1 abgehakt. **Batch 2 (6–10) ist seit 18.07.2026 erledigt** und muss dort nachgetragen werden — die Datei ist für Chat-Claude schreibgeschützt, das ist Oktays Schritt in Project Knowledge.
+
+**Themen des nächsten Batches (Batch 3 = Karten 11–15, „Storage & Datenmanagement"):**
+
+| Nr | Services | Szenario-Kern |
+|---|---|---|
+| 11 | S3 Lifecycle, Glacier Deep Archive | Rechnungsarchiv, 10 Jahre Aufbewahrungspflicht, fast nie Zugriff, Kosten minimieren |
+| 12 | S3 Intelligent-Tiering | Zugriffsmuster unbekannt — automatisch in die richtige Speicherklasse |
+| 13 | EFS, EC2 Multi-AZ | Mehrere Webserver brauchen dasselbe gemeinsame Dateisystem (NFS) |
+| 14 | FSx for Windows, Active Directory | Windows-Fileserver mit SMB-Shares und AD-Rechten in die Cloud |
+| 15 | S3 Versioning, Object Lock, MFA Delete | Ransomware-Schutz: Backups unlöschbar (WORM/Compliance-Mode) |
+
+---
+
+### 10.9 ▶️ WIE ES WEITERGEHT — Stand bei Session-Ende 18.07.
+
+**Erledigt in dieser Session:**
+1. ✅ Karten 6–10 erstellt (Diagramm + QC + 4 Dateien je Karte)
+2. ✅ Karten 1–10 im Repo unter `src/content/scenarios/card-NN/`, gepusht (`9d23a6d`)
+3. ✅ Quiz-Backfill-Irrtum aufgeklärt — remote war immer 265/265 komplett (§10.6a)
+4. ✅ Frisches Turso-Backup `~/certops-backups/certops-20260718-1008.sql` (2,3 MB, integrity_check ok)
+
+**Offen, in dieser Reihenfolge:**
+
+1. **Vercel-Deploy prüfen + Browser-Smoke** *(einziger unerledigter Punkt aus §5.1 oben)*
+   Nach `9d23a6d` deployt Vercel automatisch. Danach live prüfen: **q-181** (D3, 5 Optionen) und **q-258** (D4, Multi-Select) müssen die **strukturierte Erklärung** zeigen (Verdict-Box zustandsgefärbt, Eselsbrücke + Prüfungsfalle nebeneinander), kein H-Scroll auf Mobile. Da remote 265/265 belegt ist, darf der Fallback nirgends greifen — täte er es, liegt es am Frontend, nicht an der DB.
+
+2. **Szenarien-Seite bauen** *(empfohlen VOR Batch 3)*
+   Zehn Karten liegen im Repo, die niemand sehen kann. Das Szenarien-Tile im SAA-Dashboard ist weiterhin nur der NEU-Teaser (§4/S4). Zu klären beim Bau:
+   - **Auslieferung der Assets:** `src/content/scenarios/` wird von Next **nicht** serviert → nach `public/scenarios/` spiegeln oder importieren.
+   - **Datenquelle:** DB-Strang wie die Skripte (Tabelle + Seed aus den `.md`, konsistent mit den drei bestehenden Content-Arten) **oder** dateibasiert + SSG (gray-matter beim Build, kein Migrationsaufwand). **Diese Entscheidung ist noch offen und gehört Oktay** — `ask_user_input_v0` verwenden, nicht selbst entscheiden.
+   - **SSG-Invariante beachten:** bei dynamischen Detailseiten `generateStaticParams` + `dynamicParams=false`, sonst 500 unter `next start` (§8, gelernt am 16.07.).
+   - Plan-Mode in Claude Code, Plan im Chat reviewen, dann Umsetzung.
+
+3. **Batch 3 = Karten 11–15** (Themen siehe §10.8) — danach.
+
+4. **Masterplan-Fortschritt nachtragen:** Batch 2 (6–10) abhaken.
+
+**Restpunkte aus dem Original-Stand bleiben unverändert bestehen:** SAA-TTS als dokumentierte Schuld · CLF-topic-Backfill optional · Header-Pill Tap-Höhe · `InvalidStateError` beim Exam-Switch · Cross-Exam-Round-Cookie-404 · Ops-Skripte ins Repo übernehmen (jetzt zusätzlich dringlicher, siehe §10.6b).
+
+---
+
+### 10.10 Offene Entscheidungen (keine davon getroffen)
+
+| Thema | Optionen | Warum es drängt |
+|---|---|---|
+| **Binaries im Git** | PNG/PDF mitversionieren **oder** nur SVG+MD, PNG/PDF im Build erzeugen | 2,21 MiB für 9 Karten → ~25 MB bei 100. Wird mit jeder Karte teurer. |
+| **Szenarien-Datenquelle** | DB-Tabelle + Seed (wie Skripte) **oder** Dateisystem + SSG (gray-matter) | Legt Migrationen, Queries und Seite fest. Blockiert den Seitenbau. |
+| **Commit-Historie** | `85cd0c7` per Amend + force-push korrigieren **oder** falsche Message stehen lassen | Aktuell steht eine falsche Message in der gepushten Historie; `9d23a6d` benennt den Fehler. Kein `--force` ohne Oktays OK. |
+| **QC-Skript ins Repo** | `qc.py` (Textbreiten + Kollisionen) nach `scripts/` **oder** pro Session neu schreiben | Aktuell wird die Prüflogik jedes Mal neu erfunden — nicht reproduzierbar. |
+
+---
+
+### 10.11 Ergänzungen zu §7 Arbeitskonventionen
+
+- **Bei Battle-Card-Batches gilt zusätzlich:** Faktencheck per Web-Search **vor** jeder Karte; Vereinfachungen im Diagramm **explizit** in der `.md` benennen; fachliche Korrektheit vor Optik.
+- **Ablage-Konvention Battle Cards:** `src/content/scenarios/card-NN/` mit allen vier Dateien zusammen (Ordner zweistellig, Datei einstellig — siehe §10.2a).
+- **Downloads:** Kommen als ZIP mit uneinheitlichen Namen. Nie ein Namensschema annehmen (§10.2b, Regel F4).
+
+### 10.12 Ergänzungen zu §8 Learnings / Regeln
+
+- **F1:** `/mnt/project/` per `view` prüfen, bevor eine Projektwissen-Datei für fehlend erklärt wird. Suche ≠ Existenzbeweis.
+- **F2:** Skript-Header lesen statt CLI-Aufrufe rekonstruieren.
+- **F3:** `2>/dev/null` bei Zählprüfungen, nie `2>&1`.
+- **F4:** Erst lose listen, dann Pattern bauen.
+- **F5:** Prüfungen müssen stoppen können — sonst sind sie Dekoration.
+- **F6:** Backups mit explizitem Dateinamen verifizieren, Dateigröße vor Gültigkeit prüfen.
+- **F7:** Keine Inline-`#`-Kommentare in kopierbaren Befehlen (zsh).
+- **F8:** Zahlen immer mit Bezugsobjekt nennen; Baustelle in jeder Antwort benennen.
+- **F9:** Nicht durchführbare Pflicht-Prüfschritte offenlegen, nicht überspringen.
+- **Remote-Stände messen, nie ableiten** (§10.6a) — der teuerste Irrtum dieser Session.
+
+---
+
+*Ende NACHTRAG 18.07.2026. Ein neuer Chat startet mit: Battle Cards **1–10 fertig und im Repo** (`src/content/scenarios/card-01`…`card-10`, je 4 Dateien, Commit `9d23a6d`), **in der App aber unsichtbar** — es gibt keine Szenarien-Seite. Quiz-Erklärungen remote **265/265 komplett** (war nie offen, §10.6a). Nächste Schritte: **(1)** Vercel-Deploy-Check + Browser-Smoke q-181/q-258, **(2)** Szenarien-Seite bauen (Entscheidung DB vs. Dateisystem offen), **(3)** Batch 3 = Karten 11–15. Vor jeder Aussage über fehlende Projektwissen-Dateien: `view /mnt/project/` — siehe Regel F1.*
