@@ -11,7 +11,7 @@ import { splitChapter } from "@/lib/skript-content";
 import { SkriptMarkdown } from "@/components/skript/SkriptMarkdown";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 
-// Fully static: all 25 cards prerender at build time (fs + gray-matter);
+// Fully static: all SCENARIO_COUNT cards prerender at build time (fs + gray-matter);
 // anything outside the enumerated slugs 404s via dynamicParams=false.
 export function generateStaticParams() {
   return listScenarios().map((s) => ({ exam: "saa", nr: s.slug }));
