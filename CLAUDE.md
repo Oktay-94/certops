@@ -56,14 +56,22 @@ generiert, nicht von Hand gepflegt.
   Danach R13 prüfen: reines `(0,0,0)` muss 0 px sein (Merksatz-y je Karte aus der
   SVG lesen, er liegt nicht immer gleich).
 
-**Antialiasing-Bruch (dokumentiert, 2026-07-19):** cairosvg 2.9.0 rendert Text mit
-Graustufen-Antialiasing. Die vor dem (e)-Sweep erzeugten Assets stammen aus einer
-Toolchain mit Subpixel-Antialiasing — deren PNGs haben farbige Glyphensäume
-(im Titelband ~9–10 % farbige Pixel, max. Kanaldivergenz 153; neu: exakt 0).
-Der Renderer ist bit-deterministisch, der Unterschied kommt allein aus dem
-AA-Modus. Karten 1, 6, 7, 8, 10, 11, 12, 15, 21–24, 31, 41, 45 sind neu
-gerendert, die übrigen 46 noch nicht. Graustufen-AA ist für skalierte und
-gedruckte Assets das korrektere Verhalten — ein Re-Render aller 60 ist offen.
+**Antialiasing-Stand (2026-07-19, abgeschlossen):** Alle 60 Karten sind mit
+CairoSVG 2.9.0 gerendert und nutzen durchgängig **Graustufen-Antialiasing**.
+Eine ältere Toolchain hatte mit Subpixel-AA gerendert, was farbige Glyphensäume
+erzeugte (im Titelband ~9–10 % farbige Pixel, max. Kanaldivergenz 153). Das ist
+bereinigt: Farbsaum-Endstand 0 von 60. Graustufen-AA ist für skalierte und
+gedruckte Assets das korrektere Verhalten, weil Subpixel-Säume auf ein
+bestimmtes Panel-Layout optimiert sind und beim Skalieren zu Farbartefakten
+werden. Der Renderer ist bit-deterministisch — gleiche SVG plus gleiche Pins
+ergibt dasselbe PNG.
+
+**Neue oder neu gerenderte Karten prüfen:** Abmessung 2400×1350, R13 = 0 px,
+und Kanaldivergenz im Titelband = 0 (Subpixel-AA-Regression). Titelband ist
+SVG y 38–104, x 60–1500 — dort steht nur dunkler Text auf Weiß. Die Untergrenze
+104 ist nicht beliebig: Karte 51 hat oranges `Replay ab Zeitpunkt` bei y=118
+(Oberkante 106), Karte 22 rotes `Failover 60–120 s…` bei y=127 (Oberkante 115).
+Ein weiteres Band schlägt auf diesen beiden fälschlich an.
 
 ## Architektur-Entscheidungen (bewusst)
 - **Skript-Speichermodell-Split:** CLF-Skript bleibt dateibasiert (13 Kapitel, `src/content/skript/`, voll statisch); SAA-Skripte liegen als DB-Content in der `scripts`-Tabelle (137 Dienst-Skripte, geseedet aus `src/db/seed/saa-scripts/*.md` via seed_key-Upsert) — sie teilen Lifecycle/Tooling mit dem übrigen SAA-Seed-Content, nicht mit dem CLF-Kapitel-Buch.
