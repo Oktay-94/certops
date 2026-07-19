@@ -122,7 +122,7 @@
   <text x="1030" y="566" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
 
   <path d="M1300,742 L1300,782 L175,782 L175,746" fill="none" stroke="#232F3E" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrN)"/>
-  <text x="740" y="808" font-size="15" fill="#232F3E" text-anchor="middle">Download der Belege</text>
+  <text x="740" y="754" font-size="15" fill="#232F3E" text-anchor="middle">Download der Belege</text>
   <circle cx="740" cy="782" r="15" fill="#232F3E"/>
   <text x="740" y="788" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">8</text>
 

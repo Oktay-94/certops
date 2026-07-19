@@ -87,8 +87,8 @@
   <text x="56" y="782" font-size="15" font-style="italic" fill="#666666">nur gestohlene Rechte</text>
 
   <path d="M195,613 L195,500 L376,500" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
-  <text x="205" y="490" font-size="15" fill="#9E1015">DeleteObjectVersion</text>
-  <text x="205" y="524" font-size="15" fill="#9E1015">PutObjectRetention</text>
+  <text x="205" y="438" font-size="15" fill="#9E1015">DeleteObjectVersion</text>
+  <text x="205" y="472" font-size="15" fill="#9E1015">PutObjectRetention</text>
   <circle cx="300" cy="500" r="15" fill="#C7161D"/>
   <text x="300" y="506" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
   <circle cx="195" cy="565" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>

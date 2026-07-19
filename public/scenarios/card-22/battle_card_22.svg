@@ -54,7 +54,7 @@
   <!-- 1: Sachbearbeitung -> Primary -->
   <line x1="290" y1="280" x2="430" y2="280" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
   <text x="360" y="245" font-size="15" fill="#1B3E86" text-anchor="middle">Writer-Endpoint</text>
-  <text x="360" y="263" font-size="15" fill="#1B3E86" text-anchor="middle">lesen + schreiben</text>
+  <text x="360" y="252" font-size="15" fill="#1B3E86" text-anchor="middle">lesen + schreiben</text>
   <circle cx="360" cy="280" r="15" fill="#2E6BE6"/>
   <text x="360" y="286" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
 
@@ -81,7 +81,7 @@
 
   <!-- 5: Failover -->
   <path d="M1075,225 L1075,155 L470,155 L470,225" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
-  <text x="770" y="140" font-size="15" fill="#9E1015" text-anchor="middle">Failover 60&#8211;120 s, Endpoint bleibt gleich</text>
+  <text x="770" y="127" font-size="15" fill="#9E1015" text-anchor="middle">Failover 60&#8211;120 s, Endpoint bleibt gleich</text>
   <circle cx="770" cy="155" r="15" fill="#C7161D"/>
   <text x="770" y="161" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
 

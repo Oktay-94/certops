@@ -70,7 +70,7 @@
   <!-- ============ Rueckstufung nach Zugriff ============ -->
 
   <path d="M1300,377 L1300,462 L540,462 L540,379" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
-  <text x="920" y="450" font-size="15" fill="#1B3E86" text-anchor="middle">Zugriff auf ein Objekt: sofort zurück in Frequent Access — keine Abrufgebühr, kein Restore</text>
+  <text x="920" y="434" font-size="15" fill="#1B3E86" text-anchor="middle">Zugriff auf ein Objekt: sofort zurück in Frequent Access — keine Abrufgebühr, kein Restore</text>
   <circle cx="920" cy="462" r="15" fill="#2E6BE6"/>
   <text x="920" y="468" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
 
