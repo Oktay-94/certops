@@ -11,7 +11,7 @@ import { SAA_C03_DOMAINS, type SaaC03Domain } from "./domains";
 
 const CONTENT_DIR = path.join(process.cwd(), "public", "scenarios");
 
-export const SCENARIO_COUNT = 30;
+export const SCENARIO_COUNT = 40;
 
 export type ScenarioDomainCode = "D1" | "D2" | "D3" | "D4";
 
@@ -30,7 +30,7 @@ function isDomainCode(v: unknown): v is ScenarioDomainCode {
 
 export type ScenarioMeta = {
   nr: number;
-  /** Route slug, zero-padded ("01".."25") — matches the card-NN directories. */
+  /** Route slug, zero-padded ("01".."NN") — matches the card-NN directories. */
   slug: string;
   title: string;
   services: string[];
@@ -112,12 +112,12 @@ function readScenario(nr: number): { meta: ScenarioMeta; body: string } {
   return { meta, body };
 }
 
-/** All 25 scenarios sorted by nr; throws on any invalid card (build guard). */
+/** All SCENARIO_COUNT scenarios sorted by nr; throws on any invalid card (build guard). */
 export function listScenarios(): ScenarioMeta[] {
   return Array.from({ length: SCENARIO_COUNT }, (_, i) => readScenario(i + 1).meta);
 }
 
-/** Scenario by zero-padded slug ("01".."25"); null for anything else. */
+/** Scenario by zero-padded slug ("01".."NN"); null for anything else. */
 export function getScenario(
   slug: string,
 ): { meta: ScenarioMeta; body: string } | null {
