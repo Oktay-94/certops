@@ -1,0 +1,13 @@
+# Render-Toolchain fuer die Battle Cards (PNG 2400 px + PDF).
+# Systemvoraussetzung: brew install cairo — cairocffi linkt gegen die native Lib.
+#
+# Setup:  python3 -m venv .venv && .venv/bin/pip install -r requirements-render.txt
+# .venv/ ist in .gitignore und gehoert nicht ins Repo.
+
+CairoSVG==2.9.0
+
+# Pillow ist NICHT nur eine cairosvg-Abhaengigkeit, sondern wird von
+# scripts/qc.py direkt zur Textbreitenmessung benutzt (text_bbox). Eine andere
+# Pillow-Version kann die Bounding-Boxen verschieben und damit QC-Befunde
+# erzeugen oder verschwinden lassen — deshalb hier mitgepinnt.
+pillow==12.3.0
