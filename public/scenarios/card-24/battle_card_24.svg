@@ -64,7 +64,7 @@
   <!-- 1: Nutzer -> App -->
   <line x1="240" y1="350" x2="330" y2="350" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
   <text x="285" y="315" font-size="15" fill="#1B3E86" text-anchor="middle">Katalog-</text>
-  <text x="285" y="333" font-size="15" fill="#1B3E86" text-anchor="middle">Anfrage</text>
+  <text x="285" y="322" font-size="15" fill="#1B3E86" text-anchor="middle">Anfrage</text>
   <circle cx="285" cy="350" r="15" fill="#2E6BE6"/>
   <text x="285" y="356" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
 
@@ -76,7 +76,7 @@
 
   <!-- 3: Hit -->
   <line x1="880" y1="340" x2="610" y2="340" stroke="#7A3FE0" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrP)"/>
-  <text x="775" y="325" font-size="15" fill="#5B2BAF" text-anchor="middle">Cache Hit: Antwort in ms</text>
+  <text x="775" y="312" font-size="15" fill="#5B2BAF" text-anchor="middle">Cache Hit: Antwort in ms</text>
   <circle cx="830" cy="340" r="15" fill="#7A3FE0"/>
   <text x="830" y="346" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
 

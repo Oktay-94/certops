@@ -15,7 +15,7 @@
   <rect x="40" y="150" width="520" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
   <text x="300" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ERKENNUNG</text>
   <rect x="590" y="150" width="420" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
-  <text x="800" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ZENTRALE SICHT</text>
+  <text x="800" y="167" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ZENTRALE SICHT</text>
   <rect x="1040" y="150" width="520" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
   <text x="1300" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AUTOMATISCHE REAKTION</text>
 

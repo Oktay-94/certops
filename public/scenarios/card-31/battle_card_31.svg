@@ -92,7 +92,7 @@
   <text x="1465" y="415" font-size="15" font-weight="bold" fill="#555555" text-anchor="middle">Route Table TEST</text>
   <text x="1465" y="437" font-size="14" fill="#444444" text-anchor="middle">Sandbox isoliert</text>
 
-  <text x="1430" y="490" font-size="15" fill="#232F3E" text-anchor="middle">Sandbox sieht keine Prod-Daten</text>
+  <text x="1430" y="472" font-size="15" fill="#232F3E" text-anchor="middle">Sandbox sieht keine Prod-Daten</text>
 
   <line x1="1300" y1="442" x2="1300" y2="558" stroke="#A16E00" stroke-width="3" marker-end="url(#arrGd)"/>
   <circle cx="1300" cy="500" r="15" fill="#A16E00"/>

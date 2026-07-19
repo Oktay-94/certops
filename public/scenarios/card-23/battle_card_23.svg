@@ -52,14 +52,14 @@
   <!-- 1: Teams -> Aurora -->
   <line x1="250" y1="270" x2="360" y2="270" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
   <text x="305" y="235" font-size="15" fill="#1B3E86" text-anchor="middle">Verbindung</text>
-  <text x="305" y="253" font-size="15" fill="#1B3E86" text-anchor="middle">aus der CI</text>
+  <text x="305" y="242" font-size="15" fill="#1B3E86" text-anchor="middle">aus der CI</text>
   <circle cx="305" cy="270" r="15" fill="#2E6BE6"/>
   <text x="305" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
 
   <!-- 2: Aurora -> Volume -->
   <line x1="720" y1="270" x2="830" y2="270" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
   <text x="775" y="235" font-size="15" fill="#232F3E" text-anchor="middle">Compute</text>
-  <text x="775" y="253" font-size="15" fill="#232F3E" text-anchor="middle">auf Volume</text>
+  <text x="775" y="242" font-size="15" fill="#232F3E" text-anchor="middle">auf Volume</text>
   <circle cx="775" cy="270" r="15" fill="#232F3E"/>
   <text x="775" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
 
