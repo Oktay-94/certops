@@ -71,12 +71,12 @@
 
   <!-- ARROW 1: TEAM -> QUEUE -->
   <line x1="240" y1="400" x2="320" y2="400" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
-  <text x="280" y="388" font-size="15" fill="#1B3E86" text-anchor="middle">submit</text>
+  <text x="280" y="372" font-size="15" fill="#1B3E86" text-anchor="middle">submit</text>
   <circle cx="280" cy="400" r="15" fill="#2E6BE6"/><text x="280" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
 
   <!-- ARROW 2: QUEUE -> GPU -->
   <line x1="570" y1="390" x2="690" y2="390" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
-  <text x="630" y="378" font-size="15" fill="#0B5A66" text-anchor="middle">dispatch</text>
+  <text x="630" y="362" font-size="15" fill="#0B5A66" text-anchor="middle">dispatch</text>
   <circle cx="630" cy="390" r="15" fill="#0F7C8C"/><text x="630" y="396" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
 
   <!-- ARROW 3: S3 INPUT -> GPU (routed under queue) -->
@@ -90,7 +90,7 @@
 
   <!-- ARROW 5: SPOT/GPU -> S3 OUTPUT -->
   <line x1="1240" y1="400" x2="1340" y2="400" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
-  <text x="1290" y="388" font-size="15" fill="#2E6318" text-anchor="middle">write</text>
+  <text x="1290" y="372" font-size="15" fill="#2E6318" text-anchor="middle">write</text>
   <circle cx="1290" cy="400" r="15" fill="#3F8624"/><text x="1290" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
 
   <!-- REJECTED STUB -->

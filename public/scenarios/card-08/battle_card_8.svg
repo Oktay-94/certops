@@ -53,7 +53,7 @@
 
   <!-- ARROW 1: DEV -> ELB (upload into env) -->
   <line x1="240" y1="440" x2="340" y2="350" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
-  <text x="292" y="415" font-size="15" fill="#1B3E86" text-anchor="middle">upload</text>
+  <text x="292" y="367" font-size="15" fill="#1B3E86" text-anchor="middle">upload</text>
   <circle cx="290" cy="395" r="15" fill="#2E6BE6"/><text x="290" y="401" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
 
   <!-- ARROW 2: ELB -> ASG -->
@@ -63,7 +63,7 @@
 
   <!-- ARROW 3: ASG -> EXTERNAL RDS (routed under boxes) -->
   <path d="M 480 630 L 480 700 L 1340 700 L 1340 600" fill="none" stroke="#2E27AD" stroke-width="3" marker-end="url(#arrDb)"/>
-  <text x="910" y="688" font-size="15" fill="#232082" text-anchor="middle">DB-Query → externe RDS (Endpoint via Env-Var)</text>
+  <text x="910" y="672" font-size="15" fill="#232082" text-anchor="middle">DB-Query → externe RDS (Endpoint via Env-Var)</text>
   <circle cx="910" cy="700" r="15" fill="#2E27AD"/><text x="910" y="706" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
 
   <!-- REJECTED: coupled RDS stub with red X -->

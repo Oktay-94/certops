@@ -52,22 +52,22 @@
 
   <!-- ARROW 1: PRODUCER -> SQS -->
   <line x1="260" y1="425" x2="360" y2="425" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
-  <text x="310" y="412" font-size="15" fill="#1B3E86" text-anchor="middle">send</text>
+  <text x="310" y="397" font-size="15" fill="#1B3E86" text-anchor="middle">send</text>
   <circle cx="310" cy="425" r="15" fill="#2E6BE6"/><text x="310" y="431" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
 
   <!-- ARROW 2: SQS -> LAMBDA (poll) -->
   <line x1="610" y1="425" x2="710" y2="425" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
-  <text x="660" y="412" font-size="15" fill="#0B5A66" text-anchor="middle">poll Batch</text>
+  <text x="660" y="397" font-size="15" fill="#0B5A66" text-anchor="middle">poll Batch</text>
   <circle cx="660" cy="425" r="15" fill="#0F7C8C"/><text x="660" y="431" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
 
   <!-- ARROW 3: LAMBDA -> DYNAMODB -->
   <line x1="960" y1="425" x2="1060" y2="425" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
-  <text x="1010" y="412" font-size="15" fill="#B25400" text-anchor="middle">write</text>
+  <text x="1010" y="397" font-size="15" fill="#B25400" text-anchor="middle">write</text>
   <circle cx="1010" cy="425" r="15" fill="#ED7100"/><text x="1010" y="431" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
 
   <!-- ARROW 4: LAMBDA fail -> back to SQS (dashed) -->
   <path d="M 760 490 L 760 540 L 500 540 L 500 490" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
-  <text x="632" y="530" font-size="15" fill="#9E1015" text-anchor="middle">Fehler → zuruck in Queue (Visibility Timeout)</text>
+  <text x="632" y="492" font-size="15" fill="#9E1015" text-anchor="middle">Fehler → zuruck in Queue (Visibility Timeout)</text>
   <circle cx="760" cy="520" r="15" fill="#C7161D"/><text x="760" y="526" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
 
   <!-- ARROW 5: SQS -> DLQ after maxReceiveCount -->
