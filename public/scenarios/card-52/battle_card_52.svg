@@ -1,0 +1,124 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 52 — Amazon Data Firehose · S3 · Athena</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Logs ohne eine Zeile Code in den Data Lake — die Partitionierung entscheidet über die Abfragekosten</text>
+
+  <!-- Zonen -->
+  <rect x="370" y="215" width="370" height="310" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="555" y="200" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">INGESTION — ohne Code</text>
+
+  <rect x="1190" y="215" width="330" height="265" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="1355" y="200" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ABFRAGE — pro Volumen</text>
+
+  <!-- Microservices -->
+  <rect x="55" y="300" width="265" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="187" y="342" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">40 Microservices</text>
+  <text x="187" y="378" font-size="15" fill="#444444" text-anchor="middle">Anwendungslogs</text>
+  <text x="187" y="412" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Direct PUT API</text>
+
+  <!-- Firehose -->
+  <rect x="390" y="255" width="330" height="250" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="555" y="297" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">Amazon Data Firehose</text>
+  <text x="555" y="325" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">seit 02/2024 neuer Name</text>
+  <text x="555" y="366" font-size="16" fill="#444444" text-anchor="middle">Format Conversion Parquet</text>
+  <text x="555" y="398" font-size="16" fill="#444444" text-anchor="middle">Dynamic Partitioning</text>
+  <text x="555" y="430" font-size="16" fill="#444444" text-anchor="middle">Puffer: Größe ODER Zeit</text>
+  <text x="555" y="470" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Consumer-Code</text>
+
+  <!-- Lambda -->
+  <rect x="390" y="620" width="330" height="120" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="555" y="668" font-size="20" font-weight="bold" fill="#B25400" text-anchor="middle">Lambda-Transformation</text>
+  <text x="555" y="704" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">optional, z. B. Felder kürzen</text>
+
+  <!-- S3 -->
+  <rect x="820" y="300" width="280" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="960" y="340" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Data Lake</text>
+  <text x="960" y="374" font-size="16" fill="#444444" text-anchor="middle">Parquet, spaltenweise</text>
+  <text x="960" y="404" font-size="16" fill="#444444" text-anchor="middle">Präfix je Partition</text>
+  <text x="960" y="436" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">region=/dt=</text>
+
+  <!-- Glue -->
+  <rect x="820" y="560" width="280" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="960" y="602" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">Glue Data Catalog</text>
+  <text x="960" y="634" font-size="16" fill="#444444" text-anchor="middle">Tabellendefinition</text>
+  <text x="960" y="662" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Partitionen bekannt</text>
+
+  <!-- Athena -->
+  <rect x="1210" y="300" width="290" height="160" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="1355" y="340" font-size="21" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Amazon Athena</text>
+  <text x="1355" y="374" font-size="16" fill="#444444" text-anchor="middle">Standard-SQL, serverless</text>
+  <text x="1355" y="404" font-size="16" fill="#444444" text-anchor="middle">liest nur passende Präfixe</text>
+  <text x="1355" y="436" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Cluster</text>
+
+  <!-- verworfen: eigener Consumer -->
+  <rect x="55" y="620" width="265" height="120" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="187" y="666" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Eigener Consumer</text>
+  <text x="187" y="698" font-size="15" fill="#444444" text-anchor="middle">EC2 + Code</text>
+  <text x="187" y="726" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">niemand betreibt ihn</text>
+
+  <!-- 1 Services -> Firehose -->
+  <line x1="320" y1="375" x2="390" y2="375" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="355" cy="375" r="15" fill="#2E6BE6"/>
+  <text x="355" y="381" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="355" y="340" font-size="15" fill="#1B3E86" text-anchor="middle">Logs</text>
+
+  <!-- 2 Firehose -> S3 -->
+  <line x1="720" y1="355" x2="820" y2="355" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="770" cy="355" r="15" fill="#D97706"/>
+  <text x="770" y="361" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="770" y="300" font-size="15" fill="#A85A05" text-anchor="middle">Parquet</text>
+  <text x="770" y="322" font-size="15" fill="#A85A05" text-anchor="middle">+ Präfixe</text>
+
+  <!-- 3 S3 -> Glue -->
+  <line x1="960" y1="460" x2="960" y2="560" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)"/>
+  <circle cx="960" cy="510" r="15" fill="#3F8624"/>
+  <text x="960" y="516" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="1030" y="516" font-size="15" fill="#2E6318" text-anchor="middle">Schema</text>
+
+  <!-- 4 Glue -> Athena (rechtwinklig) -->
+  <path d="M1100,600 L1355,600 L1355,460" fill="none" stroke="#D97706" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrO)"/>
+  <circle cx="1228" cy="600" r="15" fill="#D97706"/>
+  <text x="1228" y="606" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="1228" y="640" font-size="15" fill="#A85A05" text-anchor="middle">Tabellen-Metadaten</text>
+
+  <!-- 5 S3 -> Athena -->
+  <line x1="1100" y1="355" x2="1210" y2="355" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <circle cx="1155" cy="355" r="15" fill="#7A3FE0"/>
+  <text x="1155" y="361" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1155" y="320" font-size="15" fill="#5B2BAF" text-anchor="middle">SQL liest</text>
+
+  <!-- optionale Lambda-Transformation -->
+  <line x1="555" y1="505" x2="555" y2="620" stroke="#ED7100" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrO)"/>
+  <text x="640" y="570" font-size="15" font-style="italic" fill="#B25400" text-anchor="middle">optional</text>
+
+  <!-- verworfener Pfad -->
+  <line x1="187" y1="450" x2="187" y2="620" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <text x="187" y="775" font-size="16" font-weight="bold" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <circle cx="187" cy="535" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="174" y1="522" x2="200" y2="548" stroke="#C7161D" stroke-width="4"/>
+  <line x1="200" y1="522" x2="174" y2="548" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Firehose liefert, Streams puffern  ·  Parquet + Partitionen senken die Kosten je Abfrage  ·  Glue katalogisiert, Athena liest</text>
+</svg>

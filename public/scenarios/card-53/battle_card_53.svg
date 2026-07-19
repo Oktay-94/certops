@@ -1,0 +1,124 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#7A3FE0"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 53 — Athena · Glue Data Catalog · S3</text>
+  <text x="60" y="106" font-size="21" fill="#555555">40.000 Partitionen: dieselbe Frage, dieselben Daten — der Unterschied liegt im Layout</text>
+
+  <!-- Zonen -->
+  <rect x="380" y="255" width="360" height="285" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="560" y="240" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">SERVERLESS — kein Cluster</text>
+
+  <rect x="840" y="255" width="330" height="225" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="1005" y="240" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ABFRAGE — pro Volumen</text>
+
+  <!-- Analyst -->
+  <rect x="55" y="330" width="250" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="180" y="372" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">Analyst</text>
+  <text x="180" y="408" font-size="16" fill="#444444" text-anchor="middle">Ad-hoc-SQL</text>
+  <text x="180" y="440" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Cluster nötig</text>
+
+  <!-- Athena -->
+  <rect x="400" y="290" width="320" height="230" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="560" y="332" font-size="21" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Amazon Athena</text>
+  <text x="560" y="366" font-size="16" fill="#444444" text-anchor="middle">Engine Version 3</text>
+  <text x="560" y="398" font-size="16" fill="#444444" text-anchor="middle">serverless, schema-on-read</text>
+  <text x="560" y="440" font-size="16" fill="#444444" text-anchor="middle">Partition Projection aktiv</text>
+  <text x="560" y="480" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">berechnet Partitionen selbst</text>
+
+  <!-- Glue -->
+  <rect x="400" y="640" width="320" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="560" y="682" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">Glue Data Catalog</text>
+  <text x="560" y="714" font-size="16" fill="#444444" text-anchor="middle">GetPartitions bei 40.000</text>
+  <text x="560" y="744" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bei Projection nicht gefragt</text>
+
+  <!-- S3 -->
+  <rect x="860" y="290" width="290" height="170" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1005" y="332" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Data Lake</text>
+  <text x="1005" y="366" font-size="16" fill="#444444" text-anchor="middle">Parquet, spaltenweise</text>
+  <text x="1005" y="398" font-size="16" fill="#444444" text-anchor="middle">jahr=/monat=/tag=</text>
+  <text x="1005" y="436" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">liest nur den Tagespfad</text>
+
+  <!-- Query Result Reuse -->
+  <rect x="860" y="600" width="290" height="140" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="1005" y="645" font-size="20" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Query Result Reuse</text>
+  <text x="1005" y="678" font-size="16" fill="#444444" text-anchor="middle">gleiche Workgroup</text>
+  <text x="1005" y="708" font-size="16" fill="#444444" text-anchor="middle">gleicher Query-Text</text>
+  <text x="1005" y="732" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">max. 7 Tage</text>
+
+  <!-- Ergebnis -->
+  <rect x="1260" y="330" width="260" height="130" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1390" y="372" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">Ergebnis</text>
+  <text x="1390" y="406" font-size="16" fill="#444444" text-anchor="middle">ohne erneuten Scan</text>
+  <text x="1390" y="438" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bei Wiederholung</text>
+
+  <!-- verworfen: Redshift -->
+  <rect x="55" y="640" width="250" height="130" rx="10" fill="#FDF0F5" stroke="#B0084D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="180" y="682" font-size="20" font-weight="bold" fill="#8A0A3F" text-anchor="middle">Redshift-Cluster</text>
+  <text x="180" y="714" font-size="16" fill="#444444" text-anchor="middle">läuft auch nachts</text>
+  <text x="180" y="744" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Fixkosten ohne Abfrage</text>
+
+  <!-- 1 Analyst -> Athena -->
+  <line x1="305" y1="400" x2="400" y2="400" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="352" cy="400" r="15" fill="#2E6BE6"/>
+  <text x="352" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="352" y="365" font-size="15" fill="#1B3E86" text-anchor="middle">SQL</text>
+
+  <!-- 2 Athena -> Glue (Umweg ohne Projection) -->
+  <line x1="560" y1="520" x2="560" y2="640" stroke="#D97706" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrO)"/>
+  <circle cx="560" cy="580" r="15" fill="#D97706"/>
+  <text x="560" y="586" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="700" y="565" font-size="15" font-style="italic" fill="#A85A05" text-anchor="middle">nur ohne</text>
+  <text x="700" y="587" font-size="15" font-style="italic" fill="#A85A05" text-anchor="middle">Projection</text>
+
+  <!-- 3 Athena -> S3 -->
+  <line x1="720" y1="360" x2="860" y2="360" stroke="#7A3FE0" stroke-width="3" marker-end="url(#arrP)"/>
+  <circle cx="790" cy="360" r="15" fill="#7A3FE0"/>
+  <text x="790" y="366" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="790" y="322" font-size="15" fill="#5B2BAF" text-anchor="middle">liest Präfixe</text>
+
+  <!-- 4 S3 -> Ergebnis -->
+  <line x1="1150" y1="360" x2="1260" y2="360" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)"/>
+  <circle cx="1205" cy="360" r="15" fill="#3F8624"/>
+  <text x="1205" y="366" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- 5 Athena -> Result Reuse -->
+  <line x1="720" y1="450" x2="860" y2="640" stroke="#7A3FE0" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrP)"/>
+  <circle cx="790" cy="545" r="15" fill="#7A3FE0"/>
+  <text x="790" y="551" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- 6 Result Reuse -> Ergebnis (rechtwinklig) -->
+  <path d="M1150,660 L1390,660 L1390,460" fill="none" stroke="#7A3FE0" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrP)"/>
+  <circle cx="1270" cy="660" r="15" fill="#7A3FE0"/>
+  <text x="1270" y="666" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="1270" y="700" font-size="15" fill="#5B2BAF" text-anchor="middle">aus dem Cache</text>
+
+  <!-- verworfener Pfad -->
+  <line x1="180" y1="470" x2="180" y2="640" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <text x="180" y="800" font-size="16" font-weight="bold" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <circle cx="180" cy="555" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="167" y1="542" x2="193" y2="568" stroke="#C7161D" stroke-width="4"/>
+  <line x1="193" y1="542" x2="167" y2="568" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Partitionen sparen Zeilen, Parquet spart Spalten  ·  Projection ersetzt GetPartitions  ·  Result Reuse braucht Engine v3</text>
+</svg>

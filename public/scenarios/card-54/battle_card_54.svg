@@ -1,0 +1,115 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 54 — OpenSearch Service · Dashboards</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Correlation-ID über 60 Services in Sekunden — Volltextsuche braucht einen Index, keinen Scan</text>
+
+  <!-- Zonen -->
+  <rect x="350" y="285" width="630" height="195" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="665" y="270" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">INGESTION — ohne Code</text>
+
+  <rect x="990" y="150" width="340" height="430" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="1160" y="135" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">EINE ENTSCHEIDUNG</text>
+
+  <!-- Microservices -->
+  <rect x="55" y="320" width="240" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="175" y="362" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">60 Microservices</text>
+  <text x="175" y="398" font-size="16" fill="#444444" text-anchor="middle">Anwendungslogs</text>
+  <text x="175" y="430" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Correlation-ID je Request</text>
+
+  <!-- CloudWatch Logs -->
+  <rect x="370" y="320" width="260" height="140" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="500" y="362" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">CloudWatch Logs</text>
+  <text x="500" y="398" font-size="16" fill="#444444" text-anchor="middle">Log-Gruppe je Service</text>
+  <text x="500" y="430" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Subscription Filter</text>
+
+  <!-- Firehose -->
+  <rect x="700" y="320" width="260" height="140" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="830" y="362" font-size="20" font-weight="bold" fill="#A85A05" text-anchor="middle">Data Firehose</text>
+  <text x="830" y="398" font-size="16" fill="#444444" text-anchor="middle">liefert ohne Code</text>
+  <text x="830" y="430" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">puffert und schreibt</text>
+
+  <!-- Domain -->
+  <rect x="1010" y="180" width="300" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1160" y="222" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Domain (managed)</text>
+  <text x="1160" y="258" font-size="16" fill="#444444" text-anchor="middle">Cluster aus Nodes</text>
+  <text x="1160" y="298" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Instanztyp selbst wählen</text>
+
+  <!-- Collection -->
+  <rect x="1010" y="390" width="300" height="170" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1160" y="432" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Collection (Serverless)</text>
+  <text x="1160" y="468" font-size="16" fill="#444444" text-anchor="middle">kein Cluster, kein Node</text>
+  <text x="1160" y="500" font-size="16" fill="#444444" text-anchor="middle">skaliert in OCUs</text>
+  <text x="1160" y="536" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Encryption Pflicht</text>
+
+  <!-- Dashboards -->
+  <rect x="1010" y="640" width="300" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1160" y="684" font-size="19" font-weight="bold" fill="#1B3E86" text-anchor="middle">OpenSearch Dashboards</text>
+  <text x="1160" y="716" font-size="16" fill="#444444" text-anchor="middle">früher Kibana</text>
+  <text x="1160" y="746" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Endpunkt /_dashboards</text>
+
+  <!-- verworfen: Athena -->
+  <rect x="370" y="640" width="260" height="130" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="500" y="684" font-size="20" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Athena auf S3</text>
+  <text x="500" y="716" font-size="16" fill="#444444" text-anchor="middle">scannt statt sucht</text>
+  <text x="500" y="746" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Volltext-Index</text>
+
+  <!-- 1 -->
+  <line x1="295" y1="390" x2="370" y2="390" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="332" cy="390" r="15" fill="#2E6BE6"/>
+  <text x="332" y="396" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- 2 -->
+  <line x1="630" y1="390" x2="700" y2="390" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="665" cy="390" r="15" fill="#232F3E"/>
+  <text x="665" y="396" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3 Firehose -> Domain -->
+  <line x1="960" y1="360" x2="1010" y2="270" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="985" cy="315" r="15" fill="#D97706"/>
+  <text x="985" y="321" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4 Firehose -> Collection -->
+  <line x1="960" y1="420" x2="1010" y2="470" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="985" cy="445" r="15" fill="#D97706"/>
+  <text x="985" y="451" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <text x="830" y="500" font-size="15" fill="#A85A05" text-anchor="middle">indexiert — entweder oder</text>
+
+  <!-- 5 Collection -> Dashboards -->
+  <line x1="1160" y1="560" x2="1160" y2="640" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="1160" cy="600" r="15" fill="#0F7C8C"/>
+  <text x="1160" y="606" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1265" y="606" font-size="15" fill="#0B5A66" text-anchor="middle">Suche</text>
+
+  <!-- verworfener Pfad -->
+  <line x1="175" y1="460" x2="175" y2="700" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6"/>
+  <line x1="175" y1="700" x2="370" y2="700" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <text x="175" y="745" font-size="16" font-weight="bold" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <circle cx="175" cy="570" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="162" y1="557" x2="188" y2="583" stroke="#C7161D" stroke-width="4"/>
+  <line x1="188" y1="557" x2="162" y2="583" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Volltextsuche braucht einen Index, kein Scan  ·  Domain = Cluster, Collection = kein Cluster  ·  Serverless: keine Migration, nur Reindex</text>
+</svg>

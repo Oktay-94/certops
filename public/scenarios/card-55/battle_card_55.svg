@@ -1,0 +1,120 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrI" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3B3B98"/>
+    </marker>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 55 — Amazon MSK · Apache Kafka</text>
+  <text x="60" y="106" font-size="21" fill="#555555">40 Anwendungen sprechen Kafka — der bestehende Code ist das Argument, nicht der Durchsatz</text>
+
+  <!-- Zonen -->
+  <rect x="40" y="255" width="300" height="230" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="190" y="240" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE</text>
+
+  <rect x="860" y="150" width="340" height="365" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="1030" y="135" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">PROVISIONED — Broker-Typ</text>
+
+  <!-- On-Prem Anwendungen -->
+  <rect x="55" y="290" width="270" height="180" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="190" y="330" font-size="20" font-weight="bold" fill="#555555" text-anchor="middle">40 Anwendungen</text>
+  <text x="190" y="364" font-size="15" fill="#444444" text-anchor="middle">Kafka Producer/Consumer</text>
+  <text x="190" y="392" font-size="15" fill="#444444" text-anchor="middle">Kafka Connect zu SAP</text>
+  <text x="190" y="420" font-size="15" fill="#444444" text-anchor="middle">Kafka Streams</text>
+  <text x="190" y="452" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Code wird angefasst</text>
+
+  <!-- MSK -->
+  <rect x="430" y="255" width="330" height="250" rx="10" fill="#EFEFF9" stroke="#3B3B98" stroke-width="2.5"/>
+  <text x="595" y="299" font-size="21" font-weight="bold" fill="#2B2B72" text-anchor="middle">Amazon MSK</text>
+  <text x="595" y="336" font-size="16" fill="#444444" text-anchor="middle">echtes Apache Kafka</text>
+  <text x="595" y="370" font-size="16" fill="#444444" text-anchor="middle">KRaft statt ZooKeeper</text>
+  <text x="595" y="404" font-size="16" fill="#444444" text-anchor="middle">bis 60 Broker je Cluster</text>
+  <text x="595" y="444" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bestehende Clients bleiben</text>
+  <text x="595" y="478" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Kafka-APIs unverändert</text>
+
+  <!-- Standard-Broker -->
+  <rect x="880" y="180" width="300" height="130" rx="10" fill="#EFEFF9" stroke="#3B3B98" stroke-width="2.5"/>
+  <text x="1030" y="222" font-size="19" font-weight="bold" fill="#2B2B72" text-anchor="middle">Standard-Broker</text>
+  <text x="1030" y="256" font-size="15" fill="#444444" text-anchor="middle">EBS selbst planen</text>
+  <text x="1030" y="286" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">volle Kontrolle</text>
+
+  <!-- Express-Broker -->
+  <rect x="880" y="345" width="300" height="150" rx="10" fill="#EFEFF9" stroke="#3B3B98" stroke-width="2.5"/>
+  <text x="1030" y="387" font-size="19" font-weight="bold" fill="#2B2B72" text-anchor="middle">Express-Broker</text>
+  <text x="1030" y="420" font-size="15" fill="#444444" text-anchor="middle">kein Storage-Management</text>
+  <text x="1030" y="448" font-size="15" fill="#444444" text-anchor="middle">keine Wartungsfenster</text>
+  <text x="1030" y="478" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">drei AZ Pflicht</text>
+
+  <!-- Serverless -->
+  <rect x="880" y="530" width="300" height="140" rx="10" fill="#EFEFF9" stroke="#3B3B98" stroke-width="2.5"/>
+  <text x="1030" y="574" font-size="19" font-weight="bold" fill="#2B2B72" text-anchor="middle">MSK Serverless</text>
+  <text x="1030" y="608" font-size="15" fill="#444444" text-anchor="middle">keine Kapazitätsplanung</text>
+  <text x="1030" y="640" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">skaliert automatisch</text>
+
+  <!-- Konsumenten -->
+  <rect x="1300" y="255" width="240" height="250" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1420" y="330" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Konsumenten</text>
+  <text x="1420" y="372" font-size="16" fill="#444444" text-anchor="middle">unveränderte</text>
+  <text x="1420" y="400" font-size="16" fill="#444444" text-anchor="middle">Kafka-Clients</text>
+  <text x="1420" y="440" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Rewrite</text>
+
+  <!-- verworfen: Kinesis -->
+  <rect x="430" y="650" width="330" height="130" rx="10" fill="#EFEFF9" stroke="#3B3B98" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="595" y="694" font-size="20" font-weight="bold" fill="#2B2B72" text-anchor="middle">Kinesis Data Streams</text>
+  <text x="595" y="726" font-size="15" fill="#444444" text-anchor="middle">andere API, andere SDKs</text>
+  <text x="595" y="756" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">40 Anwendungen umschreiben</text>
+
+  <!-- 1 -->
+  <line x1="325" y1="380" x2="430" y2="380" stroke="#9A9A9A" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="377" cy="380" r="15" fill="#9A9A9A"/>
+  <text x="377" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="377" y="345" font-size="15" fill="#555555" text-anchor="middle">Lift</text>
+
+  <!-- 2 MSK -> Standard -->
+  <line x1="760" y1="320" x2="880" y2="245" stroke="#3B3B98" stroke-width="3" marker-end="url(#arrI)"/>
+  <circle cx="820" cy="282" r="15" fill="#3B3B98"/>
+  <text x="820" y="288" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3 MSK -> Express -->
+  <line x1="760" y1="380" x2="880" y2="420" stroke="#3B3B98" stroke-width="3" marker-end="url(#arrI)"/>
+  <circle cx="820" cy="400" r="15" fill="#3B3B98"/>
+  <text x="820" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4 MSK -> Serverless -->
+  <line x1="760" y1="440" x2="880" y2="600" stroke="#3B3B98" stroke-width="3" marker-end="url(#arrI)"/>
+  <circle cx="820" cy="520" r="15" fill="#3B3B98"/>
+  <text x="820" y="526" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <text x="640" y="560" font-size="15" font-style="italic" fill="#2B2B72" text-anchor="middle">erst Cluster-Typ,</text>
+  <text x="640" y="584" font-size="15" font-style="italic" fill="#2B2B72" text-anchor="middle">dann Broker-Typ</text>
+
+  <!-- 5 Express -> Konsumenten -->
+  <line x1="1180" y1="420" x2="1300" y2="380" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="1240" cy="400" r="15" fill="#2E6BE6"/>
+  <text x="1240" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1215" y="470" font-size="15" fill="#1B3E86" text-anchor="middle">dieselben Topics</text>
+
+  <!-- verworfener Pfad -->
+  <line x1="190" y1="470" x2="190" y2="715" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6"/>
+  <line x1="190" y1="715" x2="430" y2="715" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <text x="190" y="760" font-size="16" font-weight="bold" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <circle cx="190" cy="590" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="177" y1="577" x2="203" y2="603" stroke="#C7161D" stroke-width="4"/>
+  <line x1="203" y1="577" x2="177" y2="603" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  MSK wenn Kafka-Code bleibt, Kinesis beim Neubau  ·  Erst Cluster-Typ, dann Broker-Typ  ·  KRaft ersetzt ZooKeeper</text>
+</svg>

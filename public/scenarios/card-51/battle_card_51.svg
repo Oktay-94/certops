@@ -1,0 +1,117 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrI" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3B3B98"/>
+    </marker>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrPk" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#E7157B"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 51 — Kinesis Data Streams vs. SQS</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Clickstream: drei Teams brauchen dieselben Events — und einer muss drei Stunden neu lesen</text>
+
+  <!-- Zone Konsumenten -->
+  <rect x="800" y="150" width="330" height="450" rx="10" fill="none" stroke="#9A9A9A" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="965" y="627" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">KONSUMENTEN — parallel, unabhängig</text>
+
+  <!-- Shop -->
+  <rect x="60" y="300" width="250" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="185" y="340" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Shop-Frontend</text>
+  <text x="185" y="370" font-size="15" fill="#444444" text-anchor="middle">Klick-Events je Session</text>
+  <text x="185" y="398" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Partition Key = Session-ID</text>
+
+  <!-- Kinesis Data Streams -->
+  <rect x="390" y="250" width="310" height="230" rx="10" fill="#EFEFF9" stroke="#3B3B98" stroke-width="2.5"/>
+  <text x="545" y="292" font-size="22" font-weight="bold" fill="#2B2B72" text-anchor="middle">Kinesis Data Streams</text>
+  <text x="545" y="330" font-size="16" fill="#444444" text-anchor="middle">Retention 24 h Default</text>
+  <text x="545" y="358" font-size="16" fill="#444444" text-anchor="middle">bis 7 Tage extended</text>
+  <text x="545" y="386" font-size="16" fill="#444444" text-anchor="middle">bis 365 Tage long-term</text>
+  <text x="545" y="424" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Records bleiben nach dem Lesen</text>
+  <text x="545" y="452" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Reihenfolge je Partition Key</text>
+
+  <!-- SQS verworfen -->
+  <rect x="390" y="600" width="310" height="150" rx="10" fill="#FDEDF4" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="545" y="642" font-size="22" font-weight="bold" fill="#B01059" text-anchor="middle">SQS-Queue</text>
+  <text x="545" y="678" font-size="16" fill="#444444" text-anchor="middle">Nachricht nach Delete weg</text>
+  <text x="545" y="714" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein zweiter Leser, kein Replay</text>
+
+  <!-- Konsumenten -->
+  <rect x="830" y="175" width="270" height="115" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="965" y="215" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">Personalisierung</text>
+  <text x="965" y="248" font-size="15" fill="#444444" text-anchor="middle">Echtzeit-Empfehlung</text>
+
+  <rect x="830" y="320" width="270" height="115" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="965" y="360" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">Betrugserkennung</text>
+  <text x="965" y="393" font-size="15" fill="#444444" text-anchor="middle">Sitzungsmuster</text>
+
+  <rect x="830" y="465" width="270" height="115" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="965" y="505" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">BI-Konsument</text>
+  <text x="965" y="538" font-size="15" fill="#444444" text-anchor="middle">Nachtladung</text>
+
+  <!-- S3 -->
+  <rect x="1250" y="465" width="250" height="115" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1375" y="505" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Data Lake</text>
+  <text x="1375" y="538" font-size="15" fill="#444444" text-anchor="middle">Rohdaten-Ablage</text>
+
+  <!-- 1 Shop -> Stream -->
+  <line x1="310" y1="365" x2="390" y2="365" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="350" cy="365" r="15" fill="#2E6BE6"/>
+  <text x="350" y="371" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="350" y="325" font-size="15" fill="#1B3E86" text-anchor="middle">Klickstrom</text>
+
+  <!-- 2 Stream -> Personalisierung -->
+  <line x1="700" y1="300" x2="830" y2="232" stroke="#3B3B98" stroke-width="3" marker-end="url(#arrI)"/>
+  <circle cx="765" cy="266" r="15" fill="#3B3B98"/>
+  <text x="765" y="272" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- 3 Stream -> Betrugserkennung -->
+  <line x1="700" y1="365" x2="830" y2="377" stroke="#3B3B98" stroke-width="3" marker-end="url(#arrI)"/>
+  <circle cx="765" cy="371" r="15" fill="#3B3B98"/>
+  <text x="765" y="377" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- 4 Stream -> BI -->
+  <line x1="700" y1="430" x2="830" y2="522" stroke="#3B3B98" stroke-width="3" marker-end="url(#arrI)"/>
+  <circle cx="765" cy="476" r="15" fill="#3B3B98"/>
+  <text x="765" y="482" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <text x="742" y="182" font-size="15" fill="#2B2B72" text-anchor="middle">Enhanced Fan-out</text>
+  <text x="742" y="204" font-size="15" fill="#2B2B72" text-anchor="middle">eigener Lesedurchsatz</text>
+
+  <!-- 5 BI -> S3 -->
+  <line x1="1100" y1="522" x2="1250" y2="522" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)"/>
+  <circle cx="1175" cy="522" r="15" fill="#3F8624"/>
+  <text x="1175" y="528" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1175" y="482" font-size="15" fill="#2E6318" text-anchor="middle">Parquet-Ablage</text>
+
+  <!-- 6 Replay: Personalisierung zurueck an den Stream (rechtwinklig) -->
+  <path d="M1235,232 L1235,140 L545,140 L545,250" fill="none" stroke="#D97706" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrO)"/>
+  <line x1="1100" y1="232" x2="1235" y2="232" stroke="#D97706" stroke-width="3" stroke-dasharray="9,6"/>
+  <circle cx="890" cy="140" r="15" fill="#D97706"/>
+  <text x="890" y="146" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="890" y="118" font-size="15" fill="#A85A05" text-anchor="middle">Replay ab Zeitpunkt</text>
+
+  <!-- verworfener SQS-Pfad -->
+  <line x1="185" y1="430" x2="185" y2="600" stroke="#E7157B" stroke-width="3" stroke-dasharray="8,6"/>
+  <line x1="185" y1="600" x2="390" y2="600" stroke="#E7157B" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrPk)"/>
+  <text x="185" y="640" font-size="16" font-weight="bold" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <circle cx="185" cy="515" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="172" y1="502" x2="198" y2="528" stroke="#C7161D" stroke-width="4"/>
+  <line x1="198" y1="502" x2="172" y2="528" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  SQS löscht nach Konsum, Kinesis behält nach Zeit  ·  Replay braucht Retention, keine Queue  ·  Fan-out: jeder liest denselben Shard eigenständig</text>
+</svg>
