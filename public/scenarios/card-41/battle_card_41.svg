@@ -92,7 +92,7 @@
   <path d="M790,520 L900,520" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)" fill="none"/>
   <circle cx="845" cy="520" r="15" fill="#232F3E"/>
   <text x="845" y="526" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
-  <text x="800" y="545" font-size="15" fill="#232F3E" text-anchor="start">holt Credentials</text>
+  <text x="845" y="556" font-size="15" fill="#232F3E" text-anchor="middle">holt Credentials</text>
 
   <!-- 4: Lambda -> STS (rechtwinklig) -->
   <path d="M790,700 L845,700 L845,580 L900,580" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)" fill="none"/>
