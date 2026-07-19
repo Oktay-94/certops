@@ -1,0 +1,107 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrRp" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#B0084D"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrGd" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 39 — Aurora Global Database · RPO und RTO</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Eine Schreibregion, mehrere Leseregionen — Switchover kostet keine Daten, Failover kostet Sekunden</text>
+
+  <!-- Anwendung -->
+  <rect x="40" y="340" width="180" height="120" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="130" y="378" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Anwendung</text>
+  <text x="130" y="406" font-size="15" fill="#444444" text-anchor="middle">Schreibpfad</text>
+  <text x="130" y="429" font-size="15" fill="#444444" text-anchor="middle">Frankfurt</text>
+
+  <!-- Aurora Primary -->
+  <rect x="290" y="300" width="290" height="200" rx="10" fill="#FDF0F5" stroke="#B0084D" stroke-width="2.5"/>
+  <text x="435" y="352" font-size="22" font-weight="bold" fill="#8A0A3F" text-anchor="middle">Aurora Primary</text>
+  <text x="435" y="386" font-size="15" fill="#444444" text-anchor="middle">eu-central-1</text>
+  <text x="435" y="409" font-size="15" fill="#444444" text-anchor="middle">einzige Schreibregion</text>
+  <text x="435" y="432" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Writer + Reader</text>
+
+  <!-- Aurora Secondary -->
+  <rect x="650" y="300" width="290" height="200" rx="10" fill="#FDF0F5" stroke="#B0084D" stroke-width="2.5"/>
+  <text x="795" y="352" font-size="22" font-weight="bold" fill="#8A0A3F" text-anchor="middle">Aurora Secondary</text>
+  <text x="795" y="386" font-size="15" fill="#444444" text-anchor="middle">us-east-1</text>
+  <text x="795" y="409" font-size="15" fill="#444444" text-anchor="middle">read-only, nimmt keine Writes</text>
+  <text x="795" y="432" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">beförderbar in ~1 Minute</text>
+
+  <!-- weitere Secondaries -->
+  <rect x="650" y="570" width="290" height="130" rx="10" fill="#FDF0F5" stroke="#B0084D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="795" y="613" font-size="20" font-weight="bold" fill="#8A0A3F" text-anchor="middle">weitere Secondaries</text>
+  <text x="795" y="645" font-size="15" fill="#444444" text-anchor="middle">mehrere Regionen möglich</text>
+  <text x="795" y="668" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">je Region eine volle Kopie</text>
+
+  <!-- Switchover -->
+  <rect x="1010" y="170" width="440" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1230" y="212" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Switchover (geplant)</text>
+  <text x="1230" y="244" font-size="15" fill="#444444" text-anchor="middle">RPO = 0, kein Datenverlust</text>
+  <text x="1230" y="267" font-size="15" fill="#444444" text-anchor="middle">alle Cluster müssen gesund sein</text>
+  <text x="1230" y="290" font-size="15" fill="#444444" text-anchor="middle">Rollen tauschen, ~1 Minute</text>
+  <text x="1230" y="313" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">für DR-Test und Wartungsrotation</text>
+
+  <!-- Failover -->
+  <rect x="1010" y="380" width="440" height="160" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1230" y="422" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Failover (ungeplant)</text>
+  <text x="1230" y="454" font-size="15" fill="#444444" text-anchor="middle">RPO in Sekunden</text>
+  <text x="1230" y="477" font-size="15" fill="#444444" text-anchor="middle">abhängig vom Replikationslag</text>
+  <text x="1230" y="500" font-size="15" fill="#444444" text-anchor="middle">RTO in Minuten</text>
+  <text x="1230" y="523" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">für den echten Regionalausfall</text>
+
+  <!-- RPO-Steuerung -->
+  <rect x="40" y="570" width="420" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="250" y="608" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">rds.global_db_rpo</text>
+  <text x="250" y="640" font-size="15" fill="#444444" text-anchor="middle">nur Aurora PostgreSQL</text>
+  <text x="250" y="663" font-size="15" fill="#444444" text-anchor="middle">setzt eine RPO-Obergrenze</text>
+  <text x="250" y="686" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bremst Transaktionen am Writer</text>
+
+  <!-- Falle: Write Forwarding -->
+  <rect x="1010" y="570" width="440" height="130" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1230" y="608" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Falle: Write Forwarding</text>
+  <text x="1230" y="640" font-size="15" fill="#444444" text-anchor="middle">Secondary nimmt Writes entgegen</text>
+  <text x="1230" y="663" font-size="15" fill="#444444" text-anchor="middle">und leitet sie zum Primary weiter</text>
+  <text x="1230" y="686" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">das ist kein aktiv-aktiv</text>
+
+  <!-- Schreibpfad und Replikation -->
+  <path d="M220,400 L290,400" stroke="#B0084D" stroke-width="3" fill="none" marker-end="url(#arrRp)"/>
+  <path d="M580,400 L650,400" stroke="#B0084D" stroke-width="3" fill="none" marker-end="url(#arrRp)"/>
+  <text x="615" y="375" font-size="15" fill="#8A0A3F" text-anchor="middle">&lt; 1 s Lag</text>
+  <path d="M500,500 L500,635 L650,635" stroke="#B0084D" stroke-width="3" fill="none" marker-end="url(#arrRp)"/>
+
+  <!-- RPO-Obergrenze wirkt auf den Writer -->
+  <path d="M350,570 L350,506" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrT)"/>
+
+  <!-- Zwei Wege zur Promotion -->
+  <path d="M940,400 L975,400" stroke="#B0084D" stroke-width="3" fill="none"/>
+  <path d="M975,400 L975,250 L1010,250" stroke="#3F8624" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrG)"/>
+  <path d="M975,400 L975,460 L1010,460" stroke="#A16E00" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrGd)"/>
+
+  <!-- Nummern-Badges -->
+  <circle cx="255" cy="400" r="15" fill="#B0084D"/>
+  <text x="255" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="615" cy="400" r="15" fill="#B0084D"/>
+  <text x="615" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="500" cy="570" r="15" fill="#B0084D"/>
+  <text x="500" y="576" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="975" cy="320" r="15" fill="#3F8624"/>
+  <text x="975" y="326" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="975" cy="440" r="15" fill="#A16E00"/>
+  <text x="975" y="446" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Switchover = RPO 0, alle Cluster gesund · Failover = RPO in Sekunden · Secondary ist read-only · Write Forwarding ist kein aktiv-aktiv</text>
+</svg>

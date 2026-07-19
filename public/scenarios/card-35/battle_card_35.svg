@@ -1,0 +1,103 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/>
+    </marker>
+    <marker id="arrGd" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 35 — Global Accelerator vs CloudFront</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Anycast-IPs und Backbone-Routing statt Caching: was der Weg bringt und was der Inhalt</text>
+
+  <text x="300" y="230" font-size="15" fill="#232F3E" text-anchor="middle">UDP-Spielverkehr</text>
+
+  <rect x="50" y="280" width="210" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="155" y="320" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Spieler</text>
+  <text x="155" y="348" font-size="15" fill="#444444" text-anchor="middle">weltweit, mobil</text>
+  <text x="155" y="374" font-size="15" fill="#444444" text-anchor="middle">UDP + HTTP</text>
+  <text x="155" y="400" font-size="14" font-style="italic" fill="#9E1015" text-anchor="middle">Asien: 180 ms</text>
+
+  <line x1="260" y1="320" x2="398" y2="250" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="329" cy="285" r="15" fill="#232F3E"/>
+  <text x="329" y="291" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <rect x="400" y="180" width="260" height="110" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="530" y="215" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">Global Accelerator</text>
+  <text x="530" y="242" font-size="15" fill="#444444" text-anchor="middle">2 statische Anycast-IPs</text>
+  <text x="530" y="266" font-size="15" fill="#444444" text-anchor="middle">Layer 4, TCP und UDP</text>
+
+  <line x1="660" y1="216" x2="808" y2="192" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="734" cy="204" r="15" fill="#232F3E"/>
+  <text x="734" y="210" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <rect x="810" y="150" width="250" height="85" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="935" y="180" font-size="18" font-weight="bold" fill="#2E6318" text-anchor="middle">eu-central-1</text>
+  <text x="935" y="205" font-size="15" fill="#444444" text-anchor="middle">Game-Server EC2</text>
+
+  <line x1="660" y1="255" x2="808" y2="307" stroke="#232F3E" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrN)"/>
+  <circle cx="734" cy="281" r="15" fill="#232F3E"/>
+  <text x="734" y="287" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="710" y="340" font-size="15" fill="#232F3E" text-anchor="middle">Failover in Sekunden</text>
+
+  <rect x="810" y="265" width="250" height="85" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="935" y="295" font-size="18" font-weight="bold" fill="#2E6318" text-anchor="middle">ap-northeast-1</text>
+  <text x="935" y="320" font-size="15" fill="#444444" text-anchor="middle">Game-Server EC2</text>
+
+  <line x1="530" y1="478" x2="530" y2="400" stroke="#C7161D" stroke-width="3"/>
+  <circle cx="530" cy="439" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="518" y1="427" x2="542" y2="451" stroke="#C7161D" stroke-width="4"/>
+  <line x1="542" y1="427" x2="518" y2="451" stroke="#C7161D" stroke-width="4"/>
+  <text x="620" y="439" font-size="15" fill="#9E1015">kein UDP</text>
+
+  <text x="300" y="600" font-size="15" fill="#B25400" text-anchor="middle">Patch-Downloads, HTTP</text>
+
+  <line x1="260" y1="380" x2="398" y2="510" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="329" cy="445" r="15" fill="#ED7100"/>
+  <text x="329" y="451" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <rect x="400" y="480" width="260" height="110" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="530" y="515" font-size="22" font-weight="bold" fill="#B25400" text-anchor="middle">CloudFront</text>
+  <text x="530" y="543" font-size="15" fill="#444444" text-anchor="middle">Layer 7, HTTP/S</text>
+  <text x="530" y="567" font-size="15" fill="#444444" text-anchor="middle">cached am Edge</text>
+
+  <line x1="660" y1="535" x2="808" y2="535" stroke="#ED7100" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="734" cy="535" r="15" fill="#ED7100"/>
+  <text x="734" y="541" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <rect x="810" y="490" width="250" height="90" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="935" y="522" font-size="19" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Origin</text>
+  <text x="935" y="548" font-size="15" fill="#444444" text-anchor="middle">40 TB Patches</text>
+  <text x="935" y="570" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">kaum Origin-Last</text>
+
+  <line x1="530" y1="678" x2="530" y2="620" stroke="#C7161D" stroke-width="3"/>
+  <circle cx="530" cy="649" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="518" y1="637" x2="542" y2="661" stroke="#C7161D" stroke-width="4"/>
+  <line x1="542" y1="637" x2="518" y2="661" stroke="#C7161D" stroke-width="4"/>
+  <text x="620" y="649" font-size="15" fill="#9E1015">löst Jitter nicht</text>
+
+  <rect x="400" y="680" width="260" height="90" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="530" y="710" font-size="18" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Route 53 Latency</text>
+  <text x="530" y="735" font-size="15" fill="#444444" text-anchor="middle">nur DNS-Auflösung</text>
+  <text x="530" y="757" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Pakete via Internet</text>
+
+  <path d="M 1060,192 L 1330,192 L 1330,618" stroke="#A16E00" stroke-width="3" fill="none" marker-end="url(#arrGd)"/>
+  <circle cx="1200" cy="192" r="15" fill="#A16E00"/>
+  <text x="1200" y="198" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <rect x="1120" y="620" width="420" height="155" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1330" y="655" font-size="19" font-weight="bold" fill="#7A5300" text-anchor="middle">Kosten Global Accelerator</text>
+  <text x="1330" y="684" font-size="15" fill="#444444" text-anchor="middle">$18 im Monat fix</text>
+  <text x="1330" y="707" font-size="15" fill="#444444" text-anchor="middle">+ DT-Premium $0,007–0,105/GB</text>
+  <text x="1330" y="731" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">nur in der dominanten Richtung</text>
+  <text x="1330" y="757" font-size="15" font-weight="bold" fill="#7A5300" text-anchor="middle">AWS-Beispiel: 10 TB &#8594; $128</text>
+
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  GA beschleunigt den Weg, CloudFront den Inhalt  ·  nur GA kann UDP  ·  statische IPs gibt es inzwischen bei beiden</text>
+</svg>

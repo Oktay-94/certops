@@ -1,0 +1,104 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrGd" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 32 — Site-to-Site VPN vs Direct Connect</text>
+  <text x="60" y="106" font-size="21" fill="#555555">1,8 TB pro Nacht in sechs Stunden: mit VPN sofort starten, auf Direct Connect landen</text>
+
+  <line x1="622" y1="205" x2="700" y2="205" stroke="#C7161D" stroke-width="3"/>
+  <circle cx="661" cy="205" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="649" y1="193" x2="673" y2="217" stroke="#C7161D" stroke-width="4"/>
+  <line x1="673" y1="193" x2="649" y2="217" stroke="#C7161D" stroke-width="4"/>
+  <text x="710" y="210" font-size="15" fill="#9E1015">5 Gbps hilft hier nicht</text>
+
+  <text x="525" y="165" font-size="16" font-weight="bold" fill="#232F3E" text-anchor="middle">Weg 1 — VPN über Internet</text>
+
+  <rect x="430" y="180" width="190" height="85" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="525" y="210" font-size="19" font-weight="bold" fill="#555555" text-anchor="middle">Internet</text>
+  <text x="525" y="233" font-size="15" fill="#444444" text-anchor="middle">Rate schwankt</text>
+  <text x="525" y="255" font-size="15" fill="#444444" text-anchor="middle">0,3 – 1,1 Gbps</text>
+
+  <rect x="50" y="250" width="270" height="180" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="4,4"/>
+  <text x="185" y="290" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE HAMBURG</text>
+  <text x="185" y="335" font-size="17" fill="#555555" text-anchor="middle">Customer Gateway</text>
+  <text x="185" y="368" font-size="16" fill="#444444" text-anchor="middle">1,8 TB pro Nacht</text>
+  <text x="185" y="398" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Fenster: 6 Stunden</text>
+
+  <line x1="320" y1="300" x2="428" y2="230" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="374" cy="265" r="15" fill="#232F3E"/>
+  <text x="374" y="271" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <line x1="620" y1="230" x2="788" y2="300" stroke="#232F3E" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrN)"/>
+  <circle cx="704" cy="265" r="15" fill="#232F3E"/>
+  <text x="704" y="271" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="700" y="335" font-size="14" fill="#232F3E" text-anchor="middle">Backup</text>
+
+  <text x="525" y="388" font-size="16" font-weight="bold" fill="#2E6318" text-anchor="middle">Weg 2 — Direct Connect</text>
+
+  <rect x="430" y="400" width="190" height="85" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="525" y="428" font-size="19" font-weight="bold" fill="#2E6318" text-anchor="middle">DX Location</text>
+  <text x="525" y="451" font-size="15" fill="#444444" text-anchor="middle">1 Gbps dedicated</text>
+  <text x="525" y="472" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Wochen Vorlauf</text>
+
+  <line x1="320" y1="390" x2="428" y2="430" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="374" cy="410" r="15" fill="#3F8624"/>
+  <text x="374" y="416" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <line x1="620" y1="430" x2="788" y2="370" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="704" cy="400" r="15" fill="#3F8624"/>
+  <text x="704" y="406" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <rect x="790" y="280" width="290" height="115" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="935" y="318" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">AWS Transit Gateway</text>
+  <text x="935" y="345" font-size="15" fill="#444444" text-anchor="middle">VPN- und DX-Attachment</text>
+  <text x="935" y="370" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bevorzugt DX automatisch</text>
+
+  <line x1="1080" y1="310" x2="1168" y2="240" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <line x1="1080" y1="330" x2="1168" y2="300" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <line x1="1080" y1="350" x2="1168" y2="360" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+
+  <rect x="1170" y="200" width="180" height="52" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1260" y="232" font-size="17" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Prod</text>
+  <rect x="1170" y="270" width="180" height="52" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1260" y="302" font-size="17" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Test</text>
+  <rect x="1170" y="340" width="180" height="52" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1260" y="372" font-size="17" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Shared</text>
+
+  <text x="1260" y="415" font-size="15" fill="#1B3E86" text-anchor="middle">und 9 weitere am TGW</text>
+
+  <path d="M 525,487 L 525,610 L 698,610" stroke="#3F8624" stroke-width="3" fill="none" marker-end="url(#arrGr)"/>
+  <circle cx="525" cy="550" r="15" fill="#3F8624"/>
+  <text x="525" y="556" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <rect x="700" y="560" width="310" height="100" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+  <text x="855" y="592" font-size="17" font-weight="bold" fill="#9E1015" text-anchor="middle">DX ist nicht verschlüsselt</text>
+  <text x="855" y="617" font-size="15" fill="#444444" text-anchor="middle">MACsec erst ab 10 Gbps</text>
+  <text x="855" y="640" font-size="15" fill="#444444" text-anchor="middle">hier: IPsec-VPN über DX</text>
+
+  <path d="M 935,397 L 935,520 L 1305,520 L 1305,558" stroke="#A16E00" stroke-width="3" fill="none" marker-end="url(#arrGd)"/>
+  <circle cx="1150" cy="520" r="15" fill="#A16E00"/>
+  <text x="1150" y="526" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <rect x="1090" y="560" width="430" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1305" y="592" font-size="19" font-weight="bold" fill="#7A5300" text-anchor="middle">Kostenwende bei 14 TB/Monat</text>
+  <text x="1305" y="618" font-size="15" fill="#444444" text-anchor="middle">Egress über Internet: $0,09/GB &#8776; $1.290</text>
+  <text x="1305" y="641" font-size="15" fill="#444444" text-anchor="middle">Egress über DX: $0,02/GB &#8776; $287</text>
+  <text x="1305" y="664" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">+ Port $219/Monat, Colo separat</text>
+
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  VPN in Minuten, DX in Wochen  ·  AWS bevorzugt DX vor VPN — Failover läuft von selbst  ·  DX ist nicht verschlüsselt</text>
+</svg>

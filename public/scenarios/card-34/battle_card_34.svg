@@ -1,0 +1,105 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrGd" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 34 — NAT Gateway vs VPC Endpoints</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Private Subnets: welcher Verkehr den NAT verlässt und ab wann sich ein Endpoint rechnet</text>
+
+  <text x="374" y="205" font-size="15" fill="#232F3E" text-anchor="middle">heute: alles über NAT</text>
+
+  <rect x="50" y="280" width="230" height="170" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="320" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Private Subnets</text>
+  <text x="165" y="350" font-size="15" fill="#444444" text-anchor="middle">3 AZs, keine Public IPs</text>
+  <text x="165" y="378" font-size="15" fill="#444444" text-anchor="middle">Analytics-Cluster</text>
+  <text x="165" y="406" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">11,4 TB pro Monat</text>
+
+  <line x1="280" y1="330" x2="468" y2="240" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="374" cy="285" r="15" fill="#232F3E"/>
+  <text x="374" y="291" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <rect x="470" y="170" width="230" height="95" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="585" y="205" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">NAT Gateway</text>
+  <text x="585" y="230" font-size="15" fill="#444444" text-anchor="middle">$0,045 je Stunde und AZ</text>
+  <text x="585" y="252" font-size="15" fill="#444444" text-anchor="middle">$0,045 je GB</text>
+
+  <line x1="700" y1="217" x2="828" y2="217" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="750" cy="217" r="15" fill="#232F3E"/>
+  <text x="750" y="223" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <rect x="830" y="175" width="190" height="85" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="925" y="208" font-size="19" font-weight="bold" fill="#555555" text-anchor="middle">Internet</text>
+  <text x="925" y="235" font-size="15" fill="#444444" text-anchor="middle">300 GB / Monat</text>
+
+  <line x1="280" y1="365" x2="468" y2="365" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="374" cy="365" r="15" fill="#3F8624"/>
+  <text x="374" y="371" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <rect x="470" y="320" width="230" height="90" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="585" y="350" font-size="17" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Gateway Endpoint</text>
+  <text x="585" y="375" font-size="16" fill="#444444" text-anchor="middle">kostenlos</text>
+  <text x="585" y="398" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">nur Route-Table-Eintrag</text>
+
+  <line x1="700" y1="365" x2="828" y2="365" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+
+  <rect x="830" y="325" width="190" height="80" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="925" y="358" font-size="19" font-weight="bold" fill="#2E6318" text-anchor="middle">Amazon S3</text>
+  <text x="925" y="383" font-size="15" fill="#444444" text-anchor="middle">8 TB / Monat</text>
+
+  <line x1="280" y1="400" x2="468" y2="510" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="374" cy="455" r="15" fill="#3F8624"/>
+  <text x="374" y="461" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <rect x="470" y="470" width="230" height="90" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="585" y="498" font-size="17" font-weight="bold" fill="#2E6318" text-anchor="middle">Interface Endpoints</text>
+  <text x="585" y="522" font-size="15" fill="#444444" text-anchor="middle">ecr.api + ecr.dkr</text>
+  <text x="585" y="545" font-size="14" fill="#444444" text-anchor="middle">$0,01/h je AZ + $0,01/GB</text>
+
+  <line x1="700" y1="515" x2="828" y2="515" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+
+  <rect x="830" y="475" width="190" height="80" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="925" y="508" font-size="19" font-weight="bold" fill="#232F3E" text-anchor="middle">Amazon ECR</text>
+  <text x="925" y="533" font-size="15" fill="#444444" text-anchor="middle">2,5 TB / Monat</text>
+
+  <line x1="585" y1="562" x2="585" y2="640" stroke="#C7161D" stroke-width="3"/>
+  <circle cx="585" cy="600" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="573" y1="588" x2="597" y2="612" stroke="#C7161D" stroke-width="4"/>
+  <line x1="597" y1="588" x2="573" y2="612" stroke="#C7161D" stroke-width="4"/>
+  <text x="585" y="672" font-size="15" fill="#9E1015" text-anchor="middle">400 GB — unter der Schwelle</text>
+
+  <path d="M 700,240 L 790,240 L 790,665 L 828,665" stroke="#232F3E" stroke-width="3" fill="none" marker-end="url(#arrN)"/>
+  <circle cx="790" cy="450" r="15" fill="#232F3E"/>
+  <text x="790" y="456" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="880" y="600" font-size="15" fill="#232F3E" text-anchor="middle">bleibt auf NAT</text>
+
+  <rect x="830" y="620" width="230" height="90" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="945" y="655" font-size="19" font-weight="bold" fill="#232F3E" text-anchor="middle">CloudWatch Logs</text>
+  <text x="945" y="680" font-size="15" fill="#444444" text-anchor="middle">400 GB / Monat</text>
+
+  <line x1="1020" y1="365" x2="1118" y2="365" stroke="#A16E00" stroke-width="3" marker-end="url(#arrGd)"/>
+  <circle cx="1069" cy="365" r="15" fill="#A16E00"/>
+  <text x="1069" y="371" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <rect x="1120" y="290" width="420" height="155" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1330" y="325" font-size="19" font-weight="bold" fill="#7A5300" text-anchor="middle">Kostenbilanz pro Monat</text>
+  <text x="1330" y="355" font-size="15" fill="#444444" text-anchor="middle">vorher: 3 NAT, 11,4 TB &#8776; $614</text>
+  <text x="1330" y="380" font-size="15" fill="#444444" text-anchor="middle">nachher &#8776; $199</text>
+  <text x="1330" y="405" font-size="14" fill="#666666" text-anchor="middle">Break-even Interface-Endpoint:</text>
+  <text x="1330" y="430" font-size="15" font-weight="bold" fill="#7A5300" text-anchor="middle">626 GB je Monat und Dienst</text>
+
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Gateway-Endpoint für S3 und DynamoDB ist gratis  ·  Interface-Endpoint lohnt ab ~626 GB/Monat  ·  S3 in derselben Region: kein Egress</text>
+</svg>

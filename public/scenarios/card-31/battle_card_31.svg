@@ -1,0 +1,138 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrGy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/>
+    </marker>
+    <marker id="arrGd" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 31 — VPC Peering vs Transit Gateway</text>
+  <text x="60" y="106" font-size="21" fill="#555555">12 VPCs und ein Rechenzentrum: Full-Mesh-Peering scheitert an Betriebsaufwand und fehlendem Transit</text>
+
+  <text x="60" y="155" font-size="19" font-weight="bold" fill="#9E1015">Full Mesh: 12 VPCs = 66 Verbindungen</text>
+  <text x="830" y="155" font-size="19" font-weight="bold" fill="#232F3E">Transit Gateway: ein Hub statt 66 Verbindungen</text>
+
+  <rect x="70" y="175" width="130" height="55" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="135" y="209" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC 1</text>
+  <rect x="330" y="175" width="130" height="55" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="395" y="209" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC 2</text>
+  <rect x="70" y="300" width="130" height="55" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="135" y="334" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC 3</text>
+  <rect x="330" y="300" width="130" height="55" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="395" y="334" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC 4</text>
+
+  <line x1="200" y1="202" x2="330" y2="202" stroke="#2E6BE6" stroke-width="3"/>
+  <line x1="200" y1="327" x2="330" y2="327" stroke="#2E6BE6" stroke-width="3"/>
+  <line x1="135" y1="230" x2="135" y2="300" stroke="#2E6BE6" stroke-width="3"/>
+  <line x1="395" y1="230" x2="395" y2="300" stroke="#2E6BE6" stroke-width="3"/>
+  <line x1="200" y1="230" x2="330" y2="300" stroke="#2E6BE6" stroke-width="3"/>
+  <line x1="200" y1="300" x2="330" y2="230" stroke="#2E6BE6" stroke-width="3"/>
+
+  <circle cx="265" cy="202" r="15" fill="#2E6BE6"/>
+  <text x="265" y="208" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <circle cx="265" cy="327" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="253" y1="315" x2="277" y2="339" stroke="#C7161D" stroke-width="4"/>
+  <line x1="277" y1="315" x2="253" y2="339" stroke="#C7161D" stroke-width="4"/>
+
+  <text x="265" y="385" font-size="15" fill="#9E1015" text-anchor="middle">132 Route-Table-Einträge, zwei Netzwerker</text>
+
+  <text x="645" y="245" font-size="17" font-weight="bold" fill="#555555" text-anchor="middle">aus 66 mach 13</text>
+  <text x="645" y="272" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">n(n-1)/2 &#8594; n+1</text>
+
+  <rect x="805" y="180" width="175" height="52" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="892" y="212" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Team 1 Prod</text>
+  <rect x="805" y="248" width="175" height="52" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="892" y="280" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Team 1 Test</text>
+  <rect x="805" y="316" width="175" height="52" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="892" y="348" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Shared Svc</text>
+  <rect x="805" y="384" width="175" height="52" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="892" y="416" font-size="16" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Sandbox</text>
+
+  <text x="892" y="470" font-size="15" fill="#1B3E86" text-anchor="middle">insgesamt 12 VPC-Attachments</text>
+
+  <line x1="980" y1="206" x2="1048" y2="350" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <line x1="980" y1="274" x2="1048" y2="368" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <line x1="980" y1="342" x2="1048" y2="382" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <line x1="980" y1="410" x2="1048" y2="400" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+
+  <circle cx="1014" cy="362" r="15" fill="#2E6BE6"/>
+  <text x="1014" y="368" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <rect x="1050" y="325" width="290" height="115" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1195" y="363" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">AWS Transit Gateway</text>
+  <text x="1195" y="390" font-size="15" fill="#444444" text-anchor="middle">Hub — transitiv, zentral</text>
+  <text x="1195" y="415" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">13 Attachments</text>
+
+  <line x1="1340" y1="335" x2="1378" y2="335" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="1359" cy="335" r="15" fill="#3F8624"/>
+  <text x="1359" y="341" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <line x1="1340" y1="419" x2="1378" y2="419" stroke="#9A9A9A" stroke-width="3" marker-end="url(#arrGy)"/>
+
+  <rect x="1380" y="300" width="170" height="58" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1465" y="325" font-size="15" font-weight="bold" fill="#2E6318" text-anchor="middle">Route Table PROD</text>
+  <text x="1465" y="347" font-size="14" fill="#444444" text-anchor="middle">nur Prod-VPCs</text>
+  <rect x="1380" y="390" width="170" height="58" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5"/>
+  <text x="1465" y="415" font-size="15" font-weight="bold" fill="#555555" text-anchor="middle">Route Table TEST</text>
+  <text x="1465" y="437" font-size="14" fill="#444444" text-anchor="middle">Sandbox isoliert</text>
+
+  <text x="1430" y="490" font-size="15" fill="#232F3E" text-anchor="middle">Sandbox sieht keine Prod-Daten</text>
+
+  <line x1="1300" y1="442" x2="1300" y2="558" stroke="#A16E00" stroke-width="3" marker-end="url(#arrGd)"/>
+  <circle cx="1300" cy="500" r="15" fill="#A16E00"/>
+  <text x="1300" y="506" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <rect x="1200" y="560" width="350" height="110" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1375" y="592" font-size="19" font-weight="bold" fill="#7A5300" text-anchor="middle">Preis der Ordnung</text>
+  <text x="1375" y="618" font-size="15" fill="#444444" text-anchor="middle">13 Attachments &#215; $0,05/h &#8776; $475/Monat</text>
+  <text x="1375" y="640" font-size="15" fill="#444444" text-anchor="middle">+ $0,02 je verarbeitetem GB</text>
+  <text x="1375" y="661" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Peering-Verbindungen kosteten nichts</text>
+
+  <rect x="60" y="560" width="260" height="150" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="4,4"/>
+  <text x="190" y="590" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE HAMBURG</text>
+  <text x="190" y="630" font-size="17" fill="#555555" text-anchor="middle">Rechenzentrum</text>
+  <text x="190" y="658" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Site-to-Site VPN</text>
+
+  <line x1="320" y1="635" x2="388" y2="635" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="354" cy="635" r="15" fill="#232F3E"/>
+  <text x="354" y="641" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <rect x="390" y="595" width="200" height="80" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="490" y="625" font-size="18" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Shared Svc</text>
+  <text x="490" y="650" font-size="15" fill="#444444" text-anchor="middle">einziger VPN-Endpunkt</text>
+
+  <line x1="590" y1="635" x2="648" y2="635" stroke="#C7161D" stroke-width="3" marker-end="url(#arrR)"/>
+  <circle cx="619" cy="635" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="607" y1="623" x2="631" y2="647" stroke="#C7161D" stroke-width="4"/>
+  <line x1="631" y1="623" x2="607" y2="647" stroke="#C7161D" stroke-width="4"/>
+
+  <rect x="650" y="595" width="150" height="80" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="725" y="625" font-size="18" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC Team 3</text>
+  <text x="725" y="650" font-size="15" fill="#444444" text-anchor="middle">erreicht HH nicht</text>
+
+  <text x="619" y="705" font-size="15" fill="#9E1015" text-anchor="middle">kein transitives Routing</text>
+
+  <path d="M 190,710 L 190,780 L 1130,780 L 1130,444" stroke="#232F3E" stroke-width="3" fill="none" marker-end="url(#arrN)"/>
+  <circle cx="950" cy="780" r="15" fill="#232F3E"/>
+  <text x="950" y="786" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="620" y="762" font-size="16" fill="#232F3E" text-anchor="middle">ein VPN-Attachment statt vier Einzel-VPNs</text>
+
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Peering ist nicht transitiv — 12 VPCs = 66 Verbindungen  ·  nur TGW trägt on-premises zu allen VPCs  ·  TGW kostet pro Attachment und pro GB</text>
+</svg>

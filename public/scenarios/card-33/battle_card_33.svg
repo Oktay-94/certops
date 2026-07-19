@@ -1,0 +1,113 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrGr" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+    <marker id="arrGd" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 33 — AWS PrivateLink</text>
+  <text x="60" y="106" font-size="21" fill="#555555">SaaS für 40 Kunden privat anbieten: ohne Routen, ohne IP-Allowlist, trotz doppelter CIDR</text>
+
+  <text x="500" y="135" font-size="15" fill="#9E1015" text-anchor="middle">Provider kann nicht zurück</text>
+  <line x1="698" y1="160" x2="300" y2="160" stroke="#C7161D" stroke-width="3" marker-end="url(#arrR)"/>
+  <circle cx="500" cy="160" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="488" y1="148" x2="512" y2="172" stroke="#C7161D" stroke-width="4"/>
+  <line x1="512" y1="148" x2="488" y2="172" stroke="#C7161D" stroke-width="4"/>
+
+  <rect x="700" y="150" width="560" height="420" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="4,4"/>
+  <text x="980" y="185" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">PROVIDER-VPC TELEMETRIK24 · 10.0.0.0/16</text>
+
+  <rect x="50" y="180" width="230" height="95" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="212" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Kunde A</text>
+  <text x="165" y="238" font-size="15" fill="#444444" text-anchor="middle">VPC 172.16.0.0/16</text>
+  <text x="165" y="260" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">eigener Account</text>
+
+  <line x1="280" y1="227" x2="368" y2="227" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="324" cy="227" r="15" fill="#2E6BE6"/>
+  <text x="324" y="233" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <rect x="370" y="185" width="215" height="85" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="477" y="213" font-size="17" font-weight="bold" fill="#2E6318" text-anchor="middle">Interface Endpoint</text>
+  <text x="477" y="236" font-size="15" fill="#444444" text-anchor="middle">ENI, private IP</text>
+  <text x="477" y="257" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">im Kunden-Subnetz</text>
+
+  <text x="666" y="200" font-size="14" fill="#2E6318" text-anchor="middle">über PrivateLink</text>
+  <line x1="585" y1="227" x2="748" y2="275" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+  <circle cx="666" cy="251" r="15" fill="#3F8624"/>
+  <text x="666" y="257" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <rect x="750" y="250" width="250" height="90" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="875" y="285" font-size="17" font-weight="bold" fill="#232F3E" text-anchor="middle">Network Load Balancer</text>
+  <text x="875" y="310" font-size="15" fill="#444444" text-anchor="middle">TCP und UDP</text>
+
+  <line x1="1000" y1="295" x2="1058" y2="295" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="1029" cy="295" r="15" fill="#232F3E"/>
+  <text x="1029" y="301" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <rect x="1060" y="250" width="170" height="90" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1145" y="285" font-size="18" font-weight="bold" fill="#232F3E" text-anchor="middle">Service</text>
+  <text x="1145" y="310" font-size="15" fill="#444444" text-anchor="middle">EC2 / ECS</text>
+
+  <line x1="890" y1="418" x2="890" y2="342" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrT)"/>
+  <circle cx="890" cy="380" r="15" fill="#0F7C8C"/>
+  <text x="890" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <rect x="750" y="420" width="280" height="100" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="890" y="450" font-size="17" font-weight="bold" fill="#0B5A66" text-anchor="middle">VPC Endpoint Service</text>
+  <text x="890" y="474" font-size="15" fill="#444444" text-anchor="middle">Allowed Principals</text>
+  <text x="890" y="496" font-size="15" fill="#444444" text-anchor="middle">40 Kundenaccounts</text>
+
+  <rect x="50" y="430" width="230" height="95" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="462" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Kunde B</text>
+  <text x="165" y="488" font-size="15" fill="#444444" text-anchor="middle">VPC 10.0.0.0/16</text>
+  <text x="165" y="510" font-size="14" font-style="italic" fill="#9E1015" text-anchor="middle">gleiche CIDR wie SaaS</text>
+
+  <line x1="280" y1="477" x2="368" y2="477" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="324" cy="477" r="15" fill="#2E6BE6"/>
+  <text x="324" y="483" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <rect x="370" y="435" width="215" height="85" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="477" y="463" font-size="17" font-weight="bold" fill="#2E6318" text-anchor="middle">Interface Endpoint</text>
+  <text x="477" y="486" font-size="15" fill="#444444" text-anchor="middle">ENI, private IP</text>
+  <text x="477" y="507" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">CIDR ist egal</text>
+
+  <line x1="585" y1="477" x2="748" y2="320" stroke="#3F8624" stroke-width="3" marker-end="url(#arrGr)"/>
+
+  <line x1="285" y1="575" x2="560" y2="575" stroke="#C7161D" stroke-width="3"/>
+  <circle cx="422" cy="575" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="410" y1="563" x2="434" y2="587" stroke="#C7161D" stroke-width="4"/>
+  <line x1="434" y1="563" x2="410" y2="587" stroke="#C7161D" stroke-width="4"/>
+  <text x="422" y="612" font-size="15" fill="#9E1015" text-anchor="middle">Peering: CIDR kollidiert</text>
+
+  <path d="M 585,522 L 585,660 L 1310,660 L 1310,688" stroke="#A16E00" stroke-width="3" fill="none" marker-end="url(#arrGd)"/>
+  <circle cx="1000" cy="660" r="15" fill="#A16E00"/>
+  <text x="1000" y="666" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <text x="300" y="700" font-size="15" fill="#1B3E86" text-anchor="middle">und 38 weitere Kunden, je ein Endpoint</text>
+
+  <rect x="1090" y="690" width="440" height="115" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1310" y="720" font-size="19" font-weight="bold" fill="#7A5300" text-anchor="middle">Kosten trägt der Consumer</text>
+  <text x="1310" y="746" font-size="15" fill="#444444" text-anchor="middle">$0,01 je Endpoint, AZ und Stunde</text>
+  <text x="1310" y="768" font-size="15" fill="#444444" text-anchor="middle">3 AZs &#8776; $21,90 pro Monat und VPC</text>
+  <text x="1310" y="790" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">+ $0,01/GB, erste 1 PB</text>
+
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  PrivateLink ist einseitig — nur der Consumer initiiert  ·  überlappende CIDRs sind egal  ·  Allowed Principals statt IP-Allowlist</text>
+</svg>

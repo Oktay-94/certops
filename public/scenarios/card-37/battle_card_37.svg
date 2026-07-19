@@ -1,0 +1,110 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#ED7100"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 37 — CloudFront · S3 mit OAC</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Bucket privat, Auslieferung global: OAC signiert jeden Origin-Request — Signaturbeziehung statt Netzwerk-Route</text>
+
+  <!-- Viewer -->
+  <rect x="40" y="310" width="210" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="145" y="348" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">Viewer</text>
+  <text x="145" y="376" font-size="15" fill="#444444" text-anchor="middle">Tokio</text>
+  <text x="145" y="399" font-size="15" fill="#444444" text-anchor="middle">docs.nordwind.io</text>
+
+  <!-- Route 53 -->
+  <rect x="320" y="310" width="210" height="130" rx="10" fill="#F5F0FE" stroke="#7A3FE0" stroke-width="2.5"/>
+  <text x="425" y="348" font-size="20" font-weight="bold" fill="#5B2BAF" text-anchor="middle">Route 53</text>
+  <text x="425" y="376" font-size="15" fill="#444444" text-anchor="middle">Alias-Record</text>
+  <text x="425" y="399" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein CNAME nötig</text>
+
+  <!-- CloudFront -->
+  <rect x="600" y="300" width="250" height="150" rx="10" fill="#FDF3E9" stroke="#ED7100" stroke-width="2.5"/>
+  <text x="725" y="340" font-size="22" font-weight="bold" fill="#B25400" text-anchor="middle">CloudFront</text>
+  <text x="725" y="370" font-size="15" fill="#444444" text-anchor="middle">Edge Location</text>
+  <text x="725" y="393" font-size="15" fill="#444444" text-anchor="middle">Cache + TLS + Shield Std</text>
+  <text x="725" y="416" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Default Root Object</text>
+
+  <!-- S3 -->
+  <rect x="920" y="310" width="240" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1040" y="348" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Bucket</text>
+  <text x="1040" y="376" font-size="15" fill="#444444" text-anchor="middle">privat, Block Public Access</text>
+  <text x="1040" y="399" font-size="15" fill="#444444" text-anchor="middle">Bucket Policy: SourceArn</text>
+  <text x="1040" y="422" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Bucket owner enforced</text>
+
+  <!-- KMS -->
+  <rect x="1230" y="310" width="220" height="130" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1340" y="348" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">KMS Key</text>
+  <text x="1340" y="376" font-size="15" fill="#444444" text-anchor="middle">SSE-KMS</text>
+  <text x="1340" y="399" font-size="15" fill="#444444" text-anchor="middle">Key Policy: kms:Decrypt</text>
+
+  <!-- OAC -->
+  <rect x="740" y="575" width="290" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="885" y="613" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Origin Access Control</text>
+  <text x="885" y="641" font-size="15" fill="#444444" text-anchor="middle">signiert mit SigV4</text>
+  <text x="885" y="664" font-size="15" fill="#444444" text-anchor="middle">Signing „always“ → HTTPS</text>
+  <text x="885" y="687" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">keine Netzwerk-Route</text>
+
+  <!-- Falle: Website-Endpoint -->
+  <rect x="90" y="575" width="400" height="130" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="290" y="613" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Falle: Website-Endpoint</text>
+  <text x="290" y="641" font-size="15" fill="#444444" text-anchor="middle">S3-Website-Endpoint = Custom Origin</text>
+  <text x="290" y="664" font-size="15" fill="#444444" text-anchor="middle">→ OAC und OAI nicht möglich</text>
+  <text x="290" y="687" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">REST-Endpoint des Buckets verwenden</text>
+
+  <!-- Verworfen: Direktzugriff -->
+  <rect x="1190" y="575" width="260" height="130" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1320" y="613" font-size="18" font-weight="bold" fill="#9E1015" text-anchor="middle">Direkt auf die S3-URL</text>
+  <text x="1320" y="641" font-size="15" fill="#444444" text-anchor="middle">Block Public Access an</text>
+  <text x="1320" y="664" font-size="15" fill="#444444" text-anchor="middle">Policy ohne Public-Statement</text>
+  <text x="1320" y="687" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">= 403 Forbidden</text>
+
+  <!-- Hauptfluss -->
+  <path d="M250,375 L320,375" stroke="#ED7100" stroke-width="3" fill="none" marker-end="url(#arrO)"/>
+  <path d="M530,375 L600,375" stroke="#ED7100" stroke-width="3" fill="none" marker-end="url(#arrO)"/>
+  <path d="M850,375 L920,375" stroke="#ED7100" stroke-width="3" fill="none" marker-end="url(#arrO)"/>
+  <path d="M1160,375 L1230,375" stroke="#232F3E" stroke-width="3" fill="none" marker-end="url(#arrN)"/>
+
+  <!-- Cache Hit: Rueckweg ohne Origin -->
+  <path d="M620,450 L620,510 L145,510 L145,440" stroke="#ED7100" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrO)"/>
+  <text x="450" y="500" font-size="15" fill="#B25400" text-anchor="middle">Cache Hit — Antwort ohne Origin</text>
+
+  <!-- OAC signiert den Origin-Request -->
+  <path d="M905,575 L905,382" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrT)"/>
+  <text x="917" y="480" font-size="15" fill="#0B5A66">signiert Request</text>
+
+  <!-- Verworfener Pfad: Viewer umgeht CloudFront -->
+  <path d="M1320,575 L1320,500 L1090,500 L1090,440" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrR)"/>
+  <circle cx="1200" cy="500" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="1186" y1="486" x2="1214" y2="514" stroke="#C7161D" stroke-width="4"/>
+  <line x1="1214" y1="486" x2="1186" y2="514" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- Nummern-Badges -->
+  <circle cx="285" cy="375" r="15" fill="#ED7100"/>
+  <text x="285" y="381" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="565" cy="375" r="15" fill="#ED7100"/>
+  <text x="565" y="381" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="620" cy="485" r="15" fill="#ED7100"/>
+  <text x="620" y="491" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="868" cy="375" r="15" fill="#ED7100"/>
+  <text x="868" y="381" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="1195" cy="375" r="15" fill="#232F3E"/>
+  <text x="1195" y="381" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  OAC = Signatur, kein Endpoint · Website-Endpoint = Custom Origin, kein OAC · SSE-KMS erzwingt OAC · CloudFront cached, Global Accelerator nicht</text>
+</svg>

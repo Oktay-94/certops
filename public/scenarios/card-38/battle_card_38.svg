@@ -1,0 +1,117 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 38 — Network Firewall · Egress-Kontrolle</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Ausgehender Verkehr nur zu freigegebenen Domains — gefiltert über TLS-SNI, nicht über IP-Adressen</text>
+
+  <!-- Verworfen: blockiertes Ziel -->
+  <rect x="340" y="150" width="320" height="120" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="500" y="190" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">paste.evil.example</text>
+  <text x="500" y="218" font-size="15" fill="#444444" text-anchor="middle">nicht in der Allowlist</text>
+  <text x="500" y="241" font-size="15" fill="#444444" text-anchor="middle">DROP im Stateful-Regelwerk</text>
+
+  <!-- EC2 -->
+  <rect x="40" y="340" width="230" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="155" y="378" font-size="20" font-weight="bold" fill="#1B3E86" text-anchor="middle">EC2 Workload</text>
+  <text x="155" y="406" font-size="15" fill="#444444" text-anchor="middle">Private Subnet AZ-a</text>
+  <text x="155" y="429" font-size="15" fill="#444444" text-anchor="middle">0.0.0.0/0 → Firewall</text>
+  <text x="155" y="452" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein direkter IGW-Weg</text>
+
+  <!-- Network Firewall -->
+  <rect x="340" y="340" width="240" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="460" y="378" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Network Firewall</text>
+  <text x="460" y="406" font-size="15" fill="#444444" text-anchor="middle">Endpoint je AZ</text>
+  <text x="460" y="429" font-size="15" fill="#444444" text-anchor="middle">eigenes Firewall-Subnet</text>
+  <text x="460" y="452" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">macht kein NAT</text>
+
+  <!-- NAT Gateway -->
+  <rect x="650" y="340" width="210" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="755" y="378" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">NAT Gateway</text>
+  <text x="755" y="406" font-size="15" fill="#444444" text-anchor="middle">Public Subnet AZ-a</text>
+  <text x="755" y="429" font-size="15" fill="#444444" text-anchor="middle">Quell-IP → EIP</text>
+  <text x="755" y="452" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">keine Kontrollinstanz</text>
+
+  <!-- Internet Gateway -->
+  <rect x="930" y="340" width="200" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1030" y="378" font-size="18" font-weight="bold" fill="#232F3E" text-anchor="middle">Internet Gateway</text>
+  <text x="1030" y="406" font-size="15" fill="#444444" text-anchor="middle">VPC-Ausgang</text>
+
+  <!-- Erlaubtes Ziel -->
+  <rect x="1200" y="340" width="240" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1320" y="378" font-size="18" font-weight="bold" fill="#2E6318" text-anchor="middle">updates.debian.org</text>
+  <text x="1320" y="406" font-size="15" fill="#444444" text-anchor="middle">in der Allowlist</text>
+  <text x="1320" y="429" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">SNI stimmt überein</text>
+
+  <!-- Firewall Policy -->
+  <rect x="250" y="600" width="390" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="445" y="638" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Firewall Policy</text>
+  <text x="445" y="666" font-size="15" fill="#444444" text-anchor="middle">Stateless: pass → stateful</text>
+  <text x="445" y="689" font-size="15" fill="#444444" text-anchor="middle">Stateful Domain List: TLS-SNI / HTTP-Host</text>
+  <text x="445" y="712" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Suricata-kompatible Regeln</text>
+
+  <!-- Falle: HOME_NET -->
+  <rect x="710" y="600" width="390" height="130" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="905" y="638" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Falle: HOME_NET</text>
+  <text x="905" y="666" font-size="15" fill="#444444" text-anchor="middle">prüft nur das Deployment-VPC</text>
+  <text x="905" y="689" font-size="15" fill="#444444" text-anchor="middle">Spoke-VPCs über TGW: CIDRs eintragen</text>
+  <text x="905" y="712" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">sonst läuft Spoke-Traffic ungeprüft</text>
+
+  <!-- Firewall Logs -->
+  <rect x="1170" y="600" width="260" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1300" y="638" font-size="20" font-weight="bold" fill="#2E6318" text-anchor="middle">Firewall Logs</text>
+  <text x="1300" y="666" font-size="15" fill="#444444" text-anchor="middle">Alert + Flow</text>
+  <text x="1300" y="689" font-size="15" fill="#444444" text-anchor="middle">S3 / CloudWatch / Firehose</text>
+
+  <!-- Hauptfluss -->
+  <path d="M270,415 L340,415" stroke="#232F3E" stroke-width="3" fill="none" marker-end="url(#arrN)"/>
+  <path d="M580,415 L650,415" stroke="#232F3E" stroke-width="3" fill="none" marker-end="url(#arrN)"/>
+  <path d="M860,415 L930,415" stroke="#232F3E" stroke-width="3" fill="none" marker-end="url(#arrN)"/>
+  <path d="M1130,415 L1200,415" stroke="#232F3E" stroke-width="3" fill="none" marker-end="url(#arrN)"/>
+
+  <!-- Policy prueft den Verbindungsaufbau -->
+  <path d="M460,600 L460,497" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrT)"/>
+
+  <!-- Logging -->
+  <path d="M560,490 L560,560 L1300,560 L1300,600" stroke="#3F8624" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrG)"/>
+  <text x="900" y="532" font-size="15" fill="#2E6318" text-anchor="middle">jeder Treffer geloggt</text>
+
+  <!-- Verworfener Pfad: blockierte Domain -->
+  <path d="M450,340 L450,270" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" fill="none" marker-end="url(#arrR)"/>
+  <text x="478" y="310" font-size="15" fill="#9E1015">SNI geprüft</text>
+  <circle cx="450" cy="305" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="436" y1="291" x2="464" y2="319" stroke="#C7161D" stroke-width="4"/>
+  <line x1="464" y1="291" x2="436" y2="319" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- Nummern-Badges -->
+  <circle cx="305" cy="415" r="15" fill="#232F3E"/>
+  <text x="305" y="421" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="460" cy="545" r="15" fill="#0F7C8C"/>
+  <text x="460" y="551" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="615" cy="415" r="15" fill="#232F3E"/>
+  <text x="615" y="421" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="895" cy="415" r="15" fill="#232F3E"/>
+  <text x="895" y="421" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="1165" cy="415" r="15" fill="#232F3E"/>
+  <text x="1165" y="421" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <circle cx="900" cy="560" r="15" fill="#3F8624"/>
+  <text x="900" y="566" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Security Group kennt keine Domains · SNI &#8800; DNS: beides filtern · Firewall vor NAT zeigt die echte Quell-IP · HOME_NET erweitern bei zentraler Firewall</text>
+</svg>
