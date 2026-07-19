@@ -9,6 +9,10 @@ Pruefungen:
   (c) Segmente gegen Boxen (Liang-Barsky, 6 px Inset)
   (d) Badges: Ziffer passt in den Kreis, Kreis liegt auf einem Segment,
       Ziffern-y = cy + 6
+  (e) freie Labels gegen Badge-Aussenkanten (Rechteck/Kreis). Beruehrung auf
+      0 px ist Konvention und kein Befund, nur echte Ueberlappung. Ein Badge ist
+      kein Segment und keine Box -> (b) und (a) finden diese Klasse nicht.
+      Aus Batch 12: neun Kollisionen, fuenfmal von Hand nachgebaut.
 
 Ausnahmen: gestrichelte Zonen (dasharray 4,4) sind keine Text-Container und
 keine Kollisionsobjekte; Badge-Ziffern sind von (a)/(b) ausgenommen; das
@@ -124,6 +128,24 @@ def text_bbox(t):
     return x0, t["y"] - t["size"] * 0.80, x1, t["y"] + t["size"] * 0.22
 
 
+# Beruehrung auf 0 px ist Konvention (Label beginnt bei x = cx + r), keine
+# Kollision. Nur echte Ueberlappung ist ein Befund. TOL faengt das Rauschen
+# der PIL-Breitenmessung ab; ohne sie meldet jedes Label bei cx + r einen
+# Scheinbefund, weil die gemessene Breite um Bruchteile schwankt.
+OVERLAP_TOL = 0.5
+
+
+def rect_circle_hit(r, cx, cy, rad):
+    """Achsenparalleles Rechteck gegen Kreis. Naechster Punkt des Rechtecks
+    zum Kreismittelpunkt; liegt der ECHT innerhalb des Radius, ueberlappen sie.
+    Deckt auch den Fall ab, dass der Kreis komplett im Rechteck liegt."""
+    nx = max(r["x0"], min(cx, r["x1"]))
+    ny = max(r["y0"], min(cy, r["y1"]))
+    d2 = (nx - cx) ** 2 + (ny - cy) ** 2
+    grenze = max(0.0, rad - OVERLAP_TOL)
+    return d2 < grenze * grenze
+
+
 def liang_barsky(x0, y0, x1, y1, r):
     dx, dy = x1 - x0, y1 - y0
     p = [-dx, dx, -dy, dy]
@@ -222,8 +244,33 @@ def main(path):
         if not on_seg:
             findings.append(f"(d) Badge ({c['cx']:.0f},{c['cy']:.0f}) liegt auf keinem Segment")
 
+    # (e) freie Labels gegen Badge-Aussenkanten.
+    # Badges sind randlos gefuellt -> r ist bereits die Aussenkante (cy +- 15
+    # bei r=15). Das rote X ist weiss gefuellt mit Rand und faellt nicht in
+    # 'badges'; es wird hier separat mit r + stroke/2 geprueft.
+    x_marks = [c for c in circles
+               if c["stroke"] and c["fill"].upper() in ("#FFFFFF", "WHITE")]
+    for i, t in enumerate(texts):
+        if i in badge_texts:
+            continue
+        if any(b["x0"] <= t["x"] <= b["x1"] and b["y0"] <= t["y"] <= b["y1"] for b in boxes):
+            continue
+        bx0, by0, bx1, by1 = text_bbox(t)
+        r = {"x0": bx0, "y0": by0, "x1": bx1, "y1": by1}
+        for c in badges:
+            if rect_circle_hit(r, c["cx"], c["cy"], c["r"]):
+                findings.append(
+                    f"(e) Label '{t['text']}' [{bx0:.0f}..{bx1:.0f} x {by0:.0f}..{by1:.0f}] "
+                    f"ueberlappt Badge ({c['cx']:.0f},{c['cy']:.0f}) r={c['r']:.0f}")
+        for c in x_marks:
+            if rect_circle_hit(r, c["cx"], c["cy"], c["r"] + 1.5):
+                findings.append(
+                    f"(e) Label '{t['text']}' [{bx0:.0f}..{bx1:.0f} x {by0:.0f}..{by1:.0f}] "
+                    f"ueberlappt X-Kreis ({c['cx']:.0f},{c['cy']:.0f}) r={c['r']:.0f}+stroke")
+
     print(f"== {path}")
-    print(f"   {len(boxes)} Boxen, {len(texts)} Texte, {len(segs)} Segmente, {len(badges)} Badges")
+    print(f"   {len(boxes)} Boxen, {len(texts)} Texte, {len(segs)} Segmente, "
+          f"{len(badges)} Badges, {len(x_marks)} X-Kreise")
     if findings:
         for f in findings:
             print("   ! " + f)
