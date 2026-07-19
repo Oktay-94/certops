@@ -1,0 +1,138 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrGy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 42 — Cognito User Pools · Identity Pools</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Login per E-Mail oder Google, danach direkter S3-Zugriff — jeder nur auf seinen eigenen Ordner</text>
+
+  <!-- Zonen -->
+  <rect x="40" y="150" width="520" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="300" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AUTHENTIFIZIERUNG</text>
+  <rect x="590" y="150" width="450" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="815" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AUTORISIERUNG</text>
+  <rect x="1070" y="150" width="490" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="1315" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS-ZUGRIFF</text>
+
+  <!-- Google IdP (extern, gestrichelt) -->
+  <rect x="70" y="215" width="200" height="110" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="170" y="252" font-size="22" font-weight="bold" fill="#555555" text-anchor="middle">Google (IdP)</text>
+  <text x="170" y="280" font-size="15" fill="#444444" text-anchor="middle">Social Login via OIDC</text>
+  <text x="170" y="304" font-size="15" fill="#444444" text-anchor="middle">optionaler Weg</text>
+
+  <!-- Mobile App -->
+  <rect x="70" y="410" width="200" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="170" y="450" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Mobile App</text>
+  <text x="170" y="478" font-size="15" fill="#444444" text-anchor="middle">200.000 Nutzer</text>
+  <text x="170" y="502" font-size="15" fill="#444444" text-anchor="middle">Video-Upload</text>
+
+  <!-- Verworfen: Access Key in der App -->
+  <rect x="70" y="620" width="290" height="130" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="215" y="658" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">Access Key in App</text>
+  <text x="215" y="686" font-size="15" fill="#444444" text-anchor="middle">fest eingebaut, Vollzugriff</text>
+  <text x="215" y="712" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Reverse Engineering</text>
+  <text x="215" y="734" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">legt ihn offen</text>
+
+  <!-- Cognito User Pool -->
+  <rect x="330" y="380" width="210" height="190" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="435" y="418" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Cognito</text>
+  <text x="435" y="442" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">User Pool</text>
+  <text x="435" y="470" font-size="15" fill="#444444" text-anchor="middle">Managed Login</text>
+  <text x="435" y="492" font-size="15" fill="#444444" text-anchor="middle">(früher Hosted UI)</text>
+  <text x="435" y="516" font-size="15" fill="#444444" text-anchor="middle">JWT: ID + Access</text>
+  <text x="435" y="546" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">wer bist du</text>
+
+  <!-- Cognito Identity Pool -->
+  <rect x="620" y="290" width="390" height="200" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="815" y="330" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Cognito Identity Pool</text>
+  <text x="815" y="360" font-size="15" fill="#444444" text-anchor="middle">GetId liefert Identity ID</text>
+  <text x="815" y="384" font-size="15" fill="#444444" text-anchor="middle">GetCredentialsForIdentity</text>
+  <text x="815" y="408" font-size="15" fill="#444444" text-anchor="middle">Enhanced Flow: zwei Aufrufe</text>
+  <text x="815" y="432" font-size="15" fill="#444444" text-anchor="middle">authenticated + guest Role</text>
+  <text x="815" y="462" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">was darfst du in AWS</text>
+
+  <!-- STS -->
+  <rect x="620" y="600" width="390" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="815" y="640" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">STS</text>
+  <text x="815" y="670" font-size="15" fill="#444444" text-anchor="middle">AssumeRoleWithWebIdentity</text>
+  <text x="815" y="694" font-size="15" fill="#444444" text-anchor="middle">Credentials 1 Stunde gültig</text>
+  <text x="815" y="722" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Pool ruft es im Hintergrund auf</text>
+
+  <!-- authenticated Role -->
+  <rect x="1100" y="230" width="290" height="140" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1245" y="270" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">authenticated Role</text>
+  <text x="1245" y="300" font-size="15" fill="#444444" text-anchor="middle">Trust: cognito-identity</text>
+  <text x="1245" y="324" font-size="15" fill="#444444" text-anchor="middle">Permissions auf S3</text>
+  <text x="1245" y="352" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">guest Role: enger gefasst</text>
+
+  <!-- IAM Policy (Regelinstanz) -->
+  <rect x="1100" y="440" width="290" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1245" y="480" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">IAM Policy</text>
+  <text x="1245" y="510" font-size="15" fill="#444444" text-anchor="middle">Prefix aus Identity ID</text>
+  <text x="1245" y="534" font-size="15" fill="#444444" text-anchor="middle">StringLike auf s3:prefix</text>
+  <text x="1245" y="562" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Identity ID, nicht User-Pool-sub</text>
+
+  <!-- S3 -->
+  <rect x="1100" y="640" width="290" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1245" y="680" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 · Videos</text>
+  <text x="1245" y="710" font-size="15" fill="#444444" text-anchor="middle">Bucket: videos-prod</text>
+  <text x="1245" y="738" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">S3 setzt die Grenze durch</text>
+
+  <!-- 1: App -> User Pool -->
+  <path d="M270,470 L330,470" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="300" cy="470" r="15" fill="#0F7C8C"/>
+  <text x="300" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="300" y="440" font-size="15" fill="#0B5A66" text-anchor="middle">Login</text>
+
+  <!-- 2: Google -> User Pool (gestrichelt, foederiert) -->
+  <path d="M270,270 L435,270 L435,380" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGy)" fill="none"/>
+  <circle cx="435" cy="330" r="15" fill="#9A9A9A"/>
+  <text x="435" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="460" y="290" font-size="15" fill="#555555" text-anchor="start">föderiert</text>
+
+  <!-- 3: User Pool -> Identity Pool (ID-Token) -->
+  <path d="M540,420 L580,420 L580,390 L620,390" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="580" cy="405" r="15" fill="#0F7C8C"/>
+  <text x="580" y="411" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="580" y="360" font-size="15" fill="#0B5A66" text-anchor="middle">ID-Token</text>
+
+  <!-- 4: Identity Pool -> STS -->
+  <path d="M815,490 L815,600" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)" fill="none"/>
+  <circle cx="815" cy="545" r="15" fill="#232F3E"/>
+  <text x="815" y="551" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="840" y="530" font-size="15" fill="#232F3E" text-anchor="start">tauscht Token</text>
+
+  <!-- 5: STS -> authenticated Role (prueft Trust, gestrichelt) -->
+  <path d="M1010,640 L1055,640 L1055,300 L1100,300" stroke="#232F3E" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrN)" fill="none"/>
+  <circle cx="1055" cy="470" r="15" fill="#232F3E"/>
+  <text x="1055" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1030" y="620" font-size="15" fill="#232F3E" text-anchor="end">Rolle annehmen</text>
+
+  <!-- 6: Role -> IAM Policy -->
+  <path d="M1245,370 L1245,440" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="1245" cy="405" r="15" fill="#0F7C8C"/>
+  <text x="1245" y="411" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="1270" y="400" font-size="15" fill="#0B5A66" text-anchor="start">prüft Prefix</text>
+
+  <!-- 7: IAM Policy -> S3 -->
+  <path d="M1245,590 L1245,640" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)" fill="none"/>
+  <circle cx="1245" cy="615" r="15" fill="#3F8624"/>
+  <text x="1245" y="621" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+  <text x="1270" y="610" font-size="15" fill="#2E6318" text-anchor="start">PutObject</text>
+
+  <!-- Verworfener Pfad: Access Key -> S3 direkt -->
+  <path d="M360,690 L560,690" stroke="#C7161D" stroke-width="3" stroke-dasharray="9,6" fill="none"/>
+  <circle cx="460" cy="690" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <path d="M446,676 L474,704" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <path d="M474,676 L446,704" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <text x="460" y="742" font-size="15" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  User Pool = wer du bist · Identity Pool = was du in AWS darfst · sub = Identity ID, nicht User-Pool-sub · S3 setzt die Trennung durch, nicht der Client</text>
+</svg>

@@ -1,0 +1,131 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 41 — IAM Roles · STS · Instance Profile</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Keine Access Keys mehr: temporäre Credentials für EC2, Lambda und das eigene Rechenzentrum</text>
+
+  <!-- Zonen -->
+  <rect x="40" y="150" width="340" height="650" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="210" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE</text>
+  <rect x="420" y="150" width="1140" height="650" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="990" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS · eu-central-1</text>
+
+  <!-- On-Prem-Altsystem -->
+  <rect x="60" y="250" width="300" height="140" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="210" y="290" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">On-Prem-Altsystem</text>
+  <text x="210" y="320" font-size="15" fill="#444444" text-anchor="middle">nächtliche Bestandslisten</text>
+  <text x="210" y="344" font-size="15" fill="#444444" text-anchor="middle">X.509 aus eigener CA</text>
+  <text x="210" y="370" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Code-Umbau erlaubt</text>
+
+  <!-- Verworfen: IAM User + Access Key -->
+  <rect x="60" y="560" width="300" height="140" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="210" y="600" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">IAM User + Key</text>
+  <text x="210" y="630" font-size="15" fill="#444444" text-anchor="middle">Key seit 4 Jahren unrotiert</text>
+  <text x="210" y="654" font-size="15" fill="#444444" text-anchor="middle">liegt in Konfigdatei</text>
+  <text x="210" y="680" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">vom Audit verworfen</text>
+
+  <!-- IAM Roles Anywhere -->
+  <rect x="470" y="250" width="320" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="630" y="290" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">IAM Roles Anywhere</text>
+  <text x="630" y="320" font-size="15" fill="#444444" text-anchor="middle">Trust Anchor + Profile</text>
+  <text x="630" y="344" font-size="15" fill="#444444" text-anchor="middle">prüft Zertifikat gegen CA</text>
+  <text x="630" y="368" font-size="15" fill="#444444" text-anchor="middle">CreateSession statt Key</text>
+  <text x="630" y="392" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Rolle vertraut Service Principal</text>
+
+  <!-- EC2 -->
+  <rect x="470" y="470" width="320" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="630" y="510" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">EC2-Flotte</text>
+  <text x="630" y="540" font-size="15" fill="#444444" text-anchor="middle">Instance Profile trägt Rolle</text>
+  <text x="630" y="564" font-size="15" fill="#444444" text-anchor="middle">IMDSv2: PUT Token, dann GET</text>
+  <text x="630" y="590" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">regional Default, nicht rückwirkend</text>
+
+  <!-- Lambda -->
+  <rect x="470" y="660" width="320" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="630" y="700" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Lambda</text>
+  <text x="630" y="730" font-size="15" fill="#444444" text-anchor="middle">Execution Role</text>
+  <text x="630" y="754" font-size="15" fill="#444444" text-anchor="middle">SDK übernimmt automatisch</text>
+
+  <!-- IAM Role (Regelinstanz, Teal) -->
+  <rect x="900" y="250" width="280" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1040" y="290" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">IAM Role</text>
+  <text x="1040" y="320" font-size="15" fill="#444444" text-anchor="middle">Trust Policy: wer darf</text>
+  <text x="1040" y="344" font-size="15" fill="#444444" text-anchor="middle">Permissions: was er darf</text>
+
+  <!-- STS -->
+  <rect x="900" y="450" width="280" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1040" y="490" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">STS</text>
+  <text x="1040" y="520" font-size="15" fill="#444444" text-anchor="middle">stellt Credentials aus</text>
+  <text x="1040" y="544" font-size="15" fill="#444444" text-anchor="middle">regionaler Endpoint</text>
+  <text x="1040" y="570" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Token gilt in allen Regionen</text>
+
+  <!-- S3 -->
+  <rect x="1280" y="250" width="260" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1410" y="290" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3</text>
+  <text x="1410" y="320" font-size="15" fill="#444444" text-anchor="middle">Sendungsdaten</text>
+  <text x="1410" y="344" font-size="15" fill="#444444" text-anchor="middle">Bestandslisten</text>
+
+  <!-- DynamoDB -->
+  <rect x="1280" y="640" width="260" height="130" rx="10" fill="#EEEDFA" stroke="#2E27AD" stroke-width="2.5"/>
+  <text x="1410" y="680" font-size="22" font-weight="bold" fill="#232082" text-anchor="middle">DynamoDB</text>
+  <text x="1410" y="710" font-size="15" fill="#444444" text-anchor="middle">Tabelle: auftraege</text>
+  <text x="1410" y="734" font-size="15" fill="#444444" text-anchor="middle">verarbeitete Aufträge</text>
+
+  <!-- 1: On-Prem -> Roles Anywhere -->
+  <path d="M360,320 L470,320" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="415" cy="320" r="15" fill="#0F7C8C"/>
+  <text x="415" y="326" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="415" y="290" font-size="15" fill="#0B5A66" text-anchor="middle">X.509 vorzeigen</text>
+
+  <!-- 2: Roles Anywhere -> STS (rechtwinklig unter IAM Role vorbei) -->
+  <path d="M790,340 L845,340 L845,500 L900,500" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="845" cy="420" r="15" fill="#0F7C8C"/>
+  <text x="845" y="426" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="812" y="395" font-size="15" fill="#0B5A66" text-anchor="end">CreateSession</text>
+
+  <!-- 3: EC2 -> STS -->
+  <path d="M790,520 L900,520" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)" fill="none"/>
+  <circle cx="845" cy="520" r="15" fill="#232F3E"/>
+  <text x="845" y="526" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="800" y="545" font-size="15" fill="#232F3E" text-anchor="start">holt Credentials</text>
+
+  <!-- 4: Lambda -> STS (rechtwinklig) -->
+  <path d="M790,700 L845,700 L845,580 L900,580" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)" fill="none"/>
+  <circle cx="845" cy="645" r="15" fill="#D97706"/>
+  <text x="845" y="651" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="880" y="700" font-size="15" fill="#A85A05" text-anchor="start">AssumeRole</text>
+
+  <!-- 5: STS liest IAM Role (gestrichelt, Regelabfrage) -->
+  <path d="M1040,450 L1040,380" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="1040" cy="415" r="15" fill="#0F7C8C"/>
+  <text x="1040" y="421" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1065" y="420" font-size="15" fill="#0B5A66" text-anchor="start">prüft Trust Policy</text>
+
+  <!-- 6: STS -> S3 (temporäre Credentials wirken) -->
+  <path d="M1180,490 L1240,490 L1240,320 L1280,320" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)" fill="none"/>
+  <circle cx="1240" cy="405" r="15" fill="#3F8624"/>
+  <text x="1240" y="411" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="1215" y="450" font-size="15" fill="#2E6318" text-anchor="end">schreibt Objekte</text>
+
+  <!-- 7: STS -> DynamoDB -->
+  <path d="M1180,560 L1240,560 L1240,705 L1280,705" stroke="#2E27AD" stroke-width="3" marker-end="url(#arrN)" fill="none"/>
+  <circle cx="1240" cy="630" r="15" fill="#2E27AD"/>
+  <text x="1240" y="636" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+  <text x="1265" y="600" font-size="15" fill="#232082" text-anchor="start">schreibt Items</text>
+
+  <!-- Verworfener Pfad: Access Key -> STS, mit rotem X -->
+  <path d="M360,630 L900,630 L900,600" stroke="#C7161D" stroke-width="3" stroke-dasharray="9,6" fill="none"/>
+  <circle cx="630" cy="630" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <path d="M616,616 L644,644" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <path d="M644,616 L616,644" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <text x="630" y="600" font-size="15" fill="#9E1015" text-anchor="middle">Key gelöscht</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Rolle statt Access Key · STS stellt aus, IMDSv2 liefert aus · Instance Profile = Rolle an EC2 · Roles Anywhere = X.509 statt Key</text>
+</svg>

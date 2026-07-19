@@ -1,0 +1,139 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+    <marker id="arrPk" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#E7157B"/></marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 45 — GuardDuty · Security Hub · EventBridge</text>
+  <text x="60" y="106" font-size="21" fill="#555555">30 Accounts, zentrale Sicht auf Bedrohungen und automatische Reaktion statt Konsole-Aufmachen</text>
+
+  <!-- Zonen -->
+  <rect x="40" y="150" width="520" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="300" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ERKENNUNG</text>
+  <rect x="590" y="150" width="420" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="800" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ZENTRALE SICHT</text>
+  <rect x="1040" y="150" width="520" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="1300" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AUTOMATISCHE REAKTION</text>
+
+  <!-- GuardDuty -->
+  <rect x="70" y="215" width="300" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="220" y="255" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">GuardDuty</text>
+  <text x="220" y="285" font-size="15" fill="#444444" text-anchor="middle">CloudTrail, VPC Flow, DNS</text>
+  <text x="220" y="309" font-size="15" fill="#444444" text-anchor="middle">Findings bleiben 90 Tage</text>
+  <text x="220" y="333" font-size="15" fill="#444444" text-anchor="middle">30 Accounts der Organization</text>
+  <text x="220" y="357" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">managed, keine eigenen Regeln</text>
+
+  <!-- Extended Threat Detection -->
+  <rect x="70" y="420" width="300" height="170" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="220" y="458" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Extended</text>
+  <text x="220" y="482" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Threat Detection</text>
+  <text x="220" y="512" font-size="15" fill="#444444" text-anchor="middle">korreliert über Zeit</text>
+  <text x="220" y="536" font-size="15" fill="#444444" text-anchor="middle">eine Kette, ein Critical-Finding</text>
+  <text x="220" y="560" font-size="15" fill="#444444" text-anchor="middle">MITRE ATT&amp;CK zugeordnet</text>
+  <text x="220" y="580" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">automatisch aktiv, ohne Aufpreis</text>
+
+  <!-- Verworfen: jedes Team prueft selbst -->
+  <rect x="70" y="650" width="300" height="115" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="220" y="688" font-size="20" font-weight="bold" fill="#9E1015" text-anchor="middle">Jedes Team prüft selbst</text>
+  <text x="220" y="716" font-size="15" fill="#444444" text-anchor="middle">elf Tage unbemerkt</text>
+  <text x="220" y="742" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">niemand macht die Konsole auf</text>
+
+  <!-- Delegated Admin Account (Navy, Account-Grenze) -->
+  <rect x="620" y="215" width="360" height="130" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="800" y="253" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">Delegated Admin</text>
+  <text x="800" y="277" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">Account</text>
+  <text x="800" y="307" font-size="15" fill="#444444" text-anchor="middle">Findings laufen zusammen</text>
+  <text x="800" y="331" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">eine Sicht statt 30 Konsolen</text>
+
+  <!-- Security Hub CSPM -->
+  <rect x="620" y="400" width="360" height="180" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="800" y="440" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Security Hub CSPM</text>
+  <text x="800" y="470" font-size="15" fill="#444444" text-anchor="middle">sammelt GuardDuty, Inspector</text>
+  <text x="800" y="494" font-size="15" fill="#444444" text-anchor="middle">Macie, IAM Access Analyzer</text>
+  <text x="800" y="518" font-size="15" fill="#444444" text-anchor="middle">normalisiert nach ASFF</text>
+  <text x="800" y="542" font-size="15" fill="#444444" text-anchor="middle">früher einfach Security Hub</text>
+  <text x="800" y="568" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">neuer Security Hub nutzt OCSF</text>
+
+  <!-- S3 Langzeitablage -->
+  <rect x="620" y="650" width="360" height="115" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="800" y="688" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 · Langzeitablage</text>
+  <text x="800" y="718" font-size="15" fill="#444444" text-anchor="middle">länger als 90 Tage aufbewahren</text>
+  <text x="800" y="744" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Export oder EventBridge</text>
+
+  <!-- EventBridge -->
+  <rect x="1070" y="215" width="300" height="170" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1220" y="255" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">EventBridge</text>
+  <text x="1220" y="285" font-size="15" fill="#444444" text-anchor="middle">Regel filtert auf Severity</text>
+  <text x="1220" y="309" font-size="15" fill="#444444" text-anchor="middle">neue Findings nahezu Echtzeit</text>
+  <text x="1220" y="333" font-size="15" fill="#444444" text-anchor="middle">Wiederholungen erst nach 6 h</text>
+  <text x="1220" y="360" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Aggregation ist einstellbar</text>
+
+  <!-- Lambda -->
+  <rect x="1070" y="450" width="300" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1220" y="490" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Lambda</text>
+  <text x="1220" y="520" font-size="15" fill="#444444" text-anchor="middle">isoliert die Instanz</text>
+  <text x="1220" y="546" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Security Group ohne Regeln</text>
+
+  <!-- SNS -->
+  <rect x="1070" y="640" width="300" height="120" rx="10" fill="#FDEDF4" stroke="#E7157B" stroke-width="2.5"/>
+  <text x="1220" y="680" font-size="22" font-weight="bold" fill="#B01059" text-anchor="middle">SNS</text>
+  <text x="1220" y="710" font-size="15" fill="#444444" text-anchor="middle">weckt das Bereitschaftsteam</text>
+  <text x="1220" y="736" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">nicht erst am Morgen</text>
+
+  <!-- 1: GuardDuty -> Extended Threat Detection -->
+  <path d="M220,365 L220,420" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="220" cy="393" r="15" fill="#0F7C8C"/>
+  <text x="220" y="399" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="245" y="390" font-size="15" fill="#0B5A66" text-anchor="start">korreliert</text>
+
+  <!-- 2: GuardDuty -> Delegated Admin -->
+  <path d="M370,270 L620,270" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)" fill="none"/>
+  <circle cx="495" cy="270" r="15" fill="#232F3E"/>
+  <text x="495" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="495" y="240" font-size="15" fill="#232F3E" text-anchor="middle">Findings</text>
+
+  <!-- 3: Delegated Admin -> Security Hub CSPM -->
+  <path d="M800,345 L800,400" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="800" cy="373" r="15" fill="#0F7C8C"/>
+  <text x="800" y="379" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="825" y="370" font-size="15" fill="#0B5A66" text-anchor="start">sammelt zentral</text>
+
+  <!-- 4: Security Hub CSPM -> S3 -->
+  <path d="M800,580 L800,650" stroke="#3F8624" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrG)" fill="none"/>
+  <circle cx="800" cy="615" r="15" fill="#3F8624"/>
+  <text x="800" y="621" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="825" y="612" font-size="15" fill="#2E6318" text-anchor="start">exportiert</text>
+
+  <!-- 5: GuardDuty -> EventBridge (oben herum, ueber die Zonen) -->
+  <path d="M370,340 L575,340 L575,195 L1020,195 L1020,270 L1070,270" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)" fill="none"/>
+  <circle cx="800" cy="195" r="15" fill="#D97706"/>
+  <text x="800" y="201" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="930" y="175" font-size="15" fill="#A85A05" text-anchor="start">jedes Finding</text>
+
+  <!-- 6: EventBridge -> Lambda -->
+  <path d="M1220,385 L1220,450" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)" fill="none"/>
+  <circle cx="1220" cy="417" r="15" fill="#D97706"/>
+  <text x="1220" y="423" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="1245" y="414" font-size="15" fill="#A85A05" text-anchor="start">hohe Severity</text>
+
+  <!-- 7: EventBridge -> SNS (rechts herum an Lambda vorbei) -->
+  <path d="M1370,330 L1420,330 L1420,700 L1370,700" stroke="#E7157B" stroke-width="3" marker-end="url(#arrPk)" fill="none"/>
+  <circle cx="1420" cy="515" r="15" fill="#E7157B"/>
+  <text x="1420" y="521" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+  <text x="1445" y="512" font-size="15" fill="#B01059" text-anchor="start">benachrichtigt</text>
+
+  <!-- Verworfener Pfad -->
+  <path d="M370,707 L620,707" stroke="#C7161D" stroke-width="3" stroke-dasharray="9,6" fill="none"/>
+  <circle cx="495" cy="707" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <path d="M481,693 L509,721" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <path d="M509,693 L481,721" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <text x="495" y="757" font-size="15" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  GuardDuty findet · Security Hub sammelt · EventBridge handelt · Findings bleiben 90 Tage, danach nur was weggeschrieben wurde</text>
+</svg>

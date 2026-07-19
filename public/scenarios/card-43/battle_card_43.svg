@@ -1,0 +1,129 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+    <marker id="arrGd" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 43 — KMS · Envelope Encryption · S3 SSE-KMS</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Eigener Schlüssel, nachweisbare Rotation, Audit pro Zugriff — bei 40 Mio. Objekten bezahlbar</text>
+
+  <!-- Zonen -->
+  <rect x="40" y="150" width="660" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="370" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ENVELOPE ENCRYPTION</text>
+  <rect x="730" y="150" width="450" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="955" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">SCHLÜSSELVERWALTUNG</text>
+  <rect x="1210" y="150" width="350" height="640" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="1385" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">NACHWEIS</text>
+
+  <!-- Anwendung -->
+  <rect x="70" y="230" width="230" height="120" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="185" y="270" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Anwendung</text>
+  <text x="185" y="300" font-size="15" fill="#444444" text-anchor="middle">lädt Akten hoch</text>
+  <text x="185" y="324" font-size="15" fill="#444444" text-anchor="middle">~8 MB je Datei</text>
+
+  <!-- Verworfen: kms:Encrypt direkt -->
+  <rect x="70" y="620" width="280" height="140" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="210" y="660" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">kms:Encrypt direkt</text>
+  <text x="210" y="690" font-size="15" fill="#444444" text-anchor="middle">Grenze: 4096 Bytes</text>
+  <text x="210" y="714" font-size="15" fill="#444444" text-anchor="middle">8 MB passen nicht hinein</text>
+  <text x="210" y="742" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">erster Entwurf, verworfen</text>
+
+  <!-- S3 -->
+  <rect x="380" y="230" width="290" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="525" y="270" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 · Patientenakten</text>
+  <text x="525" y="300" font-size="15" fill="#444444" text-anchor="middle">40 Mio. Objekte</text>
+  <text x="525" y="324" font-size="15" fill="#444444" text-anchor="middle">SSE-KMS aktiviert</text>
+  <text x="525" y="352" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">SSE-S3 ist der Grundzustand</text>
+
+  <!-- Data Key -->
+  <rect x="380" y="450" width="290" height="140" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="525" y="490" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Data Key</text>
+  <text x="525" y="520" font-size="15" fill="#444444" text-anchor="middle">Klartext verschlüsselt,</text>
+  <text x="525" y="544" font-size="15" fill="#444444" text-anchor="middle">dann sofort verworfen</text>
+  <text x="525" y="572" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">verschlüsselte Fassung bleibt</text>
+
+  <!-- KMS CMK -->
+  <rect x="770" y="230" width="370" height="180" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="955" y="270" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">KMS Customer</text>
+  <text x="955" y="294" font-size="20" font-weight="bold" fill="#0B5A66" text-anchor="middle">Managed Key</text>
+  <text x="955" y="324" font-size="15" fill="#444444" text-anchor="middle">verlässt das HSM nie</text>
+  <text x="955" y="348" font-size="15" fill="#444444" text-anchor="middle">Rotation 90 Tage bis 7 Jahre</text>
+  <text x="955" y="372" font-size="15" fill="#444444" text-anchor="middle">on-demand, max. 25 Mal</text>
+  <text x="955" y="396" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">1. und 2. Rotation je 1 $/Monat</text>
+
+  <!-- Key Policy -->
+  <rect x="770" y="470" width="370" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="955" y="510" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Key Policy</text>
+  <text x="955" y="540" font-size="15" fill="#444444" text-anchor="middle">wer den Schlüssel nutzen darf</text>
+  <text x="955" y="566" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">ohne sie hilft keine IAM-Policy</text>
+
+  <!-- S3 Bucket Key (Gold, Kosten) -->
+  <rect x="770" y="640" width="370" height="120" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="955" y="680" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">S3 Bucket Key</text>
+  <text x="955" y="710" font-size="15" fill="#444444" text-anchor="middle">bis zu 99 % weniger Aufrufe</text>
+  <text x="955" y="736" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">standardmäßig NICHT aktiv</text>
+
+  <!-- CloudTrail -->
+  <rect x="1240" y="380" width="290" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1385" y="420" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">CloudTrail</text>
+  <text x="1385" y="450" font-size="15" fill="#444444" text-anchor="middle">protokolliert jeden Aufruf</text>
+  <text x="1385" y="474" font-size="15" fill="#444444" text-anchor="middle">wer, wann, welcher Schlüssel</text>
+  <text x="1385" y="502" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">der geforderte Nachweis</text>
+
+  <!-- 1: Anwendung -> S3 -->
+  <path d="M300,290 L380,290" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)" fill="none"/>
+  <circle cx="340" cy="290" r="15" fill="#2E6BE6"/>
+  <text x="340" y="296" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="340" y="260" font-size="15" fill="#1B3E86" text-anchor="middle">PutObject</text>
+
+  <!-- 2: S3 -> KMS (GenerateDataKey) -->
+  <path d="M670,290 L770,290" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="720" cy="290" r="15" fill="#0F7C8C"/>
+  <text x="720" y="296" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="720" y="260" font-size="15" fill="#0B5A66" text-anchor="middle">GenerateDataKey</text>
+
+  <!-- 3: KMS -> Data Key -->
+  <path d="M770,350 L720,350 L720,520 L670,520" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="720" cy="435" r="15" fill="#0F7C8C"/>
+  <text x="720" y="441" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="700" y="480" font-size="15" fill="#0B5A66" text-anchor="end">zwei Fassungen</text>
+
+  <!-- 4: Data Key -> S3 (verschluesselt Objekt) -->
+  <path d="M525,450 L525,380" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)" fill="none"/>
+  <circle cx="525" cy="415" r="15" fill="#3F8624"/>
+  <text x="525" y="421" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="550" y="420" font-size="15" fill="#2E6318" text-anchor="start">verschlüsselt Objekt</text>
+
+  <!-- 5: KMS -> Key Policy -->
+  <path d="M955,410 L955,470" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="955" cy="440" r="15" fill="#0F7C8C"/>
+  <text x="955" y="446" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="980" y="435" font-size="15" fill="#0B5A66" text-anchor="start">prüft</text>
+
+  <!-- 6: Bucket Key senkt Aufrufe (Gold, gestrichelt) -->
+  <path d="M955,640 L955,590" stroke="#A16E00" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrGd)" fill="none"/>
+  <circle cx="955" cy="615" r="15" fill="#A16E00"/>
+  <text x="955" y="621" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="980" y="620" font-size="15" fill="#7A5300" text-anchor="start">spart Aufrufe</text>
+
+  <!-- 7: KMS -> CloudTrail -->
+  <path d="M1140,320 L1190,320 L1190,440 L1240,440" stroke="#232F3E" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrN)" fill="none"/>
+  <circle cx="1190" cy="380" r="15" fill="#232F3E"/>
+  <text x="1190" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+  <text x="1170" y="300" font-size="15" fill="#232F3E" text-anchor="end">protokolliert</text>
+
+  <!-- Verworfener Pfad -->
+  <path d="M350,690 L770,690" stroke="#C7161D" stroke-width="3" stroke-dasharray="9,6" fill="none"/>
+  <circle cx="560" cy="690" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <path d="M546,676 L574,704" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <path d="M574,676 L546,704" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <text x="560" y="742" font-size="15" fill="#9E1015" text-anchor="middle">4 KB überschritten</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  KMS verschlüsselt den Data Key, nicht die Daten · Encrypt endet bei 4 KB · Bucket Keys sparen bis zu 99 % KMS-Aufrufe · Nachweis steht in CloudTrail</text>
+</svg>

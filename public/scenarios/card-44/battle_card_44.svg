@@ -1,0 +1,122 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#B0084D"/></marker>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 44 — Secrets Manager vs Parameter Store</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Rotationspflicht für DB-Zugangsdaten, 3.000 Konfigurationswerte ohne — zwei Dienste, zwei Aufgaben</text>
+
+  <!-- Zonen -->
+  <rect x="40" y="150" width="740" height="410" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="410" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ROTATIONSPFLICHTIG</text>
+  <rect x="810" y="150" width="750" height="410" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="1185" y="180" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">KEINE ROTATION</text>
+  <rect x="40" y="600" width="1520" height="190" rx="10" fill="none" stroke="#9A9A9A" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="800" y="628" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">GEMEINSAME BASIS</text>
+
+  <!-- Secrets Manager -->
+  <rect x="70" y="210" width="300" height="160" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="220" y="250" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Secrets Manager</text>
+  <text x="220" y="280" font-size="15" fill="#444444" text-anchor="middle">DB-Zugangsdaten</text>
+  <text x="220" y="304" font-size="15" fill="#444444" text-anchor="middle">Rotation alle 30 Tage</text>
+  <text x="220" y="328" font-size="15" fill="#444444" text-anchor="middle">AWSCURRENT liest die App</text>
+  <text x="220" y="356" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Lebenszyklus, nicht Speicher</text>
+
+  <!-- Rotation Lambda -->
+  <rect x="440" y="210" width="300" height="160" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="590" y="250" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Rotation Lambda</text>
+  <text x="590" y="280" font-size="15" fill="#444444" text-anchor="middle">createSecret, setSecret</text>
+  <text x="590" y="304" font-size="15" fill="#444444" text-anchor="middle">testSecret, finishSecret</text>
+  <text x="590" y="328" font-size="15" fill="#444444" text-anchor="middle">AWSPENDING wird getestet</text>
+  <text x="590" y="356" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">für RDS fertige Vorlage</text>
+
+  <!-- RDS (Rot-Pink, relationale Engine) -->
+  <rect x="440" y="420" width="300" height="120" rx="10" fill="#FDF0F5" stroke="#B0084D" stroke-width="2.5"/>
+  <text x="590" y="458" font-size="20" font-weight="bold" fill="#8A0A3F" text-anchor="middle">RDS · Versicherungs-DB</text>
+  <text x="590" y="488" font-size="15" fill="#444444" text-anchor="middle">neues Passwort gesetzt</text>
+  <text x="590" y="514" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Verbindung getestet</text>
+
+  <!-- Microservices -->
+  <rect x="70" y="420" width="300" height="120" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="220" y="458" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">40 Microservices</text>
+  <text x="220" y="488" font-size="15" fill="#444444" text-anchor="middle">lesen immer AWSCURRENT</text>
+  <text x="220" y="514" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">merken von Rotation nichts</text>
+
+  <!-- Parameter Store -->
+  <rect x="840" y="210" width="330" height="190" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1005" y="250" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Parameter Store</text>
+  <text x="1005" y="280" font-size="15" fill="#444444" text-anchor="middle">3.000 Konfigurationswerte</text>
+  <text x="1005" y="304" font-size="15" fill="#444444" text-anchor="middle">Standard Tier: bis 10.000</text>
+  <text x="1005" y="328" font-size="15" fill="#444444" text-anchor="middle">4 KB je Wert, ohne Aufpreis</text>
+  <text x="1005" y="352" font-size="15" fill="#444444" text-anchor="middle">SecureString via KMS</text>
+  <text x="1005" y="382" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Feature-Flags, URLs, Timeouts</text>
+
+  <!-- Advanced Tier Hinweis -->
+  <rect x="1240" y="210" width="290" height="190" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1385" y="250" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Advanced Tier</text>
+  <text x="1385" y="280" font-size="15" fill="#444444" text-anchor="middle">100.000 und 8 KB</text>
+  <text x="1385" y="304" font-size="15" fill="#444444" text-anchor="middle">Parameter Policies</text>
+  <text x="1385" y="328" font-size="15" fill="#444444" text-anchor="middle">Rückweg gesperrt</text>
+  <text x="1385" y="356" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">andere Verschlüsselung</text>
+  <text x="1385" y="380" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">löschen und neu anlegen</text>
+
+  <!-- Verworfen: alles in Secrets Manager (Gold-Kosten) -->
+  <rect x="840" y="430" width="330" height="110" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1005" y="468" font-size="20" font-weight="bold" fill="#7A5300" text-anchor="middle">Alles in Secrets Manager</text>
+  <text x="1005" y="496" font-size="15" fill="#444444" text-anchor="middle">kostet je Secret pro Monat</text>
+  <text x="1005" y="520" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">erster Entwurf</text>
+
+  <!-- KMS (gemeinsame Basis) -->
+  <rect x="620" y="660" width="360" height="110" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="800" y="700" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">KMS</text>
+  <text x="800" y="730" font-size="15" fill="#444444" text-anchor="middle">verschlüsselt beide Dienste</text>
+  <text x="800" y="756" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">IAM regelt den Zugriff</text>
+
+  <!-- 1: Secrets Manager -> Rotation Lambda -->
+  <path d="M370,270 L440,270" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)" fill="none"/>
+  <circle cx="405" cy="270" r="15" fill="#D97706"/>
+  <text x="405" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="405" y="240" font-size="15" fill="#A85A05" text-anchor="middle">startet Rotation</text>
+
+  <!-- 2: Rotation Lambda -> RDS -->
+  <path d="M590,370 L590,420" stroke="#B0084D" stroke-width="3" marker-end="url(#arrP)" fill="none"/>
+  <circle cx="590" cy="395" r="15" fill="#B0084D"/>
+  <text x="590" y="401" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="615" y="392" font-size="15" fill="#8A0A3F" text-anchor="start">setzt Passwort</text>
+
+  <!-- 3: Microservices -> Secrets Manager -->
+  <path d="M220,420 L220,370" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrB)" fill="none"/>
+  <circle cx="220" cy="395" r="15" fill="#2E6BE6"/>
+  <text x="220" y="401" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="245" y="392" font-size="15" fill="#1B3E86" text-anchor="start">liest AWSCURRENT</text>
+
+  <!-- 4: Parameter Store -> Advanced Tier -->
+  <path d="M1170,300 L1240,300" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="1205" cy="300" r="15" fill="#0F7C8C"/>
+  <text x="1205" y="306" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="1205" y="270" font-size="15" fill="#0B5A66" text-anchor="middle">bei Bedarf</text>
+
+  <!-- 5: Secrets Manager -> KMS -->
+  <path d="M70,290 L55,290 L55,640 L620,640 L620,690" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="420" cy="640" r="15" fill="#0F7C8C"/>
+  <text x="420" y="646" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- 6: Parameter Store -> KMS -->
+  <path d="M1170,370 L1200,370 L1200,640 L980,640 L980,690" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrT)" fill="none"/>
+  <circle cx="1200" cy="500" r="15" fill="#0F7C8C"/>
+  <text x="1200" y="506" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <!-- Verworfener Pfad: rotes X auf der Gold-Box -->
+  <circle cx="1005" cy="590" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <path d="M991,576 L1019,604" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <path d="M1019,576 L991,604" stroke="#C7161D" stroke-width="4" fill="none"/>
+  <text x="1090" y="575" font-size="15" fill="#9E1015" text-anchor="start">verworfen</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Secrets Manager = Lebenszyklus · Parameter Store = Konfiguration · SecureString verschlüsselt beides · Advanced ist eine Einbahnstraße</text>
+</svg>
