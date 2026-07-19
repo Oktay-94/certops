@@ -102,7 +102,7 @@ describe("getScenario", () => {
     expect(getScenario("1")).toBeNull();
     expect(getScenario("001")).toBeNull();
     expect(getScenario("00")).toBeNull();
-    expect(getScenario("56")).toBeNull();
-    expect(getScenario("55")).not.toBeNull();
+    expect(getScenario("61")).toBeNull();
+    expect(getScenario("60")).not.toBeNull();
   });
 });
