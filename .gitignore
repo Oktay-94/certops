@@ -53,3 +53,7 @@ handoff.md
 
 # local DB backups (Turso exports, never commit)
 /backups/
+
+# python venvs (cairosvg toolchain, never commit)
+.venv/
+venv/
