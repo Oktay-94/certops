@@ -1,0 +1,117 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#1F5FA8"/>
+    </marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#B0084D"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 48 — IAM Identity Center · Permission Sets</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Maschinenbauer, 200 Mitarbeiter, 30 Accounts: eine Identität, ein Entzug, überall wirksam</text>
+
+  <!-- Externer IdP (Blau) x 40..280, y 210..350 -->
+  <rect x="40" y="210" width="240" height="140" rx="10" fill="#EDF3FB" stroke="#1F5FA8" stroke-width="2.5"/>
+  <text x="160" y="252" font-size="21" font-weight="bold" fill="#17457A" text-anchor="middle">Externer IdP</text>
+  <text x="160" y="284" font-size="15" fill="#444444" text-anchor="middle">Entra ID · Okta</text>
+  <text x="160" y="308" font-size="15" fill="#444444" text-anchor="middle">SCIM-Sync</text>
+  <text x="160" y="334" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">bleibt führend</text>
+
+  <!-- IAM Identity Center (Teal) x 360..700, y 190..370 -->
+  <rect x="360" y="190" width="340" height="180" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="530" y="238" font-size="24" font-weight="bold" fill="#0B5A66" text-anchor="middle">IAM Identity Center</text>
+  <text x="530" y="276" font-size="16" fill="#444444" text-anchor="middle">Organization Instance</text>
+  <text x="530" y="304" font-size="16" fill="#444444" text-anchor="middle">im Management Account</text>
+  <text x="530" y="340" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">früher AWS SSO, seit 2022</text>
+
+  <!-- Permission Set (Teal) x 780..1080, y 200..360 -->
+  <rect x="780" y="200" width="300" height="160" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="930" y="243" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">Permission Set</text>
+  <text x="930" y="275" font-size="15" fill="#444444" text-anchor="middle">eine Vorlage</text>
+  <text x="930" y="299" font-size="15" fill="#444444" text-anchor="middle">bis 10 Policies + 1 inline</text>
+  <text x="930" y="332" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">wird zu AWSReservedSSO_*</text>
+
+  <!-- 30 Accounts (Navy) x 1160..1440, y 190..320 -->
+  <rect x="1160" y="190" width="280" height="130" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1300" y="232" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">30 Accounts</text>
+  <text x="1300" y="264" font-size="15" fill="#444444" text-anchor="middle">IAM-Rolle je Account</text>
+  <text x="1300" y="292" font-size="15" fill="#444444" text-anchor="middle">automatisch erzeugt</text>
+
+  <!-- STS (Navy) x 1160..1440, y 400..530 -->
+  <rect x="1160" y="400" width="280" height="130" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1300" y="442" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">AWS STS</text>
+  <text x="1300" y="474" font-size="15" fill="#444444" text-anchor="middle">temporäre Credentials</text>
+  <text x="1300" y="502" font-size="15" fill="#444444" text-anchor="middle">keine Access Keys</text>
+
+  <!-- SCP (Rot-Pink) x 360..700, y 470..640 -->
+  <rect x="360" y="470" width="340" height="170" rx="10" fill="#FCEBF2" stroke="#B0084D" stroke-width="2.5"/>
+  <text x="530" y="514" font-size="21" font-weight="bold" fill="#8A063C" text-anchor="middle">Service Control Policy</text>
+  <text x="530" y="546" font-size="15" fill="#444444" text-anchor="middle">Region-Sperre in Prod</text>
+  <text x="530" y="574" font-size="15" fill="#444444" text-anchor="middle">gilt auch für Root</text>
+  <text x="530" y="610" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">begrenzt, gewährt nie</text>
+
+  <!-- Verworfen: IAM-User (Rot) x 760..1080, y 620..790 -->
+  <rect x="760" y="620" width="320" height="170" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+  <text x="920" y="664" font-size="21" font-weight="bold" fill="#9E1015" text-anchor="middle">IAM-User pro Account</text>
+  <text x="920" y="696" font-size="15" fill="#444444" text-anchor="middle">200 × 30 Konten</text>
+  <text x="920" y="724" font-size="15" fill="#444444" text-anchor="middle">Austritt bleibt 3 Wochen aktiv</text>
+  <text x="920" y="760" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Access Keys in Config-Dateien</text>
+
+  <!-- ===== Pfeile ===== -->
+  <!-- 1: IdP -> Identity Center -->
+  <line x1="280" y1="275" x2="352" y2="275" stroke="#1F5FA8" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="316" cy="275" r="15" fill="#1F5FA8"/>
+  <text x="316" y="281" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="316" y="200" font-size="15" fill="#17457A" text-anchor="middle">Nutzer + Gruppen</text>
+
+  <!-- 2: Identity Center -> Permission Set -->
+  <line x1="700" y1="275" x2="772" y2="275" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="736" cy="275" r="15" fill="#0F7C8C"/>
+  <text x="736" y="281" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="736" y="180" font-size="15" fill="#0B5A66" text-anchor="middle">zuweisen</text>
+
+  <!-- 3: Permission Set -> 30 Accounts -->
+  <line x1="1080" y1="250" x2="1152" y2="250" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="1116" cy="250" r="15" fill="#0F7C8C"/>
+  <text x="1116" y="256" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="1116" y="180" font-size="15" fill="#0B5A66" text-anchor="middle">auf alle 30</text>
+
+  <!-- 4: 30 Accounts -> STS -->
+  <line x1="1300" y1="320" x2="1300" y2="392" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="1300" cy="356" r="15" fill="#232F3E"/>
+  <text x="1300" y="362" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="1490" y="362" font-size="15" fill="#232F3E" text-anchor="middle">Login</text>
+
+  <!-- 5: SCP -> Identity Center (deckelt) -->
+  <line x1="530" y1="470" x2="530" y2="378" stroke="#B0084D" stroke-width="3" marker-end="url(#arrP)"/>
+  <circle cx="530" cy="424" r="15" fill="#B0084D"/>
+  <text x="530" y="430" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="700" y="430" font-size="15" fill="#8A063C" text-anchor="middle">deckelt alles</text>
+
+  <!-- Verworfener Pfad: IAM-User -> Permission Set, rotes X -->
+  <line x1="900" y1="620" x2="900" y2="368" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="900" cy="494" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="886" y1="480" x2="914" y2="508" stroke="#C7161D" stroke-width="4"/>
+  <line x1="914" y1="480" x2="886" y2="508" stroke="#C7161D" stroke-width="4"/>
+  <text x="1010" y="500" font-size="15" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <!-- Merkhinweis links unten -->
+  <text x="180" y="560" font-size="15" fill="#8A063C" text-anchor="middle">Effektiv = Permission Set ∩ SCP</text>
+  <text x="180" y="584" font-size="15" fill="#8A063C" text-anchor="middle">expliziter Deny gewinnt immer</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Identity Center gewährt · SCP begrenzt · Permission Set wird zur IAM-Rolle im Zielaccount · Account Instance kann kein Multi-Account</text>
+</svg>

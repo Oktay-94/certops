@@ -1,0 +1,130 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#1F5FA8"/>
+    </marker>
+    <marker id="arrA" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 50 — WAF Bot Control · Challenge vs. CAPTCHA</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Sneaker-Drop: Bestand in 11 Sekunden weg, 94 % Scalper-Bots — IP-Sperren greifen nicht</text>
+
+  <!-- CloudFront + WAF (Blau) x 40..300, y 200..340 -->
+  <rect x="40" y="200" width="260" height="140" rx="10" fill="#EDF3FB" stroke="#1F5FA8" stroke-width="2.5"/>
+  <text x="170" y="242" font-size="21" font-weight="bold" fill="#17457A" text-anchor="middle">CloudFront + WAF</text>
+  <text x="170" y="274" font-size="15" fill="#444444" text-anchor="middle">400.000 Kunden</text>
+  <text x="170" y="298" font-size="15" fill="#444444" text-anchor="middle">+ Scalper-Bots</text>
+  <text x="170" y="324" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Residential Proxies</text>
+
+  <!-- Scope-Down (Teal) x 380..660, y 200..340 -->
+  <rect x="380" y="200" width="280" height="140" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="520" y="242" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">Scope-Down</text>
+  <text x="520" y="274" font-size="15" fill="#444444" text-anchor="middle">nur /drop/* /checkout</text>
+  <text x="520" y="298" font-size="15" fill="#444444" text-anchor="middle">nicht auf Bilder und CSS</text>
+  <text x="520" y="324" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Kosten und Latenz</text>
+
+  <!-- Common Level (Teal) x 740..1020, y 185..320 -->
+  <rect x="740" y="185" width="280" height="135" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="880" y="226" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">Common Level</text>
+  <text x="880" y="256" font-size="15" fill="#444444" text-anchor="middle">self-identifying Bots</text>
+  <text x="880" y="280" font-size="15" fill="#444444" text-anchor="middle">Googlebot bleibt drin</text>
+  <text x="880" y="306" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">10 Mio./Monat frei</text>
+
+  <!-- Targeted Level (Teal) x 740..1020, y 380..530 -->
+  <rect x="740" y="380" width="280" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="880" y="423" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">Targeted Level</text>
+  <text x="880" y="455" font-size="15" fill="#444444" text-anchor="middle">Fingerprinting</text>
+  <text x="880" y="479" font-size="15" fill="#444444" text-anchor="middle">dynamisches Rate-Limit</text>
+  <text x="880" y="510" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">nur 1 Mio./Monat frei</text>
+
+  <!-- Challenge (Teal) x 1100..1400, y 185..330 -->
+  <rect x="1100" y="185" width="300" height="145" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1250" y="228" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">Challenge</text>
+  <text x="1250" y="260" font-size="15" fill="#444444" text-anchor="middle">stiller JS-Test</text>
+  <text x="1250" y="284" font-size="15" fill="#444444" text-anchor="middle">aws-waf-token</text>
+  <text x="1250" y="313" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Kunde merkt nichts</text>
+
+  <!-- CAPTCHA (Teal) x 1100..1400, y 390..535 -->
+  <rect x="1100" y="390" width="300" height="145" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1250" y="433" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">CAPTCHA</text>
+  <text x="1250" y="465" font-size="15" fill="#444444" text-anchor="middle">sichtbares Puzzle</text>
+  <text x="1250" y="489" font-size="15" fill="#444444" text-anchor="middle">nur am Checkout</text>
+  <text x="1250" y="518" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Immunity Time 300 s</text>
+
+  <!-- Kostenfalle (Gold) x 380..680, y 440..600 -->
+  <rect x="380" y="440" width="300" height="160" rx="10" fill="#FBF4E4" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="530" y="483" font-size="21" font-weight="bold" fill="#7A5300" text-anchor="middle">Ohne Scope-Down</text>
+  <text x="530" y="515" font-size="15" fill="#444444" text-anchor="middle">teure Stufe auf allem</text>
+  <text x="530" y="539" font-size="15" fill="#444444" text-anchor="middle">Common 10x mehr frei</text>
+  <text x="530" y="572" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Reihenfolge ist Kosten</text>
+
+  <!-- Verworfen: Rate-based (Rot) x 740..1060, y 640..800 -->
+  <rect x="740" y="640" width="320" height="160" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+  <text x="900" y="683" font-size="21" font-weight="bold" fill="#9E1015" text-anchor="middle">Rate-based nur auf IP</text>
+  <text x="900" y="715" font-size="15" fill="#444444" text-anchor="middle">Proxies rotieren</text>
+  <text x="900" y="739" font-size="15" fill="#444444" text-anchor="middle">trifft nichts oder Kunden</text>
+  <text x="900" y="772" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Schwelle ist geraten</text>
+
+  <!-- ===== Pfeile ===== -->
+  <!-- 1: CloudFront -> Scope-Down -->
+  <line x1="300" y1="270" x2="372" y2="270" stroke="#1F5FA8" stroke-width="3" marker-end="url(#arrB)"/>
+  <circle cx="336" cy="270" r="15" fill="#1F5FA8"/>
+  <text x="336" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="336" y="185" font-size="15" fill="#17457A" text-anchor="middle">Request</text>
+
+  <!-- 2: Scope-Down -> Common -->
+  <line x1="660" y1="260" x2="732" y2="250" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="696" cy="255" r="15" fill="#0F7C8C"/>
+  <text x="696" y="261" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="696" y="170" font-size="15" fill="#0B5A66" text-anchor="middle">gefiltert</text>
+
+  <!-- 3: Common -> Targeted -->
+  <line x1="880" y1="320" x2="880" y2="372" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="880" cy="346" r="15" fill="#0F7C8C"/>
+  <text x="880" y="352" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="710" y="352" font-size="15" fill="#0B5A66" text-anchor="middle">Rest</text>
+
+  <!-- 4: Targeted -> Challenge -->
+  <line x1="1020" y1="420" x2="1092" y2="280" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="1056" cy="350" r="15" fill="#0F7C8C"/>
+  <text x="1056" y="356" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="1250" y="360" font-size="15" fill="#0B5A66" text-anchor="middle">alle Kunden</text>
+
+  <!-- 5: Targeted -> CAPTCHA -->
+  <line x1="1020" y1="460" x2="1092" y2="462" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrT)"/>
+  <circle cx="1056" cy="461" r="15" fill="#0F7C8C"/>
+  <text x="1056" y="467" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1056" y="510" font-size="15" fill="#0B5A66" text-anchor="middle">nur Checkout</text>
+
+  <!-- G: Kostenfalle -> Scope-Down -->
+  <line x1="530" y1="440" x2="530" y2="348" stroke="#A16E00" stroke-width="3" marker-end="url(#arrA)"/>
+  <circle cx="530" cy="394" r="15" fill="#A16E00"/>
+  <text x="530" y="400" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="700" y="400" font-size="15" fill="#7A5300" text-anchor="middle">Falle</text>
+
+  <!-- Verworfener Pfad: Rate-based -> Targeted, rotes X -->
+  <line x1="900" y1="640" x2="900" y2="538" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="900" cy="589" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="886" y1="575" x2="914" y2="603" stroke="#C7161D" stroke-width="4"/>
+  <line x1="914" y1="575" x2="886" y2="603" stroke="#C7161D" stroke-width="4"/>
+  <text x="1080" y="595" font-size="15" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <!-- Randnotiz zum Verhalten ohne HTML-Client -->
+  <text x="60" y="660" font-size="15" fill="#0B5A66">Ohne Accept: text/html antwortet WAF mit HTTP 405</text>
+  <text x="60" y="682" font-size="15" fill="#0B5A66">plus Header x-amzn-waf-action — keine CORS-Header</text>
+  <text x="60" y="704" font-size="15" fill="#0B5A66">Gültiger Token wirkt wie Count, Auswertung läuft weiter</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Challenge ist still und für alle · CAPTCHA ist sichtbar und für wenige · Scope-Down vor der teuren Stufe · gültiger Token wirkt wie Count</text>
+</svg>

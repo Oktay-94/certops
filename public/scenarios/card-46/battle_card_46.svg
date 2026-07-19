@@ -1,0 +1,111 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 46 — Inspector · ECR Enhanced Scanning</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Fintech: CVE lief 8 Monate unbemerkt in Produktion — Scan beim Push allein reicht nicht</text>
+
+  <!-- ===== Box CI/CD (Navy) x 40..250, y 210..340 ===== -->
+  <rect x="40" y="210" width="210" height="130" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="145" y="248" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">CI/CD Pipeline</text>
+  <text x="145" y="275" font-size="15" fill="#444444" text-anchor="middle">Jenkins · GitHub Actions</text>
+  <text x="145" y="297" font-size="15" fill="#444444" text-anchor="middle">Inspector-Plugin</text>
+  <text x="145" y="322" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">ohne Service-Aktivierung</text>
+
+  <!-- ===== Box ECR (Teal) x 330..560, y 210..340 ===== -->
+  <rect x="330" y="210" width="230" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="445" y="252" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">Amazon ECR</text>
+  <text x="445" y="284" font-size="15" fill="#444444" text-anchor="middle">Enhanced Scanning</text>
+  <text x="445" y="312" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Registry-weit, nicht pro Repo</text>
+
+  <!-- ===== Box Inspector (Teal, gross) x 640..980, y 190..360 ===== -->
+  <rect x="640" y="190" width="340" height="170" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="810" y="235" font-size="24" font-weight="bold" fill="#0B5A66" text-anchor="middle">Amazon Inspector</text>
+  <text x="810" y="271" font-size="16" fill="#444444" text-anchor="middle">Scan-on-Push + Continuous</text>
+  <text x="810" y="299" font-size="16" fill="#444444" text-anchor="middle">Re-Scan bei neuer CVE, 90 Tage</text>
+  <text x="810" y="332" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">nur Images mit Status ACTIVE</text>
+
+  <!-- ===== Box EventBridge (Teal) x 1090..1400, y 210..340 ===== -->
+  <rect x="1090" y="210" width="310" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1245" y="252" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">EventBridge</text>
+  <text x="1245" y="284" font-size="15" fill="#444444" text-anchor="middle">Security Hub CSPM</text>
+  <text x="1245" y="312" font-size="15" fill="#444444" text-anchor="middle">Ticket + Alarm</text>
+
+  <!-- ===== Box EC2 (Teal) x 640..980, y 470..600 ===== -->
+  <rect x="640" y="470" width="340" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="810" y="512" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">EC2 Hybrid Scanning</text>
+  <text x="810" y="544" font-size="15" fill="#444444" text-anchor="middle">SSM Agent wo vorhanden</text>
+  <text x="810" y="572" font-size="15" fill="#444444" text-anchor="middle">sonst EBS-Snapshot, alle 24 h</text>
+
+  <!-- ===== Box Fargate (Navy) x 1090..1400, y 470..600 ===== -->
+  <rect x="1090" y="470" width="310" height="130" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="1245" y="512" font-size="21" font-weight="bold" fill="#232F3E" text-anchor="middle">ECS Fargate</text>
+  <text x="1245" y="544" font-size="15" fill="#444444" text-anchor="middle">40 Microservices</text>
+  <text x="1245" y="572" font-size="15" fill="#444444" text-anchor="middle">Image-zu-Task-Mapping</text>
+
+  <!-- ===== Box verworfen (Rot) x 330..620, y 640..790 ===== -->
+  <rect x="330" y="640" width="290" height="150" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+  <text x="475" y="682" font-size="21" font-weight="bold" fill="#9E1015" text-anchor="middle">ECR Basic Scanning</text>
+  <text x="475" y="714" font-size="15" fill="#444444" text-anchor="middle">scannt nur beim Push</text>
+  <text x="475" y="742" font-size="15" fill="#444444" text-anchor="middle">kein Re-Scan bei neuer CVE</text>
+  <text x="475" y="770" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">genau der Fehler im Szenario</text>
+
+  <!-- ===== Pfeile ===== -->
+  <!-- 1: CI/CD -> ECR -->
+  <line x1="250" y1="275" x2="322" y2="275" stroke="#232F3E" stroke-width="3" marker-end="url(#arrN)"/>
+  <circle cx="286" cy="275" r="15" fill="#232F3E"/>
+  <text x="286" y="281" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="286" y="212" font-size="15" fill="#232F3E" text-anchor="middle">Build bricht ab</text>
+  <text x="286" y="232" font-size="15" fill="#232F3E" text-anchor="middle">bei Critical</text>
+
+  <!-- 2: ECR -> Inspector -->
+  <line x1="560" y1="275" x2="632" y2="275" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="596" cy="275" r="15" fill="#0F7C8C"/>
+  <text x="596" y="281" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="596" y="222" font-size="15" fill="#0B5A66" text-anchor="middle">Push</text>
+
+  <!-- 3: Inspector -> EventBridge -->
+  <line x1="980" y1="275" x2="1082" y2="275" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="1031" cy="275" r="15" fill="#0F7C8C"/>
+  <text x="1031" y="281" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="1031" y="222" font-size="15" fill="#0B5A66" text-anchor="middle">Findings</text>
+
+  <!-- 4: Inspector -> EC2 -->
+  <line x1="810" y1="360" x2="810" y2="462" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrT)"/>
+  <circle cx="810" cy="411" r="15" fill="#0F7C8C"/>
+  <text x="810" y="417" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="1000" y="417" font-size="15" fill="#0B5A66" text-anchor="middle">dieselbe Aktivierung</text>
+
+  <!-- 5: EventBridge -> Fargate -->
+  <line x1="1245" y1="340" x2="1245" y2="462" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrT)"/>
+  <circle cx="1245" cy="401" r="15" fill="#0F7C8C"/>
+  <text x="1245" y="407" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1420" y="407" font-size="15" fill="#0B5A66" text-anchor="middle">deployte Images</text>
+
+  <!-- verworfener Pfad: Basic Scanning -> ECR, mit rotem X -->
+  <line x1="445" y1="640" x2="445" y2="348" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="445" cy="494" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="431" y1="480" x2="459" y2="508" stroke="#C7161D" stroke-width="4"/>
+  <line x1="459" y1="480" x2="431" y2="508" stroke="#C7161D" stroke-width="4"/>
+  <text x="590" y="490" font-size="15" fill="#9E1015" text-anchor="middle">deckt Fall 3 nicht ab</text>
+  <text x="590" y="510" font-size="15" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <!-- Hinweis: neue CVE trifft altes Image -->
+  <text x="150" y="500" font-size="15" fill="#0B5A66" text-anchor="middle">neue CVE trifft</text>
+  <text x="150" y="520" font-size="15" fill="#0B5A66" text-anchor="middle">altes Image</text>
+
+  <!-- ===== Footer ===== -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Basic = beim Push · Enhanced = auch danach · registry-weite Umstellung · Inspector findet die Lücke, GuardDuty den Angreifer</text>
+</svg>

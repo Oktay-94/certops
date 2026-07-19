@@ -1,0 +1,116 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrA" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 49 — CloudTrail-Forensik mit Athena</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Wer hat den Bucket geleert? Der Vorfall ist vier Monate her, Event History reicht 90 Tage</text>
+
+  <!-- Organization Trail (Teal) x 40..320, y 200..340 -->
+  <rect x="40" y="200" width="280" height="140" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="180" y="242" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">Organization Trail</text>
+  <text x="180" y="274" font-size="15" fill="#444444" text-anchor="middle">alle 30 Accounts</text>
+  <text x="180" y="298" font-size="15" fill="#444444" text-anchor="middle">ein Bucket, Log-Archive</text>
+  <text x="180" y="324" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">ohne Trail keine Forensik</text>
+
+  <!-- S3 Log-Archive (Gruen) x 400..700, y 200..340 -->
+  <rect x="400" y="200" width="300" height="140" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="550" y="242" font-size="21" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Log-Archive</text>
+  <text x="550" y="274" font-size="15" fill="#444444" text-anchor="middle">AWSLogs/&lt;account&gt;/</text>
+  <text x="550" y="298" font-size="15" fill="#444444" text-anchor="middle">CloudTrail/&lt;region&gt;/y/m/d</text>
+  <text x="550" y="324" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Struktur = Partitionsschema</text>
+
+  <!-- Athena (Teal) x 780..1120, y 185..355 -->
+  <rect x="780" y="185" width="340" height="170" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="950" y="232" font-size="24" font-weight="bold" fill="#0B5A66" text-anchor="middle">Amazon Athena</text>
+  <text x="950" y="269" font-size="16" fill="#444444" text-anchor="middle">Partition Projection</text>
+  <text x="950" y="297" font-size="16" fill="#444444" text-anchor="middle">kein Glue-Crawler nötig</text>
+  <text x="950" y="330" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">kein MSCK REPAIR TABLE</text>
+
+  <!-- SQL-Antwort (Teal) x 1200..1480, y 190..320 -->
+  <rect x="1200" y="190" width="280" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1340" y="232" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">SQL-Antwort</text>
+  <text x="1340" y="264" font-size="15" fill="#444444" text-anchor="middle">Principal · IP · Zeit</text>
+  <text x="1340" y="292" font-size="15" fill="#444444" text-anchor="middle">ganze Session sichtbar</text>
+
+  <!-- CloudTrail Insights (Teal) x 1200..1480, y 400..530 -->
+  <rect x="1200" y="400" width="280" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="1340" y="442" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">CloudTrail Insights</text>
+  <text x="1340" y="474" font-size="15" fill="#444444" text-anchor="middle">hätte gemeldet</text>
+  <text x="1340" y="502" font-size="15" fill="#444444" text-anchor="middle">Brücke zu Karte 45</text>
+
+  <!-- Kostenfalle (Gold) x 780..1120, y 440..600 -->
+  <rect x="780" y="440" width="340" height="160" rx="10" fill="#FBF4E4" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="950" y="483" font-size="21" font-weight="bold" fill="#7A5300" text-anchor="middle">Ohne Partitionsfilter</text>
+  <text x="950" y="515" font-size="15" fill="#444444" text-anchor="middle">scannt die ganze Historie</text>
+  <text x="950" y="539" font-size="15" fill="#444444" text-anchor="middle">Abrechnung nach Bytes</text>
+  <text x="950" y="572" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Tag + Account als Predicate</text>
+
+  <!-- Verworfen: Event History (Rot) x 40..360, y 620..780 -->
+  <rect x="40" y="620" width="320" height="160" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+  <text x="200" y="663" font-size="21" font-weight="bold" fill="#9E1015" text-anchor="middle">Event History</text>
+  <text x="200" y="695" font-size="15" fill="#444444" text-anchor="middle">nur 90 Tage</text>
+  <text x="200" y="719" font-size="15" fill="#444444" text-anchor="middle">nur Management Events</text>
+  <text x="200" y="752" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">ist kein Trail</text>
+
+  <!-- ===== Pfeile ===== -->
+  <!-- 1: Organization Trail -> S3 -->
+  <line x1="320" y1="270" x2="392" y2="270" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="356" cy="270" r="15" fill="#0F7C8C"/>
+  <text x="356" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="356" y="185" font-size="15" fill="#0B5A66" text-anchor="middle">liefert</text>
+
+  <!-- 2: S3 -> Athena -->
+  <line x1="700" y1="270" x2="772" y2="270" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)"/>
+  <circle cx="736" cy="270" r="15" fill="#3F8624"/>
+  <text x="736" y="276" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="736" y="170" font-size="15" fill="#2E6318" text-anchor="middle">Tabelle darauf</text>
+
+  <!-- 3: Athena -> SQL-Antwort -->
+  <line x1="1120" y1="250" x2="1192" y2="250" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <circle cx="1156" cy="250" r="15" fill="#0F7C8C"/>
+  <text x="1156" y="256" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="1156" y="170" font-size="15" fill="#0B5A66" text-anchor="middle">Sekunden statt Stunden</text>
+
+  <!-- 4: SQL-Antwort -> Insights -->
+  <line x1="1340" y1="320" x2="1340" y2="392" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrT)"/>
+  <circle cx="1340" cy="356" r="15" fill="#0F7C8C"/>
+  <text x="1340" y="362" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="1180" y="362" font-size="15" fill="#0B5A66" text-anchor="end">parallel</text>
+
+  <!-- 5: Kostenfalle -> Athena -->
+  <line x1="950" y1="440" x2="950" y2="363" stroke="#A16E00" stroke-width="3" marker-end="url(#arrA)"/>
+  <circle cx="950" cy="401" r="15" fill="#A16E00"/>
+  <text x="950" y="407" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="1150" y="407" font-size="15" fill="#7A5300" text-anchor="middle">Falle</text>
+
+  <!-- Verworfener Pfad: Event History -> Organization Trail, rotes X -->
+  <line x1="200" y1="620" x2="200" y2="348" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrR)"/>
+  <circle cx="200" cy="484" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="186" y1="470" x2="214" y2="498" stroke="#C7161D" stroke-width="4"/>
+  <line x1="214" y1="470" x2="186" y2="498" stroke="#C7161D" stroke-width="4"/>
+  <text x="380" y="478" font-size="15" fill="#9E1015" text-anchor="middle">Vorfall 4 Monate her</text>
+  <text x="380" y="498" font-size="15" fill="#9E1015" text-anchor="middle">verworfen</text>
+
+  <!-- Randnotiz CloudTrail Lake -->
+  <text x="450" y="660" font-size="15" fill="#0B5A66">CloudTrail Lake: seit 31.05.2026 keine Neukunden</text>
+  <text x="450" y="682" font-size="15" fill="#0B5A66">Bestandskunden weiter, nur kritische Fixes</text>
+  <text x="450" y="704" font-size="15" fill="#0B5A66">Trails und Insights sind nicht betroffen</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Event History ist kein Trail · ohne Partitionsfilter zahlt man die ganze Historie · Insights erkennt live, Athena rekonstruiert</text>
+</svg>
