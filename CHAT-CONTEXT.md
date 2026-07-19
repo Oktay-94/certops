@@ -586,3 +586,138 @@ Siehe §10.4. Kein Fehler im engeren Sinn, aber ein dokumentierter Bruch der Pfl
 ---
 
 *Ende NACHTRAG 18.07.2026. Ein neuer Chat startet mit: Battle Cards **1–10 fertig und im Repo** (`src/content/scenarios/card-01`…`card-10`, je 4 Dateien, Commit `9d23a6d`), **in der App aber unsichtbar** — es gibt keine Szenarien-Seite. Quiz-Erklärungen remote **265/265 komplett** (war nie offen, §10.6a). Nächste Schritte: **(1)** Vercel-Deploy-Check + Browser-Smoke q-181/q-258, **(2)** Szenarien-Seite bauen (Entscheidung DB vs. Dateisystem offen), **(3)** Batch 3 = Karten 11–15. Vor jeder Aussage über fehlende Projektwissen-Dateien: `view /mnt/project/` — siehe Regel F1.*
+
+---
+---
+
+# ⬆️ NACHTRAG 18.07.2026 ENDET OBERHALB — NACHTRAG 19.07.2026 AB HIER
+
+> **Lesehinweis:** Wie beim 18.07.-Nachtrag wurde oberhalb dieser Linie **nichts** geändert. Alles ab hier ist Stand **19.07.2026**. **Wo §11 und §10 sich widersprechen, gilt §11** — die betroffenen Stellen sind in §11.2 einzeln benannt.
+>
+> **⚠️ Diese Datei hatte eine Lücke:** Der letzte Doku-Commit war `aa37cc3` (Batch 3). **Die Batches 4–10 (Karten 16–50) sind hier nie dokumentiert worden** — sie existieren nur in der Git-Historie und im Chat-Verlauf. §11 schließt an Batch 11 an, füllt die Lücke aber **nicht** rückwirkend. Siehe §11.8.
+>
+> **Reihenfolge beim Einlesen:** §11.1 (Stand) → §11.2 (Korrekturen an §10) → §11.7 (nächster Schritt).
+
+---
+
+## 11. Session 19.07.2026 — Battle Cards Batch 11 (Karten 51–55)
+
+### 11.1 STAND
+
+**55 von 100 Karten fertig.** `public/scenarios/` enthält **220 Dateien** (55 × 4: `.md`, `.pdf`, `.png`, `.svg`), verifiziert **19.07.2026**.
+
+**Commits (Fast-Forward-Merge auf `main`, kein Merge-Commit):**
+
+| Commit | Inhalt |
+|---|---|
+| `b028c72` | Assets Karten 51–55 (20 Dateien) |
+| `0fac6f0` | `SCENARIO_COUNT` 50 → 55 + Guard-Test nachgezogen |
+| `8ddca3c` | Kommentar-Fix `szenarien/[nr]/page.tsx` (nannte „25 cards") |
+
+**Batch 11 = Karten 51–55 (Analytics/Streaming):**
+
+| Nr | Thema |
+|---|---|
+| 51 | Kinesis Data Streams vs. SQS |
+| 52 | Data Firehose |
+| 53 | Athena / Glue / S3 |
+| 54 | OpenSearch |
+| 55 | MSK |
+
+---
+
+### 11.2 ⚠️ KORREKTUREN AM 18.07.-NACHTRAG (§10)
+
+| Stelle | Stand 18.07. | Stand 19.07. |
+|---|---|---|
+| §10.1 Tabelle, Zeile „Szenarien" | „10 von geplant 100 … **in der App UNSICHTBAR** ❌" | **55 von 100, in der App sichtbar** ✅ — die Szenarien-Seite existiert |
+| §10.2a Ablage | `src/content/scenarios/` | **`public/scenarios/`** — die Assets müssen statisch ausgeliefert werden |
+| §10.9 „Offen" Punkt 2 | „Szenarien-Seite bauen, Datenquelle offen" | **erledigt** — dateibasiert + SSG (gray-matter), nicht DB |
+| §10.10 „Szenarien-Datenquelle" | offene Entscheidung | **entschieden: Dateisystem + SSG** |
+| §10.11 Ablage-Konvention | `src/content/scenarios/card-NN/` | **`public/scenarios/card-NN/`**, Dateien `battle_card_N.*` (Ordner zweistellig, Datei **einstellig** — Asymmetrie unverändert) |
+
+**Nicht korrigiert, weil ungeprüft:** alle übrigen Aussagen aus §10, insbesondere die Restpunkte in §10.9 und die offenen Entscheidungen „Binaries im Git", „Commit-Historie `85cd0c7`" und „QC-Skript ins Repo" (§10.10).
+
+---
+
+### 11.3 Neue Regeln R15 / R16
+
+> **Hinweis zur Nummerierung:** Die `R`-Serie wird **nicht in dieser Datei** geführt — sie stammt aus Project Knowledge (Chat-Seite). In CHAT-CONTEXT.md existieren nur die `F`-Regeln (§10.12). R15/R16 sind hier zur Nachvollziehbarkeit protokolliert, die maßgebliche Liste liegt weiterhin drüben.
+
+**R15 — Gemessene Labelgrenzen gehören in die Zonendefinition, nicht danebengerechnet.**
+Auf Karte 52 wurden vier Freizonen falsch geschnitten, obwohl die Labelbreiten **bereits gemessen vorlagen** — sie flossen nur nicht in die Zonendefinition ein, sondern wurden daneben verrechnet. Ab Karte 53 gingen sie direkt in die Zonendefinition ein.
+**Wirkung, gemessen:** Zonen-Nachbesserungen **4 (K52) → 1 (K53) → 0 (K54)**.
+
+**R16 — `qc.py` findet keine Label-an-Boxkante-Kollisionen.**
+Auf Karte 55 berührte das Label „dieselben Topics" die **Außenkante** der Konsumenten-Box mit drei Pixeln. Warum das durchrutscht:
+- Das Label liegt **außerhalb** der Box → fällt nicht unter Prüfung **a**.
+- Eine **Boxkante ist kein Segment** → fällt nicht unter Prüfung **b**.
+
+**Bekannte Lücke im QC-Skript, nicht behoben.** Gegenmittel bis dahin: nach dem Zeichnen **geänderte Labels erneut messen** und **gegen die Boxaußenkanten** prüfen.
+
+---
+
+### 11.4 ✅ Belegt statt hergeleitet: die Zwei-Commit-Trennung trägt
+
+Die Trennung „Assets zuerst, Unlock danach" wurde in Batch 11 **gemessen**, nicht argumentiert:
+
+| Build auf | Prerenderte Pfade unter `/[exam]/szenarien/[nr]` |
+|---|---|
+| `b028c72` (Commit A allein, Assets ohne Unlock) | **50** |
+| Branch-Spitze (`8ddca3c`, nach Unlock) | **55** |
+
+**Assets ohne Unlock sind für den Build unsichtbar.** Ursache: `generateStaticParams()` mappt über `listScenarios()`, das seinerseits über `SCENARIO_COUNT` iteriert — nichts liest das Verzeichnis. Commit A allein hält den Build grün.
+
+**In künftigen Batches nicht erneut prüfen.** Der Nachweis gilt, solange `listScenarios()` über `SCENARIO_COUNT` läuft und nicht über einen Verzeichnis-Scan.
+
+---
+
+### 11.5 Farbkonvention — Indigo neu
+
+**Indigo `#3B3B98` = Streaming-Transport.** Neu eingeführt auf Karte 51, **freigegeben 19.07.2026**. Trägt **Kinesis Data Streams** und **MSK**.
+
+Abgegrenzt von:
+- **Teal** = Regelinstanz
+- **Navy** = Eintrittspunkt
+- **Dunkelblau `#2E27AD`** = DynamoDB
+
+**Sonderfall Karte 55:** Dort trägt auch das **VERWORFENE** Kinesis diese Farbe. Bewusst so — **die Farbe sagt „gleiche Kategorie", das rote X sagt „hier trotzdem falsch"**. Die beiden Aussagen sind orthogonal und dürfen sich nicht vermischen.
+
+**Glue bleibt Orange** (Entscheidung 19.07.2026, Karten 52 und 53).
+
+**Weiterhin offen:** `#B0084D` (DB-Engine vs. SCP) · Lila (Athena/Spectrum) · Neptune vs. Teal.
+
+---
+
+### 11.6 Sichtprüfung R8 — die Quote
+
+**Batch 11: fünfmal von fünf unbrauchbar.** Damit **zwanzigmal von zwanzig** über die Batches 8–11.
+
+Die Sichtprüfung durch Chat-Claude ist über vier Batches hinweg **kein einziges Mal** verwertbar gewesen. Sie bleibt als Pflichtschritt bestehen (§10.7/F9: nicht durchführbare Prüfschritte offenlegen statt überspringen), aber **die Freigabe kommt faktisch immer von Oktay**. Wer einen Batch plant, soll die Chat-Sichtprüfung **nicht** als Prüfinstanz einplanen.
+
+---
+
+### 11.7 Veraltete Masterplan-Titel (Faktencheck 19.07.2026)
+
+Zwei Themen im Masterplan tragen Namen, die AWS zurückgezogen hat. **Der Masterplan ist für Chat-Claude schreibgeschützt — Nachtragen ist Oktays Schritt in Project Knowledge.**
+
+| Thema | Titel im Masterplan | Korrekt |
+|---|---|---|
+| **54** | „Kibana-Dashboards" | Heißt seit **08.09.2021** **OpenSearch Dashboards** |
+| **59** | „Kinesis Data Analytics (Flink)" | Heißt seit **30.08.2023** **Managed Service for Apache Flink**. Zusätzlich: die **SQL-Variante ist seit 27.01.2026 abgeschaltet** |
+
+Thema 54 ist mit Karte 54 (OpenSearch) bereits produziert; der veraltete Titel steht nur noch im Masterplan, nicht auf der Karte.
+
+---
+
+### 11.8 Offene Punkte (Stand 19.07.2026)
+
+1. **Doku-Lücke Batches 4–10 (Karten 16–50).** Nie in CHAT-CONTEXT.md dokumentiert — weder Themen noch Commits noch Learnings. Rekonstruierbar aus `git log --oneline --grep="battle cards"`, aber die Begründungen (Farbentscheidungen, QC-Befunde, verworfene Varianten) existieren nur im Chat-Verlauf und gehen mit jedem `/clear` weiter verloren. **Entscheidung ausstehend:** rückwirkend nachziehen oder bewusst abschreiben.
+2. **Branch-Aufräumung.** Mehrere alte Feature-Branches lokal **und** auf origin; mindestens `chore/ci-pipeline` mit **gelöschtem Upstream**. Aufräum-Durchgang steht aus.
+3. **Masterplan-Fortschritt:** Batches 2–11 dort abhaken (offen seit 18.07., §10.8).
+4. **R16-Lücke im QC-Skript** schließen (§11.3).
+5. **Restpunkte aus §10.9/§10.10** unverändert offen (Binaries im Git, `85cd0c7`-Historie, `qc.py` ins Repo).
+
+---
+
+*Ende NACHTRAG 19.07.2026. Ein neuer Chat startet mit: Battle Cards **55/100 fertig, im Repo und in der App sichtbar** (`public/scenarios/card-01`…`card-55`, 220 Dateien, `main` auf `8ddca3c`). Szenarien-Seite existiert (dateibasiert + SSG). Nächster Batch: **Batch 12 = Karten 56–60**. Vor dem Zeichnen: R15 (Labelgrenzen in die Zonendefinition) und R16 (`qc.py` sieht keine Boxkanten-Kollisionen) lesen. Die Zwei-Commit-Trennung ist belegt (§11.4) und muss nicht erneut geprüft werden. **§10 ist in den in §11.2 genannten Punkten überholt** — dort zuerst nachsehen, bevor eine Aussage aus §10 übernommen wird.*
