@@ -1,0 +1,114 @@
+<svg viewBox="0 0 1600 900" width="1600" height="900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <rect x="0" y="0" width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 60 — Redshift Serverless, Zero-ETL, S3</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Warehouse-Last drei Tage im Quartal — Kapazitaet nach Bedarf, Budget hart gedeckelt</text>
+
+  <defs>
+    <marker id="eBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1F5C99"/>
+    </marker>
+    <marker id="eRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#A33A2A"/>
+    </marker>
+    <marker id="eGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B7F5A"/>
+    </marker>
+    <marker id="ePink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#B03060"/>
+    </marker>
+  </defs>
+
+  <rect x="400" y="180" width="660" height="455" rx="10" fill="none" stroke="#888888" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="730" y="205" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AMAZON REDSHIFT SERVERLESS</text>
+
+  <path d="M 330,287 L 415,287" stroke="#1F5C99" stroke-width="2.5" fill="none" marker-end="url(#eBlue)"/>
+  <path d="M 695,287 L 760,287" stroke="#A33A2A" stroke-width="2.5" fill="none" marker-end="url(#eRed)"/>
+  <path d="M 555,360 L 555,455" stroke="#A33A2A" stroke-width="2.5" fill="none" marker-end="url(#eRed)"/>
+  <path d="M 905,360 L 905,455" stroke="#A33A2A" stroke-width="2.5" fill="none" marker-end="url(#eRed)"/>
+  <path d="M 330,532 L 415,532" stroke="#1B7F5A" stroke-width="2.5" fill="none" marker-end="url(#eGreen)"/>
+  <path d="M 1050,320 L 1140,320" stroke="#B03060" stroke-width="2.5" fill="none" marker-end="url(#ePink)"/>
+  <path d="M 1050,540 L 1140,540" stroke="#B03060" stroke-width="2.5" fill="none" marker-end="url(#ePink)"/>
+
+  <rect x="60" y="215" width="270" height="145" rx="10" fill="#EAF1F8" stroke="#1F5C99" stroke-width="2.5"/>
+  <text x="75" y="245" font-size="20" font-weight="bold" fill="#1F5C99">Aurora PostgreSQL</text>
+  <text x="75" y="273" font-size="15" fill="#444444">Bestellsystem, OLTP</text>
+  <text x="75" y="295" font-size="15" fill="#444444">laeuft durchgehend</text>
+  <text x="75" y="317" font-size="15" fill="#444444">operative Wahrheit</text>
+  <text x="75" y="343" font-size="15" font-style="italic" fill="#666666">kein Ort fuer Joins ueber</text>
+
+  <rect x="60" y="455" width="270" height="155" rx="10" fill="#EEF6F1" stroke="#1B7F5A" stroke-width="2.5"/>
+  <text x="75" y="485" font-size="20" font-weight="bold" fill="#1B7F5A">Amazon S3</text>
+  <text x="75" y="513" font-size="15" fill="#444444">7 Jahre Historie</text>
+  <text x="75" y="535" font-size="15" fill="#444444">Parquet im Data Lake</text>
+  <text x="75" y="557" font-size="15" fill="#444444">nicht geladen</text>
+  <text x="75" y="583" font-size="15" font-style="italic" fill="#666666">bleibt, wo es liegt</text>
+
+  <rect x="415" y="215" width="280" height="145" rx="10" fill="#FBEDEA" stroke="#A33A2A" stroke-width="2.5"/>
+  <text x="430" y="245" font-size="20" font-weight="bold" fill="#A33A2A">Zero-ETL</text>
+  <text x="430" y="273" font-size="15" fill="#444444">Aurora nach Redshift</text>
+  <text x="430" y="295" font-size="15" fill="#444444">Sekunden nach Commit</text>
+  <text x="430" y="317" font-size="15" fill="#444444">keine Pipeline bauen</text>
+  <text x="430" y="343" font-size="15" font-style="italic" fill="#666666">ersetzt den Glue-Job</text>
+
+  <rect x="760" y="215" width="290" height="145" rx="10" fill="#FBEDEA" stroke="#A33A2A" stroke-width="2.5"/>
+  <text x="775" y="245" font-size="20" font-weight="bold" fill="#A33A2A">RPU + AI-Scaling</text>
+  <text x="775" y="273" font-size="15" fill="#444444">Basis 4 bis 1024 RPU</text>
+  <text x="775" y="295" font-size="15" fill="#444444">1 RPU = 16 GB</text>
+  <text x="775" y="317" font-size="15" fill="#444444">skaliert vorausschauend</text>
+  <text x="775" y="343" font-size="15" font-style="italic" fill="#666666">keine Knotentypen</text>
+
+  <rect x="415" y="455" width="280" height="155" rx="10" fill="#FBEDEA" stroke="#A33A2A" stroke-width="2.5"/>
+  <text x="430" y="485" font-size="20" font-weight="bold" fill="#A33A2A">Max (RPU-Stunden)</text>
+  <text x="430" y="513" font-size="15" fill="#444444">Budgetgrenze je Monat</text>
+  <text x="430" y="535" font-size="15" fill="#444444">Aktion bei Erreichen</text>
+  <text x="430" y="557" font-size="15" fill="#444444">Kosten vorhersehbar</text>
+  <text x="430" y="583" font-size="15" font-style="italic" fill="#666666">kein Skalierungslimit!</text>
+
+  <rect x="760" y="455" width="290" height="155" rx="10" fill="#FBEDEA" stroke="#A33A2A" stroke-width="2.5"/>
+  <text x="775" y="485" font-size="20" font-weight="bold" fill="#A33A2A">Redshift Spectrum</text>
+  <text x="775" y="513" font-size="15" fill="#444444">liest S3 mit</text>
+  <text x="775" y="535" font-size="15" fill="#444444">Join Warehouse + Lake</text>
+  <text x="775" y="557" font-size="15" fill="#444444">in RPU abgerechnet</text>
+  <text x="775" y="583" font-size="15" font-style="italic" fill="#666666">kein Laden noetig</text>
+
+  <rect x="1140" y="250" width="250" height="140" rx="10" fill="#FCEEF3" stroke="#B03060" stroke-width="2.5"/>
+  <text x="1155" y="280" font-size="20" font-weight="bold" fill="#B03060">QuickSight</text>
+  <text x="1155" y="308" font-size="15" fill="#444444">Quartalsauswertung</text>
+  <text x="1155" y="330" font-size="15" fill="#444444">Controlling</text>
+  <text x="1155" y="356" font-size="15" font-style="italic" fill="#666666">siehe Karte 56</text>
+
+  <rect x="1140" y="470" width="250" height="140" rx="10" fill="#FCEEF3" stroke="#B03060" stroke-width="2.5"/>
+  <text x="1155" y="500" font-size="20" font-weight="bold" fill="#B03060">20 Analysten</text>
+  <text x="1155" y="528" font-size="15" fill="#444444">drei Tage im Quartal</text>
+  <text x="1155" y="550" font-size="15" fill="#444444">dann tagelang still</text>
+  <text x="1155" y="576" font-size="15" font-style="italic" fill="#666666">Leerlauf faehrt herunter</text>
+
+  <text x="372.5" y="260" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">repliziert</text>
+  <text x="727.5" y="260" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">landet</text>
+  <text x="571" y="425" font-size="15" font-style="italic" fill="#666666">deckelt</text>
+  <text x="921" y="425" font-size="15" font-style="italic" fill="#666666">erweitert</text>
+  <text x="372.5" y="505" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">extern</text>
+  <text x="1095" y="293" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Bericht</text>
+  <text x="1095" y="513" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">SQL</text>
+
+  <circle cx="372.5" cy="287" r="15" fill="#1F5C99"/>
+  <text x="372.5" y="293" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="727.5" cy="287" r="15" fill="#A33A2A"/>
+  <text x="727.5" y="293" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="555" cy="407.5" r="15" fill="#A33A2A"/>
+  <text x="555" y="413.5" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="905" cy="407.5" r="15" fill="#A33A2A"/>
+  <text x="905" y="413.5" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="372.5" cy="532" r="15" fill="#1B7F5A"/>
+  <text x="372.5" y="538" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <circle cx="1095" cy="320" r="15" fill="#B03060"/>
+  <text x="1095" y="326" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <circle cx="1095" cy="540" r="15" fill="#B03060"/>
+  <text x="1095" y="546" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+
+  <rect x="60" y="700" width="1480" height="130" rx="10" fill="#F7F7F7" stroke="#CCCCCC" stroke-width="1.5"/>
+  <text x="80" y="740" font-size="16" font-weight="bold" fill="#111111">Anhaltende Warehouse-Last mit Joins ist Redshift — Athena rechnet je Ad-hoc-Abfrage nach gescanntem Volumen.</text>
+  <text x="80" y="772" font-size="15" fill="#444444">Max deckelt das BUDGET in RPU-Stunden, nicht die Skalierung. Provisioned lohnt erst bei stetiger Last mit RI.</text>
+  <text x="80" y="800" font-size="15" fill="#444444">Zero-ETL bringt Aurora-Daten in Sekunden nach Redshift — ohne Pipeline. Spectrum liest S3, ohne zu laden.</text>
+</svg>

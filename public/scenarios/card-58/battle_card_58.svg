@@ -1,0 +1,123 @@
+<svg viewBox="0 0 1600 900" width="1600" height="900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <rect x="0" y="0" width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 58 — Lake Formation, Data Catalog, S3</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Eine Tabelle, drei Teams, drei Sichten — Zeilen- und Spaltenrechte statt drei Kopien</text>
+
+  <defs>
+    <marker id="cGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B7F5A"/>
+    </marker>
+    <marker id="cGold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9A6700"/>
+    </marker>
+    <marker id="cOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#C2410C"/>
+    </marker>
+    <marker id="cPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#B03060"/>
+    </marker>
+  </defs>
+
+  <rect x="390" y="180" width="340" height="420" rx="10" fill="none" stroke="#888888" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="560" y="205" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS LAKE FORMATION</text>
+
+  <path d="M 195,355 L 195,430" stroke="#1B7F5A" stroke-width="2.5" fill="none" marker-end="url(#cGreen)"/>
+  <path d="M 330,285 L 415,285" stroke="#9A6700" stroke-width="2.5" fill="none" marker-end="url(#cGold)"/>
+  <path d="M 560,355 L 560,430" stroke="#9A6700" stroke-width="2.5" fill="none" marker-end="url(#cGold)"/>
+  <path d="M 705,285 L 770,285" stroke="#C2410C" stroke-width="2.5" fill="none" marker-end="url(#cOrange)"/>
+  <path d="M 705,500 L 770,500" stroke="#C2410C" stroke-width="2.5" fill="none" marker-end="url(#cOrange)"/>
+  <path d="M 1020,250 L 1105,250" stroke="#B03060" stroke-width="2.5" fill="none" marker-end="url(#cPink)"/>
+  <path d="M 1020,300 L 1105,300" stroke="#B03060" stroke-width="2.5" fill="none" marker-end="url(#cPink)"/>
+  <path d="M 1020,545 L 1105,545" stroke="#B03060" stroke-width="2.5" fill="none" marker-end="url(#cPink)"/>
+
+  <rect x="60" y="215" width="270" height="140" rx="10" fill="#EEF6F1" stroke="#1B7F5A" stroke-width="2.5"/>
+  <text x="75" y="245" font-size="20" font-weight="bold" fill="#1B7F5A">Amazon S3</text>
+  <text x="75" y="273" font-size="15" fill="#444444">Versichertendaten</text>
+  <text x="75" y="295" font-size="15" fill="#444444">eine einzige Kopie</text>
+  <text x="75" y="317" font-size="15" fill="#444444">in LF registriert</text>
+  <text x="75" y="341" font-size="15" font-style="italic" fill="#666666">S3-Rechte entziehen!</text>
+
+  <rect x="60" y="430" width="270" height="140" rx="10" fill="#F3EFF9" stroke="#7B5EA7" stroke-width="2.5"/>
+  <text x="75" y="460" font-size="20" font-weight="bold" fill="#7B5EA7">Glue Data Catalog</text>
+  <text x="75" y="488" font-size="15" fill="#444444">Tabellen + Spalten</text>
+  <text x="75" y="510" font-size="15" fill="#444444">Metadaten, keine Daten</text>
+  <text x="75" y="532" font-size="15" fill="#444444">Ziel der LF-Tags</text>
+  <text x="75" y="556" font-size="15" font-style="italic" fill="#666666">Register, kein Waechter</text>
+
+  <rect x="415" y="215" width="290" height="140" rx="10" fill="#FBF3E0" stroke="#9A6700" stroke-width="2.5"/>
+  <text x="430" y="245" font-size="20" font-weight="bold" fill="#9A6700">LF-Tags (LF-TBAC)</text>
+  <text x="430" y="273" font-size="15" fill="#444444">classification=pii</text>
+  <text x="430" y="295" font-size="15" fill="#444444">region=sued</text>
+  <text x="430" y="317" font-size="15" fill="#444444">skaliert statt 17 Grants</text>
+  <text x="430" y="341" font-size="15" font-style="italic" fill="#666666">nicht IAM-, nicht S3-Tags</text>
+
+  <rect x="415" y="430" width="290" height="140" rx="10" fill="#FBF3E0" stroke="#9A6700" stroke-width="2.5"/>
+  <text x="430" y="460" font-size="20" font-weight="bold" fill="#9A6700">Data Filters</text>
+  <text x="430" y="488" font-size="15" fill="#444444">Zeilenfilter: Region</text>
+  <text x="430" y="510" font-size="15" fill="#444444">Spaltenfilter: PII raus</text>
+  <text x="430" y="532" font-size="15" fill="#444444">Zelle = Zeile + Spalte</text>
+  <text x="430" y="556" font-size="15" font-style="italic" fill="#666666">filtert vor der Rueckgabe</text>
+
+  <rect x="770" y="215" width="250" height="140" rx="10" fill="#FDF0E9" stroke="#C2410C" stroke-width="2.5"/>
+  <text x="785" y="245" font-size="20" font-weight="bold" fill="#C2410C">Athena</text>
+  <text x="785" y="273" font-size="15" fill="#444444">SQL ad hoc</text>
+  <text x="785" y="295" font-size="15" fill="#444444">LF prueft je Abfrage</text>
+  <text x="785" y="317" font-size="15" fill="#444444">Engine v3</text>
+  <text x="785" y="341" font-size="15" font-style="italic" fill="#666666">kein Result Reuse</text>
+
+  <rect x="770" y="430" width="250" height="140" rx="10" fill="#FDF0E9" stroke="#C2410C" stroke-width="2.5"/>
+  <text x="785" y="460" font-size="20" font-weight="bold" fill="#C2410C">Redshift Spectrum</text>
+  <text x="785" y="488" font-size="15" fill="#444444">dieselben Regeln</text>
+  <text x="785" y="510" font-size="15" fill="#444444">keine zweite Config</text>
+  <text x="785" y="532" font-size="15" fill="#444444">auch EMR, Glue ETL</text>
+  <text x="785" y="556" font-size="15" font-style="italic" fill="#666666">eine Quelle der Wahrheit</text>
+
+  <rect x="1105" y="170" width="250" height="118" rx="10" fill="#FCEEF3" stroke="#B03060" stroke-width="2.5"/>
+  <text x="1120" y="200" font-size="20" font-weight="bold" fill="#B03060">Abrechnung</text>
+  <text x="1120" y="228" font-size="15" fill="#444444">alle Spalten</text>
+  <text x="1120" y="250" font-size="15" fill="#444444">nur Region Sued</text>
+  <text x="1120" y="274" font-size="15" font-style="italic" fill="#666666">Zeilenfilter greift</text>
+
+  <rect x="1105" y="330" width="250" height="140" rx="10" fill="#FCEEF3" stroke="#B03060" stroke-width="2.5"/>
+  <text x="1120" y="360" font-size="20" font-weight="bold" fill="#B03060">Analytics</text>
+  <text x="1120" y="388" font-size="15" fill="#444444">alle Regionen</text>
+  <text x="1120" y="410" font-size="15" fill="#444444">ohne Klarname</text>
+  <text x="1120" y="432" font-size="15" fill="#444444">ohne Versichertennr.</text>
+  <text x="1120" y="456" font-size="15" font-style="italic" fill="#666666">Spaltenfilter greift</text>
+
+  <rect x="1105" y="512" width="250" height="118" rx="10" fill="#FCEEF3" stroke="#B03060" stroke-width="2.5"/>
+  <text x="1120" y="542" font-size="20" font-weight="bold" fill="#B03060">Revision</text>
+  <text x="1120" y="570" font-size="15" fill="#444444">sieht alles</text>
+  <text x="1120" y="592" font-size="15" fill="#444444">keine Filter</text>
+  <text x="1120" y="616" font-size="15" font-style="italic" fill="#666666">eigener Grant</text>
+
+  <text x="210" y="400" font-size="15" font-style="italic" fill="#666666">beschreibt</text>
+  <text x="340" y="262" font-size="15" font-style="italic" fill="#666666">getaggt</text>
+  <text x="575" y="400" font-size="15" font-style="italic" fill="#666666">praezisiert</text>
+  <text x="715" y="262" font-size="15" font-style="italic" fill="#666666">prueft</text>
+  <text x="715" y="477" font-size="15" font-style="italic" fill="#666666">prueft</text>
+  <text x="1030" y="227" font-size="15" font-style="italic" fill="#666666">Sicht A</text>
+  <text x="1030" y="330" font-size="15" font-style="italic" fill="#666666">Sicht B</text>
+  <text x="1030" y="522" font-size="15" font-style="italic" fill="#666666">Sicht C</text>
+
+  <circle cx="195" cy="392.5" r="15" fill="#1B7F5A"/>
+  <text x="195" y="398.5" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="372.5" cy="285" r="15" fill="#9A6700"/>
+  <text x="372.5" y="291" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="560" cy="392.5" r="15" fill="#9A6700"/>
+  <text x="560" y="398.5" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="737.5" cy="285" r="15" fill="#C2410C"/>
+  <text x="737.5" y="291" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="737.5" cy="500" r="15" fill="#C2410C"/>
+  <text x="737.5" y="506" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <circle cx="1062.5" cy="250" r="15" fill="#B03060"/>
+  <text x="1062.5" y="256" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <circle cx="1062.5" cy="545" r="15" fill="#B03060"/>
+  <text x="1062.5" y="551" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+
+  <rect x="60" y="700" width="1480" height="130" rx="10" fill="#F7F7F7" stroke="#CCCCCC" stroke-width="1.5"/>
+  <text x="80" y="740" font-size="16" font-weight="bold" fill="#111111">Feingranulare Rechte ueber alle Engines: Lake Formation filtert an der Quelle, nicht im Dashboard.</text>
+  <text x="80" y="772" font-size="15" fill="#444444">Solange IAMAllowedPrincipals Super-Rechte haelt, entscheidet IAM allein — die LF-Regeln greifen nicht.</text>
+  <text x="80" y="800" font-size="15" fill="#444444">Wer S3:GetObject behaelt, liest per Download an Lake Formation vorbei. Governed Tables sind seit 31.12.2024 weg.</text>
+</svg>

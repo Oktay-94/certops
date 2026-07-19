@@ -1,0 +1,113 @@
+<svg viewBox="0 0 1600 900" width="1600" height="900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <rect x="0" y="0" width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 59 — Managed Service for Apache Flink</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Betrugsmuster im Zahlungsstrom — gleitende Fenster rechnen ueber Ereignisse hinweg</text>
+
+  <defs>
+    <marker id="dBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1F5C99"/>
+    </marker>
+    <marker id="dTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0F766E"/>
+    </marker>
+    <marker id="dPink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#B03060"/>
+    </marker>
+  </defs>
+
+  <rect x="385" y="190" width="700" height="450" rx="10" fill="none" stroke="#888888" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="735" y="212" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AMAZON MANAGED SERVICE FOR APACHE FLINK</text>
+
+  <path d="M 185,350 L 185,430" stroke="#1F5C99" stroke-width="2.5" fill="none" marker-end="url(#dBlue)"/>
+  <path d="M 310,302 L 400,302" stroke="#1F5C99" stroke-width="2.5" fill="none" marker-end="url(#dBlue)"/>
+  <path d="M 700,302 L 790,302" stroke="#0F766E" stroke-width="2.5" fill="none" marker-end="url(#dTeal)"/>
+  <path d="M 550,380 L 550,445" stroke="#0F766E" stroke-width="2.5" fill="none" marker-end="url(#dTeal)"/>
+  <path d="M 930,380 L 930,445" stroke="#0F766E" stroke-width="2.5" fill="none" marker-end="url(#dTeal)"/>
+  <path d="M 700,532 L 790,532" stroke="#0F766E" stroke-width="2.5" fill="none" marker-end="url(#dTeal)"/>
+  <path d="M 1070,315 L 1160,315" stroke="#B03060" stroke-width="2.5" fill="none" marker-end="url(#dPink)"/>
+  <path d="M 1070,540 L 1160,540" stroke="#B03060" stroke-width="2.5" fill="none" marker-end="url(#dPink)"/>
+
+  <rect x="60" y="225" width="250" height="125" rx="10" fill="#F5F5F5" stroke="#555555" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="75" y="255" font-size="20" font-weight="bold" fill="#555555">Zahlungsterminals</text>
+  <text x="75" y="283" font-size="15" fill="#444444">Kartentransaktionen</text>
+  <text x="75" y="305" font-size="15" fill="#444444">weltweit verteilt</text>
+  <text x="75" y="331" font-size="15" font-style="italic" fill="#666666">Ereignisse kommen unsortiert</text>
+
+  <rect x="60" y="430" width="250" height="155" rx="10" fill="#EAF1F8" stroke="#1F5C99" stroke-width="2.5"/>
+  <text x="75" y="460" font-size="20" font-weight="bold" fill="#1F5C99">Kinesis Streams</text>
+  <text x="75" y="488" font-size="15" fill="#444444">Data Streams, transportiert</text>
+  <text x="75" y="510" font-size="15" fill="#444444">haelt Reihenfolge je Shard</text>
+  <text x="75" y="532" font-size="15" fill="#444444">Replay moeglich</text>
+  <text x="75" y="558" font-size="15" font-style="italic" fill="#666666">rechnet selbst nichts</text>
+
+  <rect x="400" y="225" width="300" height="155" rx="10" fill="#E9F5F3" stroke="#0F766E" stroke-width="2.5"/>
+  <text x="415" y="255" font-size="20" font-weight="bold" fill="#0F766E">Watermarks</text>
+  <text x="415" y="283" font-size="15" fill="#444444">Ereigniszeit, nicht</text>
+  <text x="415" y="305" font-size="15" fill="#444444">Verarbeitungszeit</text>
+  <text x="415" y="327" font-size="15" fill="#444444">allowedLateness setzen</text>
+  <text x="415" y="353" font-size="15" font-style="italic" fill="#666666">Standard 0 = verworfen</text>
+
+  <rect x="790" y="225" width="280" height="155" rx="10" fill="#E9F5F3" stroke="#0F766E" stroke-width="2.5"/>
+  <text x="805" y="255" font-size="20" font-weight="bold" fill="#0F766E">keyBy(Kartennr.)</text>
+  <text x="805" y="283" font-size="15" fill="#444444">Zustand je Karte</text>
+  <text x="805" y="305" font-size="15" fill="#444444">parallel verarbeitet</text>
+  <text x="805" y="327" font-size="15" fill="#444444">durable state</text>
+  <text x="805" y="353" font-size="15" font-style="italic" fill="#666666">exactly-once</text>
+
+  <rect x="400" y="445" width="300" height="175" rx="10" fill="#E9F5F3" stroke="#0F766E" stroke-width="2.5"/>
+  <text x="415" y="475" font-size="20" font-weight="bold" fill="#0F766E">Sliding Window</text>
+  <text x="415" y="503" font-size="15" fill="#444444">5 Minuten Groesse</text>
+  <text x="415" y="525" font-size="15" fill="#444444">1 Minute Versatz</text>
+  <text x="415" y="547" font-size="15" fill="#444444">Fenster ueberlappen</text>
+  <text x="415" y="573" font-size="15" font-style="italic" fill="#666666">Tumbling waere luecken-</text>
+  <text x="415" y="593" font-size="15" font-style="italic" fill="#666666">haft an der Grenze</text>
+
+  <rect x="790" y="445" width="280" height="175" rx="10" fill="#E9F5F3" stroke="#0F766E" stroke-width="2.5"/>
+  <text x="805" y="475" font-size="20" font-weight="bold" fill="#0F766E">Mustererkennung</text>
+  <text x="805" y="503" font-size="15" fill="#444444">zwei Laender in 10 Min</text>
+  <text x="805" y="525" font-size="15" fill="#444444">zustandsbehaftet</text>
+  <text x="805" y="547" font-size="15" fill="#444444">ueber Ereignisse hinweg</text>
+  <text x="805" y="573" font-size="15" font-style="italic" fill="#666666">Lambda kann das nicht —</text>
+  <text x="805" y="593" font-size="15" font-style="italic" fill="#666666">sieht nur ein Ereignis</text>
+
+  <rect x="1160" y="245" width="250" height="140" rx="10" fill="#FCEEF3" stroke="#B03060" stroke-width="2.5"/>
+  <text x="1175" y="275" font-size="20" font-weight="bold" fill="#B03060">Amazon SNS</text>
+  <text x="1175" y="303" font-size="15" fill="#444444">Alarm an Betrugs-</text>
+  <text x="1175" y="325" font-size="15" fill="#444444">abwehr, sofort</text>
+  <text x="1175" y="351" font-size="15" font-style="italic" fill="#666666">nur bei Treffer</text>
+
+  <rect x="1160" y="470" width="250" height="140" rx="10" fill="#FCEEF3" stroke="#B03060" stroke-width="2.5"/>
+  <text x="1175" y="500" font-size="20" font-weight="bold" fill="#B03060">Amazon S3</text>
+  <text x="1175" y="528" font-size="15" fill="#444444">alle Ereignisse</text>
+  <text x="1175" y="550" font-size="15" fill="#444444">Revision, Nachweis</text>
+  <text x="1175" y="576" font-size="15" font-style="italic" fill="#666666">spaeter per Athena</text>
+
+  <text x="200" y="398" font-size="15" font-style="italic" fill="#666666">schreibt</text>
+  <text x="322" y="280" font-size="15" font-style="italic" fill="#666666">liest</text>
+  <text x="745" y="275" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">sortiert</text>
+  <text x="566" y="430" font-size="15" font-style="italic" fill="#666666">gruppiert</text>
+  <text x="745" y="505" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">speist</text>
+  <text x="1115" y="288" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Treffer</text>
+  <text x="1115" y="513" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">alles</text>
+
+  <circle cx="185" cy="390" r="15" fill="#1F5C99"/>
+  <text x="185" y="396" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="355" cy="302" r="15" fill="#1F5C99"/>
+  <text x="355" y="308" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="745" cy="302" r="15" fill="#0F766E"/>
+  <text x="745" y="308" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="550" cy="412.5" r="15" fill="#0F766E"/>
+  <text x="550" y="418.5" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="745" cy="532" r="15" fill="#0F766E"/>
+  <text x="745" y="538" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+  <circle cx="1115" cy="315" r="15" fill="#B03060"/>
+  <text x="1115" y="321" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <circle cx="1115" cy="540" r="15" fill="#B03060"/>
+  <text x="1115" y="546" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <rect x="60" y="700" width="1480" height="130" rx="10" fill="#F7F7F7" stroke="#CCCCCC" stroke-width="1.5"/>
+  <text x="80" y="740" font-size="16" font-weight="bold" fill="#111111">Fensteraggregate und Muster ueber Ereignisse hinweg sind Flink — Kinesis und MSK transportieren nur.</text>
+  <text x="80" y="772" font-size="15" fill="#444444">Sliding Window statt Tumbling: „hoechstens 5 in 5 Minuten" braucht ueberlappende Fenster, sonst rutscht</text>
+  <text x="80" y="800" font-size="15" fill="#444444">der Betrug ueber die Fenstergrenze. Kinesis Data Analytics for SQL wurde am 27.01.2026 geloescht.</text>
+</svg>
