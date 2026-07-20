@@ -1,0 +1,97 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrC" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrX" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 63 &#8212; Comprehend, Lambda, DynamoDB</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Support-Tickets nach Stimmung und Thema sortieren &#8212; ohne ML-Team</text>
+
+  <!-- API Gateway (Quelle) -->
+  <rect x="40" y="380" width="232" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="156" y="418" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">API Gateway</text>
+  <text x="156" y="448" font-size="15" fill="#444444" text-anchor="middle">Ticket-Eingang</text>
+  <text x="156" y="469" font-size="15" fill="#444444" text-anchor="middle">Freitext</text>
+  <text x="156" y="490" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">tausende / Tag</text>
+
+  <!-- Lambda (Compute) -->
+  <rect x="372" y="380" width="232" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="488" y="418" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Lambda</text>
+  <text x="488" y="448" font-size="15" fill="#444444" text-anchor="middle">ruft zwei APIs</text>
+  <text x="488" y="469" font-size="15" fill="#444444" text-anchor="middle">fasst zusammen</text>
+  <text x="488" y="490" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Modell nötig</text>
+
+  <!-- DetectSentiment (Compute) -->
+  <rect x="704" y="205" width="280" height="145" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="844" y="243" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">DetectSentiment</text>
+  <text x="844" y="273" font-size="15" fill="#444444" text-anchor="middle">vortrainiert</text>
+  <text x="844" y="294" font-size="14" fill="#444444" text-anchor="middle">POSITIVE / NEGATIVE</text>
+  <text x="844" y="315" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">NEUTRAL / MIXED</text>
+
+  <!-- ClassifyDocument (Compute) -->
+  <rect x="704" y="560" width="280" height="145" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="844" y="598" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">ClassifyDocument</text>
+  <text x="844" y="628" font-size="15" fill="#444444" text-anchor="middle">Custom Classifier</text>
+  <text x="844" y="649" font-size="15" fill="#444444" text-anchor="middle">eigene Klassen</text>
+  <text x="844" y="670" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Endpoint nötig</text>
+
+  <!-- Ticket-Ablage (Storage) -->
+  <rect x="1300" y="380" width="250" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1425" y="418" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Ticket-Ablage</text>
+  <text x="1425" y="448" font-size="15" fill="#444444" text-anchor="middle">DynamoDB</text>
+  <text x="1425" y="469" font-size="15" fill="#444444" text-anchor="middle">Stimmung + Thema</text>
+  <text x="1425" y="490" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Prio nach Sentiment</text>
+
+  <!-- Topic Modeling verworfen (Compute-Rand, Ablehnung via X) -->
+  <rect x="340" y="650" width="296" height="140" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="488" y="688" font-size="21" font-weight="bold" fill="#A85A05" text-anchor="middle">Topic Modeling</text>
+  <text x="488" y="718" font-size="14" fill="#444444" text-anchor="middle">entdeckt Themen selbst</text>
+  <text x="488" y="739" font-size="14" fill="#444444" text-anchor="middle">keine festen Klassen</text>
+  <text x="488" y="760" font-size="14" fill="#444444" text-anchor="middle">Neukunden ab 30.04. zu</text>
+
+  <!-- Segmente -->
+  <line x1="272" y1="455" x2="364" y2="455" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+  <line x1="604" y1="430" x2="696" y2="300" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="604" y1="480" x2="696" y2="610" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="984" y1="300" x2="1292" y2="425" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="984" y1="610" x2="1292" y2="485" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="488" y1="530" x2="488" y2="642" stroke="#C7161D" stroke-width="3" marker-end="url(#arrX)"/>
+
+  <!-- Badges -->
+  <circle cx="300" cy="455" r="15" fill="#2E6BE6"/>
+  <text x="300" y="461" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="650" cy="365" r="15" fill="#D97706"/>
+  <text x="650" y="371" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="650" cy="545" r="15" fill="#D97706"/>
+  <text x="650" y="551" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="1138" cy="363" r="15" fill="#D97706"/>
+  <text x="1138" y="369" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="1138" cy="547" r="15" fill="#D97706"/>
+  <text x="1138" y="553" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- rotes X auf dem verworfenen Pfad -->
+  <circle cx="488" cy="586" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="476" y1="574" x2="500" y2="598" stroke="#C7161D" stroke-width="4"/>
+  <line x1="500" y1="574" x2="476" y2="598" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- freie Labels -->
+  <text x="318" y="431" font-size="15" fill="#1B3E86" text-anchor="middle">Freitext</text>
+  <text x="628" y="351" font-size="15" fill="#A85A05" text-anchor="end">Stimmung</text>
+  <text x="628" y="559" font-size="15" fill="#A85A05" text-anchor="end">Thema</text>
+  <text x="1150" y="339" font-size="15" fill="#A85A05">NEGATIVE zuerst</text>
+  <text x="1150" y="571" font-size="15" fill="#A85A05">Klasse + Score</text>
+  <text x="516" y="630" font-size="15" fill="#9E1015">falsches Werkzeug</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Sentiment vortrainiert, eigene Klassen custom  ·  Topic Modeling entdeckt, Classification sortiert ein  ·  Endpoint kostet im Stand</text>
+</svg>

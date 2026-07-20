@@ -1,0 +1,100 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrC" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrS" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrX" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 64 &#8212; Transcribe, Translate, Polly</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Callcenter: transkribieren, übersetzen, vorlesen &#8212; Sentiment inklusive</text>
+
+  <!-- Anruf-Audio (Quelle) -->
+  <rect x="40" y="330" width="236" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="158" y="368" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Anruf-Audio</text>
+  <text x="158" y="398" font-size="15" fill="#444444" text-anchor="middle">Kundengespräch</text>
+  <text x="158" y="419" font-size="15" fill="#444444" text-anchor="middle">Stream oder Datei</text>
+  <text x="158" y="440" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">mehrsprachig</text>
+
+  <!-- Call Analytics (Compute) -->
+  <rect x="380" y="310" width="268" height="190" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="514" y="348" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Call Analytics</text>
+  <text x="514" y="378" font-size="15" fill="#444444" text-anchor="middle">Transcribe</text>
+  <text x="514" y="399" font-size="14" fill="#444444" text-anchor="middle">Transkript + Sentiment</text>
+  <text x="514" y="420" font-size="15" fill="#444444" text-anchor="middle">PII-Redaktion</text>
+  <text x="514" y="444" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">nicht anpassbar</text>
+  <text x="514" y="464" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">alles in einem Schritt</text>
+
+  <!-- Translate (Compute) -->
+  <rect x="752" y="330" width="252" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="878" y="368" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Translate</text>
+  <text x="878" y="398" font-size="15" fill="#444444" text-anchor="middle">TranslateText</text>
+  <text x="878" y="419" font-size="14" fill="#444444" text-anchor="middle">Custom Terminology</text>
+  <text x="878" y="440" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Fachvokabular</text>
+
+  <!-- Polly (Compute) -->
+  <rect x="1108" y="330" width="236" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1226" y="368" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Polly</text>
+  <text x="1226" y="398" font-size="14" fill="#444444" text-anchor="middle">SynthesizeSpeech</text>
+  <text x="1226" y="419" font-size="14" fill="#444444" text-anchor="middle">neural / generative</text>
+  <text x="1226" y="440" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Antwort als Audio</text>
+
+  <!-- Ablage (Storage) -->
+  <rect x="1108" y="580" width="236" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1226" y="618" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Ablage</text>
+  <text x="1226" y="648" font-size="15" fill="#444444" text-anchor="middle">S3</text>
+  <text x="1226" y="669" font-size="14" fill="#444444" text-anchor="middle">Transkript + Audio</text>
+  <text x="1226" y="690" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">QS und Revision</text>
+
+  <!-- Comprehend verworfen (Compute-Rand, Ablehnung via X) -->
+  <rect x="380" y="610" width="268" height="140" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="514" y="648" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Comprehend</text>
+  <text x="514" y="678" font-size="15" fill="#444444" text-anchor="middle">DetectSentiment</text>
+  <text x="514" y="699" font-size="15" fill="#444444" text-anchor="middle">zweiter Aufruf</text>
+  <text x="514" y="720" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">schon enthalten</text>
+
+  <!-- Segmente -->
+  <line x1="276" y1="405" x2="372" y2="405" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+  <line x1="648" y1="405" x2="744" y2="405" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="1004" y1="405" x2="1100" y2="405" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="1226" y1="480" x2="1226" y2="572" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="514" y1="500" x2="514" y2="602" stroke="#C7161D" stroke-width="3" marker-end="url(#arrX)"/>
+  <line x1="1100" y1="655" x2="660" y2="655" stroke="#3F8624" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrS)"/>
+
+  <!-- Badges -->
+  <circle cx="304" cy="405" r="15" fill="#2E6BE6"/>
+  <text x="304" y="411" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="676" cy="405" r="15" fill="#D97706"/>
+  <text x="676" y="411" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="1032" cy="405" r="15" fill="#D97706"/>
+  <text x="1032" y="411" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="1226" cy="512" r="15" fill="#D97706"/>
+  <text x="1226" y="518" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- rotes X auf dem verworfenen Pfad -->
+  <circle cx="514" cy="551" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="502" y1="539" x2="526" y2="563" stroke="#C7161D" stroke-width="4"/>
+  <line x1="526" y1="539" x2="502" y2="563" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- freie Labels -->
+  <text x="324" y="381" font-size="15" fill="#1B3E86" text-anchor="middle">Audio</text>
+  <text x="696" y="381" font-size="15" fill="#A85A05" text-anchor="middle">Transkript</text>
+  <text x="1052" y="381" font-size="15" fill="#A85A05" text-anchor="middle">übersetzt</text>
+  <text x="1246" y="512" font-size="15" fill="#A85A05">MP3</text>
+  <text x="540" y="596" font-size="15" fill="#9E1015">zweiter Dienst</text>
+  <text x="880" y="631" font-size="15" fill="#2E6318" text-anchor="middle">Transkript zur QS</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Call Analytics bringt Sentiment und PII mit  ·  Comprehend wäre doppelt  ·  Stream = Realtime, Datei = Post-Call</text>
+</svg>

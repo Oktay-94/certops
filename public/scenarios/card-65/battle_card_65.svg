@@ -1,0 +1,109 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrC" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+    <marker id="arrX" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 65 &#8212; Personalize, S3, Event Tracker</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Webshop-Empfehlungen ohne eigenes ML-Team &#8212; Klicks wirken sofort</text>
+
+  <!-- S3 Rohdaten (Quelle) -->
+  <rect x="40" y="300" width="232" height="170" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="156" y="338" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">S3 Rohdaten</text>
+  <text x="156" y="368" font-size="15" fill="#444444" text-anchor="middle">Interactions</text>
+  <text x="156" y="389" font-size="15" fill="#444444" text-anchor="middle">Items</text>
+  <text x="156" y="410" font-size="15" fill="#444444" text-anchor="middle">Users</text>
+  <text x="156" y="434" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Dataset Import Job</text>
+
+  <!-- Dataset Group (Governance) -->
+  <rect x="376" y="290" width="256" height="190" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="504" y="328" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Dataset Group</text>
+  <text x="504" y="358" font-size="14" fill="#444444" text-anchor="middle">Domain: ECOMMERCE</text>
+  <text x="504" y="379" font-size="14" fill="#444444" text-anchor="middle">Container + Schema</text>
+  <text x="504" y="400" font-size="15" fill="#444444" text-anchor="middle">Event Tracker</text>
+  <text x="504" y="424" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Domain oder Custom,</text>
+  <text x="504" y="444" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">nicht beides zurück</text>
+
+  <!-- Recommender (Compute) -->
+  <rect x="736" y="300" width="264" height="170" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="868" y="338" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Recommender</text>
+  <text x="868" y="368" font-size="15" fill="#444444" text-anchor="middle">vorkonfiguriert</text>
+  <text x="868" y="389" font-size="14" fill="#444444" text-anchor="middle">trainiert automatisch</text>
+  <text x="868" y="410" font-size="15" fill="#444444" text-anchor="middle">kein Modellbau</text>
+  <text x="868" y="434" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Campaign nur custom</text>
+
+  <!-- Shop-Frontend (Quelle) -->
+  <rect x="1300" y="300" width="250" height="170" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1425" y="338" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Shop-Frontend</text>
+  <text x="1425" y="368" font-size="14" fill="#444444" text-anchor="middle">GetRecommendations</text>
+  <text x="1425" y="389" font-size="14" fill="#444444" text-anchor="middle">Kunden kauften auch</text>
+  <text x="1425" y="410" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Produktseite</text>
+
+  <!-- Event Tracker (Transport) -->
+  <rect x="736" y="590" width="264" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="868" y="628" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Event Tracker</text>
+  <text x="868" y="658" font-size="15" fill="#444444" text-anchor="middle">PutEvents</text>
+  <text x="868" y="679" font-size="15" fill="#444444" text-anchor="middle">Klicks live</text>
+  <text x="868" y="700" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">wirkt in Sekunden</text>
+
+  <!-- SageMaker verworfen (Compute-Rand, Ablehnung via X) -->
+  <rect x="340" y="590" width="264" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="472" y="628" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">SageMaker</text>
+  <text x="472" y="658" font-size="15" fill="#444444" text-anchor="middle">eigenes Modell</text>
+  <text x="472" y="679" font-size="14" fill="#444444" text-anchor="middle">Training + Endpoint</text>
+  <text x="472" y="700" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Monate statt Tage</text>
+
+  <!-- Segmente -->
+  <line x1="272" y1="385" x2="368" y2="385" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+  <line x1="632" y1="385" x2="728" y2="385" stroke="#A16E00" stroke-width="3" marker-end="url(#arrG)"/>
+  <line x1="1000" y1="385" x2="1292" y2="385" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="1350" y1="470" x2="1350" y2="665" stroke="#2E6BE6" stroke-width="3" stroke-dasharray="8,6"/>
+  <line x1="1350" y1="665" x2="1008" y2="665" stroke="#2E6BE6" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrQ)"/>
+  <line x1="868" y1="590" x2="868" y2="478" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrT)"/>
+  <line x1="504" y1="480" x2="504" y2="582" stroke="#C7161D" stroke-width="3" marker-end="url(#arrX)"/>
+
+  <!-- Badges -->
+  <circle cx="300" cy="385" r="15" fill="#2E6BE6"/>
+  <text x="300" y="391" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="660" cy="385" r="15" fill="#A16E00"/>
+  <text x="660" y="391" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="1120" cy="385" r="15" fill="#D97706"/>
+  <text x="1120" y="391" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="1350" cy="560" r="15" fill="#2E6BE6"/>
+  <text x="1350" y="566" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="868" cy="530" r="15" fill="#0F7C8C"/>
+  <text x="868" y="536" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- rotes X auf dem verworfenen Pfad -->
+  <circle cx="504" cy="531" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="492" y1="519" x2="516" y2="543" stroke="#C7161D" stroke-width="4"/>
+  <line x1="516" y1="519" x2="492" y2="543" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- freie Labels -->
+  <text x="320" y="361" font-size="15" fill="#1B3E86" text-anchor="middle">Import</text>
+  <text x="680" y="361" font-size="15" fill="#7A5300" text-anchor="middle">trainiert</text>
+  <text x="1146" y="361" font-size="15" fill="#A85A05">Empfehlungen</text>
+  <text x="1330" y="560" font-size="15" fill="#1B3E86" text-anchor="end">Klick</text>
+  <text x="848" y="530" font-size="15" fill="#0B5A66" text-anchor="end">frische Signale</text>
+  <text x="530" y="531" font-size="15" fill="#9E1015">Monate Arbeit</text>
+  <text x="1180" y="641" font-size="15" fill="#1B3E86" text-anchor="middle">PutEvents</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Domain-Gruppe gibt Recommender, Custom-Gruppe gibt Campaign  ·  PutEvents wirkt ohne Retraining  ·  Die Campaign kostet, solange sie steht</text>
+</svg>

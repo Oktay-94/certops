@@ -1,0 +1,120 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrC" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+    <marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/>
+    </marker>
+    <marker id="arrX" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 62 &#8212; Textract, Step Functions, SQS</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Rechnungsprüfung mit Callback &#8212; unsichere Felder an den Menschen</text>
+
+  <!-- Eingangs-Bucket (Quelle) -->
+  <rect x="40" y="250" width="248" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="164" y="288" font-size="21" font-weight="bold" fill="#1B3E86" text-anchor="middle">Eingangs-Bucket</text>
+  <text x="164" y="318" font-size="15" fill="#444444" text-anchor="middle">S3 &#8212; Rechnungen</text>
+  <text x="164" y="339" font-size="15" fill="#444444" text-anchor="middle">PDF / Scan</text>
+  <text x="164" y="360" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">startet Execution</text>
+
+  <!-- Step Functions (Governance) -->
+  <rect x="352" y="230" width="240" height="180" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="472" y="268" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Step Functions</text>
+  <text x="472" y="298" font-size="15" fill="#444444" text-anchor="middle">Standard Workflow</text>
+  <text x="472" y="319" font-size="15" fill="#444444" text-anchor="middle">orchestriert</text>
+  <text x="472" y="340" font-size="15" fill="#444444" text-anchor="middle">Choice State</text>
+  <text x="472" y="364" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Express kann das</text>
+  <text x="472" y="384" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">nicht</text>
+
+  <!-- Textract (Compute) -->
+  <rect x="716" y="250" width="252" height="140" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="842" y="288" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Textract</text>
+  <text x="842" y="318" font-size="15" fill="#444444" text-anchor="middle">AnalyzeDocument</text>
+  <text x="842" y="339" font-size="14" fill="#444444" text-anchor="middle">FeatureTypes FORMS</text>
+  <text x="842" y="360" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Key-Value + Score</text>
+
+  <!-- ERP-Ablage (Storage) -->
+  <rect x="1300" y="245" width="250" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1425" y="283" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">ERP-Ablage</text>
+  <text x="1425" y="313" font-size="15" fill="#444444" text-anchor="middle">DynamoDB</text>
+  <text x="1425" y="334" font-size="15" fill="#444444" text-anchor="middle">geprüfte Felder</text>
+  <text x="1425" y="355" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Buchungssatz</text>
+
+  <!-- Review-Queue (Transport) -->
+  <rect x="352" y="560" width="240" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="472" y="598" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Review-Queue</text>
+  <text x="472" y="628" font-size="15" fill="#444444" text-anchor="middle">SQS + Task Token</text>
+  <text x="472" y="649" font-size="15" fill="#444444" text-anchor="middle">Workflow pausiert</text>
+  <text x="472" y="670" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">kein Compute läuft</text>
+
+  <!-- Sachbearbeiter (Navy, Struktur) -->
+  <rect x="716" y="560" width="252" height="150" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+  <text x="842" y="598" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Sachbearbeiter</text>
+  <text x="842" y="628" font-size="15" fill="#444444" text-anchor="middle">korrigiert Felder</text>
+  <text x="842" y="649" font-size="15" fill="#444444" text-anchor="middle">eigene Web-App</text>
+  <text x="842" y="670" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">SendTaskSuccess</text>
+
+  <!-- A2I verworfen (Governance-Rand, Ablehnung via X) -->
+  <rect x="1050" y="560" width="252" height="150" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1176" y="598" font-size="21" font-weight="bold" fill="#7A5300" text-anchor="middle">A2I Human Loop</text>
+  <text x="1176" y="628" font-size="15" fill="#444444" text-anchor="middle">Neukunden ab</text>
+  <text x="1176" y="649" font-size="15" fill="#444444" text-anchor="middle">30.07.2026 zu</text>
+  <text x="1176" y="670" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Bestand läuft weiter</text>
+
+  <!-- Segmente -->
+  <line x1="288" y1="320" x2="344" y2="320" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+  <line x1="592" y1="300" x2="708" y2="300" stroke="#A16E00" stroke-width="3" marker-end="url(#arrG)"/>
+  <line x1="968" y1="300" x2="1292" y2="290" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <line x1="472" y1="410" x2="472" y2="552" stroke="#A16E00" stroke-width="3" marker-end="url(#arrG)"/>
+  <line x1="592" y1="635" x2="708" y2="635" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <line x1="968" y1="635" x2="1042" y2="635" stroke="#C7161D" stroke-width="3" marker-end="url(#arrX)"/>
+  <line x1="842" y1="560" x2="842" y2="470" stroke="#232F3E" stroke-width="3" stroke-dasharray="8,6"/>
+  <line x1="842" y1="470" x2="600" y2="470" stroke="#232F3E" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrN)"/>
+
+  <!-- Badges -->
+  <circle cx="316" cy="320" r="15" fill="#2E6BE6"/>
+  <text x="316" y="326" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="650" cy="300" r="15" fill="#A16E00"/>
+  <text x="650" y="306" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="1130" cy="297" r="15" fill="#D97706"/>
+  <text x="1130" y="303" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="472" cy="470" r="15" fill="#A16E00"/>
+  <text x="472" y="476" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <circle cx="650" cy="635" r="15" fill="#0F7C8C"/>
+  <text x="650" y="641" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <circle cx="842" cy="512" r="15" fill="#232F3E"/>
+  <text x="842" y="518" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <!-- rotes X auf dem verworfenen Pfad -->
+  <circle cx="1005" cy="635" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="993" y1="623" x2="1017" y2="647" stroke="#C7161D" stroke-width="4"/>
+  <line x1="1017" y1="623" x2="993" y2="647" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- freie Labels -->
+  <text x="316" y="296" font-size="15" fill="#1B3E86" text-anchor="middle">Upload</text>
+  <text x="650" y="276" font-size="15" fill="#7A5300" text-anchor="middle">Dokument</text>
+  <text x="1130" y="260" font-size="15" fill="#A85A05" text-anchor="middle">Confidence hoch</text>
+  <text x="492" y="470" font-size="15" fill="#7A5300">Graubereich</text>
+  <text x="650" y="611" font-size="15" fill="#0B5A66" text-anchor="middle">Task Token</text>
+  <text x="862" y="500" font-size="15" fill="#232F3E">SendTaskSuccess</text>
+  <text x="1005" y="545" font-size="15" fill="#9E1015" text-anchor="middle">A2I geschlossen</text>
+
+  <!-- Footer -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Callback nur in Standard  ·  Token pausiert ohne Compute  ·  SendTaskSuccess weckt den Workflow  ·  A2I ab 30.07.2026 zu</text>
+</svg>
