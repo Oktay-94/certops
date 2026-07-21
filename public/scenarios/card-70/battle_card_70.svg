@@ -1,0 +1,135 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrC" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrX" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 70 — AWS WAF Fraud Control (ACFP)</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Fake-Account-Registrierungen in Echtzeit abwehren — Schutz an der Kante statt ML-Scoring in der Anwendung</text>
+
+  <!-- ===== Oberzeile: Abwehrkette ===== -->
+
+  <rect x="40" y="250" width="250" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="288" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Bot-Traffic</text>
+  <text x="165" y="318" font-size="15" fill="#444444" text-anchor="middle">GET Registrierung</text>
+  <text x="165" y="342" font-size="15" fill="#444444" text-anchor="middle">POST Sign-up</text>
+  <text x="165" y="368" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">20 € Startguthaben</text>
+  <text x="165" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">als Anreiz</text>
+
+  <rect x="380" y="250" width="250" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="505" y="286" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">CloudFront +</text>
+  <text x="505" y="312" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Web ACL</text>
+  <text x="505" y="342" font-size="15" fill="#444444" text-anchor="middle">Protection Pack</text>
+  <text x="505" y="366" font-size="15" fill="#444444" text-anchor="middle">nimmt Traffic an</text>
+  <text x="505" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">vor der Anwendung</text>
+
+  <rect x="720" y="250" width="250" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="845" y="288" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">ACFP Rule Group</text>
+  <text x="845" y="318" font-size="15" fill="#444444" text-anchor="middle">ACFPRuleSet</text>
+  <text x="845" y="342" font-size="15" fill="#444444" text-anchor="middle">50 WCU, kostet extra</text>
+  <text x="845" y="368" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">prüft E-Mail-Domain,</text>
+  <text x="845" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Telefon, Adresse</text>
+
+  <rect x="1060" y="250" width="250" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1185" y="286" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Registrierungs-</text>
+  <text x="1185" y="312" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Endpoint</text>
+  <text x="1185" y="342" font-size="15" fill="#444444" text-anchor="middle">nur echte Anfragen</text>
+  <text x="1185" y="366" font-size="15" fill="#444444" text-anchor="middle">kommen an</text>
+  <text x="1185" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Bots vorher raus</text>
+
+  <!-- ===== Verworfen ===== -->
+  <rect x="1360" y="250" width="200" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1460" y="288" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Eigenes</text>
+  <text x="1460" y="318" font-size="15" fill="#444444" text-anchor="middle">SageMaker-Modell</text>
+  <text x="1460" y="342" font-size="15" fill="#444444" text-anchor="middle">Trainingsdaten,</text>
+  <text x="1460" y="368" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Endpoint, Betrieb</text>
+  <text x="1460" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">für Kanten-Abwehr</text>
+
+  <!-- ===== Unterzeile ===== -->
+
+  <rect x="380" y="490" width="250" height="150" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="505" y="528" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">JavaScript SDK</text>
+  <text x="505" y="558" font-size="15" fill="#444444" text-anchor="middle">injiziert Token</text>
+  <text x="505" y="582" font-size="15" fill="#444444" text-anchor="middle">Pflicht für die</text>
+  <text x="505" y="608" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Token-Regeln</text>
+  <text x="505" y="630" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">sonst wirkungslos</text>
+
+  <rect x="720" y="490" width="250" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="845" y="526" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Stolen</text>
+  <text x="845" y="552" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Credential-DB</text>
+  <text x="845" y="582" font-size="15" fill="#444444" text-anchor="middle">aus Dark-Web-Leaks</text>
+  <text x="845" y="606" font-size="15" fill="#444444" text-anchor="middle">Aggregation nach</text>
+  <text x="845" y="630" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">IP und Session</text>
+
+  <rect x="1060" y="490" width="250" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1185" y="526" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Response</text>
+  <text x="1185" y="552" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Inspection</text>
+  <text x="1185" y="582" font-size="15" fill="#444444" text-anchor="middle">NUR bei CloudFront</text>
+  <text x="1185" y="608" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">asynchron, keine</text>
+  <text x="1185" y="630" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Extra-Latenz</text>
+
+  <!-- ===== Grenzen-Box ===== -->
+  <rect x="40" y="680" width="630" height="126" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="355" y="716" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Grenzen</text>
+  <text x="355" y="746" font-size="15" fill="#444444" text-anchor="middle">NICHT für Cognito User Pools</text>
+  <text x="355" y="770" font-size="15" fill="#444444" text-anchor="middle">SDK-Pflicht · Zusatzkosten</text>
+  <text x="355" y="794" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">erst im Count-Modus ausrollen</text>
+
+  <!-- ===== Quellenkonflikt-Box ===== -->
+  <rect x="720" y="680" width="830" height="126" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1135" y="716" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Quellenkonflikt AWS-Doku</text>
+  <text x="1135" y="746" font-size="15" fill="#444444" text-anchor="middle">Fraud-Detector-Seite: WAF sei regelbasiert, NICHT ML</text>
+  <text x="1135" y="770" font-size="15" fill="#444444" text-anchor="middle">ACFP-Doku: nutzt request identifiers, behavioral</text>
+  <text x="1135" y="794" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">analysis UND machine learning — ungeklärt</text>
+
+  <!-- ===== Segmente ===== -->
+
+  <line x1="290" y1="325" x2="372" y2="325" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+  <text x="331" y="307" font-size="15" fill="#1B3E86" text-anchor="middle">Angriff</text>
+  <circle cx="331" cy="325" r="15" fill="#2E6BE6"/>
+  <text x="331" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <line x1="630" y1="325" x2="712" y2="325" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <text x="671" y="307" font-size="15" fill="#0B5A66" text-anchor="middle">prüfen</text>
+  <circle cx="671" cy="325" r="15" fill="#0F7C8C"/>
+  <text x="671" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <line x1="970" y1="325" x2="1052" y2="325" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <text x="1011" y="307" font-size="15" fill="#A85A05" text-anchor="middle">passieren</text>
+  <circle cx="1011" cy="325" r="15" fill="#D97706"/>
+  <text x="1011" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <line x1="845" y1="400" x2="845" y2="482" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <text x="865" y="445" font-size="15" fill="#2E6318">Abgleich</text>
+  <circle cx="845" cy="441" r="15" fill="#D97706"/>
+  <text x="845" y="447" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <line x1="1185" y1="400" x2="1185" y2="482" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <text x="1205" y="445" font-size="15" fill="#A85A05">Rückkanal</text>
+  <circle cx="1185" cy="441" r="15" fill="#D97706"/>
+  <text x="1185" y="447" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <line x1="1318" y1="325" x2="1352" y2="325" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrX)"/>
+  <circle cx="1335" cy="325" r="15" fill="#C7161D"/>
+  <text x="1335" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <circle cx="1335" cy="440" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="1321" y1="426" x2="1349" y2="454" stroke="#C7161D" stroke-width="4"/>
+  <line x1="1349" y1="426" x2="1321" y2="454" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- ===== Footer ===== -->
+  <rect x="40" y="830" width="1510" height="52" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="863" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  ACFP = AWSManagedRulesACFPRuleSet, 50 WCU · Response Inspection nur bei CloudFront · nicht für Cognito · Fraud Detector zu seit 07.11.2025</text>
+</svg>

@@ -1,0 +1,143 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/>
+    </marker>
+    <marker id="arrC" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrS" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/>
+    </marker>
+    <marker id="arrX" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 68 — Bedrock Knowledge Bases (RAG)</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Interner Chatbot beantwortet Fragen aus Firmendokumenten — ohne Modelltraining, ohne eigene Pipeline</text>
+
+  <!-- ===== Oberzeile: Ingestion-Kette ===== -->
+
+  <rect x="40" y="250" width="250" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="288" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Dokumente</text>
+  <text x="165" y="318" font-size="15" fill="#444444" text-anchor="middle">S3 + Confluence</text>
+  <text x="165" y="342" font-size="15" fill="#444444" text-anchor="middle">12.000 Wartungs-</text>
+  <text x="165" y="366" font-size="15" fill="#444444" text-anchor="middle">anleitungen</text>
+  <text x="165" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bis 5 Quellen je KB</text>
+
+  <rect x="380" y="250" width="250" height="150" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+  <text x="505" y="286" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Data Source</text>
+  <text x="505" y="312" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Sync</text>
+  <text x="505" y="342" font-size="15" fill="#444444" text-anchor="middle">Ingestion Job holt ab</text>
+  <text x="505" y="366" font-size="15" fill="#444444" text-anchor="middle">hält Index synchron</text>
+  <text x="505" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bei Änderungen</text>
+
+  <rect x="720" y="250" width="250" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="845" y="286" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Chunking +</text>
+  <text x="845" y="312" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Embedding</text>
+  <text x="845" y="342" font-size="15" fill="#444444" text-anchor="middle">managed von Bedrock</text>
+  <text x="845" y="366" font-size="15" fill="#444444" text-anchor="middle">Mapping zum</text>
+  <text x="845" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Originaldokument</text>
+
+  <rect x="1060" y="250" width="250" height="150" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="1185" y="288" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Vector Store</text>
+  <text x="1185" y="318" font-size="15" fill="#444444" text-anchor="middle">OpenSearch</text>
+  <text x="1185" y="342" font-size="15" fill="#444444" text-anchor="middle">Serverless</text>
+  <text x="1185" y="368" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">oder Aurora,</text>
+  <text x="1185" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Pinecone, Redis</text>
+
+  <!-- ===== Verworfen: Selbstbau ===== -->
+  <rect x="1360" y="250" width="200" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="1460" y="288" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Selbstbau</text>
+  <text x="1460" y="318" font-size="15" fill="#444444" text-anchor="middle">Lambda +</text>
+  <text x="1460" y="342" font-size="15" fill="#444444" text-anchor="middle">OpenSearch</text>
+  <text x="1460" y="368" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Sync selbst</text>
+  <text x="1460" y="390" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bauen</text>
+
+  <!-- ===== Unterzeile: Abfragepfad ===== -->
+
+  <rect x="40" y="540" width="250" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="578" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Chatbot</text>
+  <text x="165" y="608" font-size="15" fill="#444444" text-anchor="middle">Innendienst fragt</text>
+  <text x="165" y="632" font-size="15" fill="#444444" text-anchor="middle">natürlichsprachlich</text>
+  <text x="165" y="658" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">erwartet Quellen-</text>
+  <text x="165" y="680" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">angabe</text>
+
+  <rect x="380" y="540" width="250" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="505" y="576" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Retrieve-</text>
+  <text x="505" y="602" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">AndGenerate</text>
+  <text x="505" y="632" font-size="15" fill="#444444" text-anchor="middle">Retrieval + Antwort</text>
+  <text x="505" y="656" font-size="15" fill="#444444" text-anchor="middle">in EINEM Aufruf</text>
+  <text x="505" y="680" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">mit Quellenangabe</text>
+
+  <rect x="720" y="540" width="250" height="150" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="845" y="578" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Retrieve</text>
+  <text x="845" y="608" font-size="15" fill="#444444" text-anchor="middle">nur die Chunks</text>
+  <text x="845" y="632" font-size="15" fill="#444444" text-anchor="middle">eigenes Prompting</text>
+  <text x="845" y="658" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">wenn man selbst</text>
+  <text x="845" y="680" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">formulieren will</text>
+
+  <rect x="1060" y="540" width="250" height="150" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1185" y="578" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Knowledge Base</text>
+  <text x="1185" y="608" font-size="15" fill="#444444" text-anchor="middle">IAM Service Role</text>
+  <text x="1185" y="632" font-size="15" fill="#444444" text-anchor="middle">Datenquellen-Config</text>
+  <text x="1185" y="658" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Chunking-Strategie</text>
+  <text x="1185" y="680" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Training</text>
+
+  <!-- ===== Randleiste: Agents Classic ===== -->
+  <rect x="380" y="750" width="1180" height="56" rx="9" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="402" y="784" font-size="17" fill="#7A5300"><tspan font-weight="bold">Bedrock Agents Classic</tspan> — Neukunden zu ab 30.07.2026. Knowledge Bases und Guardrails sind NICHT betroffen.</text>
+
+  <!-- ===== Segmente ===== -->
+
+  <line x1="290" y1="325" x2="372" y2="325" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+  <text x="331" y="307" font-size="15" fill="#1B3E86" text-anchor="middle">abholen</text>
+  <circle cx="331" cy="325" r="15" fill="#2E6BE6"/>
+  <text x="331" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <line x1="630" y1="325" x2="712" y2="325" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+  <text x="671" y="307" font-size="15" fill="#0B5A66" text-anchor="middle">zerlegen</text>
+  <circle cx="671" cy="325" r="15" fill="#0F7C8C"/>
+  <text x="671" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <line x1="970" y1="325" x2="1052" y2="325" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <text x="1011" y="307" font-size="15" fill="#A85A05" text-anchor="middle">indexieren</text>
+  <circle cx="1011" cy="325" r="15" fill="#D97706"/>
+  <text x="1011" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <line x1="1185" y1="400" x2="1185" y2="532" stroke="#3F8624" stroke-width="3" marker-end="url(#arrS)"/>
+  <text x="1205" y="470" font-size="15" fill="#2E6318">Suche</text>
+  <circle cx="1185" cy="466" r="15" fill="#3F8624"/>
+  <text x="1185" y="472" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <line x1="290" y1="615" x2="372" y2="615" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+  <text x="331" y="597" font-size="15" fill="#1B3E86" text-anchor="middle">fragt</text>
+  <circle cx="331" cy="615" r="15" fill="#2E6BE6"/>
+  <text x="331" y="621" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <line x1="1052" y1="615" x2="978" y2="615" stroke="#A16E00" stroke-width="3" marker-end="url(#arrG)"/>
+  <text x="1015" y="592" font-size="15" fill="#7A5300" text-anchor="middle">steuert</text>
+  <circle cx="1015" cy="615" r="15" fill="#A16E00"/>
+  <text x="1015" y="621" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <line x1="1318" y1="325" x2="1352" y2="325" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrX)"/>
+  <circle cx="1335" cy="325" r="15" fill="#C7161D"/>
+  <text x="1335" y="331" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">7</text>
+
+  <circle cx="1335" cy="440" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="1321" y1="426" x2="1349" y2="454" stroke="#C7161D" stroke-width="4"/>
+  <line x1="1349" y1="426" x2="1321" y2="454" stroke="#C7161D" stroke-width="4"/>
+
+  <!-- ===== Footer ===== -->
+  <rect x="40" y="830" width="1510" height="52" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="863" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  RAG = kein Modelltraining · Retrieve liefert Chunks, RetrieveAndGenerate die fertige Antwort · Agents Classic zu, Knowledge Bases nicht</text>
+</svg>

@@ -1,0 +1,124 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+  <defs>
+    <marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/>
+    </marker>
+    <marker id="arrC" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#D97706"/>
+    </marker>
+    <marker id="arrX" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 66 — SageMaker Canvas (Time Series Forecasting)</text>
+  <text x="60" y="106" font-size="21" fill="#555555">Filialkette will Absatzprognosen für den Nachschub — Amazon Forecast ist für Neukunden geschlossen</text>
+
+  <!-- ============ Box 1: Kassendaten S3 (Quelle) ============ -->
+  <rect x="40" y="300" width="250" height="170" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="165" y="338" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Kassendaten S3</text>
+  <text x="165" y="370" font-size="15" fill="#444444" text-anchor="middle">Verkäufe je Artikel</text>
+  <text x="165" y="394" font-size="15" fill="#444444" text-anchor="middle">Preisaktionen</text>
+  <text x="165" y="418" font-size="15" fill="#444444" text-anchor="middle">Filialstammdaten</text>
+  <text x="165" y="446" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">3 Jahre Historie</text>
+
+  <!-- ============ Box 2: Canvas Data Flow (Compute) ============ -->
+  <rect x="380" y="300" width="250" height="170" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="505" y="336" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Canvas</text>
+  <text x="505" y="362" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Data Flow</text>
+  <text x="505" y="394" font-size="15" fill="#444444" text-anchor="middle">Join zu EINEM Dataset</text>
+  <text x="505" y="418" font-size="15" fill="#444444" text-anchor="middle">Timestamp · Item ID</text>
+  <text x="505" y="442" font-size="15" fill="#444444" text-anchor="middle">· Zielspalte</text>
+
+  <!-- ============ Box 3: Canvas AutoML (Compute) ============ -->
+  <rect x="720" y="300" width="250" height="170" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="845" y="338" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Canvas AutoML</text>
+  <text x="845" y="370" font-size="15" fill="#444444" text-anchor="middle">Ensemble mehrerer</text>
+  <text x="845" y="394" font-size="15" fill="#444444" text-anchor="middle">Algorithmen</text>
+  <text x="845" y="418" font-size="15" fill="#444444" text-anchor="middle">Leaderboard wählt</text>
+  <text x="845" y="446" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">bestes Modell</text>
+
+  <!-- ============ Box 4: Real-time Endpoint (Compute) ============ -->
+  <rect x="1060" y="300" width="250" height="170" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+  <text x="1185" y="336" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Real-time</text>
+  <text x="1185" y="362" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Endpoint</text>
+  <text x="1185" y="394" font-size="15" fill="#444444" text-anchor="middle">HTTPS aus der Anwendung</text>
+  <text x="1185" y="422" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein Forecast-Objekt</text>
+  <text x="1185" y="444" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">zu erzeugen</text>
+
+  <!-- ============ Box 5: Modellartefakte (Storage) ============ -->
+  <rect x="720" y="570" width="250" height="110" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+  <text x="845" y="608" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Modellartefakte</text>
+  <text x="845" y="638" font-size="15" fill="#444444" text-anchor="middle">S3-Ablage der</text>
+  <text x="845" y="662" font-size="15" fill="#444444" text-anchor="middle">trainierten Modelle</text>
+
+  <!-- ============ Box 6: Warenwirtschaft (Quelle) ============ -->
+  <rect x="1060" y="570" width="250" height="110" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+  <text x="1185" y="608" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Warenwirtschaft</text>
+  <text x="1185" y="638" font-size="15" fill="#444444" text-anchor="middle">ruft Prognose je</text>
+  <text x="1185" y="662" font-size="15" fill="#444444" text-anchor="middle">Artikel und Filiale</text>
+
+  <!-- ============ Box 7: SageMaker Domain (Governance) ============ -->
+  <rect x="1340" y="300" width="220" height="170" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+  <text x="1450" y="338" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">SageMaker</text>
+  <text x="1450" y="364" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Domain</text>
+  <text x="1450" y="396" font-size="15" fill="#444444" text-anchor="middle">Execution Role</text>
+  <text x="1450" y="420" font-size="15" fill="#444444" text-anchor="middle">S3-Zugriff für</text>
+  <text x="1450" y="444" font-size="15" fill="#444444" text-anchor="middle">Training</text>
+
+  <!-- ============ Box 8: Amazon Forecast (verworfen, Rand behaelt Rollenfarbe) ============ -->
+  <rect x="40" y="600" width="250" height="150" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="165" y="638" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Amazon Forecast</text>
+  <text x="165" y="670" font-size="15" fill="#444444" text-anchor="middle">3 Datasets nötig</text>
+  <text x="165" y="694" font-size="15" fill="#444444" text-anchor="middle">erst erzeugen,</text>
+  <text x="165" y="718" font-size="15" fill="#444444" text-anchor="middle">dann abfragen</text>
+
+  <!-- ============ Segment 1: S3 -> Data Flow ============ -->
+  <line x1="290" y1="385" x2="372" y2="385" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+  <text x="331" y="367" font-size="15" fill="#1B3E86" text-anchor="middle">3 Dateien</text>
+  <circle cx="331" cy="385" r="15" fill="#2E6BE6"/>
+  <text x="331" y="391" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+
+  <!-- ============ Segment 2: Data Flow -> AutoML ============ -->
+  <line x1="630" y1="385" x2="712" y2="385" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <text x="671" y="367" font-size="15" fill="#A85A05" text-anchor="middle">1 Dataset</text>
+  <circle cx="671" cy="385" r="15" fill="#D97706"/>
+  <text x="671" y="391" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+
+  <!-- ============ Segment 3: AutoML -> Endpoint ============ -->
+  <line x1="970" y1="385" x2="1052" y2="385" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <text x="1011" y="367" font-size="15" fill="#A85A05" text-anchor="middle">deployen</text>
+  <circle cx="1011" cy="385" r="15" fill="#D97706"/>
+  <text x="1011" y="391" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+
+  <!-- ============ Segment 4: AutoML -> Modellartefakte ============ -->
+  <line x1="845" y1="470" x2="845" y2="562" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <text x="865" y="520" font-size="15" fill="#2E6318">ablegen</text>
+  <circle cx="845" cy="516" r="15" fill="#D97706"/>
+  <text x="845" y="522" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- ============ Segment 5: Endpoint -> Warenwirtschaft ============ -->
+  <line x1="1185" y1="470" x2="1185" y2="562" stroke="#D97706" stroke-width="3" marker-end="url(#arrC)"/>
+  <text x="1205" y="520" font-size="15" fill="#A85A05">Prognose</text>
+  <circle cx="1185" cy="516" r="15" fill="#D97706"/>
+  <text x="1185" y="522" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+  <!-- ============ Segment 6: verworfener Pfad zu Forecast ============ -->
+  <line x1="290" y1="675" x2="452" y2="675" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrX)"/>
+  <circle cx="350" cy="675" r="15" fill="#C7161D"/>
+  <text x="350" y="681" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+
+  <!-- rotes X auf dem verworfenen Pfad -->
+  <circle cx="492" cy="675" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+  <line x1="478" y1="661" x2="506" y2="689" stroke="#C7161D" stroke-width="4"/>
+  <line x1="506" y1="661" x2="478" y2="689" stroke="#C7161D" stroke-width="4"/>
+
+  <text x="290" y="770" font-size="15" fill="#9E1015">für Neukunden geschlossen</text>
+  <text x="290" y="790" font-size="15" fill="#9E1015">seit 29.07.2024</text>
+
+  <!-- ============ Footer ============ -->
+  <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Forecast: 3 Datasets · Canvas: 1 Dataset · Forecast erzeugen, dann abfragen — Canvas ruft Endpoint · Neukunden zu seit 29.07.2024</text>
+</svg>
