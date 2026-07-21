@@ -11,7 +11,7 @@ import { SAA_C03_DOMAINS, type SaaC03Domain } from "./domains";
 
 const CONTENT_DIR = path.join(process.cwd(), "public", "scenarios");
 
-export const SCENARIO_COUNT = 65;
+export const SCENARIO_COUNT = 70;
 
 export type ScenarioDomainCode = "D1" | "D2" | "D3" | "D4";
 
