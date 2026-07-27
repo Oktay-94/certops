@@ -721,3 +721,114 @@ Thema 54 ist mit Karte 54 (OpenSearch) bereits produziert; der veraltete Titel s
 ---
 
 *Ende NACHTRAG 19.07.2026. Ein neuer Chat startet mit: Battle Cards **55/100 fertig, im Repo und in der App sichtbar** (`public/scenarios/card-01`…`card-55`, 220 Dateien, `main` auf `8ddca3c`). Szenarien-Seite existiert (dateibasiert + SSG). Nächster Batch: **Batch 12 = Karten 56–60**. Vor dem Zeichnen: R15 (Labelgrenzen in die Zonendefinition) und R16 (`qc.py` sieht keine Boxkanten-Kollisionen) lesen. Die Zwei-Commit-Trennung ist belegt (§11.4) und muss nicht erneut geprüft werden. **§10 ist in den in §11.2 genannten Punkten überholt** — dort zuerst nachsehen, bevor eine Aussage aus §10 übernommen wird.*
+
+---
+
+# NACHTRAG 27.07.2026 — Battle Cards 71–100 eingebaut, Stand 100/100
+
+> **Lesehinweis:** Oberhalb dieser Linie wurde nichts geändert. Wo dieser
+> Nachtrag §10 oder §11 widerspricht, gilt der Nachtrag.
+
+## 12. Sammel-Einbau Karten 71–100
+
+**Stand: 100 von 100 Karten im Repo und in der App sichtbar.**
+`SCENARIO_COUNT` = 100 (`src/lib/scenario-content.ts`).
+`public/scenarios/card-01` … `card-100`, 400 Dateien.
+Branch `feat/battle-cards-71-100`.
+
+Die Karten 61–70 waren beim Start dieses Vorgangs bereits eingebaut und
+freigeschaltet (Batches 13 und 14, Commits `2eb0074`/`6974e0f` und
+`4fec5b6`/`3bd28a8`). Offen waren nur 71–100. Der Auftrags-Prompt
+(`EINBAU-PLAN-PROMPT.md`) ging noch von 61–100 aus — die Bestandsaufnahme hat
+das korrigiert.
+
+### 12.1 Quellen
+
+Sechs Archive, nicht acht. **Die ZIP für 71–75 liegt nicht in `~/Downloads`**,
+sondern unter `~/certops-batches/certops-battlecards-71-75.zip` (daneben schon
+entpackt). Wer sie in `~/Downloads` sucht, findet eine Lücke zwischen
+`battlecard70.zip` und `certops-battlecards-76-80.zip` und hält 71–75
+fälschlich für verschollen.
+
+### 12.2 Zwei Befunde, die den Einbau aufgehalten hätten
+
+**Karte 100 hätte 404 geliefert.** `getScenario` akzeptierte nur zweistellige
+Slugs (`/^\d{2}$/`). `scenarioSlug(100)` ergibt `"100"` — dreistellig, also
+`null`, also `notFound()`. Der Fehler war über 70 Karten hinweg unerreichbar.
+Behoben im Unlock-Commit: die Stellenzahl-Regex ist durch einen Round-Trip
+gegen `scenarioSlug` ersetzt (`slug !== scenarioSlug(Number(slug))` → `null`).
+Der vorgeschaltete `/^\d+$/`-Test bleibt nötig, weil `"NaN"` den Round-Trip
+besteht (`Number("NaN")` ist `NaN`, `scenarioSlug(NaN)` ist `"NaN"`) und beide
+Bereichsvergleiche gegen `NaN` `false` sind — ohne den Zifferntest liefe der
+Aufruf in den Dateizugriff. Guard-Tests für `"100"`, `"101"`, `"001"`, `"1e2"`
+und `"NaN"` liegen in `scenario-content.test.ts`.
+
+**Karten 71–80 kamen ohne YAML-Frontmatter.** 81–100 tragen es, 71–80 beginnen
+direkt mit dem `# …`-H1. Ohne `nr/title/services/domains/signalwords` wirft
+`readScenario` und der Build bricht. Das Frontmatter wurde beim Einbau aus
+Kartentext, SVG und Masterplan-Zeile abgeleitet, von Oktay vor dem
+Asset-Commit freigegeben, Signalwörter englisch wie bei 81–100. **Die
+Ableitung steht in der `status_note` jeder der zehn Karten und ist damit in
+der App sichtbar** — ein leeres Feld hätte die Schuld verborgen.
+
+### 12.3 Prüfstand beim Einbau
+
+- Identität **per `grep` auf den SVG-Inhalt**, nie über Dateiname oder Datum:
+  30 von 30 ohne Abweichung.
+- Alle 30 PNGs 2400×1350, R13 = 0 px, Kanaldivergenz im Titelband = 0
+  (keine Subpixel-AA-Regression).
+- `find public/scenarios -type f ! -perm 644` leer — über **alle** 400 Dateien,
+  nicht stichprobenweise. ZIP setzt Modus 600; ohne Korrektur liefert der
+  Webserver nichts aus.
+- Zwei-Commit-Pattern eingehalten (Assets grün ohne Unlock, §11.4 bestätigt
+  sich erneut), 382 Tests grün, Smoke-Test gegen `pnpm start`.
+- **404 auf `/saa/szenarien/101` und `/saa/szenarien/001` jeweils einzeln im
+  Browser bestätigt**, nicht in einer Sammelaussage mitgeführt.
+
+## 12.4 Offene Schulden aus diesem Vorgang
+
+**Exam-Guide-Abgleich (erstmals in Batch 20 durchgeführt).**
+Die Karten **91** und **92** (IoT) sowie **94** (Amazon IVS) behandeln Dienste,
+die der offizielle SAA-C03-Exam-Guide **ausdrücklich als out of scope** führt.
+Sie sind eingebaut, weil eine Lücke in der Nummerierung schlechter wäre; offen
+ist, ob sie in der App als Exkurs markiert oder später ersetzt werden.
+Karte **100** wurde bereits von Ground Station (Kategorie Satellite, out of
+scope) auf **AWS RAM** umbelegt.
+
+Schwächer, aber erwähnenswert: Die Karten **74** (Migration Hub, Application
+Discovery Service), **76** (Mainframe Modernization) und **78** (Elastic
+Disaster Recovery) stehen in **keiner der beiden Exam-Guide-Listen** — weder
+in-scope noch out-of-scope. Das ist **kein Ausschluss** wie bei 91/92/94, da
+die Liste ausdrücklich nicht erschöpfend ist, aber ein schwächerer
+Prüfungsbezug als bei den übrigen sieben. Bei **74** zusätzlich: Migration Hub
+ist seit **07.11.2025 für Neukunden geschlossen**.
+
+**Didaktik.** Karten **71–75** sind ohne Szenario-Freigabe entstanden —
+technisch geprüft, didaktisch nie gegengelesen. Karten **71–80** kamen ohne
+Frontmatter (§12.2). Karte **91** hat drei statt vier Ablaufschritte, der
+`errorAction`-Zweig wurde beim Geometrieplan gestrichen.
+
+**Farben.** Karte **80** nutzt die Rollenpalette als Intensitätsskala —
+weiterhin offen; Karte **96** löst dieselbe Situation anders (alle
+Eigenschaftszeilen einheitlich navy) und ist ein möglicher Referenzfall.
+Grau ist ab Batch 20 freigegeben für „real gültig, aber im Auslauf", erste
+Anwendung Karte **98**; **nachzuziehen auf 85, 92 und 95**. Farbschuld der
+Karten **1–60** (service- statt rollenbasiert) unverändert offen.
+
+**Werkzeug.** `zones.py` puffert Textbreiten mit `PAD_TEXT + PAD_TEXT_REL` =
+3 px + 1,2 %; gemessen wurden bis **1,7 %** (CairoSVG rendert breiter als PIL
+misst). Ab etwa 600 px Textbreite reicht der Puffer nicht. Details in
+`EINBAU-61-100.md` aus der Batch-20-ZIP.
+
+**PNG-Sichtfreigabe.** Die Sichtprüfung der 30 PNGs durch Oktay steht aus —
+bewusst nicht als Blocker behandelt (Entscheidung 27.07.2026). §11.6 bleibt
+gültig: die Chat-Sichtprüfung ist keine Prüfinstanz.
+
+---
+
+*Ende NACHTRAG 27.07.2026. Ein neuer Chat startet mit: Battle Cards
+**100/100 fertig, im Repo und in der App sichtbar**, `SCENARIO_COUNT` = 100.
+Es folgt kein weiterer Produktions-Batch — Batch 20 war der letzte. Die
+nächsten Vorgänge sind Schuld-Abbau, nicht Neuproduktion: Exam-Guide-Frage zu
+91/92/94, Farbschuld-Sammelpass 1–60, didaktisches Gegenlesen 71–75.
+Die Doku-Lücke der Batches 12–14 (Karten 56–70) ist unverändert offen (§11.8.1).*
