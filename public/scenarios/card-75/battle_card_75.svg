@@ -1,0 +1,61 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+<marker id="arrN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+<marker id="arrX" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 75 — VMware Cloud on AWS</text>
+<text x="60" y="106" font-size="21" fill="#555555">vSphere-Landschaft 1:1 in die Cloud heben — gleiche Tools, gleiche Admins, kein Umbau</text>
+<rect x="60" y="150" width="500" height="550" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="310.0" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE</text>
+<rect x="700" y="150" width="840" height="630" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="1120.0" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS</text>
+<rect x="100" y="220" width="420" height="180" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="310.0" y="255" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">vSphere-Landschaft</text>
+<text x="310.0" y="281" font-size="15" fill="#444444" text-anchor="middle">vCenter · vSAN · NSX</text>
+<text x="310.0" y="307" font-size="15" fill="#444444" text-anchor="middle">eingespielte Admins + Runbooks</text>
+<text x="310.0" y="333" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Refactoring nicht gewollt</text>
+<rect x="760" y="210" width="740" height="350" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1130.0" y="248" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">VMC SDDC (managed)</text>
+<rect x="800" y="270" width="210" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="905.0" y="305" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">vSphere/ESXi</text>
+<text x="905.0" y="330" font-size="15" fill="#444444" text-anchor="middle">Bare-Metal-Hosts</text>
+<text x="905.0" y="355" font-size="15" fill="#444444" text-anchor="middle">dedizierte EC2</text>
+<rect x="1040" y="270" width="180" height="120" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1130.0" y="305" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">vSAN</text>
+<text x="1130.0" y="330" font-size="15" fill="#444444" text-anchor="middle">NVMe lokal</text>
+<rect x="1250" y="270" width="210" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="1355.0" y="305" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">NSX</text>
+<text x="1355.0" y="330" font-size="15" fill="#444444" text-anchor="middle">Netz + Firewall</text>
+<rect x="800" y="430" width="660" height="100" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1130.0" y="462" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Betrieb durch den Anbieter</text>
+<text x="1130.0" y="488" font-size="15" fill="#444444" text-anchor="middle">Patching, Host-Tausch, Lifecycle — nicht dein Pager</text>
+<rect x="1100" y="630" width="400" height="120" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1300.0" y="665" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Native AWS-Services</text>
+<text x="1300.0" y="690" font-size="15" fill="#444444" text-anchor="middle">S3, direkte VPC-Anbindung</text>
+<text x="1300.0" y="715" font-size="15" fill="#444444" text-anchor="middle">niedrige Latenz, kein Internet-Umweg</text>
+<rect x="100" y="500" width="420" height="140" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="310.0" y="535" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Refactor auf EC2-nativ</text>
+<text x="310.0" y="561" font-size="15" fill="#444444" text-anchor="middle">Umbau + Neuschulung nötig</text>
+<text x="310.0" y="587" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">verfehlt die Anforderung</text>
+<path d="M520,280 L760,280" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+<circle cx="615" cy="280" r="15" fill="#0F7C8C"/>
+<text x="615" y="286" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="630" y="252" font-size="15" fill="#0B5A66" text-anchor="middle">HCX-Verbindung</text>
+<path d="M520,340 L760,340" fill="none" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrT)"/>
+<circle cx="615" cy="340" r="15" fill="#0F7C8C"/>
+<text x="615" y="346" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="630" y="312" font-size="15" fill="#0B5A66" text-anchor="middle">vMotion + Bulk</text>
+<path d="M1300,560 L1300,630" fill="none" stroke="#232F3E" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrN)"/>
+<circle cx="1300" cy="595" r="15" fill="#232F3E"/>
+<text x="1300" y="601" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="1322" y="600" font-size="15" fill="#232F3E" text-anchor="start">direkt angebunden</text>
+<path d="M310,400 L310,500" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#arrX)"/>
+<circle cx="310" cy="450" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M301,441 L319,459" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M301,459 L319,441" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="340" y="455" font-size="15" fill="#9E1015" text-anchor="start">Umbau verworfen</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  „gleiche Tools, gleiche Admins“ = VMC SDDC  ·  vSphere/vSAN/NSX auf dedizierten Bare-Metal-Hosts  ·  HCX hebt VMs live hinüber</text>
+</svg>

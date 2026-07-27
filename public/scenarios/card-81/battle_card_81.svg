@@ -1,0 +1,63 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="aN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 81 — Multi-AZ vs Multi-Region</text>
+<text x="60" y="106" font-size="21" fill="#555555">Was schützt wovor? AZ-Ausfall und Regions-Ausfall sauber getrennt</text>
+<rect x="60" y="135" width="1480" height="255" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="800.0" y="163" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Innerhalb einer Region — Hochverfügbarkeit (HA)</text>
+<rect x="90" y="185" width="320" height="185" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="250.0" y="220" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">AZ-Ausfall</text>
+<text x="250.0" y="246" font-size="15" fill="#444444" text-anchor="middle">Feuer, Flut, Stromausfall</text>
+<text x="250.0" y="272" font-size="15" fill="#444444" text-anchor="middle">trifft ein Rechenzentrum</text>
+<rect x="500" y="185" width="300" height="185" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="650.0" y="220" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">ELB + Auto Scaling</text>
+<text x="650.0" y="246" font-size="15" fill="#444444" text-anchor="middle">Kapazität in mehreren AZs</text>
+<text x="650.0" y="272" font-size="15" fill="#444444" text-anchor="middle">ungesunde AZ fällt heraus</text>
+<rect x="815" y="185" width="300" height="185" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="965.0" y="220" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">RDS Multi-AZ</text>
+<text x="965.0" y="246" font-size="15" fill="#444444" text-anchor="middle">synchrone Replikation</text>
+<text x="965.0" y="272" font-size="15" fill="#444444" text-anchor="middle">DB Instance: 60–120 s</text>
+<text x="965.0" y="298" font-size="15" fill="#444444" text-anchor="middle">DB Cluster: unter 35 s</text>
+<rect x="1215" y="185" width="300" height="185" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1365.0" y="220" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">RPO 0</text>
+<text x="1365.0" y="246" font-size="15" fill="#444444" text-anchor="middle">kein Datenverlust</text>
+<text x="1365.0" y="272" font-size="15" fill="#444444" text-anchor="middle">Failover läuft automatisch</text>
+<text x="1365.0" y="298" font-size="15" fill="#444444" text-anchor="middle">ohne Eingriff</text>
+<path d="M415,278 L495,278" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<path d="M1120,278 L1210,278" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<rect x="60" y="410" width="1480" height="255" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="800.0" y="438" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Über Regionen hinweg — Disaster Recovery (DR)</text>
+<rect x="90" y="460" width="320" height="185" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="250.0" y="495" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Regions-Ausfall</text>
+<text x="250.0" y="521" font-size="15" fill="#444444" text-anchor="middle">gesamte Region fällt aus</text>
+<text x="250.0" y="547" font-size="15" fill="#444444" text-anchor="middle">oder ist nicht erreichbar</text>
+<rect x="500" y="460" width="300" height="185" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="650.0" y="495" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Aurora Global DB</text>
+<text x="650.0" y="521" font-size="15" fill="#444444" text-anchor="middle">Storage-Replikation</text>
+<text x="650.0" y="547" font-size="15" fill="#444444" text-anchor="middle">Latenz typisch unter 1 s</text>
+<text x="650.0" y="573" font-size="15" fill="#444444" text-anchor="middle">Sekundärregion liest mit</text>
+<rect x="815" y="460" width="300" height="185" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="965.0" y="495" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">S3 · DynamoDB</text>
+<text x="965.0" y="521" font-size="15" fill="#444444" text-anchor="middle">Cross-Region Replication</text>
+<text x="965.0" y="547" font-size="15" fill="#444444" text-anchor="middle">Global Tables</text>
+<text x="965.0" y="573" font-size="15" fill="#444444" text-anchor="middle">asynchron</text>
+<rect x="1215" y="460" width="300" height="185" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1365.0" y="495" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">RPO 1 s · RTO 1 min</text>
+<text x="1365.0" y="521" font-size="15" fill="#444444" text-anchor="middle">Promotion der Sekundär-</text>
+<text x="1365.0" y="547" font-size="15" fill="#444444" text-anchor="middle">region ist ein Schritt,</text>
+<text x="1365.0" y="573" font-size="15" fill="#444444" text-anchor="middle">der ausgelöst werden muss</text>
+<path d="M415,553 L495,553" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<path d="M1120,553 L1210,553" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<circle cx="140" cy="745.0" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M131,736.0 L149,754.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M131,754.0 L149,736.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<rect x="200" y="685" width="1310" height="120" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+<text x="855.0" y="715" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">Trugschluss</text>
+<text x="855.0" y="739" font-size="15" fill="#444444" text-anchor="middle">„Wir sind Multi-AZ, also überstehen wir auch den Ausfall einer Region.“</text>
+<text x="855.0" y="763" font-size="15" fill="#444444" text-anchor="middle">Multi-AZ endet an der Regionsgrenze. Gegen den Verlust einer ganzen Region hilft nur</text>
+<text x="855.0" y="787" font-size="15" fill="#444444" text-anchor="middle">eine zweite Region — Pilot Light, Warm Standby oder Active/Active.</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Multi-AZ = HA in einer Region, RPO 0  ·  Multi-Region = DR gegen Regions-Ausfall  ·  Read Replica wird nicht von allein zum Primary</text>
+</svg>

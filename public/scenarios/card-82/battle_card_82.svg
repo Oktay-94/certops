@@ -1,0 +1,60 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="aG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+<marker id="aN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 82 — AWS Backup — zentral über Accounts</text>
+<text x="60" y="106" font-size="21" fill="#555555">Backup-Pläne aus einer Hand, Kopie in einen fremden Account, unveränderlich verschlossen</text>
+<rect x="560" y="135" width="480" height="105" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="800.0" y="170" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">AWS Organizations</text>
+<text x="800.0" y="196" font-size="15" fill="#444444" text-anchor="middle">Backup Policy zentral definiert, an alle OUs vererbt</text>
+<text x="800.0" y="222" font-size="15" fill="#444444" text-anchor="middle">Ressourcenauswahl über Tags — nichts wird vergessen</text>
+<rect x="60" y="270" width="710" height="360" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="620" y="298" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Workload-Account (40×)</text>
+<rect x="830" y="270" width="710" height="360" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="1180" y="298" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Backup-Account · zweite Region</text>
+<rect x="85" y="340" width="280" height="160" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="225.0" y="375" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Backup Plan</text>
+<text x="225.0" y="401" font-size="15" fill="#444444" text-anchor="middle">Regel = Zeitplan + Lifecycle</text>
+<text x="225.0" y="427" font-size="15" fill="#444444" text-anchor="middle">läuft im Workload-Account</text>
+<rect x="465" y="340" width="280" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="605.0" y="375" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Lokaler Vault</text>
+<text x="605.0" y="401" font-size="15" fill="#444444" text-anchor="middle">der Recovery Point entsteht</text>
+<text x="605.0" y="427" font-size="15" fill="#444444" text-anchor="middle">immer zuerst hier</text>
+<text x="605.0" y="453" font-size="15" fill="#444444" text-anchor="middle">Cold Storage: Retention</text>
+<text x="605.0" y="479" font-size="15" fill="#444444" text-anchor="middle">≥ Transition + 90 Tage</text>
+<rect x="855" y="340" width="280" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="995.0" y="375" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Zentraler Vault</text>
+<text x="995.0" y="401" font-size="15" fill="#444444" text-anchor="middle">Copy Action legt die Kopie</text>
+<text x="995.0" y="427" font-size="15" fill="#444444" text-anchor="middle">in einem fremden Account</text>
+<text x="995.0" y="453" font-size="15" fill="#444444" text-anchor="middle">und einer 2. Region ab</text>
+<rect x="1235" y="340" width="280" height="160" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1375.0" y="375" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Vault Lock</text>
+<text x="1375.0" y="401" font-size="15" fill="#444444" text-anchor="middle">Compliance Mode</text>
+<text x="1375.0" y="427" font-size="15" fill="#444444" text-anchor="middle">Grace Time ≥ 3 Tage (72 h)</text>
+<text x="1375.0" y="453" font-size="15" fill="#444444" text-anchor="middle">danach unveränderlich —</text>
+<text x="1375.0" y="479" font-size="15" fill="#444444" text-anchor="middle">auch für root und AWS</text>
+<path d="M600,245 L600,258 L225,258 L225,325" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#aG)"/>
+<circle cx="410" cy="258" r="15" fill="#A16E00"/>
+<text x="410" y="264" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M370,420 L460,420" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<circle cx="405" cy="420" r="15" fill="#232F3E"/>
+<text x="405" y="426" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M750,420 L850,420" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<circle cx="800" cy="420" r="15" fill="#232F3E"/>
+<text x="800" y="426" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M1140,420 L1230,420" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#aG)"/>
+<circle cx="1175" cy="420" r="15" fill="#A16E00"/>
+<text x="1175" y="426" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+<circle cx="140" cy="720.0" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M131,711.0 L149,729.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M131,729.0 L149,711.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<rect x="200" y="650" width="1310" height="140" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+<text x="855.0" y="680" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">Governance Mode als Schutz vor Ransomware</text>
+<text x="855.0" y="704" font-size="15" fill="#444444" text-anchor="middle">Im Governance Mode kann jeder Benutzer mit ausreichenden IAM-Rechten den Lock wieder entfernen.</text>
+<text x="855.0" y="728" font-size="15" fill="#444444" text-anchor="middle">Gegen einen übernommenen Administrator-Account schützt nur der Compliance Mode. Dessen Preis:</text>
+<text x="855.0" y="752" font-size="15" fill="#444444" text-anchor="middle">nach Ablauf der Grace Time ist er unumkehrbar — auch eine versehentlich gesetzte Frist bleibt stehen.</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Compliance Mode unumkehrbar, Governance Mode nicht  ·  Backup entsteht lokal, dann Copy Action  ·  Cold Storage: Retention ≥ Transition + 90 Tage</text>
+</svg>

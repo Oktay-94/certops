@@ -1,0 +1,49 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="rv" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 80 — Die 7 R's der Migration</text>
+<text x="60" y="106" font-size="21" fill="#555555">Portfolio-Entscheidung vor der Migration — was wird wie bewegt?</text>
+<text x="190" y="152" font-size="16" font-weight="bold" fill="#888888" text-anchor="middle">Strategie</text>
+<text x="360" y="152" font-size="16" font-weight="bold" fill="#888888" text-anchor="start">Beispiel im Portfolio</text>
+<text x="1010" y="152" font-size="16" font-weight="bold" fill="#888888" text-anchor="start">AWS-Werkzeug</text>
+<text x="1550" y="152" font-size="16" font-style="italic" fill="#999999" text-anchor="end">↓ wachsende Änderungstiefe</text>
+<rect x="60" y="165" width="260" height="68" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5"/>
+<text x="190.0" y="200" font-size="22" font-weight="bold" fill="#555555" text-anchor="middle">Retire</text>
+<text x="360" y="204" font-size="15" fill="#444444" text-anchor="start">40 Altsysteme ohne Nutzer abschalten</text>
+<text x="1010" y="204" font-size="15" font-style="italic" fill="#555555" text-anchor="start">Portfolio-Assessment</text>
+<rect x="60" y="243" width="260" height="68" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5"/>
+<text x="190.0" y="278" font-size="22" font-weight="bold" fill="#555555" text-anchor="middle">Retain</text>
+<text x="360" y="282" font-size="15" fill="#444444" text-anchor="start">regulatorisch fixiertes System bleibt</text>
+<text x="1010" y="282" font-size="15" font-style="italic" fill="#555555" text-anchor="start">bewusst nichts</text>
+<rect x="60" y="321" width="260" height="68" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="190.0" y="356" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Relocate</text>
+<text x="360" y="360" font-size="15" fill="#444444" text-anchor="start">vSphere-Farm 1:1 verschieben</text>
+<text x="1010" y="360" font-size="15" font-style="italic" fill="#1B3E86" text-anchor="start">VMware Cloud on AWS</text>
+<rect x="60" y="399" width="260" height="68" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="190.0" y="434" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Rehost</text>
+<text x="360" y="438" font-size="15" fill="#444444" text-anchor="start">Standard-Webserver ohne Codeänderung</text>
+<text x="1010" y="438" font-size="15" font-style="italic" fill="#1B3E86" text-anchor="start">Application Migration Service</text>
+<rect x="60" y="477" width="260" height="68" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="190.0" y="512" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Repurchase</text>
+<text x="360" y="516" font-size="15" fill="#444444" text-anchor="start">Exchange-Server abgeben</text>
+<text x="1010" y="516" font-size="15" font-style="italic" fill="#7A5300" text-anchor="start">Microsoft 365, SaaS</text>
+<rect x="60" y="555" width="260" height="68" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="190.0" y="590" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Replatform</text>
+<text x="360" y="594" font-size="15" fill="#444444" text-anchor="start">Oracle-DB in einen Managed Service</text>
+<text x="1010" y="594" font-size="15" font-style="italic" fill="#A85A05" text-anchor="start">RDS, DMS + SCT</text>
+<rect x="60" y="633" width="260" height="68" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="190.0" y="668" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Refactor</text>
+<text x="360" y="672" font-size="15" fill="#444444" text-anchor="start">Monolith in Container oder Serverless</text>
+<text x="1010" y="672" font-size="15" font-style="italic" fill="#A85A05" text-anchor="start">ECS / EKS, Lambda</text>
+<rect x="360" y="730" width="720" height="75" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="720.0" y="765" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Alles refactoren, weil cloud-native</text>
+<text x="720.0" y="791" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">AWS rät bei großen Migrationen ausdrücklich davon ab</text>
+<path d="M190,701 L190,767 L360,767" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#rv)"/>
+<circle cx="275" cy="767" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M266,758 L284,776" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M266,776 L284,758" fill="none" stroke="#C7161D" stroke-width="4"/>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Zuerst Retire, dann Rehost oder Relocate  ·  Refactor ist die teuerste Strategie  ·  Modernisiert wird nach der Migration</text>
+</svg>

@@ -1,0 +1,66 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="gt" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+<marker id="gs" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+<marker id="gg" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9A9A9A"/></marker>
+<marker id="gv" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 79 — Storage Gateway: Tape &amp; Volume</text>
+<text x="60" y="106" font-size="21" fill="#555555">Bandsicherung ohne Bandroboter — der Archiv-Pool entscheidet beim Eject</text>
+<rect x="40" y="190" width="600" height="430" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="340.0" y="218" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">On-Premises</text>
+<rect x="780" y="190" width="790" height="510" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="1175.0" y="218" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS Region</text>
+<rect x="80" y="240" width="520" height="110" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="340.0" y="275" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Backup-Software</text>
+<text x="340.0" y="301" font-size="15" fill="#444444" text-anchor="middle">NetBackup, Veeam, Commvault</text>
+<text x="340.0" y="327" font-size="15" fill="#444444" text-anchor="middle">schreibt auf Tape wie bisher</text>
+<rect x="80" y="440" width="520" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="340.0" y="475" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Tape Gateway</text>
+<text x="340.0" y="501" font-size="15" fill="#444444" text-anchor="middle">iSCSI-VTL: Media Changer + Drives</text>
+<text x="340.0" y="527" font-size="15" fill="#444444" text-anchor="middle">lokaler Cache + Upload Buffer</text>
+<text x="340.0" y="553" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">die Backup-Software merkt nichts</text>
+<rect x="830" y="440" width="350" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1005.0" y="475" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Virtual Tape Library</text>
+<text x="1005.0" y="501" font-size="15" fill="#444444" text-anchor="middle">Tapes liegen in S3</text>
+<text x="1005.0" y="527" font-size="15" fill="#444444" text-anchor="middle">komprimiert + verschlüsselt</text>
+<rect x="1290" y="380" width="260" height="120" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1420.0" y="415" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Glacier FR</text>
+<text x="1420.0" y="441" font-size="15" fill="#444444" text-anchor="middle">Flexible Retrieval</text>
+<text x="1420.0" y="467" font-size="15" fill="#444444" text-anchor="middle">schneller abrufbar</text>
+<rect x="1290" y="540" width="260" height="120" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1420.0" y="575" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Deep Archive</text>
+<text x="1420.0" y="601" font-size="15" fill="#444444" text-anchor="middle">Langzeitaufbewahrung</text>
+<text x="1420.0" y="627" font-size="15" fill="#444444" text-anchor="middle">langsamer, günstiger</text>
+<rect x="80" y="665" width="680" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="420.0" y="700" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Volume Gateway — zum Abgrenzen</text>
+<text x="420.0" y="726" font-size="15" fill="#444444" text-anchor="middle">Cached: bis 32 TiB je Volume, S3 ist primär</text>
+<text x="420.0" y="752" font-size="15" fill="#444444" text-anchor="middle">Stored: bis 16 TiB je Volume, alles lokal</text>
+<text x="420.0" y="778" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Block-Volumes über iSCSI, keine Tapes</text>
+<rect x="830" y="230" width="420" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="1040.0" y="265" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 File Gateway</text>
+<text x="1040.0" y="291" font-size="15" fill="#444444" text-anchor="middle">NFS- / SMB-Share als Ziel</text>
+<text x="1040.0" y="317" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Backup-Jobs auf Disk-Targets umbauen</text>
+<path d="M340,350 L340,440" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#gt)"/>
+<circle cx="340" cy="385" r="15" fill="#0F7C8C"/>
+<text x="340" y="391" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M600,505 L830,505" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#gs)"/>
+<circle cx="710" cy="505" r="15" fill="#3F8624"/>
+<text x="710" y="511" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="710" y="478" font-size="15" fill="#2E6318" text-anchor="middle">asynchron</text>
+<path d="M1180,505 L1230,505 L1230,440 L1290,440" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#gs)"/>
+<circle cx="1230" cy="472" r="15" fill="#3F8624"/>
+<text x="1230" y="478" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M1180,505 L1230,505 L1230,600 L1290,600" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#gs)"/>
+<circle cx="1230" cy="552" r="15" fill="#3F8624"/>
+<text x="1230" y="558" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+<path d="M340,570 L340,665" fill="none" stroke="#9A9A9A" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#gg)"/>
+<path d="M600,295 L830,295" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#gv)"/>
+<circle cx="715" cy="295" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M706,286 L724,304" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M706,304 L724,286" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="715" y="265" font-size="15" fill="#9E1015" text-anchor="middle">Prozessumbau</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Tape Gateway spricht iSCSI-VTL  ·  Der Pool beim Eject bestimmt die Archivklasse  ·  Volume Gateway ist Block, nicht Tape</text>
+</svg>

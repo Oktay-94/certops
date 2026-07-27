@@ -1,0 +1,56 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mblau" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="mnavy" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+<marker id="mgold" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+<marker id="mrot" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 90 — Well-Architected Review</text>
+<text x="60" y="106" font-size="21" fill="#555555">Den Workload systematisch bewerten — und den Fortschritt messbar machen</text>
+<rect x="61" y="195" width="302" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="230" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Workload</text>
+<text x="212.0" y="256" font-size="15" fill="#444444" text-anchor="middle">Ressourcen + Code</text>
+<text x="212.0" y="282" font-size="15" fill="#444444" text-anchor="middle">liefert Geschäftswert</text>
+<rect x="453" y="195" width="302" height="130" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="604.0" y="230" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Lens + Fragen</text>
+<text x="604.0" y="256" font-size="15" fill="#444444" text-anchor="middle">Well-Architected Framework Lens</text>
+<text x="604.0" y="282" font-size="15" fill="#444444" text-anchor="middle">Fragen je Säule beantworten</text>
+<rect x="845" y="195" width="302" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="996.0" y="230" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">HRI und MRI</text>
+<text x="996.0" y="256" font-size="15" fill="#444444" text-anchor="middle">High und Medium Risk Issues</text>
+<text x="996.0" y="282" font-size="15" fill="#444444" text-anchor="middle">Improvement Plan entsteht</text>
+<rect x="1237" y="195" width="302" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1388.0" y="230" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Milestone</text>
+<text x="1388.0" y="256" font-size="15" fill="#444444" text-anchor="middle">Zustand festhalten</text>
+<text x="1388.0" y="282" font-size="15" fill="#444444" text-anchor="middle">Fortschritt wird messbar</text>
+<rect x="350" y="430" width="510" height="110" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="605.0" y="465" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Die sechs Säulen</text>
+<text x="605.0" y="491" font-size="15" fill="#444444" text-anchor="middle">Operational Excellence · Security · Reliability</text>
+<text x="605.0" y="517" font-size="15" fill="#444444" text-anchor="middle">Performance Efficiency · Cost Optimization · Sustainability</text>
+<rect x="1100" y="620" width="440" height="120" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1320.0" y="655" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Einmal vor Go-Live, nie wieder</text>
+<text x="1320.0" y="681" font-size="15" fill="#444444" text-anchor="middle">Risiken bleiben unbeobachtet</text>
+<text x="1320.0" y="707" font-size="15" fill="#444444" text-anchor="middle">kein Vergleich, kein Fortschritt</text>
+<path d="M363,260.0 L453,260.0" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#mblau)"/>
+<circle cx="398" cy="260.0" r="15" fill="#2E6BE6"/>
+<text x="398" y="266.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,260.0 L845,260.0" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#mnavy)"/>
+<circle cx="790" cy="260.0" r="15" fill="#232F3E"/>
+<text x="790" y="266.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1147,260.0 L1237,260.0" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mgold)"/>
+<circle cx="1182" cy="260.0" r="15" fill="#A16E00"/>
+<text x="1182" y="266.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M604.0,430 L604.0,325" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#mnavy)"/>
+<path d="M1388.0,195 L1388.0,150 L604.0,150 L604.0,195" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mgold)"/>
+<circle cx="1200" cy="150" r="15" fill="#A16E00"/>
+<text x="1200" y="156" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="850" y="138" font-size="15" fill="#A16E00" text-anchor="middle">nächster Review-Zyklus</text>
+<path d="M1388.0,325 L1388.0,620" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#mrot)"/>
+<circle cx="1388.0" cy="470" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M1379.0,461 L1397.0,479" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M1379.0,479 L1397.0,461" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="1230" y="470" font-size="15" fill="#C7161D" text-anchor="end">kein zweiter Milestone</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Sechs Säulen, ein Bewertungsvorgang  ·  HRI zuerst, dann Improvement Plan  ·  Ohne zweiten Milestone kein Fortschritt</text>
+</svg>

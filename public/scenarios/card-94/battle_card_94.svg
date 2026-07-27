@@ -1,0 +1,51 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mfluss" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+<marker id="mverw" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 94 — Amazon IVS, Live-Streaming</text>
+<text x="60" y="106" font-size="21" fill="#555555">Interaktives Live-Video anbieten, ohne eine eigene Encoding- und Auslieferungskette zu betreiben</text>
+<rect x="61" y="300" width="302" height="160" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="335" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Broadcaster</text>
+<text x="212.0" y="361" font-size="15" fill="#444444" text-anchor="middle">RTMPS, RTMP oder SRT</text>
+<text x="212.0" y="387" font-size="15" fill="#444444" text-anchor="middle">Encoder oder Browser-SDK</text>
+<rect x="453" y="300" width="302" height="160" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="604.0" y="335" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">IVS Ingest</text>
+<text x="604.0" y="361" font-size="15" fill="#444444" text-anchor="middle">Nimmt nahe am Sender an</text>
+<text x="604.0" y="387" font-size="15" fill="#444444" text-anchor="middle">Datenebene global</text>
+<text x="604.0" y="413" font-size="15" fill="#444444" text-anchor="middle">Steuerebene regional</text>
+<rect x="845" y="300" width="302" height="160" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="996.0" y="335" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">IVS Transcoding</text>
+<text x="996.0" y="361" font-size="15" fill="#444444" text-anchor="middle">Rendition-Ladder managed</text>
+<text x="996.0" y="387" font-size="15" fill="#444444" text-anchor="middle">Kein Encoder zu betreiben</text>
+<rect x="1300" y="180" width="260" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="1430.0" y="215" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Channel</text>
+<text x="1430.0" y="241" font-size="15" fill="#444444" text-anchor="middle">Broadcast an viele</text>
+<text x="1430.0" y="267" font-size="15" fill="#444444" text-anchor="middle">Abrechnung nach Dauer</text>
+<rect x="1300" y="460" width="260" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="1430.0" y="495" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Stage</text>
+<text x="1430.0" y="521" font-size="15" fill="#444444" text-anchor="middle">Teilnehmer sprechen mit</text>
+<text x="1430.0" y="547" font-size="15" fill="#444444" text-anchor="middle">Nach Teilnehmerstunden</text>
+<rect x="940" y="620" width="340" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="1110.0" y="655" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Eigene Live-Kette</text>
+<text x="1110.0" y="681" font-size="15" fill="#444444" text-anchor="middle">MediaLive und MediaPackage</text>
+<text x="1110.0" y="707" font-size="15" fill="#444444" text-anchor="middle">Mehr Kontrolle, mehr Teile</text>
+<path d="M363,380 L453,380" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="398" cy="380" r="15" fill="#0F7C8C"/>
+<text x="398" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,380 L845,380" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="790" cy="380" r="15" fill="#0F7C8C"/>
+<text x="790" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1147,380 L1225,380 L1225,240.0 L1300,240.0" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mfluss)"/>
+<path d="M1225,380 L1225,520.0 L1300,520.0" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="1182" cy="380" r="15" fill="#0F7C8C"/>
+<text x="1182" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M604.0,460 L604.0,680 L940,680" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#mverw)"/>
+<circle cx="772.0" cy="680" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M763.0,671 L781.0,689" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M763.0,689 L781.0,671" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="772.0" y="651" font-size="15" fill="#9E1015" text-anchor="middle">eigene Infra bauen</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Live ohne eigene Infra: IVS  ·  Broadcast an viele: Channel  ·  Teilnehmer reden mit: Stage</text>
+</svg>

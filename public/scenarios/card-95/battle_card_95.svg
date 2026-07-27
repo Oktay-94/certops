@@ -1,0 +1,48 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mfluss" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="msub" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="mverw" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 95 — AppSync (GraphQL), DynamoDB</text>
+<text x="60" y="106" font-size="21" fill="#555555">Ein flexibles API für viele Ansichten, mit Live-Updates und serverseitiger Konfliktauflösung</text>
+<rect x="61" y="340" width="302" height="160" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="375" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Mobile Client</text>
+<text x="212.0" y="401" font-size="15" fill="#444444" text-anchor="middle">Eine Ansicht, ein Query</text>
+<text x="212.0" y="427" font-size="15" fill="#444444" text-anchor="middle">Holt genau die Felder</text>
+<rect x="453" y="340" width="302" height="160" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="604.0" y="375" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">AppSync</text>
+<text x="604.0" y="401" font-size="15" fill="#444444" text-anchor="middle">Ein GraphQL-Endpoint</text>
+<text x="604.0" y="427" font-size="15" fill="#444444" text-anchor="middle">Cognito, IAM oder Lambda</text>
+<text x="604.0" y="453" font-size="15" fill="#444444" text-anchor="middle">Resolver je Datenquelle</text>
+<rect x="845" y="340" width="302" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="996.0" y="375" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">DynamoDB</text>
+<text x="996.0" y="401" font-size="15" fill="#444444" text-anchor="middle">Datenquelle des Resolvers</text>
+<text x="996.0" y="427" font-size="15" fill="#444444" text-anchor="middle">Versionierung je Item</text>
+<text x="996.0" y="453" font-size="15" fill="#444444" text-anchor="middle">Conflict Resolution</text>
+<rect x="1237" y="340" width="302" height="160" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="1388.0" y="375" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Weitere Clients</text>
+<text x="1388.0" y="401" font-size="15" fill="#444444" text-anchor="middle">Subscription per WebSocket</text>
+<text x="1388.0" y="427" font-size="15" fill="#444444" text-anchor="middle">Sind sofort auf dem Stand</text>
+<rect x="560" y="630" width="340" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="730.0" y="665" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">REST je Ansicht</text>
+<text x="730.0" y="691" font-size="15" fill="#444444" text-anchor="middle">Over- und Under-Fetching</text>
+<text x="730.0" y="717" font-size="15" fill="#444444" text-anchor="middle">WebSockets selbst bauen</text>
+<path d="M363,420 L453,420" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="398" cy="420" r="15" fill="#2E6BE6"/>
+<text x="398" y="426" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,420 L845,420" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="790" cy="420" r="15" fill="#2E6BE6"/>
+<text x="790" y="426" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M604.0,340 L604.0,220 L1388.0,220 L1388.0,340" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#msub)"/>
+<circle cx="604.0" cy="305" r="15" fill="#2E6BE6"/>
+<text x="604.0" y="311" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M212.0,500 L212.0,690 L560,690" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#mverw)"/>
+<circle cx="386.0" cy="690" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M377.0,681 L395.0,699" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M377.0,699 L395.0,681" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="386.0" y="661" font-size="15" fill="#9E1015" text-anchor="middle">ein Endpoint statt vieler</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Viele Ansichten, ein Endpoint: AppSync  ·  Live-Updates: GraphQL Subscriptions  ·  Offline-Store ist Amplify, nicht AppSync</text>
+</svg>

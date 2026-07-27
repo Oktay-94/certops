@@ -1,0 +1,59 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 85 — Savings Plans vs Reserved Instances vs Spot</text>
+<text x="60" y="106" font-size="21" fill="#555555">Welche Kaufoption zu welchem Lastprofil passt — und was keine davon verspricht</text>
+<text x="260.0" y="162" font-size="17" font-weight="bold" fill="#555555" text-anchor="middle">Lastprofil</text>
+<text x="690.0" y="162" font-size="17" font-weight="bold" fill="#555555" text-anchor="middle">Kaufoption</text>
+<text x="1230.0" y="162" font-size="17" font-weight="bold" fill="#555555" text-anchor="middle">Rabatt · Bindung</text>
+<rect x="70" y="178" width="380" height="94" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="260.0" y="213" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Konstante Grundlast</text>
+<text x="260.0" y="239" font-size="15" fill="#444444" text-anchor="middle">Architektur noch in Bewegung</text>
+<rect x="480" y="178" width="420" height="94" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="690.0" y="213" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Compute Savings Plans</text>
+<text x="690.0" y="239" font-size="15" fill="#444444" text-anchor="middle">gilt auch für Fargate und Lambda</text>
+<rect x="930" y="178" width="600" height="94" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1230.0" y="213" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">bis 66 %</text>
+<text x="1230.0" y="239" font-size="15" fill="#444444" text-anchor="middle">Familie, Größe, OS, Tenancy und Region frei — 1 oder 3 Jahre</text>
+<rect x="70" y="288" width="380" height="94" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="260.0" y="323" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Stabile Familie + Region</text>
+<text x="260.0" y="349" font-size="15" fill="#444444" text-anchor="middle">kein Wechsel geplant</text>
+<rect x="480" y="288" width="420" height="94" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="690.0" y="323" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">EC2 Instance Savings Plans</text>
+<text x="690.0" y="349" font-size="15" fill="#444444" text-anchor="middle">eine Familie in einer Region</text>
+<rect x="930" y="288" width="600" height="94" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1230.0" y="323" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">bis 72 %</text>
+<text x="1230.0" y="349" font-size="15" fill="#444444" text-anchor="middle">Größe und OS bleiben frei, Familie und Region nicht</text>
+<rect x="70" y="398" width="380" height="94" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="260.0" y="433" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Unterbrechbarer Batch</text>
+<text x="260.0" y="459" font-size="15" fill="#444444" text-anchor="middle">zustandslos und wiederholbar</text>
+<rect x="480" y="398" width="420" height="94" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="690.0" y="433" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Spot Instances</text>
+<text x="690.0" y="459" font-size="15" fill="#444444" text-anchor="middle">freie Kapazität von AWS</text>
+<rect x="930" y="398" width="600" height="94" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1230.0" y="433" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">bis 90 %</text>
+<text x="1230.0" y="459" font-size="15" fill="#444444" text-anchor="middle">zwei Minuten Vorwarnung, Rebalance Recommendation oft früher</text>
+<rect x="70" y="508" width="380" height="94" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="260.0" y="543" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Datenbanken</text>
+<text x="260.0" y="569" font-size="15" fill="#444444" text-anchor="middle">RDS, ElastiCache, Redshift</text>
+<rect x="480" y="508" width="420" height="94" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="690.0" y="543" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Reserved Instances</text>
+<text x="690.0" y="569" font-size="15" fill="#444444" text-anchor="middle">Prüfungsstand</text>
+<rect x="930" y="508" width="600" height="94" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1230.0" y="543" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">bis 72 %</text>
+<text x="1230.0" y="569" font-size="15" fill="#444444" text-anchor="middle">feste Instanzklasse und Region — zonale RI reserviert Kapazität</text>
+<rect x="70" y="618" width="1460" height="82" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5"/>
+<text x="800.0" y="646" font-size="22" font-weight="bold" fill="#555555" text-anchor="middle">Realitätsstand seit Dezember 2025: Database Savings Plans</text>
+<text x="800.0" y="668" font-size="15" fill="#444444" text-anchor="middle">AWS führt inzwischen vier Savings-Plans-Typen: Compute, EC2 Instance, Database und SageMaker. Der Database SP deckt</text>
+<text x="800.0" y="690" font-size="15" fill="#444444" text-anchor="middle">Aurora, RDS, DynamoDB, ElastiCache, DocumentDB, Neptune, Keyspaces, Timestream und DMS ab — bis 35 %, ein Jahr, ohne Vorauszahlung.</text>
+<circle cx="140" cy="758.0" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M131,749.0 L149,767.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M131,767.0 L149,749.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<rect x="200" y="714" width="1310" height="88" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+<text x="855.0" y="744" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">Standard RI auf m5 kaufen, während die Graviton-Migration bereits terminiert ist</text>
+<text x="855.0" y="768" font-size="15" fill="#444444" text-anchor="middle">Die Reservierung hängt an Familie, Größe und Region. Nach dem Wechsel auf m7g läuft sie ins Leere und wird trotzdem</text>
+<text x="855.0" y="792" font-size="15" fill="#444444" text-anchor="middle">bis zum Laufzeitende bezahlt. Rabatt gegen Bindung ist kein Kapazitätsversprechen — das leistet nur die zonale RI.</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Compute SP bis 66 %, EC2 Instance SP und Standard RI bis 72 %  ·  Spot bis 90 %, dafür jederzeit kündbar durch AWS  ·  Rabatt ist keine Kapazität</text>
+</svg>

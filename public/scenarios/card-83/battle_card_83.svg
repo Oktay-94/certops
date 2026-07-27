@@ -1,0 +1,76 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 83 — Pilot Light vs Warm Standby vs Active/Active</text>
+<text x="60" y="106" font-size="21" fill="#555555">Die vier DR-Muster mit RPO, RTO und Kosten — und was sie voneinander trennt</text>
+<rect x="310" y="145" width="290" height="85" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="455.0" y="180" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Backup &amp; Restore</text>
+<text x="455.0" y="206" font-size="15" fill="#444444" text-anchor="middle">Kosten: am niedrigsten</text>
+<rect x="620" y="145" width="290" height="85" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="765.0" y="180" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Pilot Light</text>
+<text x="765.0" y="206" font-size="15" fill="#444444" text-anchor="middle">Kosten: niedrig</text>
+<rect x="930" y="145" width="290" height="85" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1075.0" y="180" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Warm Standby</text>
+<text x="1075.0" y="206" font-size="15" fill="#444444" text-anchor="middle">Kosten: mittel</text>
+<rect x="1240" y="145" width="290" height="85" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1385.0" y="180" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Active/Active</text>
+<text x="1385.0" y="206" font-size="15" fill="#444444" text-anchor="middle">Kosten: am höchsten</text>
+<rect x="310" y="250" width="290" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="455.0" y="285" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">nichts</text>
+<text x="455.0" y="311" font-size="15" fill="#444444" text-anchor="middle">Infrastruktur wird im</text>
+<text x="455.0" y="337" font-size="15" fill="#444444" text-anchor="middle">Ernstfall neu ausgerollt</text>
+<rect x="620" y="250" width="290" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="765.0" y="285" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">kein Compute</text>
+<text x="765.0" y="311" font-size="15" fill="#444444" text-anchor="middle">Kern-Infrastruktur steht,</text>
+<text x="765.0" y="337" font-size="15" fill="#444444" text-anchor="middle">Server sind nicht gestartet</text>
+<rect x="930" y="250" width="290" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="1075.0" y="285" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">verkleinerte Kopie</text>
+<text x="1075.0" y="311" font-size="15" fill="#444444" text-anchor="middle">voll funktionsfähig,</text>
+<text x="1075.0" y="337" font-size="15" fill="#444444" text-anchor="middle">dauerhaft in Betrieb</text>
+<rect x="1240" y="250" width="290" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="1385.0" y="285" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">volle Kapazität</text>
+<text x="1385.0" y="311" font-size="15" fill="#444444" text-anchor="middle">nimmt produktiven</text>
+<text x="1385.0" y="337" font-size="15" fill="#444444" text-anchor="middle">Verkehr entgegen</text>
+<rect x="310" y="400" width="290" height="100" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="455.0" y="435" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Backups</text>
+<text x="455.0" y="461" font-size="15" fill="#444444" text-anchor="middle">Wiederherstellung nötig</text>
+<rect x="620" y="400" width="290" height="100" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="765.0" y="435" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">repliziert</text>
+<text x="765.0" y="461" font-size="15" fill="#444444" text-anchor="middle">Datenbank läuft mit</text>
+<rect x="930" y="400" width="290" height="100" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1075.0" y="435" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">repliziert</text>
+<text x="1075.0" y="461" font-size="15" fill="#444444" text-anchor="middle">live in der DR-Region</text>
+<rect x="1240" y="400" width="290" height="100" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1385.0" y="435" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">synchronisiert</text>
+<text x="1385.0" y="461" font-size="15" fill="#444444" text-anchor="middle">Schreibkonflikte möglich</text>
+<rect x="310" y="520" width="290" height="100" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="455.0" y="555" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">RPO Stunden</text>
+<text x="455.0" y="581" font-size="15" fill="#444444" text-anchor="middle">RTO bis 24 Stunden</text>
+<text x="455.0" y="607" font-size="15" fill="#444444" text-anchor="middle">mit PITR: RPO ab 5 Minuten</text>
+<rect x="620" y="520" width="290" height="100" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="765.0" y="555" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">RPO Minuten</text>
+<text x="765.0" y="581" font-size="15" fill="#444444" text-anchor="middle">RTO in Zehnerminuten</text>
+<rect x="930" y="520" width="290" height="100" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1075.0" y="555" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">RPO Sekunden</text>
+<text x="1075.0" y="581" font-size="15" fill="#444444" text-anchor="middle">RTO in Minuten</text>
+<text x="1075.0" y="607" font-size="15" fill="#444444" text-anchor="middle">voll skaliert = Hot Standby</text>
+<rect x="1240" y="520" width="290" height="100" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1385.0" y="555" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">RPO nahe null</text>
+<text x="1385.0" y="581" font-size="15" fill="#444444" text-anchor="middle">RTO potenziell null</text>
+<text x="290" y="193.5" font-size="17" font-weight="bold" fill="#555555" text-anchor="end">Strategie</text>
+<text x="290" y="321.0" font-size="17" font-weight="bold" fill="#555555" text-anchor="end">In der DR-Region läuft</text>
+<text x="290" y="456.0" font-size="17" font-weight="bold" fill="#555555" text-anchor="end">Daten</text>
+<text x="290" y="576.0" font-size="17" font-weight="bold" fill="#555555" text-anchor="end">RPO  →  RTO</text>
+<rect x="310" y="640" width="1220" height="90" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="920.0" y="668" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Elastic Disaster Recovery (Karte 78) sitzt zwischen den Spalten</text>
+<text x="920.0" y="690" font-size="15" fill="#444444" text-anchor="middle">DRS erreicht RPO und RTO auf Warm-Standby-Niveau, kostet aber wie Pilot Light:</text>
+<text x="920.0" y="712" font-size="15" fill="#444444" text-anchor="middle">dauerhaft laufen nur die Replikations-Ressourcen, die Server entstehen erst bei Failover oder Drill.</text>
+<circle cx="140" cy="772.5" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M131,763.5 L149,781.5" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M131,781.5 L149,763.5" fill="none" stroke="#C7161D" stroke-width="4"/>
+<rect x="200" y="740" width="1310" height="65" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+<text x="855.0" y="778" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">Active/Active als Standardwahl — operativ die komplexeste Strategie, nur bei echter Anforderung</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Pilot Light muss erst eingeschaltet werden  ·  Warm Standby läuft schon und wird nur hochskaliert  ·  Nie strenger auslegen als die Vorgabe verlangt</text>
+</svg>
