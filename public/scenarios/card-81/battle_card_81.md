@@ -27,8 +27,7 @@ status_note: |
   R16 (kein Skript deckt das ab): engster gemessener Abstand eines freien
   Labels zu einer Boxkante 18,0 px — Zonenlabel Band A. Keine Überlappung.
   Footer von Hand gemessen: 1236 px (Grenze 1420 px).
-  Sichtprüfung: AUSSTEHEND. Erfolgt lokal durch Oktay vor dem Repo-Einbau.
-  Rechnerisch geprüft ist nicht gesehen.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 # Battle Card 81 — Multi-AZ vs Multi-Region

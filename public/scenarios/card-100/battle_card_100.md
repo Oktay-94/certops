@@ -29,8 +29,7 @@ status_note: |
   Achtung bei Sammelprüfungen: Das Muster battle_card_9*.svg trifft diese
   Karte NICHT. R12-Gegencheck, r16-Sammellauf und ZIP-Vollständigkeit wurden
   mit einem Muster geprüft, das battle_card_100 einschließt.
-  Sichtprüfung: AUSSTEHEND, erfolgt lokal durch Oktay. Bildbetrachter
-  lieferte einen leeren Platzhalter.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 ## Abweichung vom Masterplan

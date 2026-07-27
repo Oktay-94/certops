@@ -29,8 +29,7 @@ status_note: |
   R16: 53.7 px, Label "nächster Review-Zyklus". Grenze ist 9 px; das ist der
   komfortabelste Wert des Batches.
   Footer-Breite von Hand gemessen: 1138 px (Grenze 1420 px).
-  Sichtpruefung: AUSSTEHEND, erfolgt lokal durch Oktay. Bildbetrachter lieferte einen
-  leeren Platzhalter (R8).
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 # Battle Card 90 — Well-Architected Review

@@ -19,6 +19,7 @@ status_note: |
   Ohne qc.py-Statuszeile geliefert. Frontmatter beim Einbau am 27.07.2026 aus
   Kartentext, SVG und Masterplan-Zeile abgeleitet, von Oktay freigegeben.
   Karten 71–75 zusätzlich ohne didaktische Szenario-Freigabe entstanden.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 # Battle Card 73 — AWS DataSync
 

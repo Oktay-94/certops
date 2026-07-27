@@ -30,8 +30,7 @@ status_note: |
   Batches (Grenze 9 px).
   R12-Gegencheck: 0 Verstoesse.
   Footer von Hand gemessen: 879.8 px (Grenze 1420 px).
-  Sichtpruefung: AUSSTEHEND, erfolgt lokal durch Oktay. Bildbetrachter lieferte
-  einen leeren Platzhalter (R8/F9).
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 # Battle Card 94 — Amazon IVS, Live-Streaming

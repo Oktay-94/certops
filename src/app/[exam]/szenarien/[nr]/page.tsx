@@ -136,11 +136,10 @@ export default async function SzenarioDetailPage({
           </article>
         ))}
 
-        {meta.statusNote && (
-          <p className="mt-6 text-[13px] leading-relaxed text-ink-faint">
-            ℹ️ {meta.statusNote}
-          </p>
-        )}
+        {/* statusNote is deliberately not rendered: it carries the workshop
+            log (qc.py counts, correction rounds, footer widths), which is not
+            for the learner. The field stays parsed in scenario-content.ts so
+            the history remains available in the repo. */}
 
         {/* Prev / next pager over the card numbers */}
         <div className="mt-11 flex gap-3.5">

@@ -25,7 +25,7 @@ status_note: |
   20,0 px (Zeilenkopf „Daten"). Die vier Zeilenkopf-Labels sind rechtsbündig
   an x=290 gesetzt, die Matrixspalten beginnen bei x=310.
   Footer von Hand gemessen: 1380 px (Grenze 1420 px).
-  Sichtprüfung: AUSSTEHEND. Erfolgt lokal durch Oktay vor dem Repo-Einbau.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
   Inhaltliche Abweichung vom Masterplan: Die Themenzeile nennt drei Muster.
   Aufgenommen wurden vier (Backup & Restore ergänzt), nach ausdrücklicher
   Freigabe durch Oktay am 23.07.2026. Begründung: Ohne Backup & Restore hat

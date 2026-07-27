@@ -33,8 +33,7 @@ status_note: |
   Korridorbreite des Bypass 1.025 px gegen ein 323 px breites Label, vor dem
   Zeichnen per assert im Generator geprüft.
   Footer von Hand gemessen: 783 px.
-  Sichtprüfung: AUSSTEHEND, erfolgt lokal durch Oktay. Bildbetrachter
-  lieferte einen leeren Platzhalter.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 ## Szenario

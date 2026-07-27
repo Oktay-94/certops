@@ -27,8 +27,7 @@ status_note: |
   zones.py (R7): 0 Befunde. R12-Gegencheck: 0 Verstöße.
   r16.py: 43,0 px am Zonenlabel "Automatisiert aus der Pipeline".
   Footer von Hand gemessen: 832 px.
-  Sichtprüfung: AUSSTEHEND, erfolgt lokal durch Oktay. Bildbetrachter
-  lieferte einen leeren Platzhalter.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 ## Szenario

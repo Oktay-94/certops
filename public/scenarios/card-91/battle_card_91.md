@@ -30,9 +30,7 @@ status_note: |
   R16 engster Label-zu-Boxkante-Abstand: 23.8 px (Grenze 9 px).
   R12-Gegencheck: 0 Verstoesse.
   Footer von Hand gemessen: 973.7 px (Grenze 1420 px).
-  Sichtpruefung: AUSSTEHEND, erfolgt lokal durch Oktay. Der Bildbetrachter hat
-  in dieser Session einen leeren Platzhalter geliefert (R8/F9). Rechnerisch
-  geprueft ist nicht gesehen.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 # Battle Card 91 — IoT Core, Rules Engine, DynamoDB

@@ -26,8 +26,7 @@ status_note: |
   R16 (engster Abstand freier Labels zu Boxkanten): 13.0 px, Label
   "Erkennen — automatisch, ohne Schwelle". Grenze ist 9 px.
   Footer-Breite von Hand gemessen: 1117 px (Grenze 1420 px).
-  Sichtpruefung: AUSSTEHEND, erfolgt lokal durch Oktay. Der Bildbetrachter lieferte
-  einen leeren Platzhalter (R8) — rechnerisch geprueft ist nicht gesehen.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 # Battle Card 86 — Cost Explorer, Budgets, Anomaly Detection

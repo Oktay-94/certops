@@ -30,8 +30,7 @@ status_note: |
   R12-Gegencheck: 0 Verstoesse.
   R16: 18.0 px, Label "Rightsizing zuerst — dann erst binden". Grenze ist 9 px.
   Footer-Breite von Hand gemessen: 1097 px (Grenze 1420 px).
-  Sichtpruefung: AUSSTEHEND, erfolgt lokal durch Oktay. Bildbetrachter lieferte einen
-  leeren Platzhalter (R8).
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 # Battle Card 87 — Compute Optimizer, Rightsizing

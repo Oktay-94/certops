@@ -28,7 +28,7 @@ status_note: |
   Batches, aber deutlich über der 9-px-Konvention des Stil-Guides und ohne
   Überlappung.
   Footer von Hand gemessen: 1366 px (Grenze 1420 px).
-  Sichtprüfung: AUSSTEHEND. Erfolgt lokal durch Oktay vor dem Repo-Einbau.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
   ACHTUNG Farbschuld: Diese Karte setzt Grau erstmals semantisch ein
   (Realitätsstand außerhalb des Prüfungsstands). Siehe Abschnitt
   „Farbkonventionen dieser Karte" — beim Sammelpass gemeinsam mit der

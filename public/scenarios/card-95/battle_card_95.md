@@ -33,8 +33,7 @@ status_note: |
   R16 engster Label-zu-Boxkante-Abstand: 83.8 px (Grenze 9 px).
   R12-Gegencheck: 0 Verstoesse.
   Footer von Hand gemessen: 1157.3 px (Grenze 1420 px).
-  Sichtpruefung: AUSSTEHEND, erfolgt lokal durch Oktay. Bildbetrachter lieferte
-  einen leeren Platzhalter (R8/F9).
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
   INHALTLICHE ABWEICHUNG von der Masterplan-Zeile: siehe Faktencheck-Notizen.
   Die Karte deckt zwei der drei genannten Eigenschaften ab; "Offline-Sync" ist
   kein AppSync-Merkmal und steht deshalb nur in den Abgrenzungen.

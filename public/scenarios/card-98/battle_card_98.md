@@ -29,8 +29,7 @@ status_note: |
   104 px. Badge 3 sitzt 35 px hinter dem Stammanfang, Außenkante x=1197,
   28 px vor dem Knick bei x=1225 — derselbe Wert wie auf Karte 94.
   Footer von Hand gemessen: 991 px.
-  Sichtprüfung: AUSSTEHEND, erfolgt lokal durch Oktay. Bildbetrachter
-  lieferte einen leeren Platzhalter.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 ## Szenario

@@ -27,7 +27,7 @@ status_note: |
   39,4 px — der größte Abstand aller fünf Karten dieses Batches. Die Karte
   hat außer Titel und Untertitel keine freien Labels.
   Footer von Hand gemessen: 1311 px (Grenze 1420 px).
-  Sichtprüfung: AUSSTEHEND. Erfolgt lokal durch Oktay vor dem Repo-Einbau.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 # Battle Card 84 — Route 53 Health Checks + Failover

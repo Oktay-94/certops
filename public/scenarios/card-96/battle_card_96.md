@@ -27,9 +27,7 @@ status_note: |
   Untertitel real gerendert bis x=897,3 bei erlaubten 908,7 px — Reserve
   11,4 px, nachträglich gegen den echten CairoSVG-Render nachgemessen,
   nachdem Karte 97 an derselben Stelle einen Befund hatte.
-  Sichtprüfung: AUSSTEHEND, erfolgt lokal durch Oktay. Der eingebaute
-  Bildbetrachter lieferte erneut einen leeren Platzhalter (dritter Batch in
-  Folge). Rechnerisch geprüft ist nicht gesehen.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 ## Szenario

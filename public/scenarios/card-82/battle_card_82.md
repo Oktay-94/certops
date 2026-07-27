@@ -27,7 +27,7 @@ status_note: |
   dem Badge 1 kollidieren — das ist die Zonenrand-Falle aus Batch 16.
   Footer von Hand gemessen: 1402 px (Grenze 1420 px) — knapp, bei jeder
   Textänderung neu prüfen.
-  Sichtprüfung: AUSSTEHEND. Erfolgt lokal durch Oktay vor dem Repo-Einbau.
+  Sichtprüfung: erteilt am 27.07.2026 durch Oktay, lokal im Browser an der gerenderten Seite.
 ---
 
 # Battle Card 82 — AWS Backup, zentral über Accounts
