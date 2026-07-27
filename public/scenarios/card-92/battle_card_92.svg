@@ -1,0 +1,51 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mfluss" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+<marker id="mverw" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 92 — IoT Greengrass V2, Inferenz am Edge</text>
+<text x="60" y="106" font-size="21" fill="#555555">ML-Klassifikation in der Fertigung, die auch bei unterbrochener Leitung weiterläuft</text>
+<rect x="55" y="230" width="730" height="270" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="420.0" y="258" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS Cloud</text>
+<rect x="840" y="230" width="705" height="270" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="1192.5" y="258" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Werkshalle — ohne Leitung weiter</text>
+<rect x="75" y="300" width="280" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="215.0" y="335" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Modell in S3</text>
+<text x="215.0" y="361" font-size="15" fill="#444444" text-anchor="middle">In der Cloud trainiert</text>
+<text x="215.0" y="387" font-size="15" fill="#444444" text-anchor="middle">Artefakt als Komponente</text>
+<rect x="445" y="300" width="280" height="160" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="585.0" y="335" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Deployment</text>
+<text x="585.0" y="361" font-size="15" fill="#444444" text-anchor="middle">Greengrass rollt Komponenten aus</text>
+<text x="585.0" y="387" font-size="15" fill="#444444" text-anchor="middle">Model, Runtime, Inference</text>
+<text x="585.0" y="413" font-size="15" fill="#444444" text-anchor="middle">Versioniert und wiederholbar</text>
+<rect x="875" y="300" width="280" height="160" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="1015.0" y="335" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Core-Gerät</text>
+<text x="1015.0" y="361" font-size="15" fill="#444444" text-anchor="middle">Inferenz läuft lokal</text>
+<text x="1015.0" y="387" font-size="15" fill="#444444" text-anchor="middle">Lokaler MQTT-Broker</text>
+<text x="1015.0" y="413" font-size="15" fill="#444444" text-anchor="middle">Arbeitet ohne Cloud weiter</text>
+<rect x="1245" y="300" width="280" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1385.0" y="335" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Stream Manager</text>
+<text x="1385.0" y="361" font-size="15" fill="#444444" text-anchor="middle">Puffert Ergebnisse lokal</text>
+<text x="1385.0" y="387" font-size="15" fill="#444444" text-anchor="middle">Exportiert bei Verbindung</text>
+<rect x="250" y="620" width="340" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="420.0" y="655" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">SageMaker Endpoint</text>
+<text x="420.0" y="681" font-size="15" fill="#444444" text-anchor="middle">Rohbilder in die Cloud</text>
+<text x="420.0" y="707" font-size="15" fill="#444444" text-anchor="middle">Bei Ausfall steht die Linie</text>
+<path d="M355,380 L445,380" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="390" cy="380" r="15" fill="#A16E00"/>
+<text x="390" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M725,380 L875,380" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="760" cy="380" r="15" fill="#A16E00"/>
+<text x="760" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1155,380 L1245,380" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="1190" cy="380" r="15" fill="#A16E00"/>
+<text x="1190" y="386" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M1015.0,460 L1015.0,680 L590,680" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#mverw)"/>
+<circle cx="802.5" cy="680" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M793.5,671 L811.5,689" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M793.5,689 L811.5,671" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="802.5" y="651" font-size="15" fill="#9E1015" text-anchor="middle">Leitung weg, Linie steht</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Verarbeitung am Gerät: Greengrass  ·  Offline weiter: Stream Manager puffert  ·  V2 denkt in Komponenten, nicht in Lambdas</text>
+</svg>

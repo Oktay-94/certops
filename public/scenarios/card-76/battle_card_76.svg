@@ -1,0 +1,56 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mg" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+<marker id="ms" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+<marker id="mc" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+<marker id="mv" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 76 — Mainframe Modernization</text>
+<text x="60" y="106" font-size="21" fill="#555555">COBOL-Batch in Wellen ablösen — Replatform vs Refactor</text>
+<rect x="60" y="300" width="260" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="190.0" y="335" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Mainframe z/OS</text>
+<text x="190.0" y="361" font-size="15" fill="#444444" text-anchor="middle">COBOL-Batch · JCL</text>
+<text x="190.0" y="387" font-size="15" fill="#444444" text-anchor="middle">DB2 / VSAM</text>
+<rect x="420" y="300" width="280" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="560.0" y="335" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Analyse &amp; Plan</text>
+<text x="560.0" y="361" font-size="15" fill="#444444" text-anchor="middle">M2 Analyzer</text>
+<text x="560.0" y="387" font-size="15" fill="#444444" text-anchor="middle">Programme, JCL, Copybooks</text>
+<rect x="800" y="300" width="280" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="940.0" y="335" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Daten &amp; Artefakte</text>
+<text x="940.0" y="361" font-size="15" fill="#444444" text-anchor="middle">DMS → Aurora / RDS</text>
+<text x="940.0" y="387" font-size="15" fill="#444444" text-anchor="middle">JCL + Binaries → S3</text>
+<rect x="1180" y="190" width="370" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="1365.0" y="225" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Replatform</text>
+<text x="1365.0" y="251" font-size="15" fill="#444444" text-anchor="middle">Rocket-Software-Runtime</text>
+<text x="1365.0" y="277" font-size="15" fill="#444444" text-anchor="middle">COBOL bleibt COBOL</text>
+<text x="1365.0" y="303" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">schnell, geringes Risiko</text>
+<rect x="1180" y="400" width="370" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="1365.0" y="435" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Refactor</text>
+<text x="1365.0" y="461" font-size="15" fill="#444444" text-anchor="middle">AWS Blu Age</text>
+<text x="1365.0" y="487" font-size="15" fill="#444444" text-anchor="middle">COBOL → Java, automatisiert</text>
+<text x="1365.0" y="513" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">löst das Skill-Problem</text>
+<rect x="700" y="625" width="420" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="910.0" y="660" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Manueller Rewrite</text>
+<text x="910.0" y="686" font-size="15" fill="#444444" text-anchor="middle">alles auf einmal, ein Stichtag</text>
+<text x="910.0" y="712" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Fachlogik lebt nur im Code</text>
+<path d="M320,365 L420,365" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mg)"/>
+<circle cx="350.0" cy="365" r="15" fill="#A16E00"/>
+<text x="350.0" y="371" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M700,365 L800,365" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#ms)"/>
+<circle cx="730.0" cy="365" r="15" fill="#3F8624"/>
+<text x="730.0" y="371" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1080,365 L1130,365 L1130,255 L1180,255" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#mc)"/>
+<circle cx="1130" cy="310" r="15" fill="#D97706"/>
+<text x="1130" y="316" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M1080,365 L1130,365 L1130,465 L1180,465" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#mc)"/>
+<circle cx="1130" cy="415" r="15" fill="#D97706"/>
+<text x="1130" y="421" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+<path d="M190,430 L190,690 L700,690" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#mv)"/>
+<circle cx="420" cy="690" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M411,681 L429,699" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M411,699 L429,681" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="560" y="665" font-size="15" fill="#9E1015" text-anchor="middle">kein Rückweg bei Abbruch</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Replatform behält den COBOL-Code  ·  Refactor wandelt ihn in Java  ·  Erst raus aus dem RZ, dann modernisieren</text>
+</svg>

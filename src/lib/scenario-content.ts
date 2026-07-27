@@ -11,7 +11,7 @@ import { SAA_C03_DOMAINS, type SaaC03Domain } from "./domains";
 
 const CONTENT_DIR = path.join(process.cwd(), "public", "scenarios");
 
-export const SCENARIO_COUNT = 70;
+export const SCENARIO_COUNT = 100;
 
 export type ScenarioDomainCode = "D1" | "D2" | "D3" | "D4";
 
@@ -117,12 +117,19 @@ export function listScenarios(): ScenarioMeta[] {
   return Array.from({ length: SCENARIO_COUNT }, (_, i) => readScenario(i + 1).meta);
 }
 
-/** Scenario by zero-padded slug ("01".."NN"); null for anything else. */
+/** Scenario by canonical slug ("01".."99", "100"); null for anything else. */
 export function getScenario(
   slug: string,
 ): { meta: ScenarioMeta; body: string } | null {
-  if (!/^\d{2}$/.test(slug)) return null;
+  // Digits first, then a round-trip against scenarioSlug — the canonical slug
+  // is by definition the one scenarioSlug produces, so "1", "001" and "1e2"
+  // fall out without hard-coding a digit count (card 100 is three digits).
+  // The digit test is not redundant: "NaN" survives the round-trip
+  // (Number("NaN") is NaN, scenarioSlug(NaN) is "NaN") and both range
+  // comparisons against NaN are false.
+  if (!/^\d+$/.test(slug)) return null;
   const nr = Number(slug);
+  if (slug !== scenarioSlug(nr)) return null;
   if (nr < 1 || nr > SCENARIO_COUNT) return null;
   return readScenario(nr);
 }

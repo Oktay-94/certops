@@ -1,0 +1,58 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+<marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 74 — Migration Hub + Application Discovery</text>
+<text x="60" y="106" font-size="21" fill="#555555">Migrations-Portfolio erfassen und zentral tracken — erst wissen, was da ist, dann in Wellen migrieren</text>
+<rect x="60" y="150" width="560" height="630" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="340.0" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE</text>
+<rect x="700" y="150" width="840" height="630" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="1120.0" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS ACCOUNT (HOME REGION)</text>
+<rect x="100" y="200" width="480" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="340.0" y="235" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Server-Landschaft</text>
+<text x="340.0" y="261" font-size="15" fill="#444444" text-anchor="middle">physische Server + VMware vCenter</text>
+<text x="340.0" y="287" font-size="15" fill="#444444" text-anchor="middle">Konfiguration, Auslastung, Abhängigkeiten</text>
+<rect x="100" y="420" width="230" height="170" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="215.0" y="455" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Discovery Agent</text>
+<text x="215.0" y="480" font-size="15" fill="#444444" text-anchor="middle">pro Server installiert</text>
+<text x="215.0" y="505" font-size="15" fill="#444444" text-anchor="middle">Prozesse, Netzverkehr,</text>
+<text x="215.0" y="530" font-size="15" fill="#444444" text-anchor="middle">Performance-Zeitreihen</text>
+<rect x="340" y="420" width="260" height="170" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="470.0" y="455" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Agentless Collector</text>
+<text x="470.0" y="480" font-size="15" fill="#444444" text-anchor="middle">EINE OVA in vCenter</text>
+<text x="470.0" y="505" font-size="15" fill="#444444" text-anchor="middle">VM-Metadaten,</text>
+<text x="470.0" y="530" font-size="15" fill="#444444" text-anchor="middle">Auslastung, DB-Inventar</text>
+<rect x="760" y="330" width="400" height="230" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="960.0" y="365" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">AWS Migration Hub</text>
+<text x="960.0" y="391" font-size="15" fill="#444444" text-anchor="middle">Home Region: ein Ort für alles</text>
+<text x="960.0" y="417" font-size="15" fill="#444444" text-anchor="middle">Portfolio: Server → Anwendungen</text>
+<text x="960.0" y="443" font-size="15" fill="#444444" text-anchor="middle">Status aller Migrationen</text>
+<text x="960.0" y="469" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">auch Import per Datei möglich</text>
+<rect x="1260" y="350" width="260" height="190" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1390.0" y="385" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Ergebnis</text>
+<text x="1390.0" y="410" font-size="15" fill="#444444" text-anchor="middle">EC2-Empfehlungen</text>
+<text x="1390.0" y="435" font-size="15" fill="#444444" text-anchor="middle">Wellen nach Abhängigkeit</text>
+<text x="1390.0" y="460" font-size="15" fill="#444444" text-anchor="middle">Tracking: MGN, DMS</text>
+<path d="M215,330 L215,420" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+<circle cx="215" cy="378" r="15" fill="#2E6BE6"/>
+<text x="215" y="384" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="237" y="383" font-size="15" fill="#1B3E86" text-anchor="start">tief: je Server</text>
+<path d="M470,330 L470,420" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+<circle cx="470" cy="378" r="15" fill="#2E6BE6"/>
+<text x="470" y="384" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="492" y="383" font-size="15" fill="#1B3E86" text-anchor="start">breit: vCenter</text>
+<path d="M215,590 L215,680 L960,680 L960,560" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+<circle cx="600" cy="680" r="15" fill="#0F7C8C"/>
+<text x="600" y="686" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="420" y="652" font-size="15" fill="#0B5A66" text-anchor="middle">Daten in die Home Region</text>
+<path d="M470,590 L470,630 L880,630 L880,560" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+<path d="M1160,445 L1260,445" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#arrG)"/>
+<circle cx="1210" cy="445" r="15" fill="#A16E00"/>
+<text x="1210" y="451" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="1210" y="417" font-size="15" fill="#7A5300" text-anchor="middle">planen</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Agent = tief (Prozesse, Netz), Agentless = breit (vCenter, eine OVA)  ·  Hub trackt, migriert selbst aber nichts  ·  Home Region zuerst</text>
+</svg>

@@ -1,0 +1,51 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mblau" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="mgold" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+<marker id="mteal" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+<marker id="mrot" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 88 — Chaos Engineering mit FIS</text>
+<text x="60" y="106" font-size="21" fill="#555555">Resilienz aktiv testen: den AZ-Ausfall simulieren, bevor er passiert</text>
+<rect x="410" y="155" width="805" height="235" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="812" y="183" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Experiment — nur mit Stop Condition</text>
+<rect x="61" y="200" width="302" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="235" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Steady State</text>
+<text x="212.0" y="261" font-size="15" fill="#444444" text-anchor="middle">CloudWatch-Baseline vorher</text>
+<text x="212.0" y="287" font-size="15" fill="#444444" text-anchor="middle">Fehlerrate, Latenz, Durchsatz</text>
+<rect x="453" y="200" width="302" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="604.0" y="235" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Experiment Template</text>
+<text x="604.0" y="261" font-size="15" fill="#444444" text-anchor="middle">Actions · Targets</text>
+<text x="604.0" y="287" font-size="15" fill="#444444" text-anchor="middle">Stop Condition = CW-Alarm</text>
+<text x="604.0" y="313" font-size="15" fill="#444444" text-anchor="middle">IAM-Rolle für FIS</text>
+<rect x="845" y="200" width="302" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="996.0" y="235" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Power Interruption</text>
+<text x="996.0" y="261" font-size="15" fill="#444444" text-anchor="middle">eine AZ: Compute gestoppt</text>
+<text x="996.0" y="287" font-size="15" fill="#444444" text-anchor="middle">EBS und Subnet reagieren nicht</text>
+<text x="996.0" y="313" font-size="15" fill="#444444" text-anchor="middle">RDS und ElastiCache schwenken</text>
+<rect x="1237" y="200" width="302" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="1388.0" y="235" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Auswertung</text>
+<text x="1388.0" y="261" font-size="15" fill="#444444" text-anchor="middle">Hielt die Fehlerrate?</text>
+<text x="1388.0" y="287" font-size="15" fill="#444444" text-anchor="middle">Erkenntnis statt Vermutung</text>
+<rect x="580" y="520" width="440" height="120" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="800.0" y="555" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Ohne Stop Condition in Prod</text>
+<text x="800.0" y="581" font-size="15" fill="#444444" text-anchor="middle">Experiment kann nicht abbrechen</text>
+<text x="800.0" y="607" font-size="15" fill="#444444" text-anchor="middle">aus dem Test wird ein Incident</text>
+<path d="M363,265.0 L453,265.0" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#mblau)"/>
+<circle cx="393" cy="265.0" r="15" fill="#2E6BE6"/>
+<text x="393" y="271.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,265.0 L845,265.0" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mgold)"/>
+<circle cx="790" cy="265.0" r="15" fill="#A16E00"/>
+<text x="790" y="271.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1147,265.0 L1237,265.0" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mteal)"/>
+<circle cx="1182" cy="265.0" r="15" fill="#0F7C8C"/>
+<text x="1182" y="271.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M604.0,330 L604.0,430 L800.0,430 L800.0,520" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#mrot)"/>
+<circle cx="700" cy="430" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M691,421 L709,439" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M691,439 L709,421" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="450" y="412" font-size="15" fill="#C7161D" text-anchor="middle">kein Guardrail</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Stop Condition ist die Abbruchleine  ·  FIS beweist Resilienz, baut sie nicht  ·  AZ-Power: 30 min Störung + 30 min Recovery</text>
+</svg>

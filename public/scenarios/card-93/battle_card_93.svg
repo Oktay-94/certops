@@ -1,0 +1,46 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mfluss" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+<marker id="mverw" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 93 — MediaConvert, S3, CloudFront</text>
+<text x="60" y="106" font-size="21" fill="#555555">Video-Plattform: Upload, Transkodierung in mehrere Formate und weltweite Auslieferung</text>
+<rect x="61" y="250" width="302" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="212.0" y="285" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Source-Bucket</text>
+<text x="212.0" y="311" font-size="15" fill="#444444" text-anchor="middle">Nutzer lädt die Datei hoch</text>
+<text x="212.0" y="337" font-size="15" fill="#444444" text-anchor="middle">Inhalt liegt vollständig vor</text>
+<rect x="453" y="250" width="302" height="160" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="604.0" y="285" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">MediaConvert</text>
+<text x="604.0" y="311" font-size="15" fill="#444444" text-anchor="middle">Dateibasierte Transkodierung</text>
+<text x="604.0" y="337" font-size="15" fill="#444444" text-anchor="middle">Rendition-Ladder je Job</text>
+<text x="604.0" y="363" font-size="15" fill="#444444" text-anchor="middle">HLS und DASH parallel</text>
+<rect x="845" y="250" width="302" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="996.0" y="285" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Output-Bucket</text>
+<text x="996.0" y="311" font-size="15" fill="#444444" text-anchor="middle">Renditions und Manifeste</text>
+<text x="996.0" y="337" font-size="15" fill="#444444" text-anchor="middle">Privat, kein Public Read</text>
+<rect x="1237" y="250" width="302" height="160" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="1388.0" y="285" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">CloudFront</text>
+<text x="1388.0" y="311" font-size="15" fill="#444444" text-anchor="middle">Liefert weltweit aus</text>
+<text x="1388.0" y="337" font-size="15" fill="#444444" text-anchor="middle">OAC hält den Bucket dicht</text>
+<rect x="520" y="560" width="340" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="690.0" y="595" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Eigene FFmpeg-Flotte</text>
+<text x="690.0" y="621" font-size="15" fill="#444444" text-anchor="middle">Skalierung selbst tragen</text>
+<text x="690.0" y="647" font-size="15" fill="#444444" text-anchor="middle">Codecs selbst pflegen</text>
+<path d="M363,330 L453,330" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="398" cy="330" r="15" fill="#D97706"/>
+<text x="398" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,330 L845,330" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="790" cy="330" r="15" fill="#D97706"/>
+<text x="790" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1147,330 L1237,330" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="1182" cy="330" r="15" fill="#D97706"/>
+<text x="1182" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M212.0,410 L212.0,620 L520,620" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#mverw)"/>
+<circle cx="366.0" cy="620" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M357.0,611 L375.0,629" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M357.0,629 L375.0,611" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="366.0" y="591" font-size="15" fill="#9E1015" text-anchor="middle">Flotte selbst betreiben</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Datei liegt fertig vor: MediaConvert  ·  Live wäre MediaLive, nicht MediaConvert  ·  Bucket privat: CloudFront mit OAC</text>
+</svg>

@@ -1,0 +1,45 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="kette" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+<marker id="verworfen" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 100 — Ein Netz für viele Accounts</text>
+<text x="60" y="106" font-size="21" fill="#555555">Subnetze teilen statt Infrastruktur vervielfachen</text>
+<rect x="61" y="210" width="302" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="248" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Netzwerk-Account</text>
+<text x="212.0" y="276" font-size="15" fill="#444444" text-anchor="middle">VPC, Subnetze, NAT Gateway</text>
+<text x="212.0" y="304" font-size="15" fill="#444444" text-anchor="middle">Direct Connect und Routing</text>
+<rect x="453" y="210" width="302" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="604.0" y="248" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Resource Share</text>
+<text x="604.0" y="276" font-size="15" fill="#444444" text-anchor="middle">AWS RAM teilt die Subnetze</text>
+<text x="604.0" y="304" font-size="15" fill="#444444" text-anchor="middle">Principal ist die OU</text>
+<rect x="845" y="210" width="302" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="996.0" y="248" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Team-Account</text>
+<text x="996.0" y="276" font-size="15" fill="#444444" text-anchor="middle">sieht die Subnetze wie eigene</text>
+<text x="996.0" y="304" font-size="15" fill="#444444" text-anchor="middle">in der VPC-Konsole</text>
+<rect x="1237" y="210" width="302" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="1388.0" y="248" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Eigene Ressourcen</text>
+<text x="1388.0" y="276" font-size="15" fill="#444444" text-anchor="middle">EC2, RDS und Lambda</text>
+<text x="1388.0" y="304" font-size="15" fill="#444444" text-anchor="middle">fremde bleiben unsichtbar</text>
+<path d="M363,275.0 L453,275.0" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#kette)"/>
+<circle cx="398" cy="275.0" r="15" fill="#A16E00"/>
+<text x="398" y="281.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,275.0 L845,275.0" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#kette)"/>
+<circle cx="790" cy="275.0" r="15" fill="#A16E00"/>
+<text x="790" y="281.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1147,275.0 L1237,275.0" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#kette)"/>
+<circle cx="1182" cy="275.0" r="15" fill="#A16E00"/>
+<text x="1182" y="281.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="604.0" y="190" font-size="15" fill="#7A5300" text-anchor="middle">Subnetze nur innerhalb der Organization</text>
+<rect x="1237" y="620" width="302" height="115" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="1388.0" y="658" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">VPC je Team</text>
+<text x="1388.0" y="686" font-size="15" fill="#444444" text-anchor="middle">plus Peering-Mesh</text>
+<path d="M212.0,340 L212.0,675 L1237,675" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#verworfen)"/>
+<circle cx="724.5" cy="675" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M715.5,666 L733.5,684" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M715.5,684 L733.5,666" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="724.5" y="646" font-size="15" fill="#9E1015" text-anchor="middle">NAT Gateway, Endpoints und IP-Planung fünffach</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Einmal bauen, per Resource Share mitnutzen lassen  ·  Owner behält das Netz, Participant seine Ressourcen</text>
+</svg>

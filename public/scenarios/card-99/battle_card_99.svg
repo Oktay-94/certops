@@ -1,0 +1,48 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="kette" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+<marker id="verworfen" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 99 — Echte Geräte statt Emulatoren</text>
+<text x="60" y="106" font-size="21" fill="#555555">Hunderte echte Geräte, parallel aus der Pipeline getestet</text>
+<rect x="40" y="150" width="1140" height="225" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="610.0" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Automatisiert aus der Pipeline</text>
+<rect x="1220" y="150" width="340" height="225" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="1390.0" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Interaktiv am Einzelgerät</text>
+<rect x="61" y="225" width="302" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="263" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">CI-Pipeline</text>
+<text x="212.0" y="291" font-size="15" fill="#444444" text-anchor="middle">App-Paket und Tests hochladen</text>
+<rect x="453" y="225" width="302" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="604.0" y="263" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Device Farm</text>
+<text x="604.0" y="291" font-size="15" fill="#444444" text-anchor="middle">parallel auf echten Geräten</text>
+<text x="604.0" y="319" font-size="15" fill="#444444" text-anchor="middle">Test-Hosts nach testspec</text>
+<rect x="845" y="225" width="302" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="996.0" y="263" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Testbericht</text>
+<text x="996.0" y="291" font-size="15" fill="#444444" text-anchor="middle">Logs, Screenshots, Video</text>
+<text x="996.0" y="319" font-size="15" fill="#444444" text-anchor="middle">je Gerät einzeln</text>
+<path d="M363,290.0 L453,290.0" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#kette)"/>
+<circle cx="398" cy="290.0" r="15" fill="#D97706"/>
+<text x="398" y="296.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,290.0 L845,290.0" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#kette)"/>
+<circle cx="790" cy="290.0" r="15" fill="#D97706"/>
+<text x="790" y="296.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<rect x="1240" y="225" width="300" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1390.0" y="263" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Remote Access</text>
+<text x="1390.0" y="291" font-size="15" fill="#444444" text-anchor="middle">Gerät live im Browser</text>
+<text x="1390.0" y="319" font-size="15" fill="#444444" text-anchor="middle">Appium-Endpoint, 150 Minuten</text>
+<rect x="300" y="430" width="847" height="115" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="723.5" y="466" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Rahmenbedingungen</text>
+<text x="723.5" y="492" font-size="15" fill="#444444" text-anchor="middle">Device Farm gibt es nur in us-west-2</text>
+<text x="723.5" y="518" font-size="15" fill="#444444" text-anchor="middle">Public Device Pool oder exklusive Private Devices</text>
+<rect x="1220" y="640" width="340" height="115" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="1390.0" y="678" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Emulatoren auf EC2</text>
+<text x="1390.0" y="706" font-size="15" fill="#444444" text-anchor="middle">kein echtes Rendering</text>
+<path d="M212.0,355 L212.0,700 L1220,700" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#verworfen)"/>
+<circle cx="716.0" cy="700" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M707.0,691 L725.0,709" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M707.0,709 L725.0,691" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="716.0" y="671" font-size="15" fill="#9E1015" text-anchor="middle">keine echte Hardware, keine Herstellervarianten</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Echte Geräte, parallel, aus der Pipeline  ·  Ein Gerät live im Browser: Remote Access</text>
+</svg>

@@ -1,0 +1,50 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="kette" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="verworfen" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 98 — Git-Push wird Preview</text>
+<text x="60" y="106" font-size="21" fill="#555555">Preview je Pull Request, Produktion aus dem main-Branch</text>
+<rect x="61" y="210" width="302" height="120" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="248" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Git-Push</text>
+<text x="212.0" y="276" font-size="15" fill="#444444" text-anchor="middle">Feature-Branch und Pull Request</text>
+<rect x="453" y="210" width="302" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="604.0" y="248" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Amplify Build</text>
+<text x="604.0" y="276" font-size="15" fill="#444444" text-anchor="middle">Build je Branch nach Buildspec</text>
+<rect x="845" y="210" width="302" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="996.0" y="248" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Amplify Hosting</text>
+<text x="996.0" y="276" font-size="15" fill="#444444" text-anchor="middle">liefert das Frontend aus</text>
+<path d="M363,270.0 L453,270.0" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#kette)"/>
+<circle cx="398" cy="270.0" r="15" fill="#2E6BE6"/>
+<text x="398" y="276.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,270.0 L845,270.0" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#kette)"/>
+<circle cx="790" cy="270.0" r="15" fill="#2E6BE6"/>
+<text x="790" y="276.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<rect x="1300" y="160" width="260" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="1430.0" y="198" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Preview-URL</text>
+<text x="1430.0" y="226" font-size="15" fill="#444444" text-anchor="middle">eigene URL je Pull Request</text>
+<text x="1430.0" y="254" font-size="15" fill="#444444" text-anchor="middle">gelöscht beim Merge</text>
+<rect x="1300" y="330" width="260" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="1430.0" y="368" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Produktion</text>
+<text x="1430.0" y="396" font-size="15" fill="#444444" text-anchor="middle">main geht atomar live</text>
+<text x="1430.0" y="424" font-size="15" fill="#444444" text-anchor="middle">Custom Domain</text>
+<path d="M1147,270.0 L1225,270.0 L1225,225.0 L1300,225.0" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#kette)"/>
+<path d="M1147,270.0 L1225,270.0 L1225,395.0 L1300,395.0" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#kette)"/>
+<circle cx="1182" cy="270.0" r="15" fill="#2E6BE6"/>
+<text x="1182" y="276.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<rect x="845" y="420" width="302" height="110" rx="10" fill="#F7F1F1" stroke="#9A9A9A" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="996.0" y="456" font-size="22" font-weight="bold" fill="#555555" text-anchor="middle">Amplify Gen 1</text>
+<text x="996.0" y="482" font-size="15" fill="#444444" text-anchor="middle">Maintenance Mode</text>
+<text x="996.0" y="508" font-size="15" fill="#444444" text-anchor="middle">EOL 01.05.2027</text>
+<rect x="1258" y="620" width="302" height="110" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1409.0" y="658" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 und CloudFront</text>
+<text x="1409.0" y="686" font-size="15" fill="#444444" text-anchor="middle">Deploy-Skript von Hand</text>
+<path d="M212.0,330 L212.0,675 L1258,675" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#verworfen)"/>
+<circle cx="735.0" cy="675" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M726.0,666 L744.0,684" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M726.0,684 L744.0,666" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="735.0" y="646" font-size="15" fill="#9E1015" text-anchor="middle">keine Preview-Umgebung, kein Teardown</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Preview je Pull Request, Teardown automatisch  ·  Hosting ist unabhängig von der Backend-Generation</text>
+</svg>

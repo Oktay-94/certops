@@ -1,0 +1,64 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="ablehn" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 96 — Express oder Standard</text>
+<text x="60" y="106" font-size="21" fill="#555555">Zwei Workflow-Typen von Step Functions, fünf Unterschiede, eine Entscheidung</text>
+<rect x="400" y="148" width="510" height="50" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="655.0" y="182" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Standard Workflows</text>
+<rect x="1030" y="148" width="510" height="50" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1285.0" y="182" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Express Workflows</text>
+<rect x="400" y="210" width="510" height="88" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="655.0" y="244" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Ein Jahr</text>
+<text x="655.0" y="270" font-size="15" fill="#444444" text-anchor="middle">langlaufend, auch mit Wartezeiten</text>
+<rect x="1030" y="210" width="510" height="88" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1285.0" y="244" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Fünf Minuten</text>
+<text x="1285.0" y="270" font-size="15" fill="#444444" text-anchor="middle">danach bricht die Ausführung ab</text>
+<text x="380" y="260.0" font-size="17" font-weight="bold" fill="#232F3E" text-anchor="end">Maximale Laufzeit</text>
+<rect x="400" y="306" width="510" height="96" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="655.0" y="338" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">exactly-once</text>
+<text x="655.0" y="362" font-size="15" fill="#444444" text-anchor="middle">nicht-idempotente Schritte sind sicher</text>
+<rect x="1030" y="306" width="510" height="96" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1285.0" y="338" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">at-least-once</text>
+<text x="1285.0" y="362" font-size="15" fill="#444444" text-anchor="middle">asynchron: kann mehrfach laufen</text>
+<text x="1285.0" y="386" font-size="15" fill="#444444" text-anchor="middle">synchron: at-most-once</text>
+<text x="380" y="360.0" font-size="17" font-weight="bold" fill="#232F3E" text-anchor="end">Ausführungssemantik</text>
+<rect x="400" y="410" width="510" height="88" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="655.0" y="444" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Je State Transition</text>
+<text x="655.0" y="470" font-size="15" fill="#444444" text-anchor="middle">jeder fertige Schritt zählt</text>
+<rect x="1030" y="410" width="510" height="88" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1285.0" y="444" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Aufrufe, Dauer, Speicher</text>
+<text x="1285.0" y="470" font-size="15" fill="#444444" text-anchor="middle">drei Faktoren statt Schritten</text>
+<text x="380" y="460.0" font-size="17" font-weight="bold" fill="#232F3E" text-anchor="end">Abrechnung</text>
+<rect x="400" y="506" width="510" height="96" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="655.0" y="538" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">API und Konsole</text>
+<text x="655.0" y="562" font-size="15" fill="#444444" text-anchor="middle">bis 90 Tage nach Abschluss</text>
+<rect x="1030" y="506" width="510" height="96" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1285.0" y="538" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Nur CloudWatch Logs</text>
+<text x="1285.0" y="562" font-size="15" fill="#444444" text-anchor="middle">Step Functions speichert nichts</text>
+<text x="1285.0" y="586" font-size="15" fill="#444444" text-anchor="middle">Logging muss aktiv sein</text>
+<text x="380" y="560.0" font-size="17" font-weight="bold" fill="#232F3E" text-anchor="end">Ausführungshistorie</text>
+<rect x="400" y="610" width="510" height="96" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="655.0" y="642" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Alle Muster</text>
+<text x="655.0" y="666" font-size="15" fill="#444444" text-anchor="middle">.sync und .waitForTaskToken</text>
+<text x="655.0" y="690" font-size="15" fill="#444444" text-anchor="middle">Distributed Map, Activities</text>
+<rect x="1030" y="610" width="510" height="96" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1285.0" y="642" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Diese Muster fehlen</text>
+<text x="1285.0" y="666" font-size="15" fill="#444444" text-anchor="middle">kein .sync, kein Task Token</text>
+<text x="1285.0" y="690" font-size="15" fill="#444444" text-anchor="middle">keine Distributed Map</text>
+<text x="380" y="664.0" font-size="17" font-weight="bold" fill="#232F3E" text-anchor="end">Integrationsmuster</text>
+<rect x="400" y="714" width="510" height="86" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="655.0" y="748" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Passt</text>
+<text x="655.0" y="774" font-size="15" fill="#444444" text-anchor="middle">exactly-once schützt die Buchung</text>
+<rect x="1030" y="714" width="510" height="86" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1285.0" y="748" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Falle</text>
+<text x="1285.0" y="774" font-size="15" fill="#444444" text-anchor="middle">at-least-once bucht womöglich zweimal</text>
+<text x="380" y="763.0" font-size="17" font-weight="bold" fill="#232F3E" text-anchor="end">Zahlungslauf steuern</text>
+<path d="M910,757.0 L1030,757.0" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#ablehn)"/>
+<circle cx="955.0" cy="757.0" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M946.0,748.0 L964.0,766.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M946.0,766.0 L964.0,748.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Kurz und idempotent: Express  ·  Lang, exakt und auditierbar: Standard</text>
+</svg>

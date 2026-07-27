@@ -1,0 +1,49 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mfluss" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+<marker id="mverw" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 91 — IoT Core, Rules Engine, DynamoDB</text>
+<text x="60" y="106" font-size="21" fill="#555555">100.000 Sensoren per MQTT anbinden und die Messwerte ohne eigene Server in eine Tabelle routen</text>
+<rect x="61" y="250" width="302" height="160" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="285" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Sensorflotte</text>
+<text x="212.0" y="311" font-size="15" fill="#444444" text-anchor="middle">100.000 Sensoren</text>
+<text x="212.0" y="337" font-size="15" fill="#444444" text-anchor="middle">MQTT über TLS</text>
+<text x="212.0" y="363" font-size="15" fill="#444444" text-anchor="middle">X.509 je Gerät</text>
+<rect x="453" y="250" width="302" height="160" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="604.0" y="285" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">IoT Core Broker</text>
+<text x="604.0" y="311" font-size="15" fill="#444444" text-anchor="middle">Pub/Sub Message Broker</text>
+<text x="604.0" y="337" font-size="15" fill="#444444" text-anchor="middle">IoT Policy prüft Publish</text>
+<text x="604.0" y="363" font-size="15" fill="#444444" text-anchor="middle">Kein Server zu betreiben</text>
+<rect x="845" y="250" width="302" height="160" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="996.0" y="285" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Rules Engine</text>
+<text x="996.0" y="311" font-size="15" fill="#444444" text-anchor="middle">SQL auf dem Topic-Stream</text>
+<text x="996.0" y="337" font-size="15" fill="#444444" text-anchor="middle">SELECT * FROM 'sensors/+'</text>
+<text x="996.0" y="363" font-size="15" fill="#444444" text-anchor="middle">Filtert und transformiert</text>
+<rect x="1237" y="250" width="302" height="160" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1388.0" y="285" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">DynamoDB</text>
+<text x="1388.0" y="311" font-size="15" fill="#444444" text-anchor="middle">Rule Action dynamoDBv2</text>
+<text x="1388.0" y="337" font-size="15" fill="#444444" text-anchor="middle">Attribut je Spalte</text>
+<text x="1388.0" y="363" font-size="15" fill="#444444" text-anchor="middle">Schreibt ohne Glue-Code</text>
+<rect x="1200" y="560" width="302" height="120" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="1351.0" y="595" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Lambda als Umweg</text>
+<text x="1351.0" y="621" font-size="15" fill="#444444" text-anchor="middle">Hop ohne fachlichen Gewinn</text>
+<text x="1351.0" y="647" font-size="15" fill="#444444" text-anchor="middle">Mehr Kosten, mehr Latenz</text>
+<path d="M363,330 L453,330" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="398" cy="330" r="15" fill="#0F7C8C"/>
+<text x="398" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,330 L845,330" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="790" cy="330" r="15" fill="#0F7C8C"/>
+<text x="790" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1147,330 L1237,330" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mfluss)"/>
+<circle cx="1182" cy="330" r="15" fill="#0F7C8C"/>
+<text x="1182" y="336" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M996.0,410 L996.0,620 L1200,620" fill="none" stroke="#C7161D" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#mverw)"/>
+<circle cx="1098.0" cy="620" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M1089.0,611 L1107.0,629" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M1089.0,629 L1107.0,611" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="1098.0" y="591" font-size="15" fill="#9E1015" text-anchor="middle">native Action genügt</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Viele Geräte + MQTT: IoT Core  ·  Routing ohne Code: Rule Action  ·  Basic Ingest spart Broker-Kosten</text>
+</svg>

@@ -35,7 +35,7 @@ describe("listScenarios", () => {
       for (const d of s.domains) {
         expect(SAA_C03_DOMAINS).toContain(d);
       }
-      expect(s.slug).toMatch(/^\d{2}$/);
+      expect(s.slug).toMatch(/^\d{2,3}$/);
       expect(s.slug).toBe(scenarioSlug(s.nr));
     }
   });
@@ -98,11 +98,23 @@ describe("getScenario", () => {
     expect(scenario!.body).not.toBe("");
   });
 
-  it("accepts only the zero-padded slug format", () => {
+  it("accepts only the canonical slug format", () => {
+    // Rejected by the scenarioSlug round-trip, not by a digit count.
     expect(getScenario("1")).toBeNull();
     expect(getScenario("001")).toBeNull();
+    expect(getScenario("1e2")).toBeNull();
+    // "NaN" survives the round-trip and both NaN range comparisons — only the
+    // leading digit test stops it before it reaches the filesystem.
+    expect(getScenario("NaN")).toBeNull();
+    // Canonical but out of range.
     expect(getScenario("00")).toBeNull();
-    expect(getScenario("71")).toBeNull();
-    expect(getScenario("70")).not.toBeNull();
+  });
+
+  it("serves the last card and rejects the one past it", () => {
+    expect(getScenario("100")).not.toBeNull();
+  });
+
+  it("rejects card 101", () => {
+    expect(getScenario("101")).toBeNull();
   });
 });

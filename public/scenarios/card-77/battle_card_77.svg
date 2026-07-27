@@ -1,0 +1,60 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="sg" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+<marker id="sv" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 77 — Container im eigenen Rechenzentrum</text>
+<text x="60" y="106" font-size="21" fill="#555555">ECS Anywhere · EKS Hybrid Nodes · EKS Anywhere — wo liegt der Control Plane?</text>
+<rect x="55" y="132" width="473" height="60" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="291.5" y="167" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">ECS Anywhere</text>
+<rect x="563" y="132" width="473" height="60" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="799.5" y="167" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">EKS Hybrid Nodes</text>
+<rect x="1071" y="132" width="473" height="60" rx="10" fill="#EDF0F4" stroke="#232F3E" stroke-width="2.5"/>
+<text x="1307.5" y="167" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">EKS Anywhere</text>
+<rect x="40" y="215" width="1520" height="185" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="140" y="243" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS Region</text>
+<rect x="40" y="460" width="1520" height="340" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="130" y="488" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">On-Premises</text>
+<rect x="55" y="262" width="473" height="120" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="291.5" y="297" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">ECS Control Plane</text>
+<text x="291.5" y="323" font-size="15" fill="#444444" text-anchor="middle">plant Tasks, eine Konsole</text>
+<text x="291.5" y="349" font-size="15" fill="#444444" text-anchor="middle">Task-Definition + IAM wie in AWS</text>
+<rect x="563" y="262" width="473" height="120" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="799.5" y="297" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">EKS Control Plane</text>
+<text x="799.5" y="323" font-size="15" fill="#444444" text-anchor="middle">von AWS betrieben und gepatcht</text>
+<text x="799.5" y="349" font-size="15" fill="#444444" text-anchor="middle">Cluster-Lifecycle bei AWS</text>
+<text x="1307.5" y="322" font-size="15" font-style="italic" fill="#555555" text-anchor="middle">kein Control Plane in AWS</text>
+<rect x="55" y="520" width="473" height="180" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="291.5" y="555" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">external instances</text>
+<text x="291.5" y="581" font-size="15" fill="#444444" text-anchor="middle">SSM Agent + ECS Agent + Docker</text>
+<text x="291.5" y="607" font-size="15" fill="#444444" text-anchor="middle">Launch Type EXTERNAL</text>
+<text x="291.5" y="633" font-size="15" fill="#444444" text-anchor="middle">ausgehend 443 genügt</text>
+<text x="291.5" y="659" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">kein ALB · kein Cloud Map · kein EFS</text>
+<rect x="563" y="520" width="473" height="180" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="799.5" y="555" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Hybrid Nodes</text>
+<text x="799.5" y="581" font-size="15" fill="#444444" text-anchor="middle">eigene VMs oder Bare Metal</text>
+<text x="799.5" y="607" font-size="15" fill="#444444" text-anchor="middle">verhalten sich wie EC2-Nodes</text>
+<text x="799.5" y="633" font-size="15" fill="#444444" text-anchor="middle">Verbindung dauerhaft nötig</text>
+<text x="799.5" y="659" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Kubernetes-API identisch</text>
+<rect x="1071" y="520" width="473" height="180" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5" stroke-dasharray="7,5"/>
+<text x="1307.5" y="555" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Cluster komplett lokal</text>
+<text x="1307.5" y="581" font-size="15" fill="#444444" text-anchor="middle">Control Plane im eigenen RZ</text>
+<text x="1307.5" y="607" font-size="15" fill="#444444" text-anchor="middle">eksctl / EKS-A-Tooling</text>
+<text x="1307.5" y="633" font-size="15" fill="#444444" text-anchor="middle">air-gapped möglich</text>
+<text x="1307.5" y="659" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">Lifecycle beim Kunden</text>
+<path d="M291.5,382 L291.5,520" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#sg)"/>
+<circle cx="291.5" cy="451" r="15" fill="#A16E00"/>
+<text x="291.5" y="457" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M799.5,382 L799.5,520" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#sg)"/>
+<circle cx="799.5" cy="451" r="15" fill="#A16E00"/>
+<text x="799.5" y="457" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1307.5,382 L1307.5,520" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#sv)"/>
+<circle cx="1307.5" cy="415" r="15" fill="#C7161D"/>
+<text x="1307.5" y="421" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="1307.5" cy="462" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M1298.5,453 L1316.5,471" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M1298.5,471 L1316.5,453" fill="none" stroke="#C7161D" stroke-width="4"/>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  ECS Anywhere und EKS Hybrid Nodes: Steuerung in AWS  ·  EKS Anywhere: Steuerung im RZ, dafür air-gapped</text>
+</svg>

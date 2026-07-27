@@ -1,0 +1,49 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mblau" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="mgold" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+<marker id="mrot" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 87 — Compute Optimizer, Rightsizing</text>
+<text x="60" y="106" font-size="21" fill="#555555">Zu große Instanzen finden und schrumpfen — vor dem Commitment</text>
+<rect x="40" y="160" width="1520" height="230" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="800" y="188" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Rightsizing zuerst — dann erst binden</text>
+<rect x="61" y="210" width="302" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="212.0" y="245" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">CloudWatch-Metriken</text>
+<text x="212.0" y="271" font-size="15" fill="#444444" text-anchor="middle">mind. 30 h aus 14 Tagen</text>
+<text x="212.0" y="297" font-size="15" fill="#444444" text-anchor="middle">Memory nur mit CW-Agent</text>
+<text x="212.0" y="323" font-size="15" fill="#444444" text-anchor="middle">Cost Explorer aktiviert</text>
+<rect x="453" y="210" width="302" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="604.0" y="245" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Compute Optimizer</text>
+<text x="604.0" y="271" font-size="15" fill="#444444" text-anchor="middle">over-provisioned / optimized</text>
+<text x="604.0" y="297" font-size="15" fill="#444444" text-anchor="middle">Enhanced Metrics: 93 Tage, paid</text>
+<rect x="845" y="210" width="302" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="996.0" y="245" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Instanz verkleinert</text>
+<text x="996.0" y="271" font-size="15" fill="#444444" text-anchor="middle">kleinerer Typ oder Graviton</text>
+<text x="996.0" y="297" font-size="15" fill="#444444" text-anchor="middle">Baseline sinkt dauerhaft</text>
+<rect x="1237" y="210" width="302" height="130" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="1388.0" y="245" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Savings Plan binden</text>
+<text x="1388.0" y="271" font-size="15" fill="#444444" text-anchor="middle">Commitment auf neue Baseline</text>
+<text x="1388.0" y="297" font-size="15" fill="#444444" text-anchor="middle">1 oder 3 Jahre</text>
+<rect x="580" y="540" width="440" height="120" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="800.0" y="575" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Savings Plan auf Ist-Flotte</text>
+<text x="800.0" y="601" font-size="15" fill="#444444" text-anchor="middle">bindet die zu große Flotte</text>
+<text x="800.0" y="627" font-size="15" fill="#444444" text-anchor="middle">Rabatt zementiert Verschwendung</text>
+<path d="M363,275.0 L453,275.0" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#mblau)"/>
+<circle cx="398" cy="275.0" r="15" fill="#2E6BE6"/>
+<text x="398" y="281.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,275.0 L845,275.0" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mgold)"/>
+<circle cx="790" cy="275.0" r="15" fill="#A16E00"/>
+<text x="790" y="281.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1147,275.0 L1237,275.0" fill="none" stroke="#A16E00" stroke-width="3" marker-end="url(#mgold)"/>
+<circle cx="1182" cy="275.0" r="15" fill="#A16E00"/>
+<text x="1182" y="281.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M212.0,340 L212.0,450 L800.0,450 L800.0,540" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#mrot)"/>
+<circle cx="680" cy="450" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M671,441 L689,459" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M671,459 L689,441" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="420" y="432" font-size="15" fill="#C7161D" text-anchor="middle">überspringt Rightsizing</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Erst rightsizen, dann Rabatt binden  ·  Ohne CW-Agent keine Memory-Daten  ·  14 Tage Lookback, 93 mit Enhanced</text>
+</svg>

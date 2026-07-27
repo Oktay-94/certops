@@ -1,0 +1,57 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="arrQ" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="arrT" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+<marker id="arrS" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3F8624"/></marker>
+<marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A16E00"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 73 — AWS DataSync</text>
+<text x="60" y="106" font-size="21" fill="#555555">Wiederkehrende NFS→S3/EFS-Synchronisation über die Leitung — inkrementell nach der Erstkopie</text>
+<rect x="60" y="150" width="500" height="550" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="310.0" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">ON-PREMISE</text>
+<rect x="700" y="150" width="840" height="550" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="1120.0" y="178" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">AWS ACCOUNT</text>
+<rect x="100" y="210" width="280" height="140" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="240.0" y="245" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">NFS-Fileserver</text>
+<text x="240.0" y="271" font-size="15" fill="#444444" text-anchor="middle">Shares mit POSIX-Metadaten</text>
+<text x="240.0" y="297" font-size="15" fill="#444444" text-anchor="middle">bleibt produktiv</text>
+<rect x="120" y="440" width="400" height="140" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="320.0" y="475" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">DataSync Agent</text>
+<text x="320.0" y="501" font-size="15" fill="#444444" text-anchor="middle">VM im eigenen RZ</text>
+<text x="320.0" y="527" font-size="15" fill="#444444" text-anchor="middle">liest Shares, sendet per TLS</text>
+<rect x="740" y="400" width="380" height="160" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="930.0" y="435" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">DataSync Service</text>
+<text x="930.0" y="461" font-size="15" fill="#444444" text-anchor="middle">inkrementell nach Erstkopie</text>
+<text x="930.0" y="487" font-size="15" fill="#444444" text-anchor="middle">Kompression + Integritätscheck</text>
+<rect x="1240" y="210" width="280" height="120" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1380.0" y="245" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">S3 Bucket</text>
+<text x="1380.0" y="271" font-size="15" fill="#444444" text-anchor="middle">Datei → Objekt 1:1</text>
+<text x="1380.0" y="297" font-size="15" fill="#444444" text-anchor="middle">Metadaten bleiben erhalten</text>
+<rect x="1240" y="430" width="280" height="100" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1380.0" y="465" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Amazon EFS</text>
+<text x="1380.0" y="491" font-size="15" fill="#444444" text-anchor="middle">POSIX-Dateisystem</text>
+<rect x="740" y="180" width="380" height="120" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="930.0" y="215" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Zeitplan (Task)</text>
+<text x="930.0" y="241" font-size="15" fill="#444444" text-anchor="middle">stündlich · täglich · wöchentlich</text>
+<text x="930.0" y="267" font-size="15" font-style="italic" fill="#666666" text-anchor="middle">ohne eigene Skripte</text>
+<path d="M240,350 L240,440" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#arrQ)"/>
+<circle cx="240" cy="398" r="15" fill="#2E6BE6"/>
+<text x="240" y="404" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="262" y="403" font-size="15" fill="#1B3E86" text-anchor="start">liest über NFS</text>
+<path d="M520,510 L740,510" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#arrT)"/>
+<circle cx="630" cy="510" r="15" fill="#0F7C8C"/>
+<text x="630" y="516" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="630" y="482" font-size="15" fill="#0B5A66" text-anchor="middle">TLS, komprimiert</text>
+<path d="M1120,460 L1180,460 L1180,270 L1240,270" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#arrS)"/>
+<circle cx="1180" cy="350" r="15" fill="#3F8624"/>
+<text x="1180" y="356" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="1162" y="355" font-size="15" fill="#2E6318" text-anchor="end">Objekte</text>
+<path d="M1120,500 L1240,480" fill="none" stroke="#3F8624" stroke-width="3" marker-end="url(#arrS)"/>
+<circle cx="1176" cy="491" r="15" fill="#3F8624"/>
+<text x="1176" y="497" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+<path d="M930,300 L930,400" fill="none" stroke="#A16E00" stroke-width="3" stroke-dasharray="8,6" marker-end="url(#arrG)"/>
+<text x="948" y="355" font-size="15" fill="#7A5300" text-anchor="start">startet Läufe</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  DataSync = geplanter Transfer, inkrementell  ·  Metadaten überleben den Umzug  ·  Dauer-Hybrid-Zugriff = Storage Gateway, nicht DataSync</text>
+</svg>

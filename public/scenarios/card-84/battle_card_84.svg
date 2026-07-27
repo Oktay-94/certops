@@ -1,0 +1,62 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="aN" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#232F3E"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 84 — Route 53 Health Checks + Failover</text>
+<text x="60" y="106" font-size="21" fill="#555555">Wie der Verkehr auf die Standby-Region umschaltet — und warum „automatisch“ nicht „sofort“ heißt</text>
+<rect x="70" y="150" width="290" height="180" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="215.0" y="185" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Health Checker</text>
+<text x="215.0" y="211" font-size="15" fill="#444444" text-anchor="middle">verteilte Prüfstellen im Netz</text>
+<text x="215.0" y="237" font-size="15" fill="#444444" text-anchor="middle">Intervall 30 s oder 10 s</text>
+<text x="215.0" y="263" font-size="15" fill="#444444" text-anchor="middle">Failure Threshold 1 bis 10</text>
+<text x="215.0" y="289" font-size="15" fill="#444444" text-anchor="middle">Standard: 3 Beobachtungen</text>
+<rect x="460" y="150" width="290" height="180" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="605.0" y="185" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Die 18-%-Regel</text>
+<text x="605.0" y="211" font-size="15" fill="#444444" text-anchor="middle">melden mehr als 18 % der</text>
+<text x="605.0" y="237" font-size="15" fill="#444444" text-anchor="middle">Checker den Endpoint gesund,</text>
+<text x="605.0" y="263" font-size="15" fill="#444444" text-anchor="middle">gilt er als gesund —</text>
+<text x="605.0" y="289" font-size="15" fill="#444444" text-anchor="middle">darunter: unhealthy</text>
+<rect x="850" y="150" width="290" height="180" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="995.0" y="185" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">Failover-Record</text>
+<text x="995.0" y="211" font-size="15" fill="#444444" text-anchor="middle">Primary ist unhealthy,</text>
+<text x="995.0" y="237" font-size="15" fill="#444444" text-anchor="middle">also antwortet Route 53</text>
+<text x="995.0" y="263" font-size="15" fill="#444444" text-anchor="middle">mit dem Secondary-Record</text>
+<rect x="1240" y="150" width="290" height="180" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="1385.0" y="185" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Client folgt</text>
+<text x="1385.0" y="211" font-size="15" fill="#444444" text-anchor="middle">aber erst, wenn seine TTL</text>
+<text x="1385.0" y="237" font-size="15" fill="#444444" text-anchor="middle">abgelaufen ist</text>
+<text x="1385.0" y="263" font-size="15" fill="#444444" text-anchor="middle">AWS empfiehlt 60 s</text>
+<text x="1385.0" y="289" font-size="15" fill="#444444" text-anchor="middle">Resolver halten oft länger</text>
+<path d="M365,240 L455,240" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<circle cx="400" cy="240" r="15" fill="#232F3E"/>
+<text x="400" y="246" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M755,240 L845,240" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<circle cx="790" cy="240" r="15" fill="#232F3E"/>
+<text x="790" y="246" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1145,240 L1235,240" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<circle cx="1180" cy="240" r="15" fill="#232F3E"/>
+<text x="1180" y="246" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<rect x="70" y="430" width="980" height="140" rx="10" fill="#FBF5E6" stroke="#A16E00" stroke-width="2.5"/>
+<text x="560.0" y="465" font-size="22" font-weight="bold" fill="#7A5300" text-anchor="middle">Failover-Zeit = Intervall × Threshold + Aggregation + TTL</text>
+<text x="560.0" y="491" font-size="15" fill="#444444" text-anchor="middle">30 s × 3 ergibt rund 90 Sekunden allein für die Erkennung. Danach kommt die</text>
+<text x="560.0" y="517" font-size="15" fill="#444444" text-anchor="middle">Verbreitung der neuen Antwort, danach der Ablauf der Zwischenspeicher.</text>
+<text x="560.0" y="543" font-size="15" fill="#444444" text-anchor="middle">Schneller als der Cache seiner Clients wird DNS-Failover nie.</text>
+<rect x="1150" y="430" width="380" height="140" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="1340.0" y="465" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Standby-Region</text>
+<text x="1340.0" y="491" font-size="15" fill="#444444" text-anchor="middle">der Warm Standby aus</text>
+<text x="1340.0" y="517" font-size="15" fill="#444444" text-anchor="middle">Karte 83 wird hochskaliert</text>
+<path d="M1340,335 L1340,425" fill="none" stroke="#232F3E" stroke-width="3" marker-end="url(#aN)"/>
+<circle cx="1340" cy="365" r="15" fill="#232F3E"/>
+<text x="1340" y="371" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+<circle cx="140" cy="705.0" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M131,696.0 L149,714.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M131,714.0 L149,696.0" fill="none" stroke="#C7161D" stroke-width="4"/>
+<rect x="200" y="640" width="1310" height="130" rx="10" fill="#FDEEEE" stroke="#C7161D" stroke-width="2.5"/>
+<text x="855.0" y="670" font-size="22" font-weight="bold" fill="#9E1015" text-anchor="middle">Health Check direkt auf eine Instanz im privaten Subnetz</text>
+<text x="855.0" y="694" font-size="15" fill="#444444" text-anchor="middle">Die Health Checker arbeiten aus dem öffentlichen Internet und erreichen private IP-Adressen nicht. Für solche</text>
+<text x="855.0" y="718" font-size="15" fill="#444444" text-anchor="middle">Endpunkte gibt es metrikbasierte Health Checks: ein CloudWatch-Alarm wird zum Health Check.</text>
+<text x="855.0" y="742" font-size="15" fill="#444444" text-anchor="middle">Zweite Falle: Sind Primary und Secondary beide unhealthy, antwortet Route 53 mit dem Primary.</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Erkennung = Intervall × Failure Threshold  ·  TTL bestimmt, wann der Client folgt  ·  Privater Endpoint → CloudWatch-Alarm als Health Check</text>
+</svg>

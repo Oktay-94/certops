@@ -1,0 +1,56 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="DejaVu Sans">
+<defs>
+<marker id="mblau" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2E6BE6"/></marker>
+<marker id="mteal" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0F7C8C"/></marker>
+<marker id="morange" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#D97706"/></marker>
+<marker id="mrot" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#C7161D"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<text x="60" y="70" font-size="40" font-weight="bold" fill="#111111">Battle Card 89 — SQS, Idempotenz, Retry-Patterns</text>
+<text x="60" y="106" font-size="21" fill="#555555">FIFO verhindert Producer-Duplikate — Consumer-Redelivery bleibt deine Aufgabe</text>
+<rect x="40" y="185" width="760" height="215" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="420" y="213" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Duplikat 1 — FIFO löst das</text>
+<rect x="830" y="185" width="730" height="215" rx="12" fill="none" stroke="#BBBBBB" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="1195" y="213" font-size="18" font-weight="bold" fill="#888888" text-anchor="middle">Duplikat 2 — nur dein Code</text>
+<rect x="61" y="230" width="287" height="130" rx="10" fill="#EFF4FE" stroke="#2E6BE6" stroke-width="2.5"/>
+<text x="204.5" y="265" font-size="22" font-weight="bold" fill="#1B3E86" text-anchor="middle">Producer</text>
+<text x="204.5" y="291" font-size="15" fill="#444444" text-anchor="middle">sendet, Timeout, sendet erneut</text>
+<text x="204.5" y="317" font-size="15" fill="#444444" text-anchor="middle">gleiche Deduplication-ID</text>
+<rect x="438" y="230" width="287" height="130" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="581.5" y="265" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">SQS FIFO</text>
+<text x="581.5" y="291" font-size="15" fill="#444444" text-anchor="middle">Dedup-Intervall: 5 Minuten</text>
+<text x="581.5" y="317" font-size="15" fill="#444444" text-anchor="middle">Duplikat 1 wird verworfen</text>
+<text x="581.5" y="343" font-size="15" fill="#444444" text-anchor="middle">exactly-once processing</text>
+<rect x="875" y="230" width="287" height="130" rx="10" fill="#FEF7EC" stroke="#D97706" stroke-width="2.5"/>
+<text x="1018.5" y="265" font-size="22" font-weight="bold" fill="#A85A05" text-anchor="middle">Consumer</text>
+<text x="1018.5" y="291" font-size="15" fill="#444444" text-anchor="middle">Seiteneffekt ausgeführt</text>
+<text x="1018.5" y="317" font-size="15" fill="#444444" text-anchor="middle">Crash vor DeleteMessage</text>
+<text x="1018.5" y="343" font-size="15" fill="#444444" text-anchor="middle">Visibility Timeout läuft ab</text>
+<rect x="1252" y="230" width="287" height="130" rx="10" fill="#F1F8EC" stroke="#3F8624" stroke-width="2.5"/>
+<text x="1395.5" y="265" font-size="22" font-weight="bold" fill="#2E6318" text-anchor="middle">Idempotenz</text>
+<text x="1395.5" y="291" font-size="15" fill="#444444" text-anchor="middle">Schlüssel = Order-ID</text>
+<text x="1395.5" y="317" font-size="15" fill="#444444" text-anchor="middle">conditional write in DynamoDB</text>
+<text x="1395.5" y="343" font-size="15" fill="#444444" text-anchor="middle">zweite Runde bleibt folgenlos</text>
+<rect x="580" y="550" width="440" height="120" rx="10" fill="#EBF6F7" stroke="#0F7C8C" stroke-width="2.5"/>
+<text x="800.0" y="585" font-size="22" font-weight="bold" fill="#0B5A66" text-anchor="middle">FIFO reicht, Rest egal</text>
+<text x="800.0" y="611" font-size="15" fill="#444444" text-anchor="middle">Redelivery trifft die Datenbank</text>
+<text x="800.0" y="637" font-size="15" fill="#444444" text-anchor="middle">doppelt gebucht, doppelt bezahlt</text>
+<path d="M348,295.0 L438,295.0" fill="none" stroke="#2E6BE6" stroke-width="3" marker-end="url(#mblau)"/>
+<circle cx="383" cy="295.0" r="15" fill="#2E6BE6"/>
+<text x="383" y="301.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+<path d="M725,295.0 L875,295.0" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mteal)"/>
+<circle cx="760" cy="295.0" r="15" fill="#0F7C8C"/>
+<text x="760" y="301.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+<path d="M1162,295.0 L1252,295.0" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#morange)"/>
+<circle cx="1197" cy="295.0" r="15" fill="#D97706"/>
+<text x="1197" y="301.0" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+<path d="M1018.5,230 L1018.5,160 L581.5,160 L581.5,230" fill="none" stroke="#0F7C8C" stroke-width="3" marker-end="url(#mteal)"/>
+<text x="800" y="148" font-size="15" fill="#0F7C8C" text-anchor="middle">Redelivery nach Visibility Timeout</text>
+<path d="M581.5,360 L581.5,460 L800.0,460 L800.0,550" fill="none" stroke="#C7161D" stroke-width="3" marker-end="url(#mrot)"/>
+<circle cx="690" cy="460" r="20" fill="#FFFFFF" stroke="#C7161D" stroke-width="3"/>
+<path d="M681,451 L699,469" fill="none" stroke="#C7161D" stroke-width="4"/>
+<path d="M681,469 L699,451" fill="none" stroke="#C7161D" stroke-width="4"/>
+<text x="430" y="442" font-size="15" fill="#C7161D" text-anchor="middle">Idempotenz weggelassen</text>
+<rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
+<text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Standard: at-least-once, immer idempotent  ·  FIFO dedupliziert nur 5 Minuten lang  ·  Crash vor Delete = zweite Zustellung</text>
+</svg>
