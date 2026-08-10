@@ -64,6 +64,20 @@ function assetUrl(nr: number, ext: "svg" | "pdf" | "png"): string {
   return `/scenarios/${cardDir(nr)}/${cardStem(nr)}.${ext}`;
 }
 
+function requireString(v: unknown, key: string, file: string): string {
+  if (typeof v !== "string" || v.trim() === "") {
+    throw new Error(`Frontmatter ungültig: "${key}" in ${file}`);
+  }
+  return v;
+}
+
+function requireNumber(v: unknown, key: string, file: string): number {
+  if (typeof v !== "number" || !Number.isFinite(v)) {
+    throw new Error(`Frontmatter ungültig: "${key}" in ${file}`);
+  }
+  return v;
+}
+
 function requireStringArray(v: unknown, key: string, file: string): string[] {
   if (
     !Array.isArray(v) ||
@@ -116,6 +130,136 @@ function readScenario(nr: number): { meta: ScenarioMeta; body: string } {
 /** All SCENARIO_COUNT scenarios sorted by nr; throws on any invalid card (build guard). */
 export function listScenarios(): ScenarioMeta[] {
   return Array.from({ length: SCENARIO_COUNT }, (_, i) => readScenario(i + 1).meta);
+}
+
+// --- Narrative long-form companion ------------------------------------------
+// Cards 1–39 have a narrative.md next to the battle card; 40–100 do not, and
+// that is the normal state, not an error. Every card prerenders, so a missing
+// file must never throw — a malformed one must.
+
+/** The nine canonical h2 keys, in the order check.py enforces. */
+export const NARRATIVE_SECTION_KEYS = [
+  "Die Grundidee zuerst",
+  "Was es eigentlich ist",
+  "Der Weg durch die Karte",
+  "Die entscheidende Unterscheidung",
+  "Die ehrliche Feinheit",
+  "Syntax lesen",
+  "Was du dadurch nicht baust",
+  "Wenn du dir eine Sache merkst",
+  "Prüfungsknackpunkte",
+] as const;
+
+export type NarrativeSectionKey = (typeof NARRATIVE_SECTION_KEYS)[number];
+
+/** The two keys a narrative may omit; the other seven are mandatory. */
+const OPTIONAL_SECTION_KEYS: readonly NarrativeSectionKey[] = [
+  "Die entscheidende Unterscheidung",
+  "Syntax lesen",
+];
+
+export type NarrativeMeta = {
+  cardNumber: number;
+  slug: string;
+  title: string;
+  services: string[];
+  domainCodes: ScenarioDomainCode[];
+  domains: SaaC03Domain[];
+  badgeCount: number;
+  narrativeVersion: number;
+  factCheckedAt: string;
+  sources: string[];
+};
+
+/** A narrative section; `key` is the canonical h2 with its " — " suffix cut. */
+export type NarrativeSection = SkriptSection & { key: NarrativeSectionKey };
+
+export type Narrative = {
+  meta: NarrativeMeta;
+  /** File order, which check.py pins to NARRATIVE_SECTION_KEYS order. */
+  sections: NarrativeSection[];
+};
+
+/**
+ * Headings carry free-form suffixes ("Syntax lesen — `evaluateOnExit`"); only
+ * the part before the em-dash separator identifies the section. The full text
+ * stays in `raw`/`text` and is what the reader sees.
+ */
+function narrativeKey(headingText: string): string {
+  return headingText.split(" — ")[0].trim();
+}
+
+/**
+ * The narrative for a card, or null when it has none.
+ *
+ * Missing file → null. That is load-bearing: listScenarios() feeds
+ * generateStaticParams over all SCENARIO_COUNT cards, so a throw on card 40
+ * would break the whole prerender. A file that exists but is malformed still
+ * throws — same loud-failure house style as readScenario.
+ */
+export function readNarrative(nr: number): Narrative | null {
+  const file = path.join(CONTENT_DIR, cardDir(nr), "narrative.md");
+  let raw: string;
+  try {
+    raw = fs.readFileSync(file, "utf8");
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw err;
+  }
+
+  const { data, content } = matter(raw);
+
+  const cardNumber = requireNumber(data.cardNumber, "cardNumber", file);
+  if (cardNumber !== nr) {
+    throw new Error(
+      `Narrativ-Frontmatter ungültig: cardNumber=${cardNumber} in ${file}`,
+    );
+  }
+  const domainCodes = requireStringArray(data.domains, "domains", file);
+  if (!domainCodes.every(isDomainCode)) {
+    throw new Error(
+      `Narrativ-Frontmatter ungültig: "domains" muss D1–D4 sein in ${file}`,
+    );
+  }
+
+  const meta: NarrativeMeta = {
+    cardNumber,
+    slug: requireString(data.slug, "slug", file),
+    title: requireString(data.title, "title", file),
+    services: requireStringArray(data.services, "services", file),
+    domainCodes,
+    domains: domainCodes.map((c) => DOMAIN_BY_CODE[c]),
+    badgeCount: requireNumber(data.badgeCount, "badgeCount", file),
+    narrativeVersion: requireNumber(
+      data.narrativeVersion,
+      "narrativeVersion",
+      file,
+    ),
+    factCheckedAt: requireString(data.factCheckedAt, "factCheckedAt", file),
+    sources: requireStringArray(data.sources, "sources", file),
+  };
+
+  const body = content.replace(/^\s*# .*\n/, "").trim();
+  const sections: NarrativeSection[] = [];
+  for (const s of splitChapter(body).sections) {
+    const key = narrativeKey(s.text);
+    if (!(NARRATIVE_SECTION_KEYS as readonly string[]).includes(key)) {
+      throw new Error(`Narrativ-Sektion unbekannt: "${s.text}" in ${file}`);
+    }
+    sections.push({ ...s, key: key as NarrativeSectionKey });
+  }
+
+  const present = new Set(sections.map((s) => s.key));
+  const missing = NARRATIVE_SECTION_KEYS.filter(
+    (k) => !present.has(k) && !OPTIONAL_SECTION_KEYS.includes(k),
+  );
+  if (missing.length > 0) {
+    throw new Error(
+      `Narrativ unvollständig: fehlende Sektionen ${missing.join(", ")} in ${file}`,
+    );
+  }
+
+  return { meta, sections };
 }
 
 // --- Production notes vs. study material ------------------------------------

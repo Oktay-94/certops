@@ -6,15 +6,23 @@ import path from "node:path";
 import matter from "gray-matter";
 import { describe, expect, it } from "vitest";
 import {
+  NARRATIVE_SECTION_KEYS,
   SCENARIO_COUNT,
   classifySection,
   getScenario,
   listScenarios,
+  readNarrative,
   scenarioSlug,
   splitScenarioBody,
 } from "./scenario-content";
 import { parseHeadings } from "./skript-content";
 import { SAA_C03_DOMAINS } from "./domains";
+import { clfC02Questions } from "../db/seed/index";
+import { clfC02QuestionsBatch2 } from "../db/seed/questions/index";
+import { clfC02QuestionsBatch3 } from "../db/seed/questions/index-batch3";
+import { clfC02Flashcards } from "../db/seed/cards/index";
+import { saaC03Flashcards, saaC03Questions } from "../db/seed/saa/index";
+import { loadSaaScripts } from "../db/seed/saa-scripts/index";
 
 const PUBLIC_DIR = path.join(process.cwd(), "public");
 
@@ -176,5 +184,101 @@ describe("classifySection / splitScenarioBody", () => {
     expect(classifySection("  ⚠️ Bewusste Vereinfachungen  ")).toBe("note");
     expect(classifySection("Prüfungs-Kernsatz")).toBe("learn");
     expect(classifySection("Faktencheck – Divergenzen")).toBe("learn");
+  });
+});
+
+describe("readNarrative", () => {
+  // Which cards actually have a narrative.md is read off disk, not hard-coded:
+  // the next narrative batch moves the boundary and must not break this file.
+  const withFile: number[] = [];
+  const withoutFile: number[] = [];
+  for (let nr = 1; nr <= SCENARIO_COUNT; nr++) {
+    const file = path.join(
+      PUBLIC_DIR,
+      "scenarios",
+      `card-${scenarioSlug(nr)}`,
+      "narrative.md",
+    );
+    (fs.existsSync(file) ? withFile : withoutFile).push(nr);
+  }
+
+  it("covers both cases, so neither branch is silently untested", () => {
+    expect(withFile.length).toBeGreaterThan(0);
+    expect(withoutFile.length).toBeGreaterThan(0);
+  });
+
+  it("returns null — never throws — for every card without a file", () => {
+    // Load-bearing: generateStaticParams prerenders all SCENARIO_COUNT cards,
+    // so a throw here would break the build, not just one page.
+    for (const nr of withoutFile) {
+      expect(() => readNarrative(nr), `Karte ${nr}`).not.toThrow();
+      expect(readNarrative(nr), `Karte ${nr}`).toBeNull();
+    }
+  });
+
+  it("parses every card that has a file, with the mandatory sections", () => {
+    const optional = ["Die entscheidende Unterscheidung", "Syntax lesen"];
+    const mandatory = NARRATIVE_SECTION_KEYS.filter(
+      (k) => !optional.includes(k),
+    );
+    for (const nr of withFile) {
+      const n = readNarrative(nr);
+      expect(n, `Karte ${nr}`).not.toBeNull();
+      expect(n!.meta.cardNumber, `Karte ${nr}`).toBe(nr);
+      expect(n!.meta.slug, `Karte ${nr}`).not.toBe("");
+      expect(n!.meta.domains.length, `Karte ${nr}`).toBeGreaterThan(0);
+      const keys = n!.sections.map((s) => s.key);
+      for (const k of mandatory) {
+        expect(keys, `Karte ${nr}`).toContain(k);
+      }
+      // Suffixes after " — " are cut for the key but kept for the reader.
+      for (const s of n!.sections) {
+        expect(s.text.startsWith(s.key), `Karte ${nr}: "${s.text}"`).toBe(true);
+      }
+    }
+  });
+
+  it("keeps the sections in the canonical order", () => {
+    const rank = new Map(NARRATIVE_SECTION_KEYS.map((k, i) => [k, i]));
+    for (const nr of withFile) {
+      const ranks = readNarrative(nr)!.sections.map((s) => rank.get(s.key)!);
+      expect(ranks, `Karte ${nr}`).toEqual([...ranks].sort((a, b) => a - b));
+    }
+  });
+
+  it("has unique narrative slugs that collide with no other content type", () => {
+    const slugs = readNarrativeSlugs();
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const s of slugs) expect(s).toMatch(/^[a-z0-9-]+$/);
+
+    // Script slugs are the risky comparison — both are service-shaped url
+    // slugs, whereas seed keys carry a content-type prefix.
+    const scriptSlugs = loadSaaScripts().map((s) => s.slug);
+    const seedKeys = [
+      ...clfC02Questions,
+      ...clfC02QuestionsBatch2,
+      ...clfC02QuestionsBatch3,
+      ...saaC03Questions,
+      ...clfC02Flashcards,
+      ...saaC03Flashcards,
+    ]
+      .map((x) => x.seedKey)
+      .concat(loadSaaScripts().map((s) => s.seedKey));
+
+    const all = [...slugs, ...scriptSlugs, ...seedKeys];
+    const dupes = all.filter((x, i) => all.indexOf(x) !== i);
+    expect(dupes, `Kollisionen: ${dupes.join(", ")}`).toEqual([]);
+  });
+
+  function readNarrativeSlugs(): string[] {
+    return withFile.map((nr) => readNarrative(nr)!.meta.slug);
+  }
+});
+
+describe("listScenarios build safety", () => {
+  it("walks all SCENARIO_COUNT cards without throwing", () => {
+    // generateStaticParams calls this; if it throws, no page prerenders.
+    expect(() => listScenarios()).not.toThrow();
+    expect(listScenarios()).toHaveLength(SCENARIO_COUNT);
   });
 });

@@ -1,15 +1,19 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   SCENARIO_COUNT,
   getScenario,
   listScenarios,
+  readNarrative,
   scenarioSlug,
   splitScenarioBody,
 } from "@/lib/scenario-content";
 import { domainColorVars, getDomainColor } from "@/lib/domain-colors";
 import { SkriptMarkdown } from "@/components/skript/SkriptMarkdown";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
+import { NarrativeSwitch } from "./NarrativeSwitch";
+import { NarrativeView } from "./NarrativeView";
 
 // Fully static: all SCENARIO_COUNT cards prerender at build time (fs + gray-matter);
 // anything outside the enumerated slugs 404s via dynamicParams=false.
@@ -46,8 +50,30 @@ export default async function SzenarioDetailPage({
   const { meta, body } = scenario;
   // splitScenarioBody, not splitChapter — it drops the production-note sections.
   const { intro, sections } = splitScenarioBody(body);
+  // null for every card without a narrative.md (40–100 today) — the switch is
+  // then not rendered at all.
+  const narrative = readNarrative(meta.nr);
   const prevNr = meta.nr > 1 ? meta.nr - 1 : undefined;
   const nextNr = meta.nr < SCENARIO_COUNT ? meta.nr + 1 : undefined;
+
+  const shortView = (
+    <>
+      {intro && (
+        <div className="mt-6 text-[16.5px] text-ink-soft">
+          <SkriptMarkdown markdown={intro} />
+        </div>
+      )}
+
+      {sections.map((s) => (
+        <article
+          key={s.slug}
+          className="mt-6 rounded-2xl border border-line bg-surface px-6 py-7 shadow-[0_1px_2px_rgba(24,24,27,0.04),0_8px_24px_-16px_rgba(24,24,27,0.10)] dark:shadow-none sm:px-9 sm:py-8"
+        >
+          <SkriptMarkdown markdown={s.markdown} anchorPrefix={meta.slug} />
+        </article>
+      ))}
+    </>
+  );
 
   return (
     <div
@@ -122,20 +148,24 @@ export default async function SzenarioDetailPage({
           />
         </div>
 
-        {intro && (
-          <div className="mt-6 text-[16.5px] text-ink-soft">
-            <SkriptMarkdown markdown={intro} />
-          </div>
+        {/* Only the section area switches — header, diagram and pager are
+            identical in both views, so the SVG stays in the DOM exactly once
+            and the battle card sits above the narrative by construction.
+            The <Suspense> boundary is mandatory: NarrativeSwitch calls
+            useSearchParams(), and without a boundary Next.js opts the whole
+            route into client-side rendering, losing all prerendered paths.
+            The fallback is the short view, so the page reads fine in every
+            state — including with JS off. */}
+        {narrative ? (
+          <Suspense fallback={shortView}>
+            <NarrativeSwitch
+              short={shortView}
+              long={<NarrativeView narrative={narrative} />}
+            />
+          </Suspense>
+        ) : (
+          shortView
         )}
-
-        {sections.map((s) => (
-          <article
-            key={s.slug}
-            className="mt-6 rounded-2xl border border-line bg-surface px-6 py-7 shadow-[0_1px_2px_rgba(24,24,27,0.04),0_8px_24px_-16px_rgba(24,24,27,0.10)] dark:shadow-none sm:px-9 sm:py-8"
-          >
-            <SkriptMarkdown markdown={s.markdown} anchorPrefix={meta.slug} />
-          </article>
-        ))}
 
         {/* statusNote is deliberately not rendered: it carries the workshop
             log (qc.py counts, correction rounds, footer widths), which is not
