@@ -5,9 +5,9 @@ import {
   getScenario,
   listScenarios,
   scenarioSlug,
+  splitScenarioBody,
 } from "@/lib/scenario-content";
 import { domainColorVars, getDomainColor } from "@/lib/domain-colors";
-import { splitChapter } from "@/lib/skript-content";
 import { SkriptMarkdown } from "@/components/skript/SkriptMarkdown";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 
@@ -44,7 +44,8 @@ export default async function SzenarioDetailPage({
   if (!scenario) notFound();
 
   const { meta, body } = scenario;
-  const { intro, sections } = splitChapter(body);
+  // splitScenarioBody, not splitChapter — it drops the production-note sections.
+  const { intro, sections } = splitScenarioBody(body);
   const prevNr = meta.nr > 1 ? meta.nr - 1 : undefined;
   const nextNr = meta.nr < SCENARIO_COUNT ? meta.nr + 1 : undefined;
 

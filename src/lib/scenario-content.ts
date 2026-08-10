@@ -8,6 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { SAA_C03_DOMAINS, type SaaC03Domain } from "./domains";
+import { splitChapter, type SkriptSection } from "./skript-content";
 
 const CONTENT_DIR = path.join(process.cwd(), "public", "scenarios");
 
@@ -115,6 +116,102 @@ function readScenario(nr: number): { meta: ScenarioMeta; body: string } {
 /** All SCENARIO_COUNT scenarios sorted by nr; throws on any invalid card (build guard). */
 export function listScenarios(): ScenarioMeta[] {
   return Array.from({ length: SCENARIO_COUNT }, (_, i) => readScenario(i + 1).meta);
+}
+
+// --- Production notes vs. study material ------------------------------------
+// The card .md files carry production notes (colour conventions, fact-check
+// bookkeeping, deliberate simplifications) next to the actual study sections.
+// Both stay in the files; only the rendering drops the notes — same principle
+// as status_note.
+
+/** Headings whose (normalized) prefix marks a section as study material. */
+const ALLOW_PREFIX = [
+  "szenario",
+  "ablauf",
+  "pruefungs-kernsatz",
+  "klassiker-fallen",
+  "abgrenzung",
+  "faktencheck - divergenzen",
+  "nachtrag zur abgrenzung",
+  "rand",
+  "die ",
+  "pflicht-abgrenzung",
+  "divergenzen",
+  "aktueller service-status",
+  "vorbemerkung",
+];
+
+/** Exact (normalized) headings that are pure production notes. */
+const BLOCK_EXACT = ["faktencheck"];
+
+/** Heading prefixes that mark a section as a pure production note. */
+const BLOCK_PREFIX = [
+  "bewusste vereinfachungen",
+  "farbkonvention",
+  "farben",
+  "faktencheck-notizen",
+  "faktencheck-quellen",
+  "faktenlage geprueft",
+  "nicht bestaetigt",
+  "korrektur",
+  "werkzeug-learning",
+  "vorschlag fuer batch",
+  "abweichung vom masterplan",
+  "technische notiz",
+  "ausblick, bewusst nicht",
+];
+
+/**
+ * Fold a heading to the form the ALLOW/BLOCK lists are written in: leading
+ * emoji and warning signs dropped, lowercase, umlauts folded, dashes and
+ * whitespace unified. Parentheses survive the strip — some headings start
+ * with one.
+ */
+function normalizeHeading(heading: string): string {
+  return heading
+    .trim()
+    .replace(/^[^\p{L}\p{N}(]+/u, "")
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/[—–]/g, "-")
+    .replace(/\s+/g, " ");
+}
+
+/**
+ * Classify a card section by its `## ` heading.
+ *
+ * Allow is checked BEFORE block, and that order is binding: the block entry
+ * "faktencheck" would otherwise swallow "Faktencheck — Divergenzen", which is
+ * study material.
+ *
+ * "unknown" means the lists have not caught up with a new heading. It renders
+ * like "learn" (fail-open — never silently drop study material); the guard test
+ * in scenario-content.test.ts is what forces the classification.
+ */
+export function classifySection(heading: string): "learn" | "note" | "unknown" {
+  const h = normalizeHeading(heading);
+  if (ALLOW_PREFIX.some((p) => h.startsWith(p))) return "learn";
+  if (BLOCK_EXACT.includes(h)) return "note";
+  if (BLOCK_PREFIX.some((p) => h.startsWith(p))) return "note";
+  return "unknown";
+}
+
+/**
+ * Split a card body into intro + renderable sections. The single place where
+ * production notes are filtered out — the page just renders what comes back.
+ */
+export function splitScenarioBody(body: string): {
+  intro: string;
+  sections: SkriptSection[];
+} {
+  const { intro, sections } = splitChapter(body);
+  return {
+    intro,
+    sections: sections.filter((s) => classifySection(s.text) !== "note"),
+  };
 }
 
 /** Scenario by canonical slug ("01".."99", "100"); null for anything else. */

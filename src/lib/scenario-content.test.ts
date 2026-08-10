@@ -7,10 +7,13 @@ import matter from "gray-matter";
 import { describe, expect, it } from "vitest";
 import {
   SCENARIO_COUNT,
+  classifySection,
   getScenario,
   listScenarios,
   scenarioSlug,
+  splitScenarioBody,
 } from "./scenario-content";
+import { parseHeadings } from "./skript-content";
 import { SAA_C03_DOMAINS } from "./domains";
 
 const PUBLIC_DIR = path.join(process.cwd(), "public");
@@ -116,5 +119,62 @@ describe("getScenario", () => {
 
   it("rejects card 101", () => {
     expect(getScenario("101")).toBeNull();
+  });
+});
+
+describe("classifySection / splitScenarioBody", () => {
+  // Every card's headings, read once — the classification guards all run
+  // against the real files.
+  const cards = Array.from({ length: SCENARIO_COUNT }, (_, i) => {
+    const nr = i + 1;
+    const { body } = getScenario(scenarioSlug(nr))!;
+    return { nr, body, headings: parseHeadings(body) };
+  });
+
+  it("classifies every heading on every card — no unknowns", () => {
+    // The anti-rot guard: a new note heading in the next card batch fails here
+    // and has to be sorted into ALLOW_PREFIX or BLOCK_PREFIX. At runtime an
+    // unknown heading renders (fail-open), so this test is the only pressure.
+    const unknown = cards.flatMap(({ nr, headings }) =>
+      headings
+        .filter((h) => classifySection(h.text) === "unknown")
+        .map((h) => `Karte ${nr}: "${h.text}"`),
+    );
+    expect(unknown, `unklassifizierte Überschriften:\n${unknown.join("\n")}`)
+      .toEqual([]);
+  });
+
+  it("renders no section whose heading is a production note", () => {
+    for (const { nr, body } of cards) {
+      const leaked = splitScenarioBody(body)
+        .sections.filter((s) => classifySection(s.text) === "note")
+        .map((s) => s.text);
+      expect(leaked, `Karte ${nr}`).toEqual([]);
+    }
+  });
+
+  it("keeps the study/note split in a plausible range", () => {
+    const all = cards.flatMap((c) => c.headings);
+    const note = all.filter((h) => classifySection(h.text) === "note").length;
+    const learn = all.filter((h) => classifySection(h.text) === "learn").length;
+    // Lower bounds, not exact counts: card corrections legitimately move these
+    // numbers (238 / 479 at the time of writing) and an equality check would
+    // break for no reason. The unknown test above is the real guard.
+    const msg = `note=${note} learn=${learn}`;
+    expect(note, msg).toBeGreaterThanOrEqual(200);
+    expect(learn, msg).toBeGreaterThanOrEqual(400);
+  });
+
+  it("checks allow before block so 'Faktencheck — Divergenzen' survives", () => {
+    expect(classifySection("Faktencheck")).toBe("note");
+    expect(classifySection("Faktencheck — Divergenzen")).toBe("learn");
+    expect(classifySection("Faktencheck-Notizen")).toBe("note");
+  });
+
+  it("normalizes leading emoji, case, umlauts and dashes", () => {
+    expect(classifySection("🔴 Korrektur zur Karte")).toBe("note");
+    expect(classifySection("  ⚠️ Bewusste Vereinfachungen  ")).toBe("note");
+    expect(classifySection("Prüfungs-Kernsatz")).toBe("learn");
+    expect(classifySection("Faktencheck – Divergenzen")).toBe("learn");
   });
 });
