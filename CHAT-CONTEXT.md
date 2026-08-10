@@ -832,3 +832,77 @@ Es folgt kein weiterer Produktions-Batch — Batch 20 war der letzte. Die
 nächsten Vorgänge sind Schuld-Abbau, nicht Neuproduktion: Exam-Guide-Frage zu
 91/92/94, Farbschuld-Sammelpass 1–60, didaktisches Gegenlesen 71–75.
 Die Doku-Lücke der Batches 12–14 (Karten 56–70) ist unverändert offen (§11.8.1).*
+
+---
+
+# NACHTRAG 10.08.2026 — Narrative-Integration + Notizfilter
+
+> **Lesehinweis:** Oberhalb dieser Linie wurde kein Zeichen geändert. Wo dieser
+> Nachtrag früheren Abschnitten widerspricht, gilt der Nachtrag.
+
+## 13.1 Was sich geändert hat
+
+**Szenarien-Stand korrigiert.** §11 nennt 55 Karten. Tatsächlich ist
+`SCENARIO_COUNT` **100**, alle 100 Pfade werden prerendert. Zusätzlich liegen
+für die Karten **1–39** erzählende Langfassungen als
+`public/scenarios/card-NN/narrative.md` im Repo. Karten 40–100 haben keine —
+das ist Normalzustand, kein Fehler.
+
+**Zwei Features live:**
+
+1. **Notizfilter.** Produktionsnotizen aus `battle_card_N.md` erscheinen nicht
+   mehr im Frontend — 238 von 717 Sektionen. Die Dateien bleiben unangetastet.
+   Details in NARRATIVE-SPEC.md §6.3.
+2. **Kurz/Ausführlich-Umschalter** über `?v=lang`, nur bei Karten mit Narrativ.
+   Details in NARRATIVE-SPEC.md §6.1–6.2.
+
+## 13.2 Commits
+
+| Commit | Inhalt |
+|---|---|
+| `b411832` | Notizfilter: `normalizeHeading`, `classifySection`, `splitScenarioBody` |
+| `54dc2e3` | `readNarrative`, `NarrativeView`, `NarrativeSwitch`, 39 narrative.md, Guard-Tests |
+
+Branch `feat/narrative-integration`, per Fast-forward auf `main` gemerged und
+gepusht. 393 Tests grün, Build grün, Route weiterhin ● SSG mit 100 Pfaden.
+
+## 13.3 Die eine Zahl, die bei jeder Änderung zu prüfen ist
+
+```
+pnpm build 2>&1 | grep -A5 "szenarien/\[nr\]"
+```
+
+Dort muss **● (SSG) mit 100 Pfaden** stehen. Steht `ƒ`, ist die Route dynamisch
+geworden — praktisch immer, weil `searchParams` in eine Server Component
+gerutscht ist oder eine `<Suspense>`-Grenze fehlt. Derselbe Fehlertyp wie bei den
+SAA-Skript-Detailseiten (§4, `a07f745`): **im Dev unsichtbar, nur unter
+`next start` sichtbar.**
+
+## 13.4 Verifiziert im Browser, nicht nur im Test
+
+Karte 37: Umschalter da, Kurzfassung ohne Farbkonventionen/Faktencheck-Notizen,
+lange Fassung mit Grundidee und Merksatz offen, H3 im Weg-Abschnitt sichtbar,
+Scrollposition beim Umschalten erhalten. Karte 45: Divergenz-Sektion korrekt
+**erhalten** — der kritische Grenzfall des Filters. Karten 45 und 100: kein
+Umschalter, `?v=lang` wirkungslos.
+
+## 13.5 Offene Punkte
+
+1. **Narrative 40–100 fehlen** — rund 20 weitere Batch-Chats à drei Stück.
+2. **Kartenkorrekturen aus dem Sammelpass** sind unverändert offen (106 Befunde,
+   HANDOFF-NARRATIVE-02 §4 bis -13 §4). Zwei davon sind Oktay-vertagt und tragen
+   beide Lösungswege im Narrativ: Befund 99 (Karte 38, „jeder Treffer geloggt")
+   und Befund 102 (Karte 39, „~1 Minute" zweimal).
+3. **Masterplan-Debt:** Karte 39 ist Aurora Global Database, der Masterplan nennt
+   dort Client VPN. Aurora Global Database steht nirgends im Masterplan; Client
+   VPN fällt damit aus den 100, obwohl es Exam-Guide-Stoff ist.
+4. **Farb-Debt und Umlaut-Defekt** unverändert (§11.5, HANDOFF-13).
+5. **`NARRATIVE-SPEC.md`** liegt seit diesem Nachtrag als `docs/NARRATIVE-SPEC.md`
+   im Repo — allerdings nur mit §6. Alle übrigen Abschnitte sind dort
+   Platzhalter und aus dem Project Knowledge zu übertragen. Der Spec-Patch v1.1
+   (§4, Wortkorridor) steht bis heute nur in HANDOFF-NARRATIVE-05 §5.1.
+
+*Ende NACHTRAG 10.08.2026. Ein neuer Chat startet mit: 100 Battle Cards im Repo
+und in der App, 39 davon mit Langfassung hinter einem Umschalter, Notizfilter
+aktiv, Code-Stand auf `54dc2e3` (dieser Nachtrag folgt als reiner Doku-Commit
+darüber). Nächster Narrativ-Batch: 14 = Karten 40, 41, 42.*
