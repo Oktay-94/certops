@@ -52,9 +52,27 @@ status_note: |
   Footer von Hand gemessen (R3): 1145,5 px. Unter Stil-Guide (~1420 px) und
   unter der R3-Warnschwelle (~1400 px).
 
-  Sichtprüfung (R8): versucht. Zurück kam ein Bildobjekt, dessen Inhalt ich
-  nicht lesen konnte — weder ein leerer Platzhalter noch etwas Beschreibbares.
-  Rechnerisch geprüft ist nicht gesehen. Die Karte ist visuell unbestätigt.
+  Sichtprüfung (R8): am 11.08.2026 DURCHGEFÜHRT. Nach dem Neurendern im
+  Container war die Karte als Bild lesbar und wurde gesehen. Sie ist damit
+  visuell bestätigt — erstmals in dieser Kartenkette. Befund aus der
+  Sichtprüfung, den kein Skript findet: Das Label "Falle" steht 200 px von
+  Badge 5 entfernt und direkt unter "parallel", das zu Pfeil 4 gehört. Die
+  Zuordnung trägt allein über die Farbe. Kein Befund nach geltender Regel,
+  Vorschlag R19 in HANDOFF-NARRATIVE-17 §2.5.
+
+  Kartenfix 11.08.2026 (Befund 140): Die Insights-Box trug "hätte gemeldet".
+  Das Szenario besteht aus Data Events, und Insights wertet die erst seit
+  dem 20.11.2025 aus, dann nur bei doppeltem Opt-in. Zeile ersetzt durch
+  "meldet nur mit Data Events" (115,8 px -> 208,1 px, verfügbar ~260).
+  Danach r2.py und collide.py: 0 Schnitte, 0 Kollisionen, 44 Textelemente
+  unverändert.
+
+  Renderdivergenz ab diesem Stand: PNG und PDF wurden in einem neueren
+  Container erzeugt als die Karten 1-48. Geometrie pixelidentisch
+  (0 abweichende Pixel auf Linien und Boxrändern), Glyphenrasterung weicht
+  um 0,3-0,5 % der Textbreite ab. R13 (0 px reines Schwarz) und R18
+  verhalten sich identisch zur Referenz. Nicht reparierbar, vier
+  Hinting-Varianten getestet. Siehe HANDOFF-NARRATIVE-17 §2.7.
 ---
 
 ## Szenario
@@ -102,11 +120,17 @@ Zurück kommen `userIdentity.arn`, `sourceIPAddress`, `eventTime` und die
 Request-Parameter. Über die Session-ID lässt sich anschließend
 rekonstruieren, was derselbe Principal im selben Zeitfenster sonst getan hat.
 
-**5 — CloudTrail Insights hätte parallel gemeldet.** Insights ist die
-eingebaute Anomalieerkennung auf Management-Events: ungewöhnliche Raten von
-API-Aufrufen im Vergleich zum gelernten Normalverhalten. Ein Massenlöschen
-hätte dort zum Zeitpunkt auffallen können. Insights ersetzt die Forensik
-nicht — es hätte den Zeitpunkt verkürzt, an dem jemand hinschaut.
+**5 — CloudTrail Insights meldet nur mit Data Events.** Insights ist die
+eingebaute Anomalieerkennung: Es bildet aus den Events der zurückliegenden
+28 Tage eine Baseline und meldet ungewöhnliche Aufruf- oder Fehlerraten. Der
+User Guide beschreibt es an mehreren Stellen als reine
+Management-Event-Analyse; seit dem 20.11.2025 wertet Insights auch Data
+Events aus. Für dieses Szenario ist genau das entscheidend, denn ein
+geleerter Bucket besteht aus `DeleteObject`-Aufrufen und damit aus Data
+Events. Insights hätte den Vorfall also gemeldet — aber nur, wenn der Trail
+Data Events loggt **und** Insights dafür eingeschaltet ist. Beides ist
+Opt-in und kostet zusätzlich. Insights ersetzt die Forensik nicht; es
+verkürzt die Zeit, bis jemand hinschaut.
 
 **Kostenfalle — die Gold-Box.** Athena rechnet nach **gescannten Bytes** ab,
 nicht nach Laufzeit. Eine Abfrage ohne Partitionsprädikate liest die gesamte
@@ -202,6 +226,19 @@ der letzten größeren Erweiterungen des Dienstes. Kursmaterial, das ihn als
 zukunftsweisende Integration darstellt, beschreibt eine Funktion, die nun
 faktisch nur noch Bestandskunden offensteht.
 *Quelle: aws.amazon.com/about-aws/whats-new/2023/11/aws-cloudtrail-lake-zero-etl-anlysis-athena*
+
+**CloudTrail Insights wertet seit dem 20.11.2025 auch Data Events aus.**
+Bis dahin analysierte es ausschließlich Management Events. Kursmaterial aus
+2024 und früher beschreibt Insights durchgehend als Management-Event-Werkzeug
+— und liegt damit für jedes Szenario falsch, in dem es um S3-Objektzugriffe
+geht. Der Dokumentationsstand ist uneinheitlich: Die Konsolen-Anleitung
+kennt die Wahl zwischen Management und Data Events, drei Übersichtsseiten
+des User Guide beschreiben Insights weiterhin als reine
+Management-Event-Analyse. Beide Insights-Typen bleiben Opt-in und setzen
+voraus, dass der Trail die betreffende Event-Art überhaupt protokolliert.
+*Quelle: aws.amazon.com/about-aws/whats-new/2025/11/cloudtrail-insights-data-events-detect-anomalies-access,
+docs.aws.amazon.com/awscloudtrail/latest/userguide/insights-events-enable.html,
+docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-insights-events-with-cloudtrail.html*
 
 **Partition Projection wird in älterem Material häufig gar nicht erwähnt.**
 Dort steht stattdessen der Glue-Crawler oder manuelles
