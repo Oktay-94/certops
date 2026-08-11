@@ -59,7 +59,7 @@
   <text x="1250" y="433" font-size="21" font-weight="bold" fill="#0B5A66" text-anchor="middle">CAPTCHA</text>
   <text x="1250" y="465" font-size="15" fill="#444444" text-anchor="middle">sichtbares Puzzle</text>
   <text x="1250" y="489" font-size="15" fill="#444444" text-anchor="middle">nur am Checkout</text>
-  <text x="1250" y="518" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Immunity Time 300 s</text>
+  <text x="1250" y="518" font-size="14" font-style="italic" fill="#666666" text-anchor="middle">Immunity Time default 300 s</text>
 
   <!-- Kostenfalle (Gold) x 380..680, y 440..600 -->
   <rect x="380" y="440" width="300" height="160" rx="10" fill="#FBF4E4" stroke="#A16E00" stroke-width="2.5"/>
@@ -104,7 +104,8 @@
   <line x1="1020" y1="460" x2="1092" y2="462" stroke="#0F7C8C" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrT)"/>
   <circle cx="1056" cy="461" r="15" fill="#0F7C8C"/>
   <text x="1056" y="467" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
-  <text x="1056" y="510" font-size="15" fill="#0B5A66" text-anchor="middle">nur Checkout</text>
+  <text x="1060" y="498" font-size="15" fill="#0B5A66" text-anchor="middle">nur</text>
+  <text x="1060" y="518" font-size="15" fill="#0B5A66" text-anchor="middle">Checkout</text>
 
   <!-- G: Kostenfalle -> Scope-Down -->
   <line x1="530" y1="440" x2="530" y2="348" stroke="#A16E00" stroke-width="3" marker-end="url(#arrA)"/>

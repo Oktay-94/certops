@@ -98,9 +98,9 @@
   <!-- 6 Replay: Personalisierung zurueck an den Stream (rechtwinklig) -->
   <path d="M1235,232 L1235,140 L545,140 L545,250" fill="none" stroke="#D97706" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrO)"/>
   <line x1="1100" y1="232" x2="1235" y2="232" stroke="#D97706" stroke-width="3" stroke-dasharray="9,6"/>
-  <circle cx="890" cy="140" r="15" fill="#D97706"/>
-  <text x="890" y="146" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
-  <text x="890" y="118" font-size="15" fill="#A85A05" text-anchor="middle">Replay ab Zeitpunkt</text>
+  <circle cx="1150" cy="140" r="15" fill="#D97706"/>
+  <text x="1150" y="146" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="1150" y="118" font-size="15" fill="#A85A05" text-anchor="middle">Replay ab Zeitpunkt</text>
 
   <!-- verworfener SQS-Pfad -->
   <line x1="185" y1="430" x2="185" y2="600" stroke="#E7157B" stroke-width="3" stroke-dasharray="8,6"/>
