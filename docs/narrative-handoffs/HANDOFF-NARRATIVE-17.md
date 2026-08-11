@@ -202,7 +202,9 @@ Der Konflikt ist strukturell: Badge 6 sitzt auf y=140, also 34 px unter der Unte
 
 Die AWS-Sammelankündigung vom 31.03.2026 trifft drei Masterplan-Zeilen.
 
-**148 🚨🚨🚨 Karte 5 (App Runner) ist überholt — Narrativ ist live.** Siehe §8, eigener Arbeitsauftrag.
+**148 ❌ ZURÜCKGEZOGEN — Karte 5 war bereits aktualisiert.** Der Befund wurde am 11.08. aus der Masterplan-Zeile abgeleitet, ohne `battle_card_5.md` zu lesen. Die Karte trägt längst einen Abschnitt *⚠ Aktueller Service-Status (Stand 2026)* mit Maintenance Mode, dem Datum 30.04.2026, dem Bestandsschutz, ECS Express Mode als Migrationspfad und der Prüfungseinordnung. Im Frontend am 11.08. verifiziert. **Kein Handlungsbedarf.**
+
+> **Konvention: Ein kartenübergreifender Befund wird erst gemeldet, wenn die betroffene Karte gelesen wurde. Die Masterplan-Zeile beschreibt die Absicht, nicht den Stand.**
 
 **149 (Vorwarnung) Karte 61 — Rekognition.** Masterplan-Zeile: „Rekognition, Lambda, S3 · Marktplatz moderiert hochgeladene Bilder automatisch". In Maintenance gehen die Features **Streaming Events und Batch Image Content Moderation**. Die synchrone Bildmoderation ist damit vermutlich nicht betroffen, aber die Batch-Variante ist es — und das Kartenthema ist Bildmoderation. **Vor dem Zeichnen von Karte 61 klären, welche API die Karte zeigt.**
 
@@ -274,29 +276,23 @@ Beide liegen über der Marke. Das ist die gewünschte Richtung (§2.1), verlangt
 
 ---
 
-## 8. Arbeitsauftrag: Karte 5 (App Runner) — Befund 148
+## 8. Erledigt am 11.08.2026 nach Auslieferung von Teil 1
 
-**Der Sachstand.** Der App Runner Developer Guide sagt: Der Dienst ist für Neukunden geschlossen, Bestandskunden können normal weiterarbeiten einschließlich neuer Ressourcen und Services, AWS investiert weiter in Sicherheit und Verfügbarkeit, **plant aber keine neuen Features**. Als Migrationsziel empfiehlt AWS ausdrücklich **Amazon ECS Express Mode**: ein API-Aufruf, ein Container-Image, zwei IAM-Rollen — und ECS provisioniert ECS-Service auf Fargate, Application Load Balancer, Auto Scaling, Security Groups und Networking. Ohne Zusatzgebühr; bezahlt werden nur die darunterliegenden Ressourcen.
+**Befund 140 (Kartenfix Karte 49)** — angewandt, gerendert, im Frontend verifiziert.
 
-**Warum das Karte 5 im Kern trifft.** Die Masterplan-Zeile lautet: „App Runner, ECR · Kleines Team will Container-Webservice deployen, **ohne je ALB/VPC/Scaling anzufassen**". Genau dieses Versprechen ist jetzt das Verkaufsargument von ECS Express Mode. Die Karte gibt für einen SAA-C03-Kandidaten, der 2026 eine neue Umgebung plant, eine Antwort, die er nicht mehr wählen kann.
+**Befund 141, 142, 143** — angewandt, `r2.py` und `collide.py` je 0 Befunde, Textelemente 44 / 52 / 36.
 
-**Fixvorschlag — zwei Wege, beide noch nicht gemessen.** ⚠️ `battle_card_5.svg` lag in diesem Chat nicht vor; ohne die Datei ist keine PIL-Messung möglich. Beide Wege sind daher Skizzen, keine Fixe.
+**Befund 144 (Karte 49 `.md`)** — behoben mit `md-fix-49.py`. Drei Änderungen: Ablauf-Pfeil 5 auf den belegten Stand gebracht, neuer Faktencheck-Eintrag zur Insights-Erweiterung vom 20.11.2025, `status_note` um R8-Ergebnis, Kartenfix und Renderdivergenz ergänzt. Im Frontend verifiziert: Diagramm, Kurzfassung und Narrativ sagen dasselbe.
 
-> **Weg A — minimal, ohne Neuzeichnung.** Eine Randnotiz-Zeile analog zur CloudTrail-Lake-Notiz auf Karte 49: drei Zeilen in Teal-dunkel, kein Kasten, weil es eine Verfügbarkeitstatsache ist und keine Architekturoption. Inhalt: App Runner für Neukunden geschlossen seit 30.04.2026 · Bestand läuft weiter, keine neuen Features · Nachfolger ist ECS Express Mode. Das Narrativ 5 wird um einen Absatz unter „Die ehrliche Feinheit" ergänzt.
+**Befund 148** — zurückgezogen, siehe §4.4.
 
-> **Weg B — Karte umbauen.** App Runner bleibt als Kasten stehen, bekommt aber Grau — nach der Farbkonvention der Kette bedeutet Grau „gültig, aber am Ende des Lebenszyklus". Daneben ein neuer Kasten für ECS Express Mode als der Weg für Neukunden. Das ist die inhaltlich richtigere, aber deutlich teurere Variante: neue Geometrie, neuer QC-Durchgang, neues Rendering.
+**Narrative 40–45** — waren nie im Repo angekommen, aus den ZIPs von Batch 14 und 15 nachgezogen. **49 von 49 Narrativen sind jetzt live und im Frontend sichtbar.**
 
-**Empfehlung: Weg A**, aus zwei Gründen. Erstens ist die Prüfungsfrage unverändert — die SAA-C03-Unterscheidung „wann nehme ich einen vollmanagierten Container-Dienst statt ECS/EKS" bleibt gültig, und App Runner ist dafür weiterhin das kanonische Beispiel im Prüfungsmaterial. Zweitens ist ECS Express Mode zu jung, um in der Prüfung vorzukommen; ihn als Hauptantwort zu zeichnen würde die Karte vom Prüfungsstoff wegbewegen.
+**Narrativ-Integration** — `AUFTRAG-narrative-integration.md` ist vollständig abgearbeitet, alle Phasen laufen. Der Umschalter *Kurz / Ausführlich* erscheint bei Karten mit Narrativ und fehlt bei Karten ohne. Verifiziert an 45, 49 (mit) und 50 (ohne). Guard-Tests: 20 von 20 grün, dynamisch über die vorhandenen Dateien geschrieben — die Liste `1..39` im Auftragstext ist überholt und muss nicht gepflegt werden.
 
-**Oktays Entscheidung 11.08.: Narrativ 5 nachziehen, Karte unverändert.** Das entspricht Weg A ohne den Kartenanteil. Der Arbeitsauftrag lautet damit:
+⚠️ **`next start` liest den Build, nicht die Platte.** Eine neue `narrative.md` oder `.md`-Änderung wird erst nach `pnpm build` **und** einem Neustart des Servers sichtbar. Das hat am 11.08. zwei Fehldiagnosen ausgelöst.
 
-1. `card-05-narrative.md` aus dem Repo holen — es ist live und wurde in Batch 02 geschrieben.
-2. Unter „Die ehrliche Feinheit" einen Absatz ergänzen: Verfügbarkeitsänderung, Datum, Bestandsschutz, ECS Express Mode als Nachfolger, und die ehrliche Einordnung, dass die Prüfungsfrage davon unberührt bleibt.
-3. Unter „Prüfungsknackpunkte" eine Zeile: In Prüfungsfragen bleibt App Runner die richtige Antwort für „vollmanagiert, ohne Infrastruktur"; in einer realen Neuplanung ist es sie nicht mehr.
-4. `narrativeVersion` auf 2 heben, `factCheckedAt` aktualisieren, die Availability-Change-Seite in `sources` aufnehmen.
-5. `check.py` gegenlaufen lassen — die Wortzahl darf den Korridor nicht verlassen. Bei Überlänge an anderer Stelle kürzen, **nicht** den neuen Absatz.
-
-Das ist ein eigener kleiner Batch, kein Anhängsel an Teil 2.
+**Offen für Teil 2:** `battle_card_50.md`, `status_note` nennt 51 Textelemente statt 52.
 
 ---
 
@@ -318,9 +314,9 @@ Geschrieben:     49 von 100  (Karten 1-49)
 Dieser Chat:     Karten 50 und 51. FAKTENCHECK LIEGT VOR in HANDOFF-17 §4.2
                  und §4.3 - nicht wiederholen, nur die Punkte (i) bis (iii)
                  aus §7 schließen
-Kartenfixe:      VIER SIND BESCHLOSSEN UND GELIEFERT (r2-fix-49-50-51.py).
-                 Wenn die SVGs von 50 und 51 noch die alten Positionen zeigen,
-                 ist das Skript nicht gelaufen - dann erst laufen lassen
+Kartenfixe:      VIER SIND ANGEWANDT, GERENDERT UND GESEHEN. Die SVGs, PNGs
+                 und PDFs von 50 und 51 im Upload sind der neue Stand.
+                 r2.py und collide.py melden 0 Befunde
 Ablage:          public/scenarios/card-NN/narrative.md - battle_card_N.md bleibt.
                  Narrative sind LIVE, readNarrative() liest sie, check.py ist
                  Deploy-Vorbedingung. Nicht erst am Ende laufen lassen
@@ -389,8 +385,11 @@ befunde:         150 Stück, vollständig in HANDOFF-02 §4 bis -17 §4.
 Vertagt:         Befund 99 (Karte 38), 102 (39), 114 (41), 118 (43), 121 (44),
                  129 (46), 133 (48), 146 (49, Athena-Abrechnungsmodell),
                  147 (51, Enhanced Fan-out kein Default)
-EIGENER AUFTRAG: Karte 5 / App Runner - Befund 148, HANDOFF-17 §8. Narrativ
-                 nachziehen, Karte unverändert. NICHT an Teil 2 anhängen
+ERLEDIGT 11.08.: Befunde 140-144 alle behoben und im Frontend verifiziert.
+                 Befund 148 (App Runner) ZURUECKGEZOGEN - die Karte war laengst
+                 aktuell. Narrative 40-45 nachgezogen: 49 von 49 sind live.
+                 Offen aus Teil 1: battle_card_50.md status_note sagt 51
+                 Textelemente, es sind 52
 RENDERING:       NEU UND WICHTIG (HANDOFF-17 §2.7). Der Container rendert seit
                  diesem Batch NICHT MEHR pixelidentisch zu den Karten 1-48.
                  Geometrie stimmt exakt, Glyphen weichen um 0,3-0,5 % Textbreite
