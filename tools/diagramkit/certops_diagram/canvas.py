@@ -8,6 +8,7 @@ Fehlerklassen ab, die beim Handzeichnen immer wieder aufgetreten sind:
 Zusätzlich: alles muss innerhalb der Zeichenfläche liegen.
 """
 import html
+import math
 import os
 import re
 
@@ -67,9 +68,26 @@ class Finding(Exception):
     pass
 
 
+def content_height(n_title, n_subs, isize=T.ICON_DEFAULT, tsize=T.FS_NODE_TITLE,
+                   ssize=T.FS_NODE_SUB, slack=6):
+    """Wie hoch muss eine Box sein, damit ihr Text hineinpasst?
+
+    Spiegelt die Setzung in Canvas.node() wider. Templates rechnen damit ihre
+    Zeilenhöhe aus dem Inhalt aus, statt eine Konstante zu raten — genau der
+    Fall, den die Regel ZU HOCH sonst jedes Mal meldet.
+    """
+    y = 12 + isize + 20
+    y += n_title * (tsize + 3) + 4
+    y += n_subs * (ssize + 3)
+    last = ssize if n_subs else tsize
+    return y - (last + 3) + 0.25 * last + slack
+
+
 class Canvas:
     def __init__(self, width=1600, height=1000, strict=True):
-        self.w, self.h = width, height
+        # Aufgerundet auf ganze Pixel: seit die Templates ihre Höhe aus dem
+        # Inhalt rechnen, kämen sonst Bruchzahlen in width/height und viewBox.
+        self.w, self.h = math.ceil(width), math.ceil(height)
         self.strict = strict
         self.parts = []          # Zeichenbefehle in Reihenfolge
         self.overlay = []        # kommt zuletzt (Nummernkreise)
@@ -201,12 +219,74 @@ class Canvas:
         self.nodes.append((x, y, w, h, f"Hinweis '{headline}'"))
         return self
 
+    def crossband(self, x, y, w, items, heading, node_h=118, isize=34,
+                  tsize=T.FS_NODE_TITLE - 1, ssize=10, pad=14, gap=12):
+        """Querschnittsband: gestricheltes Feld mit N gleichartigen Knoten.
+
+        Steht in fast jeder Karte unten und trägt Sicherheit, Rechte und
+        Betrieb. Die Knotenbreite wird aus der verfügbaren Breite und der
+        Anzahl berechnet — von Hand gesetzte Spalten haben in den
+        Handskripten dreimal leicht abweichende Werte ergeben.
+
+        Das Feld selbst wird bewusst NICHT als Knoten registriert, sonst
+        überlappt es alles, was darin liegt. Es ist Hintergrund, kein Objekt.
+        """
+        n = len(items)
+        if n == 0:
+            raise ValueError("crossband ohne Einträge")
+        head_h = 30
+        h = head_h + node_h + pad
+        self.parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{T.GROUP_RADIUS}" '
+                          f'fill="#FCFCFD" stroke="{T.BAND}" stroke-width="1.6" '
+                          f'stroke-dasharray="6 4"/>')
+        self._check_width(heading, T.FS_GROUP, True, w - 32, "Querschnittsband")
+        self.text(x + 16, y + 22, heading, T.FS_GROUP, True, T.ACCENT, "start")
+        node_w = (w - 2 * pad - (n - 1) * gap) / n
+        for i, it in enumerate(items):
+            nx = x + pad + i * (node_w + gap)
+            self.node(nx, y + head_h, node_w, node_h, it["icon"], it["title"],
+                      it.get("subs", []), isize=isize, tsize=tsize, ssize=ssize,
+                      title_lines=it.get("title_lines"))
+        return h
+
+    def cross(self, cx, cy, r=15):
+        """Rotes Kreuz: dieser Weg funktioniert nicht."""
+        a = r * 0.37
+        self.overlay.append(
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="#FFFFFF" stroke="{T.FAIL}" stroke-width="2"/>'
+            f'<path d="M{cx - a} {cy - a} L{cx + a} {cy + a} M{cx + a} {cy - a} L{cx - a} {cy + a}" '
+            f'fill="none" stroke="{T.FAIL}" stroke-width="2.5" stroke-linecap="round"/>')
+        return self
+
+    def tick(self, cx, cy, r=15):
+        """Grüner Haken: dieser Weg funktioniert."""
+        self.overlay.append(
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="#FFFFFF" stroke="{T.OK}" stroke-width="2"/>'
+            f'<path d="M{cx - 6} {cy} L{cx - 1.5} {cy + 5} L{cx + 6.5} {cy - 5.5}" fill="none" '
+            f'stroke="{T.OK}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>')
+        return self
+
     def legend(self, entries, y, heading="Ablauf Schritt für Schritt", cols=3, colw=520):
+        # Ohne Einträge wird gar nichts gezeichnet. Sonst trägt die Web-Fassung,
+        # die Titel und Legende bewusst weglässt, die Überschrift trotzdem.
+        if not entries:
+            return self
         self.text(40, y, heading, T.FS_GROUP, True, T.INK, "start")
-        per = -(-len(entries) // cols)
+        per = -(-len(entries) // cols) if entries else 1
+        used = -(-len(entries) // per) if entries else 0
         for i, s in enumerate(entries):
             col, row = divmod(i, per)
-            self.text(40 + col * colw, y + 25 + row * 21, s, T.FS_LEGEND, False, T.INK_LEGEND, "start")
+            x = 40 + col * colw
+            # Ohne diese Prüfung landen Einträge lautlos außerhalb der Fläche und
+            # fehlen im fertigen Bild, ohne dass irgendeine Regel anschlägt.
+            w = text_width(s, T.FS_LEGEND)
+            if x + w > self.w - 20:
+                self._finding(f"[LEGENDE ZU BREIT] Spalte {col + 1}, Eintrag '{s[:40]}…' "
+                              f"endet bei {x + w:.0f}, Fläche endet bei {self.w}")
+            self.text(x, y + 25 + row * 21, s, T.FS_LEGEND, False, T.INK_LEGEND, "start")
+        if entries and used < cols:
+            self._finding(f"[LEGENDE] {cols} Spalten angefordert, {used} tatsächlich belegt — "
+                          f"'legend_cols' passt nicht zur Anzahl der Einträge")
         return self
 
     def footer(self, y):
