@@ -1,0 +1,70 @@
+id: card-vpc-endpoint
+template: vorher_nachher
+title: "Szenario 4 · Große Dateien in Lambda verarbeiten — Fehlersuche"
+subtitle: >-
+  Warum eine Funktion im privaten Subnetz nicht auf S3 zugreifen kann —
+  und wie die korrigierte Architektur aussieht
+
+base:
+  region: "Region eu-central-1"
+  vpc_label: VPC
+  subnet_label: Privates Subnetz
+  forward: "S3 meldet die neue Datei — dieser Weg geht nicht durch die VPC"
+  left:
+    icon: s3
+    title: Amazon S3
+    subs: ["Bucket mit Dateien", "von 1 bis 3 GB"]
+  inner:
+    icon: lambda
+    title: AWS Lambda
+    subs: ["berechnet die", "Prüfsumme"]
+
+panels:
+  - state: broken
+    headline: "Vorher — so ist es gebaut, und so scheitert es"
+    back: "die Funktion ruft S3 auf — request timed out"
+    extras:
+      - icon: router
+        title: Routentabelle
+        subs: ["nur lokale Route,", "kein Weg zu S3"]
+        accent: fail
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt der"
+        - "VPC Gateway Endpoint"
+        - "ohne ihn endet jeder Aufruf im Nichts"
+
+  - state: fixed
+    headline: "Nachher — die korrigierte Architektur"
+    back: "der Aufruf läuft privat über den Endpunkt zu S3"
+    extras:
+      - icon: router
+        title: Routentabelle
+        subs: ["Präfixliste von S3", "zeigt auf den Endpunkt"]
+        ssize: 10
+        accent: ok
+        badge: true
+      - icon: lambda-function
+        title: Einstellungen
+        subs: ["mehr Speicher,", "längeres Zeitlimit"]
+        ssize: 10
+        w: 150
+        isize: 40
+    insert:
+      kind: node
+      icon: vpc-endpoint
+      title: VPC Gateway Endpoint
+      subs: ["kostenlos, privat, kein NAT nötig"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Das S3-Ereignis startet die Funktion — über den Lambda-Dienst, nicht durch die VPC"
+  - "2  Die Funktion ruft S3 auf, verlässt das Subnetz nie und läuft in die Zeitüberschreitung"
+  - "3  Die Ursache: In der Routentabelle des Subnetzes steht kein Weg zu S3"
+  - "4  Am Auslöser ändert sich nichts, der war nie das Problem"
+  - "5  Der Aufruf erreicht S3 jetzt privat, ohne einen Meter öffentliches Internet"
+  - "6  Der Gateway Endpoint trägt die S3-Präfixliste ein — kostenlos, kein NAT Gateway nötig"

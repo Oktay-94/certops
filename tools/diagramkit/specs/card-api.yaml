@@ -1,0 +1,144 @@
+id: card-api
+template: kette
+title: "Eigene APIs verkaufen · Oktupus Co. KG"
+subtitle: >-
+  Hunderte bestehende REST-APIs im eigenen Rechenzentrum über API Gateway anbieten —
+  privater Backend-Weg, Kostenkontrolle und Abrechnung
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: vpc
+    label: VPC
+    icon: grp-vpc
+    color: vpc
+  - key: subnet
+    label: Privates Subnetz
+    icon: grp-private-subnet
+    color: subnet-private
+  - key: datacenter
+    label: Rechenzentrum
+    icon: grp-datacenter
+    color: datacenter
+
+outside:
+  icon: users
+  title: API-Kunden
+  subs: ["Drittanbieter, die", "die APIs nutzen"]
+
+chain:
+  - icon: apigateway
+    title: Amazon API Gateway
+    title_lines: ["Amazon", "API Gateway"]
+    subs: ["REST API mit VPC Link", "einziger Zugangspunkt"]
+    hero: true
+    border: vpc
+    fill: "#F3EEFC"
+    w: 180
+    in: [cloud, region]
+
+  - icon: privatelink
+    title: VPC Link
+    subs: ["private Brücke ins", "eigene Netz"]
+    w: 140
+    in: [cloud, region]
+
+  - icon: nlb
+    title: Network Load Balancer
+    subs: ["Ziele sind IP-Adressen", "im Rechenzentrum"]
+    w: 210
+    in: [cloud, region, vpc, subnet]
+
+  - icon: vpn-gateway
+    title: Virtual Private Gateway
+    title_lines: ["Virtual Private", "Gateway"]
+    subs: ["Übergang zur", "Standleitung"]
+    w: 150
+    in: [cloud, region, vpc]
+
+  - icon: directconnect
+    title: AWS Direct Connect
+    subs: ["private VIF,", "kein Internet"]
+    w: 160
+    in: [cloud, region]
+    note: {text: "privater Weg, kein Internet", bold: true, color: ok}
+
+  - icon: firewall
+    title: Firewall, Router
+    subs: ["Übergabepunkt", "im Rechenzentrum"]
+    w: 160
+    in: [datacenter]
+
+branch:
+  from: 0
+  items:
+    - icon: apigateway-endpoint
+      title: Usage Plan und API-Schlüssel
+      title_lines: ["Usage Plan und", "API-Schlüssel"]
+      subs: ["Kontingent und", "Drosselung je Kunde"]
+      w: 180
+    - icon: marketplace
+      title: AWS Marketplace
+      subs: ["AWS übernimmt", "die Abrechnung"]
+      w: 170
+    - icon: lambda
+      title: AWS Lambda
+      subs: ["oder eigene Abrechnung", "über einen Dienst"]
+      ssize: 10
+      w: 170
+    - icon: app
+      title: Zahlungsdienst
+      subs: ["z. B. PayPal,", "über das Internet"]
+      w: 150
+      align_with: 4
+      note: {text: "nur ausgehend, betrifft das Rechenzentrum nicht"}
+
+crossband:
+  heading: "Querschnitt: Zugangsschutz, Rechte, Beobachtung und Kostenkontrolle"
+  items:
+    - icon: waf
+      title: AWS WAF
+      subs: ["schützt den", "Eingang"]
+    - icon: cognito
+      title: Amazon Cognito
+      title_lines: ["Amazon", "Cognito"]
+      subs: ["prüft, wer", "zugreifen darf"]
+    - icon: iam
+      title: AWS IAM
+      subs: ["Rechte je", "Komponente"]
+    - icon: cloudwatch
+      title: Amazon CloudWatch
+      title_lines: ["Amazon", "CloudWatch"]
+      subs: ["Aufrufe und", "Fehler im Blick"]
+    - icon: cost-explorer
+      title: AWS Cost Explorer
+      title_lines: ["AWS Cost", "Explorer"]
+      subs: ["zeigt, was der", "Betrieb kostet"]
+    - icon: budgets
+      title: AWS Budgets
+      subs: ["Alarm, wenn es", "teuer wird"]
+    - icon: cloudtrail
+      title: AWS CloudTrail
+      subs: ["protokolliert", "jeden Aufruf"]
+
+legend_cols: 3
+legend:
+  - "1  Ein Kunde ruft die gekaufte API über das Internet auf"
+  - "2  API Gateway prüft Schlüssel und Kontingent und leitet weiter"
+  - "3  Der VPC Link führt die Anfrage ins eigene Netz"
+  - "4  Der Load Balancer kennt die IP-Adressen der eigenen Server"
+  - "5  Vom Gateway aus geht es auf die Standleitung"
+  - "6  Direct Connect erreicht den Übergabepunkt im Rechenzentrum"
+  - "7  Jeder Aufruf wird gegen den Usage Plan des Kunden gezählt"
+  - "8  Über den Marketplace übernimmt AWS Verkauf und Abrechnung"
+  - "9  Alternativ rechnet man selbst ab und ruft dafür Lambda auf"
+  - "10  Lambda spricht den Zahlungsdienst an — nur ausgehend"
+  - "Die Antwort läuft jeweils denselben Weg zurück"

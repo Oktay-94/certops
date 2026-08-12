@@ -1,0 +1,51 @@
+id: card-kette-min
+template: kette
+title: "Prüfkarte · Kette in Minimalform"
+subtitle: >-
+  Dieselbe Vorlage ohne Hero, ohne Nebenzweig, ohne Querschnittsband und mit
+  nur einer Rahmenebene — dient dem Nachweis, dass die Geometrie gerechnet wird
+
+frames:
+  - key: region
+    label: "Region eu-west-1 (Irland)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: subnet
+    label: Öffentliches Subnetz
+    icon: grp-public-subnet
+    color: subnet-public
+
+outside:
+  icon: users
+  title: Besucher
+  subs: ["ruft die Seite auf"]
+
+chain:
+  - icon: route53
+    title: Amazon Route 53
+    subs: ["löst den Namen auf"]
+    in: [region]
+  - icon: cloudfront
+    title: Amazon CloudFront
+    subs: ["liefert aus dem Cache"]
+    in: [region]
+    note: "Cache-Treffer beenden den Weg hier"
+  - icon: alb
+    title: Application Load Balancer
+    title_lines: ["Application", "Load Balancer"]
+    subs: ["verteilt auf die Instanzen"]
+    w: 190
+    in: [region, subnet]
+  - icon: ec2
+    title: Amazon EC2
+    subs: ["beantwortet die Anfrage"]
+    in: [region, subnet]
+
+legend_cols: 2
+legend:
+  - "1  Der Besucher ruft die Seite auf"
+  - "2  Route 53 löst den Namen zur Verteilung auf"
+  - "3  CloudFront liefert aus, was im Cache liegt"
+  - "4  Alles Übrige geht an den Load Balancer"
+  - "5  Der verteilt die Anfrage auf eine Instanz"
