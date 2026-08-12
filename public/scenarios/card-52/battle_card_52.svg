@@ -84,15 +84,15 @@
   <!-- 2 Firehose -> S3 -->
   <line x1="720" y1="355" x2="820" y2="355" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
   <circle cx="770" cy="355" r="15" fill="#D97706"/>
-  <text x="770" y="361" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="770" y="361" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
   <text x="770" y="300" font-size="15" fill="#A85A05" text-anchor="middle">Parquet</text>
   <text x="770" y="322" font-size="15" fill="#A85A05" text-anchor="middle">+ Präfixe</text>
 
-  <!-- 3 S3 -> Glue -->
-  <line x1="960" y1="460" x2="960" y2="560" stroke="#3F8624" stroke-width="3" marker-end="url(#arrG)"/>
-  <circle cx="960" cy="510" r="15" fill="#3F8624"/>
-  <text x="960" y="516" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
-  <text x="1030" y="516" font-size="15" fill="#2E6318" text-anchor="middle">Schema</text>
+  <!-- 2 Glue -> Firehose (Schema ist Voraussetzung der Format Conversion) -->
+  <path d="M820,620 L775,620 L775,490 L726,490" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#arrO)"/>
+  <circle cx="775" cy="560" r="15" fill="#D97706"/>
+  <text x="775" y="566" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="795" y="522" font-size="15" fill="#8A4B04" text-anchor="start">Schema vorab</text>
 
   <!-- 4 Glue -> Athena (rechtwinklig) -->
   <path d="M1100,600 L1355,600 L1355,460" fill="none" stroke="#D97706" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrO)"/>
@@ -120,5 +120,5 @@
 
   <!-- Footer -->
   <rect x="40" y="820" width="1510" height="56" rx="9" fill="#F4F4F4"/>
-  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Firehose liefert, Streams puffern  ·  Parquet + Partitionen senken die Kosten je Abfrage  ·  Glue katalogisiert, Athena liest</text>
+  <text x="62" y="855" font-size="17" fill="#333333"><tspan font-weight="bold">Merksätze:</tspan>  Firehose liefert ab, Streams halten vor  ·  Parquet + Partitionen senken die Kosten je Abfrage  ·  Glue katalogisiert, Athena liest</text>
 </svg>
