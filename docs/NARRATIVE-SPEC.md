@@ -50,6 +50,15 @@
 > (muss zur Kartennummer passen), `slug`, `title`, `services`, `domains`
 > (D1–D4), `badgeCount`, `narrativeVersion`, `factCheckedAt`, `sources`.
 > Ein Verstoß lässt den Build scheitern, nicht nur `check.py`.
+>
+> **`correctAnswer` gehört nicht dazu.** Die Fassung im Project Knowledge
+> führt das Feld als Pflicht; keines der 99 Narrative hat es, seit Batch 01
+> nicht. Weder `readNarrative()` noch `check.py` lesen es — `check.py`
+> dokumentiert die Auslassung als Batch-Entscheidung vom 28.07. Beim
+> Übertragen aus dem Project Knowledge ist der Patch aus
+> `docs/narrative-handoffs/HANDOFF-NARRATIVE-01.md` §2 einzuarbeiten
+> („Pflicht" → „Pflicht ab Aufgaben-Track"), damit die Divergenz nicht
+> wieder einwandert.
 
 ---
 

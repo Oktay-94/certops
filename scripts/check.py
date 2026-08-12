@@ -95,6 +95,63 @@ BELEGTE_SLUGS = {
     "inspector-ecr-enhanced-scanning-weissdorn-finanz-cve-nach-dem-push",
     "macie-automated-discovery-targeted-job-immenried-versicherung-sampling-vor-vollscan",
     "iam-identity-center-permission-sets-uhlenbrook-maschinenbau-eine-identitaet-dreissig-accounts",
+    # Batch 17 Teil 1 (nachgetragen 11.08. in Batch 17 Teil 2, HANDOFF-17 §3)
+    "cloudtrail-organization-trail-athena-partition-projection-eichkamp-energie-forensik-nach-vier-monaten",
+    # Batch 17 Teil 2 (nachgetragen 11.08. in Batch 18, HANDOFF-18 §3)
+    "waf-bot-control-challenge-captcha-ostwall-sneaker-drop-scalper",
+    "kinesis-data-streams-sqs-replay-kirnau-clickstream-drei-konsumenten",
+    # Karten 52, 54-100 (nachgetragen 12.08. bei der Narrative-Integration).
+    # Diese 48 Narrative entstanden in Chats ohne eigenen HANDOFF im Repo -
+    # HANDOFF-19 war ein Pruef-Chat und hat kein Narrativ geschrieben. Darum
+    # ein Sammel-Label statt erfundener Batch-Nummern.
+    "firehose-s3-athena-logistik-datalake",
+    "opensearch-dashboards-bank-correlation-id",
+    "msk-kafka-zulieferer-bestehende-clients",
+    "quicksight-spice-rls-embedding",
+    "glue-etl-job-bookmark-parquet",
+    "lake-formation-lf-tags-data-filters",
+    "flink-sliding-window-betrugsmuster",
+    "redshift-serverless-rpu-quartalslast",
+    "rekognition-a2i-bildmoderation-marktplatz",
+    "textract-callback-task-token-rechnungspruefung",
+    "comprehend-sentiment-custom-classification-tickets",
+    "transcribe-call-analytics-translate-polly-callcenter",
+    "personalize-domain-recommender-event-tracker",
+    "sagemaker-canvas-timeseries-forecast-nachfolge",
+    "sagemaker-training-realtime-endpoint-autoscaling",
+    "bedrock-knowledge-bases-rag-chatbot",
+    "kendra-maintenance-bmkb-migration",
+    "waf-fraud-control-acfp-signup",
+    "mgn-lift-and-shift-cutover-minuten",
+    "dms-homogen-ohne-sct",
+    "datasync-nfs-nach-s3-inkrementell",
+    "migration-hub-application-discovery-portfolio",
+    "vmware-cloud-on-aws-sddc-heben",
+    "mainframe-modernization-replatform-refactor",
+    "ecs-anywhere-eks-hybrid-nodes-control-plane",
+    "drs-elastic-disaster-recovery-pilot-light",
+    "storage-gateway-tape-volume-vtl",
+    "sieben-r-migrationsstrategien",
+    "multi-az-gegen-multi-region",
+    "aws-backup-vault-lock-zentral",
+    "dr-muster-pilot-light-warm-standby-active-active",
+    "route53-health-checks-dns-failover",
+    "savings-plans-reserved-instances-spot-kaufoptionen",
+    "cost-explorer-budgets-anomaly-detection",
+    "compute-optimizer-rightsizing",
+    "fis-chaos-engineering-az-ausfall",
+    "sqs-idempotenz-retry-patterns",
+    "well-architected-review-milestones",
+    "iot-core-rules-engine-dynamodb",
+    "greengrass-v2-inferenz-am-edge",
+    "mediaconvert-vod-kette-cloudfront",
+    "ivs-live-streaming-ohne-eigene-infra",
+    "appsync-graphql-viele-ansichten",
+    "step-functions-express-gegen-standard",
+    "eventbridge-scheduler-einmal-timer",
+    "amplify-hosting-pr-preview",
+    "device-farm-echte-geraete",
+    "ram-shared-subnets-multi-account",
 }
 BELEGTE_NUMMERN = {1: "Batch 01", 2: "Batch 01", 3: "Batch 01",
                    4: "Batch 02", 5: "Batch 02", 6: "Batch 02",
@@ -123,7 +180,16 @@ BELEGTE_NUMMERN = {1: "Batch 01", 2: "Batch 01", 3: "Batch 01",
                    # nachgetragen 11.08. in Batch 16 (HANDOFF-15 §3)
                    43: "Batch 15", 44: "Batch 15", 45: "Batch 15",
                    # nachgetragen 11.08. in Batch 17 (HANDOFF-16 §3)
-                   46: "Batch 16", 47: "Batch 16", 48: "Batch 16"}
+                   46: "Batch 16", 47: "Batch 16", 48: "Batch 16",
+                   # nachgetragen 11.08. in Batch 17 Teil 2 (HANDOFF-17 §3)
+                   49: "Batch 17",
+                   # nachgetragen 11.08. in Batch 18 (HANDOFF-18 §3)
+                   50: "Batch 17", 51: "Batch 17",
+                   # nachgetragen 12.08. bei der Narrative-Integration.
+                   # 53 bleibt bewusst frei: die Karte ist geplant (IPv6,
+                   # Egress-only IGW), aber nicht gezeichnet.
+                   **{n: "Narrative-Integration"
+                      for n in [52] + list(range(54, 101))}}
 
 befunde = []
 gesehene_slugs = {s: "frueherer Batch" for s in BELEGTE_SLUGS}
