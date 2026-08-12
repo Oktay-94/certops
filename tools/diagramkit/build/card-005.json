@@ -1,0 +1,17 @@
+{
+  "id": "card-005",
+  "title": "Szenario 5 · Fan-out an mehrere Verarbeitungspfade",
+  "subtitle": "Eine Bestellung, drei unabhängige Empfänger: entkoppelt über SNS und SQS, mit Auffangbecken für Fehlschläge und garantierter Reihenfolge für die Buchhaltung",
+  "steps": [
+    "1  Die Kundschaft schließt die Bestellung ab",
+    "2  Der Bestell-Dienst speichert sie in DynamoDB",
+    "3  Danach veröffentlicht er genau eine Nachricht",
+    "4  Das Topic verteilt sie an die Lager-Bahn",
+    "5  gleichzeitig an die E-Mail-Bahn",
+    "6  und gleichzeitig an die Buchhaltungs-Bahn",
+    "7  Jede Bahn holt sich ihre Nachricht selbst ab",
+    "8  und arbeitet sie im eigenen Tempo ab",
+    "9  Was mehrfach scheitert, landet in der Dead-Letter-Queue",
+    "Die Schritte 7 bis 9 laufen in allen drei Bahnen gleich ab"
+  ]
+}

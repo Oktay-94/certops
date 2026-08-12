@@ -57,3 +57,6 @@ handoff.md
 # python venvs (cairosvg toolchain, never commit)
 .venv/
 venv/
+__pycache__/
+*.pyc
+*.bak

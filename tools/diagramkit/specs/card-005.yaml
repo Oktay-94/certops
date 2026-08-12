@@ -1,0 +1,104 @@
+id: card-005
+template: fanout
+title: "Szenario 5 · Fan-out an mehrere Verarbeitungspfade"
+subtitle: >-
+  Eine Bestellung, drei unabhängige Empfänger: entkoppelt über SNS und SQS,
+  mit Auffangbecken für Fehlschläge und garantierter Reihenfolge für die Buchhaltung
+lane_note: "drei unabhängige Bahnen — jede in eigenem Tempo"
+
+outside:
+  icon: users
+  title: Kundschaft
+  subs: ["schließt eine", "Bestellung ab"]
+
+producer:
+  icon: lambda
+  title: Bestell-Dienst
+  subs: ["nimmt die", "Bestellung an"]
+
+store:
+  icon: dynamodb
+  title: Amazon DynamoDB
+  subs: ["Bestellung wird", "gespeichert"]
+
+hub:
+  icon: sns
+  title: SNS FIFO Topic
+  subs: ["eine Nachricht,", "drei Empfänger", "", "Reihenfolge bleibt erhalten"]
+
+aside:
+  icon: cloudwatch
+  title: Amazon CloudWatch
+  subs: ["Alarm, wenn eine", "Warteschlange volläuft"]
+
+lanes:
+  - queue:
+      icon: sqs
+      title: "Lager · SQS Standard"
+      subs: ["puffert, verarbeitet", "im eigenen Tempo"]
+    dlq:
+      icon: sqs-queue
+      title: Dead-Letter-Queue
+      subs: ["fängt Fehlschläge auf"]
+    worker:
+      icon: lambda
+      title: Lager-Funktion
+      subs: ["bucht den", "Bestand ab"]
+    target:
+      icon: dynamodb
+      title: Lagerbestand
+      subs: ["in DynamoDB", "aktualisiert"]
+
+  - queue:
+      icon: sqs
+      title: "E-Mail · SQS Standard"
+      subs: ["Reihenfolge egal,", "Hauptsache zugestellt"]
+    dlq:
+      icon: sqs-queue
+      title: Dead-Letter-Queue
+      subs: ["fängt Fehlschläge auf"]
+    worker:
+      icon: lambda
+      title: E-Mail-Funktion
+      subs: ["versendet die", "Bestätigung"]
+    target:
+      icon: users
+      title: Kundschaft
+      subs: ["bekommt die", "Bestätigung"]
+
+  - queue:
+      icon: sqs
+      title: "Buchhaltung · SQS FIFO"
+      subs: ["exakte Reihenfolge,", "genau einmal"]
+      accent: true
+    dlq:
+      icon: sqs-queue
+      title: Dead-Letter-Queue
+      subs: ["fängt Fehlschläge auf"]
+    worker:
+      icon: lambda
+      title: Buchhaltung
+      subs: ["bucht in exakter", "Reihenfolge"]
+    target:
+      icon: app
+      title: Buchhaltungssystem
+      subs: ["erhält alles in", "der richtigen Folge"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "Ein SNS-FIFO-Topic kann beide Warteschlangen-Typen bedienen."
+    - "Umgekehrt geht es nicht: Eine FIFO-Warteschlange lässt sich"
+    - "nicht an ein Standard-Topic hängen, AWS lehnt das ab."
+
+legend:
+  - "1  Die Kundschaft schließt die Bestellung ab"
+  - "2  Der Bestell-Dienst speichert sie in DynamoDB"
+  - "3  Danach veröffentlicht er genau eine Nachricht"
+  - "4  Das Topic verteilt sie an die Lager-Bahn"
+  - "5  gleichzeitig an die E-Mail-Bahn"
+  - "6  und gleichzeitig an die Buchhaltungs-Bahn"
+  - "7  Jede Bahn holt sich ihre Nachricht selbst ab"
+  - "8  und arbeitet sie im eigenen Tempo ab"
+  - "9  Was mehrfach scheitert, landet in der Dead-Letter-Queue"
+  - "Die Schritte 7 bis 9 laufen in allen drei Bahnen gleich ab"
