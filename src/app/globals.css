@@ -199,11 +199,18 @@ body {
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  /* Viewport minus scrollbar minus a small margin, capped at 1150px. The cap
-     was 1600px first, which on a 1454px window filled 1422px — wider than the
-     diagrams need and visually detached from the 760px text column. */
-  width: calc(100vw - var(--sbw) - 2rem);
-  max-width: 1150px;
+  /* TWO clamps, and they must not cancel each other out:
+       - the user's width, --diagram-w, default 860px (drag range 700–1400)
+       - the viewport, calc(100vw - scrollbar - margin)
+     The viewport one matters more: 1400px on a 1439px window is effectively
+     edge-to-edge and would hand back the horizontal overflow that --sbw exists
+     to prevent. min() keeps both alive — at 1439px with the drag at its
+     maximum this yields 1392px, not 1400px.
+
+     Consequence for DiagramPanel: the drag handler may ONLY set --diagram-w.
+     An inline width on the element would override this rule and with it the
+     viewport clamp. */
+  width: min(calc(100vw - var(--sbw) - 2rem), var(--diagram-w, 860px));
 }
 
 /* /services practice-mode "start" buttons — Variant B: gradient base→hover with

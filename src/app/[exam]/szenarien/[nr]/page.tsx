@@ -5,6 +5,7 @@ import {
   SCENARIO_COUNT,
   getScenario,
   listScenarios,
+  readDiagramLegend,
   readNarrative,
   scenarioSlug,
   splitScenarioBody,
@@ -54,6 +55,8 @@ export default async function SzenarioDetailPage({
   // null for every card without a narrative.md (40–100 today) — the switch is
   // then not rendered at all.
   const narrative = readNarrative(meta.nr);
+  // null for the ten cards still on a battle-card fallback — no legend, no box.
+  const legend = readDiagramLegend(meta.nr);
   const prevNr = meta.nr > 1 ? meta.nr - 1 : undefined;
   const nextNr = meta.nr < SCENARIO_COUNT ? meta.nr + 1 : undefined;
 
@@ -144,6 +147,42 @@ export default async function SzenarioDetailPage({
             keeps its margins; it also owns the fullscreen view and the floating
             trigger, hence a client component. */}
         <DiagramPanel src={meta.svgUrl} title={meta.title} />
+
+        {/* Legend for the badges in the picture. The heading says "zum
+            Diagramm" on purpose: many cards number their prose steps too, and
+            those numbers do NOT line up with the badges (see
+            docs/diagramm-nummern-kollision.md). Saying which set these digits
+            belong to is the cheap half of that problem. */}
+        {legend && legend.steps.length > 0 && (
+          <section
+            aria-labelledby="diagramm-legende"
+            className="mx-auto mt-4 max-w-[760px] rounded-2xl border border-line bg-surface px-6 py-5"
+          >
+            <h2
+              id="diagramm-legende"
+              className="text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-faint"
+            >
+              Legende zum Diagramm
+            </h2>
+            <ol className="mt-3 space-y-1.5">
+              {legend.steps.map((s) => (
+                <li key={s.n} className="flex gap-2.5 text-[14px] leading-relaxed text-ink">
+                  <span className="mt-[3px] inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] text-[10.5px] font-semibold text-white">
+                    {s.n}
+                  </span>
+                  <span>{s.text}</span>
+                </li>
+              ))}
+            </ol>
+            {legend.notes.length > 0 && (
+              <ul className="mt-3.5 space-y-1 border-t border-line pt-3 text-[12.5px] leading-relaxed text-ink-soft">
+                {legend.notes.map((n) => (
+                  <li key={n}>{n}</li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
 
         {/* Only the section area switches — header, diagram and pager are
             identical in both views, so the SVG stays in the DOM exactly once

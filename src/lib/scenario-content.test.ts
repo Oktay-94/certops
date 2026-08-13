@@ -11,6 +11,7 @@ import {
   classifySection,
   getScenario,
   listScenarios,
+  readDiagramLegend,
   readNarrative,
   scenarioSlug,
   splitScenarioBody,
@@ -82,6 +83,37 @@ describe("listScenarios", () => {
     for (const s of generated) {
       expect(s.pdfUrl, `card ${s.nr}`).toMatch(/\/card-\d{3}\.pdf$/);
       expect(s.pngUrl, `card ${s.nr}`).toMatch(/\/card-\d{3}\.png$/);
+    }
+  });
+
+  // Lower bound again: the ten cards without a spec are expected to gain one.
+  it("has a diagram legend wherever a diagram was generated", () => {
+    const withLegend = scenarios.filter((s) => readDiagramLegend(s.nr) !== null);
+    expect(
+      withLegend.length,
+      `expected at least 90 legends, got ${withLegend.length}`,
+    ).toBeGreaterThanOrEqual(90);
+
+    for (const s of withLegend) {
+      const legend = readDiagramLegend(s.nr)!;
+      expect(
+        legend.steps.length,
+        `card ${s.nr} has ${legend.steps.length} numbered entries`,
+      ).toBeGreaterThanOrEqual(3);
+      // Numbers must be usable as badge labels: positive and unique.
+      const ns = legend.steps.map((x) => x.n);
+      expect(new Set(ns).size, `card ${s.nr} has duplicate badge numbers`).toBe(ns.length);
+      expect(Math.min(...ns), `card ${s.nr}`).toBeGreaterThan(0);
+      for (const step of legend.steps) {
+        expect(step.text, `card ${s.nr} badge ${step.n}`).not.toBe("");
+      }
+    }
+  });
+
+  it("has no legend for cards falling back to a battle card", () => {
+    const withoutSpec = [4, 7, 9, 25, 30, 37, 40, 54, 55, 80];
+    for (const nr of withoutSpec) {
+      expect(readDiagramLegend(nr), `card ${nr}`).toBeNull();
     }
   });
 

@@ -232,6 +232,55 @@ function narrativeKey(headingText: string): string {
  * would break the whole prerender. A file that exists but is malformed still
  * throws — same loud-failure house style as readScenario.
  */
+export type DiagramLegend = {
+  /** Numbered badge resolutions, in the order the renderer emitted them. */
+  steps: { n: number; text: string }[];
+  /** Unnumbered side notes that sat on the printed card next to the legend. */
+  notes: string[];
+};
+
+/**
+ * Legend for the generated diagram, read from card-NNN.json at BUILD TIME.
+ *
+ * Returns null for the ten cards without a diagram spec, so the page simply
+ * omits the legend instead of rendering an empty box.
+ *
+ * The renderer's `steps` array mixes both kinds of entry: numbered ones resolve
+ * a badge in the picture, unnumbered ones are side notes. They are split here
+ * because rendering a note as if it were step 4 would be a lie.
+ */
+export function readDiagramLegend(nr: number): DiagramLegend | null {
+  const file = path.join(
+    CONTENT_DIR,
+    cardDir(nr),
+    `${diagramStem(nr)}.json`,
+  );
+  let raw: string;
+  try {
+    raw = fs.readFileSync(file, "utf8");
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw err;
+  }
+
+  const parsed = JSON.parse(raw) as { steps?: unknown };
+  if (!Array.isArray(parsed.steps)) {
+    throw new Error(`Diagramm-Legende ungültig: "steps" fehlt in ${file}`);
+  }
+
+  const steps: DiagramLegend["steps"] = [];
+  const notes: string[] = [];
+  for (const entry of parsed.steps) {
+    if (typeof entry !== "string") {
+      throw new Error(`Diagramm-Legende ungültig: Eintrag kein String in ${file}`);
+    }
+    const m = /^(\d+)\s+(.*)$/.exec(entry.trim());
+    if (m) steps.push({ n: Number(m[1]), text: m[2].trim() });
+    else notes.push(entry.trim());
+  }
+  return { steps, notes };
+}
+
 export function readNarrative(nr: number): Narrative | null {
   const file = path.join(CONTENT_DIR, cardDir(nr), "narrative.md");
   let raw: string;

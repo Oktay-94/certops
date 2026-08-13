@@ -12,12 +12,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // matters here more than usual: the panel is full-bleed, and a width change
 // under it would be a visible jump on every open and close. Deliberately NOT
 // `position: fixed`, which would move the page.
+const WIDTH_KEY = "certops:diagram-width";
+const MIN_WIDTH = 700;
+const MAX_WIDTH = 1400;
+/** Below this the handle disappears and the panel just takes the viewport. */
+const DRAG_MIN_VIEWPORT = 900;
+
+const clampWidth = (px: number) =>
+  Math.round(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, px)));
+
 export function DiagramPanel({ src, title }: { src: string; title: string }) {
   const [open, setOpen] = useState(false);
+  const [canDrag, setCanDrag] = useState(false);
   const panelRef = useRef<HTMLButtonElement>(null);
   const floatRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const bleedRef = useRef<HTMLDivElement>(null);
 
   const openWith = useCallback((trigger: HTMLElement | null) => {
     triggerRef.current = trigger;
@@ -30,6 +41,74 @@ export function DiagramPanel({ src, title }: { src: string; title: string }) {
     // panel width and the lock.
     const sbw = window.innerWidth - document.documentElement.clientWidth;
     document.documentElement.style.setProperty("--sbw", `${sbw}px`);
+  }, []);
+
+  // Stored width applies AFTER mount, never during render. The server emits no
+  // width at all, so server and client markup are identical and there is
+  // nothing for React to diff — this is what keeps the hydration warning away.
+  // The property lives on <html>, so the value survives client-side navigation
+  // between scenario pages without re-reading storage.
+  useEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem(WIDTH_KEY);
+    } catch {
+      // Private mode or storage disabled — the default width is fine.
+    }
+    const px = Number(stored);
+    if (Number.isFinite(px) && px > 0) {
+      document.documentElement.style.setProperty(
+        "--diagram-w",
+        `${clampWidth(px)}px`,
+      );
+    }
+  }, []);
+
+  // The handle is pointless when the viewport is already narrower than the
+  // drag range; below that the viewport clamp wins anyway.
+  useEffect(() => {
+    const mq = window.matchMedia(`(min-width: ${DRAG_MIN_VIEWPORT}px)`);
+    const sync = () => setCanDrag(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  // Width follows the pointer's distance from the panel's centre, doubled: the
+  // element is centred via translateX(-50%), so growth is symmetric and the
+  // right edge lands exactly under the cursor.
+  //
+  // Sets ONLY --diagram-w. Assigning style.width here would beat the min() in
+  // globals.css and take the viewport clamp with it.
+  const onHandleDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const bleed = bleedRef.current;
+    if (!bleed) return;
+    e.preventDefault();
+    const handle = e.currentTarget;
+    handle.setPointerCapture(e.pointerId);
+
+    const rect = bleed.getBoundingClientRect();
+    const centreX = rect.left + rect.width / 2;
+
+    const onMove = (ev: PointerEvent) => {
+      const next = clampWidth((ev.clientX - centreX) * 2);
+      document.documentElement.style.setProperty("--diagram-w", `${next}px`);
+    };
+    const onUp = (ev: PointerEvent) => {
+      handle.releasePointerCapture(ev.pointerId);
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      handle.removeEventListener("pointercancel", onUp);
+      const current = document.documentElement.style.getPropertyValue("--diagram-w");
+      try {
+        window.localStorage.setItem(WIDTH_KEY, String(parseInt(current, 10)));
+      } catch {
+        // Not persisting is survivable; the session keeps the width.
+      }
+    };
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+    handle.addEventListener("pointercancel", onUp);
   }, []);
 
   useEffect(() => {
@@ -75,7 +154,7 @@ export function DiagramPanel({ src, title }: { src: string; title: string }) {
 
   return (
     <>
-      <div className="diagram-bleed mt-8">
+      <div ref={bleedRef} className="diagram-bleed relative mt-8">
         <button
           ref={panelRef}
           type="button"
@@ -90,6 +169,19 @@ export function DiagramPanel({ src, title }: { src: string; title: string }) {
             className="h-auto w-full"
           />
         </button>
+
+        {/* Width handle. aria-hidden and not a tab stop on purpose: resizing
+            carries no information that is otherwise unavailable — the panel
+            reads fine at any width and fullscreen is the route to a big view. */}
+        {canDrag && (
+          <div
+            aria-hidden
+            onPointerDown={onHandleDown}
+            className="absolute right-0 top-1/2 flex h-16 w-4 -translate-y-1/2 translate-x-1/2 cursor-ew-resize touch-none items-center justify-center rounded-full border border-line bg-surface opacity-40 transition hover:opacity-100"
+          >
+            <span className="h-6 w-[2px] rounded-full bg-ink-faint" />
+          </div>
+        )}
       </div>
 
       {/* Floating trigger — same view, same close behaviour. Hidden rather than
