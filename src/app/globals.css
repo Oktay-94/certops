@@ -174,11 +174,34 @@
   }
 }
 
+/* Scrollbar width — ONE source for two things that would otherwise fight:
+   the full-bleed diagram panel (100vw includes the scrollbar and would overflow)
+   and the fullscreen scroll lock. `scrollbar-gutter: stable` reserves the gutter
+   permanently, so `overflow: hidden` on <body> no longer changes the layout
+   width and needs NO paddingRight compensation — which is what would make the
+   wide panel visibly jump on open/close. --sbw is the value the panel subtracts;
+   the JS in DiagramPanel measures it once and overwrites this fallback. */
+html {
+  scrollbar-gutter: stable;
+  --sbw: 0px;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
+}
+
+/* Full-bleed breakout for the diagram panel (handoff D1). Text column is
+   untouched — this element steps out of it and back to the viewport width. */
+.diagram-bleed {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Viewport minus scrollbar minus a small margin, capped at 1600px. */
+  width: calc(100vw - var(--sbw) - 2rem);
+  max-width: 1600px;
 }
 
 /* /services practice-mode "start" buttons — Variant B: gradient base→hover with
@@ -352,6 +375,42 @@ body {
   transform: translateY(-60px);
 }
 
+/* Szenarien + Nachschlagewerk preview: endless vertical ticker. Paused at rest
+   (first item visible, unmoving), running on hover and keyboard focus. The list
+   duplicates its first item, and the keyframe travels exactly the height of the
+   ORIGINAL items (5 × 64px), so the wrap is seamless. */
+.pv-ticker {
+  animation: pv-ticker-run 10s linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+.area-tile:hover .pv-ticker,
+.area-tile:focus-within .pv-ticker {
+  animation-play-state: running;
+}
+@keyframes pv-ticker-run {
+  to {
+    transform: translateY(-320px);
+  }
+}
+/* Soft top/bottom edges so items do not cut off hard. */
+.pv-ticker-mask {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 14px,
+    #000 calc(100% - 14px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 14px,
+    #000 calc(100% - 14px),
+    transparent 100%
+  );
+}
+
 /* Statistik preview: sparkline draws itself on hover (statistik-v3 pattern:
    stroke-dasharray/offset → 0). Idle shows the empty axis + target line. */
 .pv-spark-path {
@@ -415,6 +474,12 @@ body {
   .ring-arc {
     transition: none !important;
     animation: none !important;
+  }
+  /* Ticker: kill the animation AND pin it to the start, so the first item
+     stays visible instead of freezing mid-scroll. */
+  .pv-ticker {
+    animation: none !important;
+    transform: none !important;
   }
   .pv-spark-path {
     stroke-dasharray: none;

@@ -82,6 +82,13 @@ Ein weiteres Band schlägt auf diesen beiden fälschlich an.
 - SAA-Skripte ohne TTS (bewusst verschoben). Nachrüst-Skizze: `resolveSegmentMarkdown` um einen DB-Zweig für SAA-Slugs erweitern (Abuse-Guard bleibt „nur geseedeter Content erreichbar"), Cache-Pfad `tts/saa/{slug}/{section}-{hash}.mp3`, content-addressed Hash unverändert.
 - `source_ref`-Upsert statt TRUNCATE+INSERT (Stats-Reset bei Reseed).
 - Dashboard-Karteikarten-Untertitel „Compute & Storage" veraltet.
+- **Zurück-zum-Dashboard-Knopf existiert in drei Varianten**, keine gemeinsame
+  Komponente: `cards/page.tsx` (unten, nur im Leerzustand, `px-6 py-3`),
+  `stats/page.tsx` (unten in einer Reihe, `px-5 py-2.5`, `transition-transform`),
+  `quiz/page.tsx` (oben, mit „←", `px-4 py-2`, `text-sm`). `szenarien/page.tsx`
+  hat 13.08. die Quiz-Variante wörtlich übernommen, weil es dieselbe Seitenhülle
+  und denselben Seitentyp hat. Aufräumen in eine gemeinsame Komponente ist
+  bewusst vertagt — vier laufende Seiten anfassen war nicht Teil des Auftrags.
 - Stale Round-Cookie bei Reseed → notFound (akzeptabler Dev-Edge-Case).
 - proxy.ts-Migration (kosmetisch).
 - Switcher-Pill nutzt blue (sonst Cloud-Concepts) / rose (sonst Security) bewusst doppelt — Profil-Branding-Kontext, nicht Domain-Farbe (`src/lib/profile-branding.ts`).

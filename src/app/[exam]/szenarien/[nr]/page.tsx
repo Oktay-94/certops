@@ -12,6 +12,7 @@ import {
 import { domainColorVars, getDomainColor } from "@/lib/domain-colors";
 import { SkriptMarkdown } from "@/components/skript/SkriptMarkdown";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
+import { DiagramPanel } from "./DiagramPanel";
 import { NarrativeSwitch } from "./NarrativeSwitch";
 import { NarrativeView } from "./NarrativeView";
 
@@ -138,15 +139,11 @@ export default async function SzenarioDetailPage({
 
         {/* Architecture diagram. Deliberately bg-white (not bg-surface): the
             SVGs are authored on a light canvas and must stay legible in dark
-            mode. Plain <img> — next/image adds nothing for SVG. */}
-        <div className="mt-8 rounded-2xl border border-line bg-white p-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={meta.svgUrl}
-            alt={`Architekturdiagramm: ${meta.title}`}
-            className="h-auto w-full"
-          />
-        </div>
+            mode. Plain <img> — next/image adds nothing for SVG. The panel breaks
+            out of this 760px column (.diagram-bleed) while the text around it
+            keeps its margins; it also owns the fullscreen view and the floating
+            trigger, hence a client component. */}
+        <DiagramPanel src={meta.svgUrl} title={meta.title} />
 
         {/* Only the section area switches — header, diagram and pager are
             identical in both views, so the SVG stays in the DOM exactly once

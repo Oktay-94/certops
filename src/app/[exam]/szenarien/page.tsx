@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { listScenarios } from "@/lib/scenario-content";
+import { SZENARIEN_GLYPH, listScenarios } from "@/lib/scenario-content";
 import { ScrollBackground } from "@/components/dashboard/ScrollBackground";
 import { ScenarioGrid } from "./ScenarioGrid";
 
@@ -21,9 +22,19 @@ export default async function SzenarienPage({
   return (
     <main className="relative mx-auto w-full max-w-[1120px] px-6 py-10 sm:py-12">
       <ScrollBackground />
-      <div className="mb-3.5 flex items-center gap-2.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+      {/* Same back link the neighbouring index pages carry — markup, position
+          and text copied verbatim from /[exam]/quiz (top of page, after the
+          background). Deliberately not extracted into a shared component: that
+          would refactor four working pages for no gain here. */}
+      <Link
+        href="/saa"
+        className="inline-flex items-center gap-2 rounded-lg border border-line px-4 py-2 text-sm text-ink transition-colors hover:border-line-strong"
+      >
+        ← Zurück zum Dashboard
+      </Link>
+      <div className="mb-3.5 mt-6 flex items-center gap-2.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
         <span className="h-px w-8 bg-line-strong" aria-hidden />
-        🧩 Szenarien
+        {SZENARIEN_GLYPH} Szenarien
       </div>
       <h1 className="text-[clamp(26px,4vw,40px)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">
         Architektur-Battle-Cards

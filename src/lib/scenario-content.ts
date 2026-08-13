@@ -46,6 +46,13 @@ export type ScenarioMeta = {
   statusNote?: string;
 };
 
+/**
+ * Glyph for the Szenarien area — dashboard tile AND the overview page eyebrow.
+ * Deliberately one constant: two literals for the same area is the kind of
+ * drift nobody finds again once it exists.
+ */
+export const SZENARIEN_GLYPH = "🗺️";
+
 export function scenarioSlug(nr: number): string {
   return String(nr).padStart(2, "0");
 }

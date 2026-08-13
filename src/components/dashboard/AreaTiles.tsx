@@ -1,13 +1,26 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import type { ExamSlug } from "@/lib/exam";
-import { SCENARIO_COUNT } from "@/lib/scenario-content";
+import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
+import {
+  SCENARIO_COUNT,
+  SZENARIEN_GLYPH,
+  scenarioSlug,
+} from "@/lib/scenario-content";
 
-// Six area tiles (mockup .areas, extended from 4 to 6 — decision 2026-07-12).
-// Since the 2b polish ALL six carry a CSS-only hover mini-preview with STATIC
-// content (no live data by design): Quiz option fills, Karten/Dienste flip,
-// Skript scrolls (3s), Statistik sparkline draws itself, Übersicht chips
-// light up staggered. GETEILT pill marks exam-independent areas.
+// Seven area tiles (mockup .areas, extended from 4 to 6 — decision 2026-07-12;
+// Nachschlagewerk added 2026-08-13). Since the 2b polish ALL carry a CSS-only
+// hover mini-preview with STATIC content (no live data by design): Quiz option
+// fills, Karten/Dienste flip, Skript scrolls (3s), Statistik sparkline draws
+// itself, Übersicht chips light up staggered, Szenarien/Nachschlagewerk run an
+// endless ticker. GETEILT pill marks exam-independent areas.
+
+// INTERIM until the diagram rollout (handoff part A) lands. These are the
+// hand-authored battle cards; once card-NNN.web.svg exists per card, this
+// constant switches to those files in one line. Deliberately NOT permanent:
+// the PNGs are 2400×1350 print assets, which is why they go through
+// next/image with sizes rather than a raw <img>.
+const PREVIEW_CARDS = [1, 12, 34, 60, 87] as const;
 
 function AreaTile({
   href,
@@ -15,23 +28,29 @@ function AreaTile({
   title,
   desc,
   shared = false,
+  badge,
   preview,
 }: {
-  href: string;
+  /** Omit to render a non-interactive tile (no link, not focusable). */
+  href?: string;
   glyph: string;
   title: string;
   desc: string;
   shared?: boolean;
+  /** Corner label for tiles that exist but do not lead anywhere yet. */
+  badge?: string;
   preview?: ReactNode;
 }) {
-  return (
-    <Link
-      href={href}
-      className="area-tile relative block rounded-xl border border-line bg-surface p-[18px]"
-    >
+  const body = (
+    <>
       {shared && (
         <span className="absolute right-3.5 top-3.5 rounded-full border border-line px-[7px] py-[2px] font-mono text-[8.5px] tracking-[0.12em] text-ink-faint">
           GETEILT
+        </span>
+      )}
+      {badge && (
+        <span className="absolute right-3.5 top-3.5 rounded-full border border-line px-[7px] py-[2px] font-mono text-[8.5px] tracking-[0.12em] text-ink-faint">
+          {badge}
         </span>
       )}
       <h3 className="flex items-center gap-2.5 text-[14.5px] font-semibold text-ink">
@@ -42,6 +61,24 @@ function AreaTile({
       </h3>
       <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">{desc}</p>
       {preview && <div className="mt-3.5">{preview}</div>}
+    </>
+  );
+
+  const shell = "area-tile relative block rounded-xl border border-line p-[18px]";
+
+  // Dead-but-not-empty: still hovers and animates, but is neither a link nor a
+  // tab stop. aria-disabled tells AT what the muted styling shows visually.
+  if (!href) {
+    return (
+      <div aria-disabled className={`${shell} cursor-default bg-surface opacity-70`}>
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={href} className={`${shell} bg-surface`}>
+      {body}
     </Link>
   );
 }
@@ -164,6 +201,66 @@ function SkriptPreview() {
   );
 }
 
+// Endless vertical ticker (handoff B2/B3): paused at rest, running on hover and
+// keyboard focus. The first item is duplicated at the end so the wrap is
+// seamless — the keyframe travels exactly the height of the original list.
+function SzenarienPreview() {
+  const cards = [...PREVIEW_CARDS, PREVIEW_CARDS[0]];
+  return (
+    <div
+      aria-hidden
+      className="pv-ticker-mask h-[64px] overflow-hidden rounded-lg border border-line bg-surface-2"
+    >
+      <div className="pv-ticker">
+        {cards.map((nr, i) => (
+          <div
+            key={`${nr}-${i}`}
+            className="flex h-[64px] items-center justify-center px-2"
+          >
+            <Image
+              src={`/scenarios/card-${scenarioSlug(nr)}/battle_card_${nr}.png`}
+              alt=""
+              width={2400}
+              height={1350}
+              sizes="220px"
+              className="max-h-[52px] w-auto rounded-[3px] object-contain"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const NACHSCHLAGE_TERMS = [
+  "Elastizität",
+  "SLA",
+  "IOPS",
+  "RPO und RTO",
+  "Shared Responsibility",
+];
+
+function NachschlagewerkPreview() {
+  const terms = [...NACHSCHLAGE_TERMS, NACHSCHLAGE_TERMS[0]];
+  return (
+    <div
+      aria-hidden
+      className="pv-ticker-mask h-[64px] overflow-hidden rounded-lg border border-line bg-surface-2"
+    >
+      <div className="pv-ticker">
+        {terms.map((term, i) => (
+          <div
+            key={`${term}-${i}`}
+            className="flex h-[64px] items-center px-3 text-[11px] text-ink-soft"
+          >
+            {term}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function AreaTiles({ exam }: { exam: ExamSlug }) {
   if (exam === "saa") {
     // SAA track: Quiz, Karten, Skript, Statistik plus Szenarien (battle
@@ -173,7 +270,7 @@ export function AreaTiles({ exam }: { exam: ExamSlug }) {
         <AreaTile
           href="/saa/quiz"
           glyph="🎯"
-          title="Szenario-Quiz"
+          title={`${EXAM_CERT[exam]} Prüfungsquiz`}
           desc="265 Fragen in Runden, schwächste zuerst."
           preview={<QuizPreview />}
         />
@@ -200,9 +297,17 @@ export function AreaTiles({ exam }: { exam: ExamSlug }) {
         />
         <AreaTile
           href="/saa/szenarien"
-          glyph="🧩"
+          glyph={SZENARIEN_GLYPH}
           title="Szenarien"
           desc={`${SCENARIO_COUNT} Battle Cards: Architektur-Diagramm, Signalwörter, Fallen.`}
+          preview={<SzenarienPreview />}
+        />
+        <AreaTile
+          glyph="📚"
+          title="Nachschlagewerk"
+          desc="Alles aus dem Skript in Kurzform zum Nachschlagen."
+          badge="Bald"
+          preview={<NachschlagewerkPreview />}
         />
       </div>
     );
@@ -212,7 +317,7 @@ export function AreaTiles({ exam }: { exam: ExamSlug }) {
       <AreaTile
         href={`/${exam}/quiz`}
         glyph="🎯"
-        title="Szenario-Quiz"
+        title={`${EXAM_CERT[exam]} Prüfungsquiz`}
         desc="264 Fragen in Runden, schwächste zuerst."
         preview={<QuizPreview />}
       />
