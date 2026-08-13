@@ -59,6 +59,45 @@ describe("listScenarios", () => {
     }
   });
 
+  // Assets resolve to the generated diagram when it exists and fall back to the
+  // hand-authored battle card otherwise. Asserted as a LOWER BOUND: the ten
+  // cards without a spec are expected to gain one later, and this must not turn
+  // into a chore that has to be edited every time one lands.
+  it("resolves to generated diagrams where present, battle cards otherwise", () => {
+    const generated = scenarios.filter((s) => /\/card-\d{3}\.web\.svg$/.test(s.svgUrl));
+    const fallback = scenarios.filter((s) => /\/battle_card_\d+\.svg$/.test(s.svgUrl));
+
+    expect(
+      generated.length + fallback.length,
+      `every card must resolve to one shape or the other; got ${generated.length} generated + ${fallback.length} fallback of ${scenarios.length}`,
+    ).toBe(scenarios.length);
+
+    expect(
+      generated.length,
+      `expected at least 90 generated diagrams, got ${generated.length} (fallback: ${fallback.map((s) => s.nr).join(", ")})`,
+    ).toBeGreaterThanOrEqual(90);
+
+    // pdf and png must follow the same source as the svg — a card must not mix
+    // a generated diagram with a battle-card PDF.
+    for (const s of generated) {
+      expect(s.pdfUrl, `card ${s.nr}`).toMatch(/\/card-\d{3}\.pdf$/);
+      expect(s.pngUrl, `card ${s.nr}`).toMatch(/\/card-\d{3}\.png$/);
+    }
+  });
+
+  it("cards without a diagram spec keep their battle card", () => {
+    // docs/diagramm-specs-fehlend.md — remove numbers here as specs land.
+    const withoutSpec = [4, 7, 9, 25, 30, 37, 40, 54, 55, 80];
+    for (const nr of withoutSpec) {
+      const s = scenarios.find((x) => x.nr === nr);
+      expect(s, `card ${nr} missing from listScenarios()`).toBeDefined();
+      expect(s!.svgUrl, `card ${nr}`).toBe(
+        `/scenarios/card-${s!.slug}/battle_card_${nr}.svg`,
+      );
+      expect(fs.existsSync(path.join(PUBLIC_DIR, s!.svgUrl)), s!.svgUrl).toBe(true);
+    }
+  });
+
   it("multi-domain cards appear under every one of their domains (filter invariant)", () => {
     // ScenarioGrid filters via s.domains.includes(domain) — a card counts
     // once per domain it belongs to, so the per-domain totals overlap.

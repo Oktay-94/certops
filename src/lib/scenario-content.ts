@@ -67,8 +67,36 @@ function cardStem(nr: number): string {
   return `battle_card_${nr}`;
 }
 
+/** Generated diagram stem — three digits, unlike the two-digit directory. */
+function diagramStem(nr: number): string {
+  return `card-${String(nr).padStart(3, "0")}`;
+}
+
+/**
+ * Asset URL with fallback: the generated diagram when it exists on disk,
+ * otherwise the hand-authored battle card.
+ *
+ * 90 of 100 cards have a generated diagram; 4, 7, 9, 25, 30, 37, 40, 54, 55 and
+ * 80 have no spec yet and keep their battle_card_N.* — see
+ * docs/diagramm-specs-fehlend.md.
+ *
+ * TWO things the field names no longer carry on their own:
+ *
+ * 1. `svg` resolves to `card-NNN.web.svg`, the WEB cut — no title, no legend.
+ *    The print SVG is not shipped; it stays in the gitignored build output.
+ *
+ * 2. This resolves at BUILD TIME, not per request. Every scenario page is SSG,
+ *    so dropping a new asset into public/ without rebuilding leaves the old
+ *    image on the page. If a diagram looks stale, rebuild before looking for
+ *    the bug in the frontend — it is not there.
+ */
 function assetUrl(nr: number, ext: "svg" | "pdf" | "png"): string {
-  return `/scenarios/${cardDir(nr)}/${cardStem(nr)}.${ext}`;
+  const dir = cardDir(nr);
+  const generated = ext === "svg" ? `${diagramStem(nr)}.web.svg` : `${diagramStem(nr)}.${ext}`;
+  if (fs.existsSync(path.join(CONTENT_DIR, dir, generated))) {
+    return `/scenarios/${dir}/${generated}`;
+  }
+  return `/scenarios/${dir}/${cardStem(nr)}.${ext}`;
 }
 
 function requireString(v: unknown, key: string, file: string): string {

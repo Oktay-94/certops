@@ -1,12 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { EXAM_CERT, type ExamSlug } from "@/lib/exam";
-import {
-  SCENARIO_COUNT,
-  SZENARIEN_GLYPH,
-  scenarioSlug,
-} from "@/lib/scenario-content";
+import { SCENARIO_COUNT, SZENARIEN_GLYPH } from "@/lib/scenario-content";
 
 // Seven area tiles (mockup .areas, extended from 4 to 6 — decision 2026-07-12;
 // Nachschlagewerk added 2026-08-13). Since the 2b polish ALL carry a CSS-only
@@ -15,12 +10,17 @@ import {
 // itself, Übersicht chips light up staggered, Szenarien/Nachschlagewerk run an
 // endless ticker. GETEILT pill marks exam-independent areas.
 
-// INTERIM until the diagram rollout (handoff part A) lands. These are the
-// hand-authored battle cards; once card-NNN.web.svg exists per card, this
-// constant switches to those files in one line. Deliberately NOT permanent:
-// the PNGs are 2400×1350 print assets, which is why they go through
-// next/image with sizes rather than a raw <img>.
+// Preview thumbnails. All five have a generated diagram — none is one of the
+// ten cards still on a battle-card fallback (see docs/diagramm-specs-fehlend.md),
+// so the tile always shows current artwork.
+// Plain <img>, not next/image: these are SVGs, and the optimizer has nothing to
+// do with them. It earned its place while these were 2400×1350 PNGs.
 const PREVIEW_CARDS = [1, 12, 34, 60, 87] as const;
+
+function previewSrc(nr: number): string {
+  const dir = `card-${String(nr).padStart(2, "0")}`;
+  return `/scenarios/${dir}/card-${String(nr).padStart(3, "0")}.web.svg`;
+}
 
 function AreaTile({
   href,
@@ -217,13 +217,20 @@ function SzenarienPreview() {
             key={`${nr}-${i}`}
             className="flex h-[64px] items-center justify-center px-2"
           >
-            <Image
-              src={`/scenarios/card-${scenarioSlug(nr)}/battle_card_${nr}.png`}
+            {/* Two things here are deliberate, both learned the hard way:
+                - Fixed box, not w-auto: an unloaded image with auto width has a
+                  0×0 rect. It also keeps the ticker from jumping as images land.
+                - NO loading="lazy": these sit in a 64px overflow-hidden window,
+                  and Chrome does not load lazy images clipped by an ancestor —
+                  the tile stayed empty. Five SVGs, 117 KB raw and highly
+                  compressible, so eager is the cheaper trade. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewSrc(nr)}
               alt=""
-              width={2400}
-              height={1350}
-              sizes="220px"
-              className="max-h-[52px] w-auto rounded-[3px] object-contain"
+              width={156}
+              height={52}
+              className="h-[52px] w-[156px] rounded-[3px] object-contain"
             />
           </div>
         ))}
