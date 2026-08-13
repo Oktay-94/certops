@@ -1,0 +1,99 @@
+id: card-069
+template: hybrid
+title: "Szenario 69 · Kendra im Wartungsmodus — Migration auf Bedrock"
+subtitle: >-
+  Das ist keine Aufwärts-Migration: bei RAG gewinnt die Managed Knowledge Base,
+  bei klassischer Suche verliert sie — 7 Konnektoren statt 32+, der Rest geht über S3
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Quellen ohne Konnektor
+  nodes:
+    - icon: app
+      title: ServiceNow
+      subs: ["kein BMKB-Konnektor"]
+    - icon: app
+      title: Salesforce
+      subs: ["kein BMKB-Konnektor"]
+
+bridge:
+  - icon: stepfunctions
+    title: AWS Step Functions
+    subs: ["zieht per API und legt", "Sidecars in S3 ab"]
+    to_band: 0
+
+bands:
+  - label: "A · So kommen die Dokumente in den Index"
+    hero_note: "Chunks"
+    nodes:
+      - icon: s3
+        title: Amazon S3
+        subs: ["einer von 7 Konnektoren", "Kendra hatte 32+"]
+      - icon: amazon-bedrock
+        title: Amazon Bedrock
+        subs: ["Smart Parsing, Chunking", "jetzt explizit zu wählen"]
+      - icon: disk
+        title: Managed Vector Store
+        subs: ["Bedrock betreibt ihn ganz", "Suche immer hybrid"]
+
+  - label: "B · So fragt die Anwendung"
+    hero_note: "Frage plus Filter"
+    nodes:
+      - icon: client
+        title: Suchmaske
+        subs: ["Autocomplete und Facetten", "fallen weg"]
+      - icon: question
+        title: Metadatenfilter
+        subs: ["über .metadata.json", "kein startsWith"]
+      - icon: amazon-bedrock
+        title: RetrieveAndGenerate
+        subs: ["Antwort mit Zitaten,", "Kendra brauchte ein LLM"]
+
+hero:
+  icon: amazon-bedrock
+  title: Amazon Bedrock Managed Knowledge Base
+  title_lines: ["Amazon Bedrock", "Managed KB"]
+  subs:
+    - "Das Migrationsziel"
+    - ""
+    - "7 Konnektoren statt 32+"
+    - "keine Facetten, keine"
+    - "Synonyme, kein Autocomplete"
+    - "dafür RAG nativ"
+    - "und Agentic Retrieval"
+
+crossband:
+  heading: "Querschnitt: sechs Kendra-Funktionen, die in BMKB fehlen — jede braucht einen eigenen Workaround"
+  items:
+    - icon: question
+      title: Query Suggestions
+      subs: ["eigener Suggester-Index", "oder LLM-Ergänzung"]
+    - icon: folders
+      title: Faceted Search
+      subs: ["Sidecars, aber keine", "dynamischen Zähler"]
+    - icon: documents
+      title: Custom Synonyms
+      subs: ["Thesaurus vor der Query", "in DynamoDB oder S3"]
+    - icon: alert
+      title: Spell Checking
+      subs: ["Lambda-Vorstufe oder", "LLM-Korrektur"]
+    - icon: app
+      title: Incremental Learning
+      title_lines: ["Incremental", "Learning"]
+      subs: ["Reranking plus eigener", "Feedback-Loop"]
+    - icon: lambda
+      title: Custom Document Enrichment
+      title_lines: ["Custom Document", "Enrichment"]
+      subs: ["Pipeline vor dem Upload,", "keine Hooks mehr"]
+
+legend_cols: 2
+legend:
+  - "1  ServiceNow und Salesforce haben keinen Konnektor — Umweg über S3"
+  - "2  Bedrock parst und zerlegt; die Chunking-Strategie wird gewählt"
+  - "3  Den Vektorindex betreibt Bedrock vollständig selbst"
+  - "4  Er gehört zur Managed Knowledge Base, nicht zu einem eigenen Store"
+  - "5  Die Suchmaske stellt die Frage und setzt die Filter"
+  - "6  Metadatenfilter ersetzen die Facetten, so weit das geht"
+  - "7  RetrieveAndGenerate antwortet mit Zitaten aus derselben Wissensbasis"
+  - "Wer eine Suchmaske betreibt, verliert; wer einen Chatbot baut, gewinnt"
+  - "Wartungsmodus ist keine Abschaltung — für Kendra gibt es kein Enddatum"

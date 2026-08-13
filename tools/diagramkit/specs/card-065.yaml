@@ -1,0 +1,58 @@
+id: card-065
+template: kette
+title: "Szenario 65 · Webshop-Empfehlungen ohne ML-Team"
+subtitle: >-
+  Domain-Gruppe gibt einen Recommender, der selbst nachtrainiert — und PutEvents
+  macht den gerade angesehenen Artikel sofort wirksam, ganz ohne Retraining
+
+outside:
+  icon: users
+  title: Kundschaft
+  subs: ["kauft und klickt seit", "Jahren im Shop"]
+  w: 165
+
+chain:
+  - icon: s3
+    title: Amazon S3
+    subs: ["Bestell- und Klickdaten", "als Dataset Import Job"]
+    w: 195
+
+  - icon: amazon-personalize
+    title: Dataset Group
+    subs: ["Domain oder Custom —", "nicht mehr zurück"]
+    w: 195
+
+  - icon: amazon-personalize
+    title: Recommender
+    subs: ["vorkonfiguriert, trainiert", "selbst nach"]
+    w: 195
+    note: {text: "Campaign gäbe es nur im Custom-Weg"}
+
+  - icon: app
+    title: Shop-Frontend
+    subs: ["ruft GetRecommendations", "je Produktseite auf"]
+    w: 195
+
+  - icon: amazon-personalize
+    title: Event Tracker
+    subs: ["PutEvents, genau einer", "je Dataset Group"]
+    w: 195
+
+branch:
+  from: 0
+  items:
+    - icon: amazon-sage-maker-a-i
+      title: Amazon SageMaker AI
+      subs: ["eigenes Modell, eigene Daten", "verworfen: kein ML-Team"]
+      w: 230
+
+legend_cols: 2
+legend:
+  - "1  Der Shop liefert seit Jahren Bestell- und Klickdaten nach S3"
+  - "2  Der Dataset Import Job zieht sie in die Dataset Group"
+  - "3  Die Domain-Gruppe stellt den Recommender fertig bereit"
+  - "4  Das Frontend holt die Empfehlungen je Produktseite"
+  - "5  Jeder Klick geht über PutEvents an den Event Tracker"
+  - "6  Verworfen: ein eigenes Modell kostet Monate statt Tage"
+  - "Der Event Tracker schreibt zurück in den Datenbestand"
+  - "Die Empfehlung ändert sich in Sekunden, ohne neues Training"

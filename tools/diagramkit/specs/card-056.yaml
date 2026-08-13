@@ -1,0 +1,94 @@
+id: card-056
+template: kette
+title: "Szenario 56 · Self-Service-BI und eingebettete Haendler-Dashboards"
+subtitle: >-
+  Die Geschaeftsfuehrung klickt den ganzen Tag, 300 Haendler sehen ihre eigenen Zahlen
+  ohne AWS-Login — und die Kosten fuer gescanntes Volumen sollen dabei nicht mitwachsen
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: quicksuite
+    label: "Amazon Quick Suite — seit 09.10.2025, ehem. QuickSight"
+    color: accent
+    full_height: true
+
+outside:
+  icon: office
+  title: Fahrradhersteller
+  subs: ["Auftraege und", "Verkaufshistorie"]
+
+chain:
+  - icon: s3
+    title: Amazon S3
+    subs: ["Parquet, sieben Jahre", "Verkaufshistorie"]
+    ssize: 10
+    w: 160
+    in: [cloud, region]
+
+  - icon: a-w-s-glue-data-catalog
+    title: AWS Glue Data Catalog
+    title_lines: ["AWS Glue", "Data Catalog"]
+    subs: ["Register: Tabelle", "und Partitionen"]
+    ssize: 10
+    w: 175
+    in: [cloud, region]
+
+  - icon: athena
+    title: Amazon Athena
+    subs: ["SQL auf S3, bezahlt", "je gescanntem Volumen"]
+    ssize: 10
+    w: 160
+    in: [cloud, region]
+
+  - icon: amazon-quick-suite
+    title: SPICE
+    subs: ["Dataset A: Athena-Historie", "Dataset B: RDS, tagesaktuell", "Import statt Direktabfrage", "Refresh nach dem ETL"]
+    hero: true
+    border: "#B03060"
+    fill: "#FDF1F5"
+    w: 225
+    in: [cloud, region, quicksuite]
+
+  - icon: metrics
+    title: Analyse und Dashboard
+    title_lines: ["Analyse und", "Dashboard"]
+    subs: ["Author filtert selbst,", "kein IT-Ticket noetig"]
+    ssize: 10
+    w: 175
+    in: [cloud, region, quicksuite]
+
+  - icon: client
+    title: Haendlerportal
+    subs: ["300 Haendler, anonym", "eingebettet, Session-Tags"]
+    ssize: 10
+    w: 175
+    in: []
+
+branch:
+  from: 3
+  items:
+    - icon: a-w-s-identity-access-management-permissions
+      title: Row-Level Security
+      subs: ["filtert im Dataset, nicht im Visual", "tag-basiert, nur auf Textfeldern"]
+      ssize: 10
+      w: 260
+
+legend_cols: 2
+legend:
+  - "1  Auftraege und Verkaufshistorie liegen im Data Lake"
+  - "2  Crawler oder DDL tragen die Parquet-Dateien in den Katalog ein"
+  - "3  Athena liest das Schema und wendet SQL auf die S3-Objekte an"
+  - "4  Das Abfrageergebnis wird als Dataset in SPICE importiert"
+  - "5  Analyse und Dashboard lesen aus SPICE, nicht aus der Quelle"
+  - "6  Das Dashboard wird anonym ins Haendlerportal eingebettet"
+  - "7  Auf dasselbe Dataset werden RLS-Regeln gelegt"
+  - "Session-Tags mit der Haendler-ID filtern das Dataset zur Laufzeit"

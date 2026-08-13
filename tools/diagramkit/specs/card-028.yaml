@@ -1,0 +1,82 @@
+id: card-028
+template: vorher_nachher
+title: "Szenario 28 · Wenn der Lambda-Schwarm die Verbindungen auffrisst"
+subtitle: >-
+  9.000 Requests pro Sekunde, 900 gleichzeitige Ausführungen und eine Datenbank
+  mit 200 Verbindungsplätzen — ein Verbindungsproblem, kein Kapazitätsproblem
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: VPC
+  subnet_label: "Privates Subnetz · Bestell-API"
+  forward: "Black Friday: 9.000 Requests pro Sekunde auf die Bestell-API"
+  left:
+    icon: users
+    title: Kundschaft
+    subs: ["bestellt in derselben", "halben Stunde"]
+  inner:
+    icon: lambda
+    title: AWS Lambda
+    subs: ["skaliert auf 900", "gleichzeitige Instanzen"]
+    w: 180
+
+panels:
+  - state: broken
+    headline: "Vorher — jede Instanz bringt ihre eigene Verbindung mit"
+    back: "FATAL: sorry, too many clients already"
+    extras:
+      - icon: alert
+        title: Kein Verbindungspool
+        subs: ["900 Instanzen öffnen", "900 eigene Verbindungen"]
+        accent: fail
+        badge: true
+        w: 200
+      - icon: rds
+        title: Amazon RDS for PostgreSQL
+        title_lines: ["Amazon RDS", "for PostgreSQL"]
+        subs: ["max_connections = 200,", "CPU dabei bei 30 %"]
+        accent: fail
+        badge: true
+        w: 185
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Die Wand steht nicht"
+        - "bei der Last, sondern"
+        - "bei der Zahl der Verbindungen"
+
+  - state: fixed
+    headline: "Nachher — ein Pool entkoppelt Instanzen von Verbindungen"
+    back: "die Bestellungen laufen durch, die Instanz bleibt dieselbe"
+    extras:
+      - icon: amazon-r-d-s-proxy-instance
+        title: Amazon RDS Proxy
+        subs: ["bündelt 900 auf 40,", "gibt sie je Transaktion frei"]
+        accent: ok
+        badge: true
+        w: 200
+      - icon: rds
+        title: Amazon RDS for PostgreSQL
+        title_lines: ["Amazon RDS", "for PostgreSQL"]
+        subs: ["sieht 40 statt 900,", "Failover bis 66 % kürzer"]
+        badge: true
+        w: 185
+    insert:
+      kind: node
+      icon: secretsmanager
+      title: AWS Secrets Manager
+      subs: ["Zugangsdaten aus dem Secret,", "optional IAM-Zwang"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Der Ansturm trifft die Bestell-API, Lambda skaliert auf 900 Instanzen"
+  - "2  Die Aufrufe scheitern, obwohl die Datenbank noch Luft hätte"
+  - "3  Denn jede Instanz baut ihre eigene Datenbankverbindung auf"
+  - "4  Bei 200 Plätzen ist Schluss — daran ändert auch mehr CPU nichts"
+  - "5  An der Last ändert sich nichts, es ist derselbe Black Friday"
+  - "6  Die Bestellungen laufen durch, ohne größere Instanz"
+  - "7  Lambda verbindet sich zum Proxy-Endpoint, der 900 auf 40 bündelt"
+  - "8  Die Datenbank sieht 40 statt 900 — dieselbe Instanz, dieselbe Größe"
+  - "Ein einziges SET beim Verbindungsaufbau pinnt — dann poolt nichts mehr"

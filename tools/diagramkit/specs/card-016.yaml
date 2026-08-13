@@ -1,0 +1,85 @@
+id: card-016
+template: hybrid
+title: "Szenario 16 · S3 File Gateway — das Netzlaufwerk bleibt, die Daten landen in S3"
+subtitle: >-
+  Der Protokollbruch zwischen Datei- und Objektwelt wird im Gateway aufgelöst, nicht in der
+  Anwendung: SMB bleibt SMB, und trotzdem entsteht aus jeder Datei ein echtes S3-Objekt
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: "Ingenieurbüro Nordwerk"
+  nodes:
+    - icon: client
+      title: CAD-Arbeitsplätze
+      title_lines: ["CAD-Arbeits-", "plätze"]
+      subs: ["180 Mitarbeiter", "kennen nur Z:"]
+      ssize: 10
+    - icon: server
+      title: PDM-Server
+      subs: ["mountet die", "SMB-Freigabe"]
+      ssize: 10
+    - icon: folders
+      title: Altes NAS
+      subs: ["40 TB, 94 % voll", "wird abgelöst"]
+      ssize: 10
+  actor:
+    icon: users
+    title: Qualitätssicherung
+    title_lines: ["Qualitäts-", "sicherung"]
+    subs: ["fragt die Prüfprotokolle", "per SQL ab"]
+    ssize: 10
+    to_band: 1
+
+bridge:
+  - icon: a-w-s-storage-gateway-amazon-s3-file-gateway
+    title: S3 File Gateway
+    subs: ["VM im eigenen RZ,", "spricht NFS und SMB"]
+    ssize: 10
+  - icon: disk
+    title: Lokaler Cache
+    subs: ["bis 64 TB, ACK sofort,", "Read-Through beim Lesen"]
+    ssize: 10
+    to_band: 0
+
+bands:
+  - label: "A · Schreibweg — 1 Datei = 1 Objekt, Dateipfad = Object Key"
+    nodes:
+      - icon: s3
+        title: Amazon S3
+        subs: ["echte Objekte, kein", "proprietäres Format"]
+      - icon: amazon-simple-storage-service-s3-glacier-deep-archive
+        title: S3 Glacier Deep Archive
+        title_lines: ["S3 Glacier", "Deep Archive"]
+        subs: ["Lifecycle ab 90 Tagen,", "Restore dauert Stunden"]
+
+  - label: "B · Auswertung — dieselben Objekte, ohne Export"
+    nodes:
+      - icon: athena
+        title: Amazon Athena
+        subs: ["SQL direkt über die", "abgelegten Protokolle"]
+
+crossband:
+  heading: "Nicht verwechseln: drei Gateways, drei Probleme"
+  items:
+    - icon: a-w-s-storage-gateway-amazon-s3-file-gateway
+      title: S3 File Gateway
+      title_lines: ["S3 File", "Gateway"]
+      subs: ["NFS/SMB, lesbare", "Objekte in S3"]
+    - icon: a-w-s-storage-gateway-volume-gateway
+      title: Volume Gateway
+      title_lines: ["Volume", "Gateway"]
+      subs: ["iSCSI-Blöcke,", "EBS-Snapshots"]
+    - icon: a-w-s-storage-gateway-tape-gateway
+      title: Tape Gateway
+      title_lines: ["Tape", "Gateway"]
+      subs: ["virtuelle Tape", "Library (VTL)"]
+
+legend_cols: 2
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der PDM-Server schreibt über SMB, das Gateway lädt asynchron nach S3"
+  - "2  Der Write landet zuerst im lokalen Cache, der ACK kommt vor der WAN-Leitung"
+  - "3  Eine Lifecycle-Regel im Bucket archiviert Altprojekte — kein Gateway-Feature"
+  - "4  Die QS fragt die Prüfprotokolle per SQL ab, ohne sie vorher zu exportieren"
+  - "Aus Z:\\projekte\\anlage-7.pdf wird das Objekt projekte/anlage-7.pdf — kein Container, kein Blob"
+  - "Deshalb lesen auch Lambda (s3:ObjectCreated) und SageMaker dieselben Objekte direkt"

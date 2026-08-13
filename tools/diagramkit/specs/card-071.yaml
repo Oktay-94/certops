@@ -1,0 +1,58 @@
+id: card-071
+template: hybrid
+title: "Szenario 71 · Application Migration Service — Cutover in Minuten"
+subtitle: >-
+  50 Server aus vSphere, Hyper-V und Bare Metal ziehen unverändert nach EC2:
+  Block-Replikation im laufenden Betrieb, Test ohne Störung, Umschaltung in Minuten
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum vor Ort
+  nodes:
+    - icon: servers
+      title: vSphere-VMs
+      subs: ["Quellserver"]
+    - icon: servers
+      title: Hyper-V-VMs
+      subs: ["Quellserver"]
+    - icon: server
+      title: Bare Metal
+      subs: ["physische Server", "gehen mit"]
+    - icon: app
+      title: MGN-Agent
+      subs: ["läuft auf jedem", "Quellserver"]
+
+bridge:
+  - icon: internet
+    title: TLS-Strecke
+    subs: ["Blockänderungen", "laufend verschlüsselt"]
+    to_band: 0
+
+bands:
+  - label: "A · Replikation läuft, Produktion läuft weiter — bis zum Cutover"
+    nodes:
+      - icon: a-w-s-application-migration-service
+        title: AWS Application Migration Service
+        title_lines: ["AWS Application", "Migration Service"]
+        subs: ["nimmt die Blöcke an,", "steuert den Cutover"]
+      - icon: ebs
+        title: Staging Area
+        subs: ["Replication Server auf", "günstigen EBS-Volumes"]
+      - icon: ec2
+        title: Amazon EC2
+        subs: ["Test-Instanz, stört die", "Replikation nicht"]
+      - icon: ec2
+        title: Amazon EC2
+        subs: ["Produktion nach Cutover,", "OS und Daten 1:1"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der Agent repliziert Blöcke laufend und verschlüsselt nach AWS"
+  - "2  MGN legt die mitwachsende Kopie in der Staging Area ab"
+  - "3  Aus dem Staging-Stand startet jederzeit eine Test-Instanz"
+  - "4  Final Sync, dann startet die Produktion — Cutover in Minuten"
+  - "Die Quellserver bleiben ein Rollback-Fenster lang stehen, dann Stilllegung"
+  - "Verworfen: AWS SMS — Snapshot-basiert, Cutover in Stunden, eingestellt"

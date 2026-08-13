@@ -1,0 +1,89 @@
+id: card-026
+template: kette
+title: "Szenario 26 · Betrugsringe über Beziehungsnetzwerke finden"
+subtitle: >-
+  240 Mio. Beziehungen zwischen Kunden, Geräten und Adressen — ein Traversal
+  je Antrag in Echtzeit, eine Ringsuche über den Gesamtgraph in der Nacht
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: vpc
+    label: VPC
+    icon: grp-vpc
+    color: vpc
+  - key: subnet
+    label: Privates Subnetz
+    icon: grp-private-subnet
+    color: subnet-private
+
+outside:
+  icon: user
+  title: Kontoeröffnung
+  subs: ["Gerät, IP und", "Zustelladresse"]
+  w: 160
+
+chain:
+  - icon: lambda
+    title: AWS Lambda
+    subs: ["Fraud-Service, fragt", "bis zu drei Hops weit"]
+    w: 200
+    in: [cloud, region, vpc, subnet]
+
+  - icon: amazon-neptune
+    title: Amazon Neptune
+    subs: ["Property Graph, 240 Mio. Kanten", "Gremlin, openCypher, SPARQL"]
+    hero: true
+    w: 270
+    in: [cloud, region, vpc, subnet]
+
+  - icon: s3
+    title: Amazon S3
+    subs: ["Snapshot des Graphen,", "Ausgangspunkt der Analyse"]
+    w: 190
+    in: [cloud, region]
+
+  - icon: analytics
+    title: Neptune Analytics
+    subs: ["eigener Dienst, In-Memory,", "nur openCypher"]
+    w: 215
+    in: [cloud, region]
+
+  - icon: users
+    title: Betrugs-Team
+    subs: ["Community Detection", "und PageRank"]
+    w: 190
+
+crossband:
+  heading: "Querschnitt: Was über Neptune sonst noch gefragt wird"
+  items:
+    - icon: database
+      title: Relationale Alternative
+      title_lines: ["Relationale", "Alternative"]
+      subs: ["ein Self-Join je Hop,", "Tiefe vorab unbekannt"]
+    - icon: amazon-neptune
+      title: Neptune Serverless
+      subs: ["Minimum 1 NCU, nie null", "Maximum 128 NCU"]
+    - icon: iam
+      title: AWS IAM
+      subs: ["Rolle für den Bulk Loader", "auf den S3-Bucket"]
+    - icon: vpc
+      title: Amazon VPC
+      subs: ["VPC-only, es gibt keinen", "öffentlichen Endpoint"]
+
+legend_cols: 3
+legend:
+  - "1  Jeder Antrag liefert Gerät, IP und Adresse an den Fraud-Service"
+  - "2  Die Funktion fragt den Graphen über bis zu drei Hops ab"
+  - "3  Für die Ermittlung wird ein Snapshot des Graphen abgelegt"
+  - "4  Neptune Analytics lädt ihn als eigene In-Memory-Kopie"
+  - "5  Erst darauf fallen ganze Ringe auf, nicht nur einzelne Konten"
+  - "Die Kopie altert ab dem Laden — sie gleicht sich nie wieder ab"

@@ -1,0 +1,69 @@
+id: card-094
+template: kette
+title: "Szenario 94 · Amazon IVS, Live-Streaming"
+subtitle: >-
+  Live ohne eigene Streaming-Infrastruktur: der Dienst nimmt an, transkodiert und
+  liefert aus — die Betriebsart entscheidet über Produkt und Abrechnung
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 — Steuerebene: Channel, Stage und Stream Key"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: camera
+  title: Broadcaster
+  subs: ["Streaming-Software", "oder Broadcast-SDK"]
+
+chain:
+  - icon: amazon-interactive-video-service
+    title: Amazon IVS (Ingest)
+    title_lines: ["Amazon IVS", "(Ingest)"]
+    subs: ["RTMP, RTMPS und SRT", "Annahme nahe am Sender"]
+    w: 195
+    in: [cloud, region]
+  - icon: amazon-interactive-video-service
+    title: Amazon IVS (Transcoding)
+    title_lines: ["Amazon IVS", "(Transcoding)"]
+    subs: ["Rendition-Ladder", "entsteht im Dienst"]
+    w: 195
+    in: [cloud, region]
+    note: {text: "mehr Kontrolle, mehr Betrieb: MediaLive und MediaPackage"}
+  - icon: amazon-interactive-video-service
+    title: IVS Channels
+    subs: ["sendet an ein Publikum", "Video ein, Zuschauer aus"]
+    w: 195
+    in: [cloud, region]
+  - icon: users
+    title: Zuschauer
+    subs: ["sehen weltweit zu", "Datenebene ist global"]
+    w: 180
+
+branch:
+  from: 1
+  items:
+    - icon: amazon-interactive-video-service
+      title: IVS Stages
+      subs: ["verbindet Teilnehmer", "miteinander"]
+      w: 195
+    - icon: users
+      title: Teilnehmer
+      subs: ["Zuschauer werden", "auf die Bühne geholt"]
+      w: 180
+
+legend_cols: 3
+legend:
+  - "1  Der Broadcaster sendet per RTMP, RTMPS oder SRT"
+  - "2  IVS nimmt an und baut die Rendition-Ladder selbst"
+  - "3  Ein Channel sendet an ein Publikum"
+  - "4  Zuschauer sehen weltweit zu — abgerechnet nach Dauer"
+  - "5  Alternativ verbindet ein Stage die Teilnehmer miteinander"
+  - "6  Dort wird nach Teilnehmerstunden abgerechnet"
+  - "Die Betriebsart wird am Anfang gewählt, nicht nach dem Transcoding"

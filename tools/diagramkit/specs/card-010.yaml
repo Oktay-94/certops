@@ -1,0 +1,69 @@
+id: card-010
+template: ablauf
+title: "Karte 10 · AWS Batch, EC2 GPU und S3"
+subtitle: >-
+  Ein Animationsstudio rendert nachts hunderte unabhängige Szenen: GPU-Jobs in einer Queue,
+  Kapazität auf Spot, tagsüber keine Kosten — und ein Retry, wenn Spot zurückgeholt wird
+
+region: "Region eu-central-1 (Frankfurt)"
+
+machine:
+  label: "Compute Environment"
+  icon: a-w-s-batch
+  color: accent
+
+outside_top:
+  icon: users
+  title: Render-Team
+  subs: ["schickt hunderte Jobs", "per submit-job"]
+
+top:
+  - icon: a-w-s-batch
+    title: AWS Batch
+    subs: ["Job Queue mit Priorität,", "Retry und Dependencies"]
+    w: 200
+
+  - icon: s3
+    title: Amazon S3
+    subs: ["Input-Bucket: Szenen", "und Texturen"]
+    w: 190
+
+  - icon: amazon-e-c2-spot-instance
+    title: Amazon EC2
+    subs: ["GPU-Instanzen der p-Familie", "auf Spot, unterbrechbar"]
+    w: 210
+    machine: true
+
+  - icon: s3
+    title: Amazon S3
+    subs: ["Output-Bucket, per Lifecycle", "später ins Archiv"]
+    w: 210
+
+bottom:
+  - col: 2
+    icon: alert
+    title: Spot-Unterbrechung
+    subs: ["Instanz wird", "zurückgeholt"]
+    w: 210
+    machine: true
+    from_top: true
+    from_label: "2 Minuten vorher"
+    to: 0
+
+  - col: 0
+    icon: a-w-s-batch
+    title: AWS Batch
+    subs: ["plant den Job", "automatisch neu"]
+    w: 200
+
+legend_cols: 2
+legend:
+  - "1  Das Render-Team schickt hunderte Jobs per submit-job an AWS Batch"
+  - "2  Batch dispatcht den Job, der seine Szenen aus dem Input-Bucket zieht"
+  - "3  Gerendert wird auf GPU-Instanzen der p-Familie, die Kapazität läuft auf Spot"
+  - "4  Fertige Frames landen im Output-Bucket, per Lifecycle später im Archiv"
+  - "5  Wird eine Spot-Instanz zurückgeholt, meldet EC2 das zwei Minuten vorher"
+  - "6  Batch plant den betroffenen Job automatisch neu — kein Frame geht verloren"
+  - "Nach dem letzten Job fährt Batch auf 0 Instanzen herunter (minvCpus 0)"
+  - "Fargate kann kein GPU — GPU-Jobs brauchen das EC2-Compute-Environment"
+  - "Lambda scheidet aus: 15 Minuten Timeout und ebenfalls keine GPU"

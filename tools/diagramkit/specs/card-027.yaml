@@ -1,0 +1,97 @@
+id: card-027
+template: kette
+title: "Szenario 27 · IoT-Zeitreihen zwischen Prüfungsstand und Produktstand"
+subtitle: >-
+  3 Mio. Messwerte pro Minute, zwei Zugriffsmuster, die einander widersprechen —
+  und ein Dienst, der für Neukunden nicht mehr offen ist
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: a-w-s-io-t-thing-temperature-vibration-sensor
+  title: 40.000 Maschinen
+  subs: ["Temperatur, Druck,", "Vibration im Sekundentakt"]
+  w: 175
+
+chain:
+  - icon: a-w-s-io-t-core
+    title: AWS IoT Core
+    subs: ["MQTT-Eingang, Rule Action", "schreibt ohne Zwischencode"]
+    w: 220
+    in: [cloud, region]
+
+  - icon: amazon-timestream
+    title: Timestream Memory Store
+    title_lines: ["Timestream", "Memory Store"]
+    subs: ["hoher Schreibdurchsatz,", "schnelle Punktabfragen"]
+    hero: true
+    w: 250
+    in: [cloud, region]
+
+  - icon: amazon-timestream
+    title: Timestream Magnetic Store
+    title_lines: ["Timestream", "Magnetic Store"]
+    subs: ["günstige Langzeitstufe,", "analytische Abfragen"]
+    w: 225
+    in: [cloud, region]
+
+  - icon: analytics
+    title: SQL-Abfrage
+    subs: ["adaptive Engine liest über", "beide Stufen hinweg"]
+    w: 215
+    in: [cloud, region]
+
+  - icon: users
+    title: Leitwarte und Konstruktion
+    title_lines: ["Leitwarte und", "Konstruktion"]
+    subs: ["zehn Minuten oder", "drei Jahre"]
+    w: 180
+
+branch:
+  from: 0
+  items:
+    - icon: amazon-timestream
+      title: Timestream for InfluxDB
+      title_lines: ["Timestream", "for InfluxDB"]
+      subs: ["Instanzen statt serverless,", "InfluxDB 3"]
+      w: 230
+    - icon: analytics
+      title: SQL und InfluxQL
+      subs: ["dieselbe Frage, zweite", "Abfragesprache"]
+      w: 215
+      note: {text: "Realitätspfad — LiveAnalytics ist seit 20.06.2025 für Neukunden geschlossen", bold: true, color: fail}
+
+crossband:
+  heading: "Querschnitt: Was die beiden Stufen sonst noch bestimmen"
+  items:
+    - icon: amazon-timestream
+      title: EnableMagneticStoreWrites
+      title_lines: ["Enable", "MagneticStoreWrites"]
+      subs: ["nimmt spät eintreffende", "Messwerte doch noch an"]
+    - icon: amazon-cloud-watch-event-time-based
+      title: Scheduled Queries
+      subs: ["Aggregate vorab, eigene", "Retention, weniger Scan"]
+    - icon: s3
+      title: Amazon S3
+      subs: ["Retention ist kein Backup —", "abgelaufen heißt weg"]
+
+legend_cols: 3
+legend:
+  - "1  Die Maschinen melden ihre Messwerte per MQTT an IoT Core"
+  - "2  Eine Rule Action schreibt sie direkt in den Memory Store"
+  - "3  Nach Ablauf der Retention wandern sie automatisch weiter"
+  - "4  Eine einzige SQL-Abfrage greift über beide Stufen zu"
+  - "5  Leitwarte und Konstruktion fragen dieselbe Tabelle an"
+  - "6  Dieselbe Regel, anderes Ziel: der Weg für Neukunden"
+  - "7  Auch dieser Weg endet bei SQL, dazu kommt InfluxQL"
+  - "Es gibt kein FROM memory_store — die Engine wählt die Stufe selbst"

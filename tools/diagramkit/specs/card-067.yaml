@@ -1,0 +1,72 @@
+id: card-067
+template: ablauf
+title: "Szenario 67 · SageMaker Training und Real-time Endpoints"
+subtitle: >-
+  Der Training Job ist Rechenzeit auf Abruf, der Endpoint ist Dauerbetrieb und kostet
+  auch bei null Anfragen — dimensioniert wird er in der Endpoint Config, nicht im Training
+region: "Region eu-central-1 (Frankfurt)"
+
+outside_top:
+  icon: documents
+  title: Schadensfälle
+  subs: ["historische Meldungen", "als Trainingsdaten"]
+
+top:
+  - icon: s3
+    title: Amazon S3
+    subs: ["Trainingsdaten, S3-Pfad", "als Input-Channel"]
+    w: 180
+  - icon: amazon-sage-maker-a-i-train
+    title: Training Job
+    subs: ["eigener PyTorch-Container", "Instanz nur für den Job"]
+    w: 180
+  - icon: s3
+    title: Amazon S3
+    subs: ["model.tar.gz, daraus", "entsteht das Model"]
+    w: 180
+  - icon: amazon-sage-maker-a-i-model
+    title: Endpoint Config
+    subs: ["Instanztyp und Anzahl —", "hier fällt die Größe"]
+    w: 180
+  - icon: amazon-sage-maker-a-i
+    title: Real-time Endpoint
+    title_lines: ["Real-time", "Endpoint"]
+    subs: ["Payload 6 MB, 60 s", "kostet auch ohne Last"]
+    w: 180
+  - icon: app
+    title: Schadens-Anwendung
+    subs: ["ruft in Echtzeit auf,", "Lastspitzen morgens"]
+    w: 180
+
+bottom:
+  - col: 1
+    icon: amazon-sage-maker-a-i-canvas
+    title: SageMaker Canvas
+    subs: ["No-Code für Analysten", "verworfen: eigener Code"]
+    accent: fail
+  - col: 3
+    icon: alert
+    title: SageMaker Model Monitor
+    title_lines: ["SageMaker", "Model Monitor"]
+    subs: ["die Lehrbuchantwort auf", "Drift — Neukunden zu"]
+  - col: 4
+    icon: a-w-s-application-auto-scaling
+    title: Application Auto Scaling
+    title_lines: ["Application", "Auto Scaling"]
+    subs: ["Target Tracking auf", "InvocationsPerInstance"]
+    from_top: true
+    from_label: regelt
+    from_color: accent
+
+legend_cols: 2
+legend:
+  - "1  Historische Schadensfälle liegen als Trainingsdaten in S3"
+  - "2  Der Training Job bekommt den S3-Pfad als Input-Channel"
+  - "3  Er schreibt model.tar.gz nach S3, daraus entsteht das Model"
+  - "4  Die Endpoint Config legt Instanztyp und Instanzzahl fest"
+  - "5  Aus ihr entsteht der Real-time Endpoint"
+  - "6  Die Anwendung ruft den Endpoint per HTTPS auf"
+  - "7  Application Auto Scaling regelt über InvocationsPerInstance"
+  - "Der Training Job kostet auf Zeit, der Endpoint kostet dauerhaft"
+  - "Payload über 6 MB oder Laufzeit über 60 s heißt Async oder Batch"
+  - "Model Monitor ist ab 30.07.2026 für Neukunden geschlossen"

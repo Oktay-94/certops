@@ -1,0 +1,80 @@
+id: card-014
+template: hybrid
+title: "Szenario 14 · Windows-Fileserver in die Cloud — FSx for Windows mit Active Directory"
+subtitle: >-
+  SMB bleibt SMB, NTFS-ACLs bleiben NTFS-ACLs, und das Active Directory bleibt im Werk stehen —
+  FSx tritt der bestehenden Domäne bei, statt sie zu ersetzen
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Werk Dortmund
+  nodes:
+    - icon: client
+      title: Windows-Clients
+      subs: ["450 Anwender", "Laufwerk Z:"]
+      ssize: 10
+    - icon: folders
+      title: Alter Fileserver
+      subs: ["8 TB Shares", "geht außer Betrieb"]
+      ssize: 10
+    - icon: firewall
+      title: Werksfirewall
+      subs: ["Übergabepunkt"]
+      ssize: 10
+  actor:
+    icon: server
+    title: Active Directory
+    subs: ["self-managed, bleibt", "im Werk stehen"]
+    to_band: 1
+    both: true
+
+bridge:
+  - icon: directconnect
+    title: AWS Direct Connect
+    subs: ["private Leitung, kein", "SMB über das Internet"]
+    ssize: 10
+
+bands:
+  - label: "A · Dateizugriff — SMB bleibt SMB"
+    hero_note: "SMB 2.0 bis 3.1.1"
+    nodes:
+      - icon: vpc
+        title: Amazon VPC
+        subs: ["Subnetze in AZ a und AZ b,", "aus dem Werk erreichbar"]
+
+  - label: "B · Identität — Domain Join"
+    hero_note: "Domain Join plus AD-Ports"
+    nodes:
+      - icon: a-w-s-directory-service-a-w-s-managed-microsoft-a-d
+        title: AWS Managed Microsoft AD
+        title_lines: ["AWS Managed", "Microsoft AD"]
+        subs: ["nur die Alternative im VPC:", "Ersatz oder Trust"]
+
+hero:
+  icon: amazon-f-sxfor-w-f-s
+  title: Amazon FSx for Windows File Server
+  title_lines: ["Amazon FSx for", "Windows File Server"]
+  subs: ["echter Windows Server", "", "Multi-AZ: aktiv in AZ a,", "Standby in AZ b, synchron", "ein DNS-Name über den", "Failover hinweg"]
+
+crossband:
+  heading: "Schutz und Betrieb: was AWS übernimmt"
+  items:
+    - icon: a-w-s-backup-backup-restore
+      title: Shadow Copies
+      subs: ["Vorgängerversionen", "im Explorer"]
+    - icon: backup
+      title: AWS Backup
+      subs: ["tägliche Sicherung,", "lange Aufbewahrung"]
+    - icon: a-w-s-systems-manager-patch-manager
+      title: Windows-Patching
+      subs: ["AWS patcht im", "Wartungsfenster"]
+
+legend_cols: 2
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der SMB-Verkehr verlässt das Werk über Direct Connect und erreicht das VPC"
+  - "2  Im Login-Skript steht jetzt fsx.bergmann.local statt fileserver"
+  - "3  Das AD bleibt im Werk; ein Managed Microsoft AD wäre Ersatz oder Trust"
+  - "4  FSx tritt der Domäne beim Anlegen bei und wertet die vorhandenen NTFS-ACLs aus"
+  - "Für die Anwender bleibt alles gleich: Laufwerk Z:, dieselben Rechte, dieselben Sperren"
+  - "Ein DNS-Name über den Failover hinweg — Linux- und macOS-Clients folgen ihm nicht selbst"

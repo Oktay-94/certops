@@ -1,0 +1,82 @@
+id: card-068
+template: kette
+title: "Szenario 68 · Interner Chatbot auf Firmendokumenten (RAG)"
+subtitle: >-
+  Knowledge Bases decken den ganzen RAG-Weg ab: kein Modelltraining, kein eigener
+  Sync — und die Quellenangabe funktioniert nur, weil das Mapping erhalten bleibt
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: folders
+  title: Firmendokumente
+  subs: ["12.000 Dateien, ändern", "sich laufend"]
+  w: 165
+
+chain:
+  - icon: s3
+    title: Amazon S3
+    subs: ["bis zu fünf Quellen:", "S3, Confluence, SharePoint"]
+    w: 182
+    in: [cloud, region]
+
+  - icon: amazon-bedrock
+    title: Data Source Sync
+    subs: ["Ingestion Job hält den", "Index synchron zur Quelle"]
+    w: 182
+    in: [cloud, region]
+
+  - icon: amazon-bedrock
+    title: Amazon Bedrock
+    subs: ["Chunking und Embedding,", "Mapping bleibt erhalten"]
+    w: 182
+    in: [cloud, region]
+
+  - icon: amazon-open-search-service
+    title: Amazon OpenSearch Serverless
+    title_lines: ["Amazon OpenSearch", "Serverless"]
+    subs: ["Vektorindex, von Bedrock", "automatisch angelegt"]
+    w: 182
+    in: [cloud, region]
+
+  - icon: amazon-bedrock
+    title: RetrieveAndGenerate
+    subs: ["Suche und Generierung", "in einem Aufruf"]
+    w: 182
+    in: [cloud, region]
+    note: {text: "Retrieve gäbe nur die Chunks"}
+
+  - icon: app
+    title: Chatbot
+    subs: ["fragt natürlichsprachlich,", "bekommt Quellenangabe"]
+    w: 182
+
+branch:
+  from: 0
+  items:
+    - icon: lambda
+      title: AWS Lambda
+      subs: ["Chunking und Sync selbst", "verworfen: Heavy Lifting"]
+      w: 210
+
+legend_cols: 2
+legend:
+  - "1  Die Knowledge Base zieht aus S3, Confluence und weiteren Quellen"
+  - "2  Ein Ingestion Job hält den Vektorindex mit der Quelle synchron"
+  - "3  Bedrock zerlegt in Chunks und rechnet die Embeddings — managed"
+  - "4  Die Vektoren liegen in einer OpenSearch-Serverless-Collection"
+  - "5  RetrieveAndGenerate sucht und generiert in einem einzigen Aufruf"
+  - "6  Der Chatbot bekommt die Antwort samt Quellenangabe"
+  - "7  Verworfen: der Selbstbau betriebe Sync und Indexpflege selbst"
+  - "Fine-Tuning wäre falsch, sobald die Dokumente sich laufend ändern"
+  - "Ein Agent wird erst gebraucht, wenn das System handeln soll"

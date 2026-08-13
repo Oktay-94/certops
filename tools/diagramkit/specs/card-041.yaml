@@ -1,0 +1,86 @@
+id: card-041
+template: kette
+title: "Battle Card 41 · Temporäre Credentials über IAM Roles und STS"
+subtitle: >-
+  Ein Altsystem im eigenen Rechenzentrum, eine EC2-Flotte und eine Lambda-Funktion
+  holen sich Rechte beim selben Aussteller — ohne einen einzigen Access Key
+
+frames:
+  - key: cloud
+    label: "AWS Cloud"
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: office
+  w: 180
+  title: On-Prem-Altsystem
+  title_lines: ["On-Prem-", "Altsystem"]
+  subs: ["zeigt sein X.509-Zertifikat", "aus der eigenen CA vor"]
+
+chain:
+  - icon: a-w-s-identity-access-management-i-a-m-roles-anywhere
+    title: IAM Roles Anywhere
+    subs: ["Trust Anchor prüft die CA", "Profile grenzt Rollen ein"]
+    w: 240
+    in: [cloud, region]
+  - icon: a-w-s-identity-access-management-a-w-s-s-t-s
+    title: AWS STS
+    subs: ["stellt Rollensitzungen aus,", "die von allein ablaufen"]
+    w: 240
+    in: [cloud, region]
+    hero: true
+  - icon: a-w-s-identity-access-management-role
+    title: IAM Role
+    subs: ["Trust Policy: wer darf sie", "Permissions Policy: was dann"]
+    w: 240
+    in: [cloud, region]
+  - icon: s3
+    title: Amazon S3
+    subs: ["nimmt Bestandslisten und", "Sendungsdaten auf"]
+    w: 240
+    in: [cloud, region]
+
+branch:
+  from: 1
+  items:
+    - icon: lambda
+      title: AWS Lambda
+      subs: ["Execution Role, Credentials", "aus der Laufzeitumgebung"]
+      w: 240
+      align_with: 1
+    - icon: dynamodb
+      title: Amazon DynamoDB
+      subs: ["nimmt die verarbeiteten", "Aufträge entgegen"]
+      w: 240
+
+crossband:
+  heading: "Ein Aussteller, drei Auslieferwege — und der Weg, der dadurch entfällt"
+  items:
+    - icon: ec2
+      title: EC2 Instance Profile
+      title_lines: ["EC2 Instance Profile"]
+      subs: ["bindet die Rolle an die Instanz", "das SDK holt sie über IMDSv2"]
+    - icon: lambda
+      title: Lambda Execution Role
+      subs: ["kein Instance Profile nötig", "gleiches Prinzip, andere Technik"]
+    - icon: a-w-s-identity-access-management-long-term-security-credential
+      title: IAM User mit Access Key
+      subs: ["verworfen: läuft nie ab und", "lässt sich beliebig kopieren"]
+
+legend_cols: 2
+legend:
+  - "1  Das Altsystem weist sein Zertifikat aus der eigenen PKI vor"
+  - "2  Roles Anywhere lässt darauf eine Rollensitzung erzeugen"
+  - "3  STS stellt die kurzlebigen Credentials für die Rolle aus"
+  - "4  Damit landen die Bestandslisten im Bucket"
+  - "5  Lambda erhält seine Credentials über dieselbe Stelle"
+  - "6  und schreibt die verarbeiteten Aufträge nach DynamoDB"
+  - "Trust Policy entscheidet, wer die Rolle annehmen darf"
+  - "Permissions Policy entscheidet, was der Anrufer danach tun darf"

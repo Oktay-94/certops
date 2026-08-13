@@ -1,0 +1,74 @@
+id: card-088
+template: vorher_nachher
+title: "Szenario 88 · Chaos Engineering mit FIS"
+subtitle: >-
+  Das Szenario „AZ Availability: Power Interruption" erzeugt die Symptome eines
+  zonalen Stromausfalls — die Stop Condition unterscheidet den Test von der Sabotage
+
+base:
+  region: "Region eu-central-1 · betroffen ist AZ a"
+  vpc_label: VPC
+  subnet_label: "Privates Subnetz in AZ a"
+  forward: "Das Experiment injiziert die Ausfallsymptome, 30 Minuten lang"
+  left:
+    icon: a-w-s-fault-injection-service
+    title: AWS Fault Injection Service
+    title_lines: ["AWS Fault", "Injection Service"]
+    subs: ["Template aus Actions,", "Targets, Stop Conditions"]
+  inner:
+    icon: ec2
+    title: Amazon EC2
+    subs: ["zonale Kapazität fällt weg,", "nichts skaliert nach"]
+
+panels:
+  - state: broken
+    headline: "Vorher — Experiment ohne Stop Condition, direkt in Produktion"
+    back: "keine Abbruchleine — aus dem Test wird ein Incident"
+    extras:
+      - icon: ebs
+        title: Amazon EBS
+        subs: ["Volumes reagieren", "nicht mehr"]
+        w: 180
+        badge: true
+      - icon: rds
+        title: Amazon RDS
+        subs: ["schwenkt auf den", "Standby in AZ b"]
+        w: 180
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt die"
+        - "Stop Condition"
+        - "ohne sie läuft das Experiment weiter"
+
+  - state: fixed
+    headline: "Nachher — Steady State gemessen, Stop Condition gesetzt, Ergebnis auswertbar"
+    back: "Schwelle gerissen: der Alarm bricht das Experiment ab"
+    extras:
+      - icon: ebs
+        title: Amazon EBS
+        subs: ["Volumes reagieren", "nicht mehr"]
+        w: 180
+      - icon: rds
+        title: Amazon RDS
+        subs: ["schwenkt auf den", "Standby in AZ b"]
+        w: 180
+    insert:
+      kind: node
+      icon: amazon-cloud-watch-alarm
+      title: Amazon CloudWatch
+      subs: ["Steady State als Baseline,", "Alarm ist die Stop Condition"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Das Szenario nimmt der Availability Zone die Compute-Kapazität"
+  - "2  Ohne Stop Condition lässt sich der Lauf nicht anhalten"
+  - "3  Die EBS-Volumes der Zone reagieren nicht mehr"
+  - "4  RDS schwenkt auf den Standby in der zweiten AZ"
+  - "5  Dasselbe Szenario, dieselben Symptome — nur mit Abbruchbedingung"
+  - "6  Reißt die Fehlerrate die Schwelle, stoppt FIS das Experiment selbst"
+  - "Ohne definierten Steady State ist das Ergebnis hinterher nicht interpretierbar"
+  - "FIS beweist Resilienz, es baut sie nicht — die Antwort auf „validieren“, nicht auf „absichern“"

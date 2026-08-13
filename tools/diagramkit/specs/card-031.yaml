@@ -1,0 +1,64 @@
+id: card-031
+template: vorher_nachher
+title: "Karte 31 · VPC Peering gegen Transit Gateway"
+subtitle: >-
+  Warum ein Full Mesh am Betriebsaufwand scheitert — und warum nur ein Hub
+  das Rechenzentrum an alle VPCs weiterträgt
+
+base:
+  region: "Region eu-central-1"
+  vpc_label: "VPC Team 3"
+  subnet_label: "Privates Subnetz"
+  forward: "Peering verbindet genau dieses Paar — das funktioniert"
+  left:
+    icon: vpc
+    title: VPC Shared Services
+    subs: ["zentrale Dienste für", "alle zwölf VPCs"]
+  inner:
+    icon: ec2
+    title: Amazon EC2
+    subs: ["Tracking-Plattform,", "braucht Hamburg"]
+
+panels:
+  - state: broken
+    headline: "Vorher — 18 Peering-Verbindungen, und Hamburg bleibt unerreichbar"
+    back: "kein transitives Routing — das VPN endet an seinem VPC"
+    extras:
+      - icon: router
+        title: Route Table
+        subs: ["11 Peering-Routen je VPC,", "132 im Full Mesh"]
+        accent: fail
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt der"
+        - "zentrale Hub"
+        - "66 Verbindungen bei 12 VPCs —"
+        - "und keine davon trägt weiter"
+
+  - state: fixed
+    headline: "Nachher — ein Attachment je VPC, eine VPN-Leitung für alle"
+    back: "das TGW trägt Hamburg zu jedem VPC weiter"
+    extras:
+      - icon: router
+        title: Route Table
+        subs: ["eine Route zum TGW", "statt elf zu Nachbarn"]
+        accent: ok
+        badge: true
+    insert:
+      kind: node
+      icon: a-w-s-transit-gateway
+      title: AWS Transit Gateway
+      subs: ["ein Attachment je VPC", "Prod und Test getrennt"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Team 3 erreicht Shared Services direkt — Peering verbindet immer nur ein Paar"
+  - "2  Weiter nach Hamburg geht es nicht: Peering routet weder transitiv noch Edge-to-Edge"
+  - "3  Jede Route Table trägt elf Peering-Routen; ein Full Mesh aus 12 VPCs bräuchte 132"
+  - "4  Am Peering zwischen beiden VPCs ändert sich nichts — es war nie das Problem"
+  - "5  Über das Transit Gateway erreichen alle VPCs dieselbe VPN-Leitung nach Hamburg"
+  - "6  Eine Route zum TGW ersetzt elf; zwei TGW-Route-Tables trennen Prod von Test"

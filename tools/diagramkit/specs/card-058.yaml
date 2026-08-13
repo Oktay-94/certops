@@ -1,0 +1,93 @@
+id: card-058
+template: kette
+title: "Szenario 58 · Eine Tabelle, drei Sichten — Lake Formation statt drei Kopien"
+subtitle: >-
+  Zeilen- und Spaltenrechte, die fuer Athena und Redshift Spectrum gleichermassen gelten —
+  ohne den Datensatz zu duplizieren und ohne tabellenweise Rechtevergabe
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: lf
+    label: "AWS Lake Formation — feingranulare Rechte"
+    color: "#9A6700"
+
+outside:
+  icon: office
+  title: Versicherer
+  subs: ["Versichertendaten,", "drei Teams"]
+
+chain:
+  - icon: s3
+    title: Amazon S3
+    subs: ["Data Lake, registriert", "S3-Rechte entziehen!"]
+    ssize: 10
+    w: 175
+    in: [cloud, region]
+
+  - icon: a-w-s-glue-data-catalog
+    title: AWS Glue Data Catalog
+    title_lines: ["AWS Glue", "Data Catalog"]
+    subs: ["Register, kein Waechter:", "haelt nur die Metadaten"]
+    ssize: 10
+    w: 170
+    in: [cloud, region]
+
+  - icon: a-w-s-lake-formation
+    title: LF-Tags
+    subs: ["classification=pii, region=sued", "an Datenbank, Tabelle, Spalte", "statt 17 Einzel-Grants"]
+    hero: true
+    border: "#9A6700"
+    fill: "#FBF6EA"
+    w: 225
+    in: [cloud, region, lf]
+
+  - icon: a-w-s-lake-formation-data-lake
+    title: Data Filters
+    subs: ["Zeilenfilter + Spaltenfilter", "= Zellenebene"]
+    ssize: 10
+    w: 175
+    in: [cloud, region, lf]
+
+  - icon: athena
+    title: Amazon Athena
+    subs: ["filtert vor der", "Rueckgabe"]
+    ssize: 10
+    w: 160
+    in: [cloud, region]
+
+  - icon: users
+    title: Drei Teams
+    subs: ["Abrechnung, Analytics,", "Revision — eine Tabelle"]
+    ssize: 10
+    w: 170
+    in: []
+
+branch:
+  from: 3
+  items:
+    - icon: amazon-redshift
+      title: Amazon Redshift Spectrum
+      title_lines: ["Amazon Redshift", "Spectrum"]
+      subs: ["dieselben Regeln ohne zweite", "Konfiguration — auch EMR, Glue ETL"]
+      ssize: 10
+      w: 265
+
+legend_cols: 2
+legend:
+  - "1  Die S3-Location wird in Lake Formation registriert"
+  - "2  Der Katalog beschreibt Tabellen und Spalten — er setzt nichts durch"
+  - "3  LF-Tags haengen an Datenbank, Tabelle und einzelnen Spalten"
+  - "4  Wo Tags nicht reichen, praezisieren Zeilen- und Spaltenfilter"
+  - "5  Athena prueft die Berechtigung und wendet die Filter an"
+  - "6  Jedes Team sieht seine Sicht — dieselbe Datei in S3"
+  - "7  Fuer Redshift Spectrum gelten dieselben Regeln"
+  - "Solange IAMAllowedPrincipals steht, entscheidet IAM und nichts davon greift"

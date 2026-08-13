@@ -1,0 +1,90 @@
+id: card-060
+template: kette
+title: "Szenario 60 · Warehouse fuer schubweise Quartalslast mit Redshift Serverless"
+subtitle: >-
+  Drei Tage im Quartal arbeiten zwanzig Analysten gleichzeitig, dazwischen steht das System
+  tagelang still — und die Finanzabteilung verlangt eine harte Obergrenze
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: app
+  title: Bestellsystem
+  subs: ["laeuft unveraendert", "weiter"]
+
+chain:
+  - icon: amazon-aurora-postgre-s-q-l-instance
+    title: Amazon Aurora PostgreSQL
+    title_lines: ["Amazon Aurora", "PostgreSQL"]
+    subs: ["OLTP: viele kleine", "Transaktionen"]
+    ssize: 10
+    w: 175
+    in: [cloud, region]
+
+  - icon: data-stream
+    title: Zero-ETL-Integration
+    title_lines: ["Zero-ETL-", "Integration"]
+    subs: ["repliziert in Sekunden,", "kein Job, kein Zeitplan"]
+    ssize: 10
+    w: 180
+    in: [cloud, region]
+
+  - icon: amazon-redshift
+    title: Amazon Redshift Serverless
+    title_lines: ["Amazon Redshift", "Serverless"]
+    subs: ["RPU statt Knotentypen", "AI-Scaling voreingestellt", "Max: Budget in RPU-Stunden"]
+    hero: true
+    border: "#A33A2A"
+    fill: "#FBF0EE"
+    w: 250
+    in: [cloud, region]
+
+  - icon: amazon-quick-suite
+    title: Amazon QuickSight
+    subs: ["Quartalsauswertung", "fuer das Controlling"]
+    ssize: 10
+    w: 180
+    in: [cloud, region]
+
+  - icon: users
+    title: Analysten
+    subs: ["zwanzig gleichzeitig,", "drei Tage im Quartal"]
+    ssize: 10
+    w: 190
+    in: []
+
+branch:
+  from: 2
+  items:
+    - icon: amazon-redshift
+      title: Amazon Redshift Spectrum
+      title_lines: ["Amazon Redshift", "Spectrum"]
+      subs: ["joint Warehouse-Tabellen", "und Data-Lake-Dateien"]
+      ssize: 10
+      w: 230
+    - icon: s3
+      title: Amazon S3
+      subs: ["sieben Jahre Historie,", "bleibt, wo es liegt"]
+      ssize: 10
+      w: 190
+
+legend_cols: 2
+legend:
+  - "1  Das Bestellsystem schreibt weiter in Aurora"
+  - "2  Zero-ETL repliziert die Daten in Sekunden nach Redshift"
+  - "3  Kapazitaet in RPU statt Knotentyp und Knotenzahl"
+  - "4  Das Controlling bekommt seine Quartalsauswertung"
+  - "5  Zwanzig Analysten arbeiten drei Tage lang per SQL"
+  - "6  Spectrum verbindet Warehouse und Data Lake in einer Abfrage"
+  - "7  Die sieben Jahre Historie werden nicht geladen"
+  - "Max ist eine Budgetgrenze in RPU-Stunden, kein Kapazitaetslimit"

@@ -1,0 +1,87 @@
+id: card-045
+template: fanout
+title: "Battle Card 45 · GuardDuty, Security Hub CSPM und EventBridge"
+subtitle: >-
+  Bedrohungen aus dreißig Accounts an einer Stelle sichtbar — und drei Regeln, die
+  darauf reagieren, ohne dass jemand die Konsole öffnet
+region: "Delegated Admin Account · Region eu-central-1 (Frankfurt)"
+lane_note: "drei EventBridge-Regeln, drei Wege — parallel, nicht nacheinander"
+
+outside:
+  icon: a-w-s-organizations
+  title: 30 AWS-Accounts
+  subs: ["Mitgliedskonten einer", "Organization"]
+
+producer:
+  icon: guardduty
+  title: Amazon GuardDuty
+  subs: ["Extended Threat Detection", "macht ein Finding daraus"]
+
+store:
+  icon: a-w-s-security-hub
+  title: Security Hub CSPM
+  subs: ["sammelt und normalisiert", "nach ASFF"]
+
+hub:
+  icon: eventbridge
+  title: EventBridge
+  subs: ["jedes Finding wird", "ein Ereignis", "", "Regeln filtern nach Severity"]
+
+lanes:
+  - queue:
+      icon: amazon-event-bridge-rule
+      title: "Regel · Critical"
+      subs: ["nur Findings mit", "kritischer Severity"]
+      accent: true
+    worker:
+      icon: lambda
+      title: AWS Lambda
+      subs: ["hängt eine Security", "Group ohne Regeln an"]
+    target:
+      icon: ec2
+      title: EC2-Instanz
+      subs: ["in Sekunden vom", "Netz getrennt"]
+
+  - queue:
+      icon: amazon-event-bridge-rule
+      title: "Regel · neue Findings"
+      subs: ["greift bei jeder", "neuen Finding-ID"]
+    worker:
+      icon: sns
+      title: Amazon SNS
+      subs: ["Topic der", "Bereitschaft"]
+    target:
+      icon: users
+      title: Bereitschaftsteam
+      subs: ["entscheidet über das", "weitere Vorgehen"]
+
+  - queue:
+      icon: amazon-event-bridge-rule
+      title: "Regel · Aufbewahrung"
+      subs: ["für Zeiträume über", "90 Tage hinaus"]
+    worker:
+      icon: s3
+      title: Amazon S3
+      subs: ["Findings als Objekte", "abgelegt"]
+    target:
+      icon: documents
+      title: Audit-Nachweis
+      subs: ["was GuardDuty selbst", "nicht mehr vorhält"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "Neue Findings gehen nahezu in Echtzeit an EventBridge."
+    - "Wiederholungen desselben Findings werden aggregiert und"
+    - "standardmäßig erst nach sechs Stunden gemeldet."
+
+legend:
+  - "1  In dreißig Mitgliedskonten läuft dieselbe GuardDuty-Konfiguration"
+  - "2  Security Hub CSPM sammelt die Findings und normalisiert sie"
+  - "3  Parallel dazu wird jedes Finding an EventBridge veröffentlicht"
+  - "4  Eine Regel greift nur bei kritischer Severity"
+  - "5  eine zweite bei jeder neuen Finding-ID"
+  - "6  und eine dritte für alles, was länger bleiben muss"
+  - "7  Jede Bahn übergibt an den Dienst, der handelt"
+  - "8  und der erzeugt das Ergebnis der Bahn"
+  - "GuardDuty hält Findings 90 Tage — danach zählt nur der Export"

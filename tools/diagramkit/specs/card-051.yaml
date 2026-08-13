@@ -1,0 +1,86 @@
+id: card-051
+template: fanout
+title: "Szenario 51 · Kinesis Data Streams statt SQS"
+subtitle: >-
+  Clickstream eines Web-Shops: drei Teams brauchen dieselben Events gleichzeitig,
+  und nach einem fehlerhaften Deployment muss eines davon drei Stunden erneut lesen
+lane_note: "drei Konsumenten — jeder mit eigenem Iterator, unabhaengig voneinander"
+
+outside:
+  icon: users
+  title: Kundschaft
+  subs: ["klickt im Web-Shop"]
+
+producer:
+  icon: app
+  title: Shop-Frontend
+  subs: ["schreibt Klick-Events", "Partition Key: Session-ID"]
+
+hub:
+  icon: amazon-kinesis-data-streams
+  title: Amazon Kinesis
+  subs: ["Data Streams", "", "ein Stream, viele Leser", "behält nach Zeit"]
+  fill: "#EEEEF7"
+  border: "#3B3B98"
+
+aside:
+  icon: recover
+  title: Replay
+  subs: ["Iterator zurücksetzen,", "dieselben Records erneut"]
+
+lanes:
+  - queue:
+      icon: data-stream
+      title: Personalisierung
+      subs: ["eigener Iterator,", "eigene Position im Stream"]
+    worker:
+      icon: gear
+      title: Empfehlungen
+      subs: ["in Echtzeit, je Sitzung"]
+    target:
+      icon: app
+      title: Web-Shop
+      subs: ["reagiert sofort,", "speichert nichts"]
+
+  - queue:
+      icon: data-stream
+      title: Betrugserkennung
+      subs: ["eigener Iterator,", "eigene Position im Stream"]
+    worker:
+      icon: magnifying-glass
+      title: Sitzungsmuster
+      subs: ["Reihenfolge je Session"]
+    target:
+      icon: alert
+      title: Betrugsabwehr
+      subs: ["reagiert sofort,", "speichert nichts"]
+
+  - queue:
+      icon: data-stream
+      title: BI-Ladung
+      subs: ["eigener Iterator,", "eigene Position im Stream"]
+    worker:
+      icon: data-table
+      title: Nächtliche Ladung
+      subs: ["sammelt die Rohdaten"]
+    target:
+      icon: s3
+      title: Amazon S3
+      subs: ["Data Lake — Athena und", "Glue arbeiten weiter"]
+
+callout:
+  headline: "Verworfen — die SQS-Queue"
+  lines:
+    - "Eine SQS-Nachricht ist weg, sobald ein Konsument sie loescht."
+    - "Drei Leser braeuchten drei Queues plus ein SNS-Topic davor —"
+    - "und selbst dann gaebe es kein Replay: geloescht ist geloescht."
+
+legend:
+  - "1  Die Kundschaft klickt im Web-Shop"
+  - "3  Das Frontend schreibt jedes Klick-Event in den Stream"
+  - "4  Die Personalisierung liest den Stream ..."
+  - "5  ... die Betrugserkennung liest dieselben Records ..."
+  - "6  ... und die BI-Ladung ebenfalls, ohne die anderen zu stoeren"
+  - "7  Lesen entfernt nichts: jeder haelt seine eigene Position"
+  - "8  Jede Bahn schreibt ihr Ergebnis an ihr eigenes Ziel"
+  - "Replay: der Konsument setzt seinen Iterator zurueck"

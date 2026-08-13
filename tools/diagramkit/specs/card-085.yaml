@@ -1,0 +1,93 @@
+id: card-085
+template: fanout
+title: "Szenario 85 · Savings Plans, Reserved Instances, Spot"
+subtitle: >-
+  Jedes Lastprofil bekommt die Kaufoption, die zu seiner Beweglichkeit passt —
+  Rabatt kauft man gegen Bindung, Kapazität reserviert nur die zonale RI
+lane_note: "drei Lastprofile, drei Antworten — gelesen wird zeilenweise"
+region: "Region eu-central-1 (Frankfurt)"
+
+outside:
+  icon: users
+  title: FinOps
+  subs: ["soll 30 % senken,", "Umbau läuft weiter"]
+
+producer:
+  icon: ec2
+  title: Laufende Last
+  subs: ["EC2, Fargate, Lambda,", "RDS und Nacht-Batch"]
+
+store:
+  icon: ec2
+  title: Graviton-Migration
+  subs: ["nächstes Quartal:", "m5 wird zu m7g"]
+
+hub:
+  icon: cloud-financial-management
+  title: Kaufentscheidung
+  subs: ["Rabatt gegen Bindung,", "je Lastprofil einzeln", "", "Kapazität sichert keine"]
+
+aside:
+  icon: savings-plans
+  title: AWS Savings Plans
+  subs: ["EC2 Instance-Variante:", "bis 72 %, Familie fix"]
+
+lanes:
+  - queue:
+      icon: ec2
+      title: Konstante Grundlast
+      subs: ["EC2, Fargate, Lambda —", "Architektur in Bewegung"]
+    worker:
+      icon: savings-plans
+      title: Compute Savings Plans
+      title_lines: ["Compute", "Savings Plans"]
+      subs: ["Betrag pro Stunde"]
+    target:
+      icon: fargate
+      title: "bis 66 % Rabatt"
+      subs: ["Familie, Größe, Region frei —", "gilt auch für Fargate/Lambda"]
+
+  - queue:
+      icon: a-w-s-batch
+      title: Unterbrechbarer Batch
+      subs: ["nächtliches Rendering,", "zustandslos, wiederholbar"]
+    worker:
+      icon: amazon-e-c2-spot-instance
+      title: Amazon EC2 Spot
+      subs: ["freie Kapazität,", "2 Minuten Vorwarnung"]
+    target:
+      icon: ec2
+      title: "bis 90 % Rabatt"
+      subs: ["AWS kann die Kapazität", "jederzeit zurückholen"]
+
+  - queue:
+      icon: rds
+      title: Datenbanken
+      subs: ["RDS-Cluster,", "stabile Instanzklasse"]
+    worker:
+      icon: reserved-instance-reporting
+      title: Reserved Instances
+      subs: ["Klasse, Engine und", "Region gebunden"]
+    target:
+      icon: ec2
+      title: "bis 72 % Rabatt"
+      subs: ["nur die zonale RI liefert", "auch eine Kapazitätsreservierung"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "Eine Standard RI auf m5 kaufen, während die Graviton-Migration"
+    - "terminiert ist: Nach dem Wechsel auf m7g läuft die Reservierung"
+    - "ins Leere — und wird bis zum Laufzeitende trotzdem bezahlt."
+
+legend:
+  - "1  FinOps soll 30 % senken, ohne den Umbau zu blockieren"
+  - "2  Die Graviton-Migration ist terminiert und entscheidet über die Bindung"
+  - "3  Für jedes Lastprofil wird einzeln entschieden"
+  - "4  Konstante Grundlast bei beweglicher Architektur"
+  - "5  Unterbrechbarer, zustandsloser Nacht-Batch"
+  - "6  Datenbanken mit stabiler Instanzklasse"
+  - "7  Jedes Profil bekommt die Kaufoption, die seine Beweglichkeit zulässt"
+  - "8  Der Rabatt kostet Bindung — 1 oder 3 Jahre, Spot gar keine"
+  - "Realitätsstand seit 12/2025: Database Savings Plans (Prüfungsstand bleibt RI)"
+  - "Convertible RI liegt bei bis zu 66 %, verlangt aber einen manuellen Tausch"

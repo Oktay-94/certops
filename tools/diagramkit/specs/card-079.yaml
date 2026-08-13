@@ -1,0 +1,76 @@
+id: card-079
+template: hybrid
+title: "Szenario 79 · Storage Gateway — Bandworkflow behalten, Roboter ersetzen"
+subtitle: >-
+  Sieben Jahre Aufbewahrung ohne Umbau der Backup-Prozesse: eine virtuelle Tape
+  Library über iSCSI, und der Archiv-Pool entscheidet über die Speicherklasse
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum vor Ort
+  nodes:
+    - icon: app
+      title: Backup-Software
+      subs: ["unverändert, sieht", "einen Bandroboter"]
+    - icon: a-w-s-storage-gateway
+      title: Storage Gateway
+      subs: ["stellt die VTL", "per iSCSI bereit"]
+    - icon: disk
+      title: Lokaler Cache
+      subs: ["bestätigt sofort,", "Upload Buffer"]
+    - icon: tapestorage
+      title: LTO-Bandroboter
+      subs: ["am Lebensende,", "wird abgelöst"]
+
+bridge:
+  - icon: internet
+    title: Asynchroner Upload
+    title_lines: ["Asynchroner", "Upload"]
+    subs: ["komprimiert und", "verschlüsselt"]
+    to_band: 0
+  - icon: internet
+    title: Volume-Pfad
+    subs: ["dieselbe Appliance,", "andere Betriebsart"]
+    to_band: 1
+
+bands:
+  - label: "A · Tape Gateway"
+    nodes:
+      - icon: a-w-s-storage-gateway-tape-gateway
+        title: AWS Storage Gateway (Tape Gateway)
+        title_lines: ["AWS Storage Gateway", "Tape Gateway"]
+        subs: ["virtuelle Tapes in", "verwalteten Buckets"]
+      - icon: amazon-simple-storage-service-glacier
+        title: Archiv-Pool
+        subs: ["beim Anlegen des Tapes", "gewählt, nicht danach"]
+
+  - label: "B · Volume Gateway — Blöcke statt Bänder"
+    nodes:
+      - icon: a-w-s-storage-gateway-cached-volume
+        title: AWS Storage Gateway (Volume Gateway)
+        title_lines: ["AWS Storage Gateway", "Volume Gateway"]
+        subs: ["Cached 32 TiB, Stored", "16 TiB je Volume"]
+
+crossband:
+  heading: "Der Pool entscheidet, keine Lifecycle-Regel"
+  items:
+    - icon: amazon-simple-storage-service-s3-glacier-flexible-retrieval
+      title: S3 Glacier Flexible Retrieval
+      title_lines: ["S3 Glacier Flexible", "Retrieval"]
+      subs: ["für Archive, die noch", "öfter gebraucht werden"]
+    - icon: amazon-simple-storage-service-s3-glacier-deep-archive
+      title: S3 Glacier Deep Archive
+      title_lines: ["S3 Glacier Deep", "Archive"]
+      subs: ["die lange, günstige", "Ablage"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der Job schreibt auf ein virtuelles Tape, der Upload läuft asynchron"
+  - "2  Beim Eject wandert das Tape in den Pool, der beim Anlegen gewählt wurde"
+  - "3  Wer Block-Volumes statt Bänder braucht, nimmt Volume Gateway"
+  - "Cached: Primärdaten in S3, lokal nur der heiße Anteil. Stored: alles lokal"
+  - "Archivierte Tapes müssen erst zurückgeholt werden und sind nur lesbar"
+  - "Verworfen: S3 File Gateway — ein Datei-Share, kein Bandroboter"

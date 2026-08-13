@@ -1,0 +1,67 @@
+id: card-087
+template: vorher_nachher
+title: "Szenario 87 · Compute Optimizer und Rightsizing"
+subtitle: >-
+  40 Instanzen bei 8 % CPU-Last: Rightsizing kommt vor dem Commitment —
+  und ohne Memory-Metrik ist die Empfehlung nur die halbe Wahrheit
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: VPC
+  subnet_label: "Privates Subnetz"
+  forward: "Compute Optimizer liest die CloudWatch-Metriken der Flotte"
+  left:
+    icon: a-w-s-compute-optimizer
+    title: AWS Compute Optimizer
+    subs: ["30 Stunden Metrik aus", "den letzten 14 Tagen"]
+  inner:
+    icon: amazon-e-c2-instances
+    title: Amazon EC2
+    subs: ["40 × m5.4xlarge,", "8 % CPU-Last im Mittel"]
+
+panels:
+  - state: broken
+    headline: "Vorher — Savings Plan auf die Ist-Flotte: 40 zu große Instanzen für 1 bis 3 Jahre gebunden"
+    back: "Empfehlung nur auf CPU — gebunden wird trotzdem"
+    extras:
+      - icon: cloudwatch
+        title: Amazon CloudWatch
+        subs: ["ohne Agent bleibt der", "Speicherverbrauch unsichtbar"]
+        w: 180
+        accent: fail
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt"
+        - "das Rightsizing"
+        - "der Rabatt gilt für ungenutzte Kapazität"
+
+  - state: fixed
+    headline: "Nachher — erst rechtsdimensionieren, dann binden: der Plan läuft auf die kleinere Baseline"
+    back: "over-provisioned — kleinerer Typ oder Graviton"
+    extras:
+      - icon: cloudwatch
+        title: Amazon CloudWatch
+        subs: ["Agent liefert Memory,", "nicht nur CPU"]
+        w: 180
+        accent: ok
+        badge: true
+    insert:
+      kind: node
+      icon: savings-plans
+      title: AWS Savings Plans
+      subs: ["bindet die neue,", "dauerhaft kleinere Baseline"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Compute Optimizer liest die Metriken der laufenden Flotte"
+  - "2  Er stuft ein: over-provisioned, under-provisioned oder optimized"
+  - "3  Ohne CloudWatch-Agent fehlt ihm der Speicherverbrauch — er rechnet auf CPU"
+  - "4  Derselbe Dienst, dieselbe Flotte, nur eine vollständige Messgrundlage"
+  - "5  Befund over-provisioned: die Instanz wird kleiner, die Baseline sinkt dauerhaft"
+  - "6  Mit Agent sieht der Dienst auch den Speicher und empfiehlt belastbar"
+  - "Cost Explorer muss aktiviert sein, sonst weist der Dienst keine Sparbeträge aus"
+  - "Enhanced Infrastructure Metrics dehnt den Zeitraum von 14 auf bis zu 93 Tage — kostenpflichtig"

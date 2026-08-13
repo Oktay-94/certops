@@ -1,0 +1,59 @@
+id: card-061
+template: ablauf
+title: "Szenario 61 · Bildmoderation im Marktplatz"
+subtitle: >-
+  Kein Bild wird sichtbar, bevor es geprüft ist: Rekognition entscheidet automatisch,
+  A2I holt im Graubereich einen Menschen dazu — ohne eigenes Modell
+region: "Region eu-central-1 (Frankfurt)"
+
+outside_top:
+  icon: users
+  title: Händler
+  subs: ["lädt ein Produktbild", "hoch"]
+
+top:
+  - icon: s3
+    title: Amazon S3
+    subs: ["Upload-Bucket, privat,", "kein Public Access"]
+    w: 200
+  - icon: lambda
+    title: AWS Lambda
+    subs: ["reicht Bucket und Key", "weiter, ruft nichts hoch"]
+    w: 200
+  - icon: rekognition
+    title: Amazon Rekognition
+    subs: ["DetectModerationLabels", "MinConfidence gesetzt"]
+    w: 200
+  - icon: s3
+    title: Amazon S3
+    subs: ["Public-Bucket, sichtbar", "zweiter Bucket, kein Loop"]
+    w: 200
+    note: {text: "Confidence hoch", color: ok}
+
+bottom:
+  - col: 0
+    icon: amazon-rekognition-image
+    title: Batch Image Moderation
+    subs: ["StartMediaAnalysisJob", "für neue Accounts zu"]
+    accent: fail
+  - col: 2
+    icon: amazon-augmented-a-i-a2-i
+    title: Amazon A2I
+    subs: ["Human Loop, eingebauter", "Rekognition-Workflow"]
+    from_top: true
+    from_label: Graubereich
+    to: 3
+  - col: 3
+    icon: users
+    title: Private Workforce
+    subs: ["eigene Leute, Vendoren", "oder Mechanical Turk"]
+
+legend_cols: 2
+legend:
+  - "1  Der Händler lädt das Bild in den privaten Upload-Bucket"
+  - "2  Die Event Notification startet die Funktion asynchron"
+  - "3  Lambda übergibt Bucket und Key an DetectModerationLabels"
+  - "4  Bei hoher Confidence wandert das Bild in den Public-Bucket"
+  - "5  Im Graubereich öffnet Rekognition einen Human Loop in A2I"
+  - "6  Ein Mensch entscheidet, sein Urteil steuert die Freigabe"
+  - "Rot umrandet: der Batch-Weg ist für neue Accounts gesperrt"

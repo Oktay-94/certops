@@ -1,0 +1,60 @@
+id: card-062
+template: ablauf
+title: "Szenario 62 · Rechnungsprüfung mit Human-in-the-Loop"
+subtitle: >-
+  Der Task Token hält die Execution an, während ein Mensch korrigiert — kein Compute
+  im Leerlauf, und waitForTaskToken gibt es nur im Standard Workflow
+region: "Region eu-central-1 (Frankfurt)"
+
+outside_top:
+  icon: documents
+  title: Rechnungen
+  subs: ["treffen als PDF ein"]
+
+top:
+  - icon: s3
+    title: Amazon S3
+    subs: ["Eingangs-Bucket, das Event", "startet die Execution"]
+    w: 210
+  - icon: stepfunctions
+    title: AWS Step Functions
+    subs: ["Standard Workflow", "Choice State entscheidet"]
+    w: 210
+  - icon: textract
+    title: Amazon Textract
+    subs: ["AnalyzeDocument, FORMS", "Felder mit Confidence"]
+    w: 210
+  - icon: dynamodb
+    title: Amazon DynamoDB
+    subs: ["ERP-Ablage, nur geprüfte", "Buchungssätze"]
+    w: 210
+    note: {text: "alle Felder sicher", color: ok}
+
+bottom:
+  - col: 1
+    icon: sqs
+    title: Amazon SQS
+    subs: ["trägt den Task Token,", "die Execution pausiert"]
+    from_top: true
+    from_label: unsicher
+    to: 2
+  - col: 2
+    icon: app
+    title: Review-Anwendung
+    subs: ["selbst gebaut, zeigt die", "unsicheren Felder"]
+  - col: 3
+    icon: amazon-augmented-a-i-a2-i
+    title: Amazon A2I
+    subs: ["die fertige Integration", "ab 30.07.2026 zu"]
+    accent: fail
+
+legend_cols: 2
+legend:
+  - "1  Die Rechnung landet im Eingangs-Bucket"
+  - "2  Das S3-Event startet eine Standard-Execution"
+  - "3  Der Workflow ruft AnalyzeDocument mit FeatureTypes FORMS auf"
+  - "4  Sind alle wichtigen Felder sicher, geht der Satz in die Ablage"
+  - "5  Sonst legt der Task den Token in die Queue und pausiert"
+  - "6  Der Sachbearbeiter korrigiert in der selbst gebauten Anwendung"
+  - "SendTaskSuccess weckt die Execution — der Rückweg ist nicht gezeichnet"
+  - "Rot umrandet: A2I wäre der fertige Weg, ist für Neukunden aber zu"

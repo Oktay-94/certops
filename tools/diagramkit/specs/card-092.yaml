@@ -1,0 +1,61 @@
+id: card-092
+template: hybrid
+title: "Szenario 92 · IoT Greengrass V2, Inferenz am Edge"
+subtitle: >-
+  Die Klassifikation läuft auf dem Gerät weiter, wenn die Leitung ausfällt —
+  Komponenten werden vorher ausgerollt, Ergebnisse später nachgereicht
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Werkshalle
+  nodes:
+    - icon: a-w-s-io-t-thing-camera
+      title: Kameras
+      subs: ["liefern Bilder", "von der Linie"]
+    - icon: a-w-s-io-t-greengrass-protocol
+      title: Lokaler MQTT-Broker
+      title_lines: ["Lokaler", "MQTT-Broker"]
+      subs: ["eigene Komponente,", "kommt nicht mit"]
+    - icon: a-w-s-io-t-greengrass
+      title: Core-Gerät
+      subs: ["rechnet die Inferenz", "in der Halle"]
+    - icon: a-w-s-io-t-greengrass-component
+      title: Stream Manager
+      subs: ["puffert Ergebnisse", "während des Ausfalls"]
+
+bridge:
+  - icon: a-w-s-io-t-core
+    title: AWS IoT Core
+    subs: ["Anbindung des Werks,", "fällt minutenweise aus"]
+    to_band: 1
+
+bands:
+  - label: "A · So kommen die Komponenten auf das Gerät"
+    nodes:
+      - icon: amazon-sage-maker-a-i
+        title: Amazon SageMaker AI
+        title_lines: ["Amazon", "SageMaker AI"]
+        subs: ["trainiert dort, wo", "Rechenzeit elastisch ist"]
+      - icon: s3
+        title: Amazon S3
+        subs: ["hält das fertige", "Modell-Artefakt"]
+      - icon: a-w-s-io-t-greengrass-deployment
+        title: Greengrass Deployment
+        title_lines: ["Greengrass", "Deployment"]
+        subs: ["Model, Runtime, Inference", "auf das Core-Gerät"]
+
+  - label: "B · So kommen die Ergebnisse zurück"
+    nodes:
+      - icon: s3
+        title: Amazon S3
+        subs: ["nimmt die nachge-", "reichten Ergebnisse"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Das trainierte Modell liegt als Artefakt in S3"
+  - "2  Das Deployment rollt Model, Runtime und Inference auf das Gerät aus"
+  - "3  Steht die Leitung wieder, exportiert Stream Manager das Gepufferte"
+  - "Kameras sprechen über den lokalen MQTT-Broker mit dem Core-Gerät"
+  - "Fällt die Verbindung aus, klassifiziert das Gerät unverändert weiter"
+  - "Ohne vorheriges Deployment kann ein Gerät im Funkloch gar nichts"

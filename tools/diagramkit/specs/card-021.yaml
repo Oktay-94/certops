@@ -1,0 +1,71 @@
+id: card-021
+template: vorher_nachher
+title: "Szenario 21 · Gaming-Leaderboard mit Mikrosekunden-Reads"
+subtitle: >-
+  900.000 Leseanfragen pro Sekunde auf immer dieselben Top-100-Einträge —
+  warum hier ein Cache gehört, der die DynamoDB-API selbst spricht
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: VPC
+  subnet_label: Privates Subnetz
+  forward: "die Tabelle hält die Top-100 der laufenden Season"
+  left:
+    icon: dynamodb
+    title: Amazon DynamoDB
+    subs: ["Leaderboard-Tabelle,", "beschrieben bei Match-Ende"]
+  inner:
+    icon: app
+    title: Nova Arena Backend
+    subs: ["liefert das Leaderboard", "ins HUD des Clients"]
+
+panels:
+  - state: broken
+    headline: "Vorher — jede Leseanfrage geht bis zur Tabelle"
+    back: "900.000 GetItem/s auf dieselben Items — p99 9 ms"
+    extras:
+      - icon: client
+        title: DynamoDB-Client
+        subs: ["ruft GetItem direkt", "gegen die Tabelle auf"]
+        accent: fail
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt der Cache,"
+        - "der DynamoDB spricht"
+        - "jede Leseanfrage kostet RCU und Zeit"
+
+  - state: fixed
+    headline: "Nachher — DAX beantwortet den Großteil der Reads"
+    back: "nur Cache Misses erreichen noch die Tabelle"
+    extras:
+      - icon: client
+        title: DAX-Client-SDK
+        subs: ["dieselben Aufrufe,", "Endpoint auf Port 8111"]
+        accent: ok
+        badge: true
+      - icon: alert
+        title: "ConsistentRead=true"
+        subs: ["wird durchgereicht", "und nicht gecacht"]
+        accent: fail
+        badge: true
+        w: 175
+    insert:
+      kind: node
+      icon: amazon-dynamo-d-b-amazon-dynamo-d-b-accelerator
+      title: DynamoDB Accelerator (DAX)
+      subs: ["Cache Hit in Mikrosekunden", "write-through, 5 Min. TTL"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Die Tabelle hält die Top-100 und liefert sie an das Backend"
+  - "2  Ohne Cache stellt jedes geöffnete HUD seine Anfrage an die Tabelle"
+  - "3  Das Backend spricht den DynamoDB-Client an — jeder Read kostet RCU"
+  - "4  Am Inhalt der Tabelle ändert sich nichts, sie bleibt die Wahrheit"
+  - "5  Nur was nicht im Item Cache liegt, erreicht überhaupt die Tabelle"
+  - "6  Nur der Client wechselt: gleiche Aufrufe, DAX-Endpoint statt Tabelle"
+  - "7  Strongly consistent Reads reicht DAX durch und cacht sie nicht"
+  - "Ein Cache Hit endet in DAX — die Tabelle erfährt von der Anfrage nichts"

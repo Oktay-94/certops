@@ -1,0 +1,71 @@
+id: card-091
+template: fanout
+title: "Szenario 91 · IoT Core, Rules Engine, DynamoDB"
+subtitle: >-
+  100.000 Sensoren melden per MQTT, die Regel schreibt ohne eigenen Code in die
+  Tabelle — und was endgültig scheitert, landet in den Logs
+region: "Region eu-central-1 (Frankfurt)"
+lane_note: "zwei Actions an derselben Regel"
+
+outside:
+  icon: a-w-s-io-t-sensor
+  title: Sensorflotte
+  subs: ["100.000 Geräte,", "kurze Abstände"]
+
+producer:
+  icon: a-w-s-io-t-core
+  title: AWS IoT Core
+  subs: ["terminiert die", "MQTT-Verbindungen"]
+
+store:
+  icon: a-w-s-io-t-certificate
+  title: IoT Policy
+  subs: ["Recht hängt am", "X.509-Zertifikat"]
+
+hub:
+  icon: a-w-s-io-t-rule
+  title: IoT Rules Engine
+  subs: ["SQL-Statement auf dem", "Topic-Stream", "", "kein eigener Code nötig"]
+
+aside:
+  icon: a-w-s-io-t-topic
+  title: Basic Ingest
+  subs: ["nimmt den Broker aus dem Weg", "spart Kosten, kein Fan-out"]
+
+lanes:
+  - queue:
+      icon: a-w-s-io-t-action
+      title: Action dynamoDBv2
+      subs: ["legt jedes Attribut", "in eine eigene Spalte"]
+      accent: true
+    worker:
+      icon: dynamodb
+      title: Amazon DynamoDB
+      subs: ["Messwert je Gerät", "und Zeitstempel"]
+    target:
+      icon: app
+      title: Auswertung
+      subs: ["liest den Einzelwert", "direkt per Key"]
+
+  - queue:
+      icon: a-w-s-io-t-action
+      title: errorAction
+      subs: ["greift erst nach den", "Wiederholungen"]
+    worker:
+      icon: amazon-cloud-watch-logs
+      title: CloudWatch Logs
+      subs: ["nur bei aktivem", "Logging"]
+    target:
+      icon: users
+      title: Betrieb
+      subs: ["sieht, welche Nachricht", "verworfen wurde"]
+
+legend:
+  - "1  Jeder Sensor publiziert per MQTT auf sein eigenes Topic"
+  - "2  IoT Core prüft am Zertifikat, ob dieses Gerät schreiben darf"
+  - "3  Die angenommene Nachricht läuft in die Rules Engine"
+  - "4  Die Regel übergibt den Messwert an die dynamoDBv2-Action"
+  - "5  Scheitert eine Action endgültig, greift die errorAction"
+  - "7  Jede Action schreibt selbst an ihr Ziel"
+  - "8  Von dort holt sich ab, wer die Daten braucht"
+  - "Zwischen MQTT-Nachricht und Tabellenzeile steht keine eigene Funktion"

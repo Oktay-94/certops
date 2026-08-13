@@ -1,0 +1,95 @@
+id: card-048
+template: fanout
+title: "Battle Card 48 · IAM Identity Center und Permission Sets"
+subtitle: >-
+  Eine Identität je Person, ein Entzug für alle dreißig Accounts — und ein SCP,
+  der auch dann noch begrenzt, wenn jemand das Permission Set umschreibt
+region: "AWS Organizations · Region eu-central-1 (Frankfurt)"
+lane_note: "eine Vorlage, dreißigmal zugewiesen — nicht dreißig Rollen von Hand"
+
+outside:
+  icon: office
+  title: Externer IdP
+  subs: ["Entra ID oder Okta,", "SCIM synchronisiert"]
+
+producer:
+  icon: iam-identity-center
+  title: IAM Identity Center
+  subs: ["Organization Instance", "im Management Account"]
+
+store:
+  icon: a-w-s-identity-access-management-permissions
+  title: Permission Set
+  subs: ["Vorlage aus IAM-Policies,", "einmal definiert"]
+
+hub:
+  icon: a-w-s-organizations
+  title: AWS Organizations
+  subs: ["30 Accounts unter", "einer Organisation", "", "Zuweisung in einer Operation"]
+
+aside:
+  icon: a-w-s-organizations-organizational-unit
+  title: Service Control Policy
+  subs: ["deckelt jede Identität, auch Root", "gewährt selbst niemals etwas"]
+
+lanes:
+  - queue:
+      icon: a-w-s-organizations-account
+      title: Produktions-Account
+      subs: ["der SCP der Produktions-OU", "sperrt fremde Regionen"]
+      accent: true
+    worker:
+      icon: a-w-s-identity-access-management-role
+      title: AWSReservedSSO-Rolle
+      title_lines: ["AWSReservedSSO-", "Rolle"]
+      subs: ["entsteht im Zielaccount"]
+    target:
+      icon: a-w-s-identity-access-management-a-w-s-s-t-s
+      title: AWS STS
+      subs: ["temporäre Credentials,", "kein Access Key mehr"]
+
+  - queue:
+      icon: a-w-s-organizations-account
+      title: Account 2 von 30
+      subs: ["dieselbe Zuweisung aus", "derselben Vorlage"]
+    worker:
+      icon: a-w-s-identity-access-management-role
+      title: AWSReservedSSO-Rolle
+      title_lines: ["AWSReservedSSO-", "Rolle"]
+      subs: ["eigener Suffix je Account"]
+    target:
+      icon: a-w-s-identity-access-management-a-w-s-s-t-s
+      title: AWS STS
+      subs: ["die Rollen-ARN muss", "niemand kennen"]
+
+  - queue:
+      icon: a-w-s-organizations-account
+      title: Account 30 von 30
+      subs: ["ein Austritt im IdP", "entzieht überall zugleich"]
+    worker:
+      icon: a-w-s-identity-access-management-role
+      title: AWSReservedSSO-Rolle
+      title_lines: ["AWSReservedSSO-", "Rolle"]
+      subs: ["Zuweisung an Gruppen"]
+    target:
+      icon: a-w-s-identity-access-management-a-w-s-s-t-s
+      title: AWS STS
+      subs: ["Sitzung endet von", "allein"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "Account Instances können keine Multi-Account Permissions."
+    - "Ihre Freischaltung für Member Accounts ist einmalig und"
+    - "nicht umkehrbar — danach hilft nur noch ein SCP."
+
+legend:
+  - "1  Der externe IdP bleibt führend, SCIM synchronisiert Nutzer und Gruppen"
+  - "2  Im Identity Center entsteht ein Permission Set aus IAM-Policies"
+  - "3  Die Zuweisung läuft in einer Operation über die Organisation"
+  - "4  Sie erreicht den Produktions-Account"
+  - "5  ebenso jeden weiteren Account"
+  - "6  bis zum dreißigsten"
+  - "7  In jedem Zielaccount entsteht dieselbe Rolle"
+  - "8  und STS stellt dafür temporäre Credentials aus"
+  - "Der SCP begrenzt jede dieser Rollen — gewähren kann nur das Permission Set"

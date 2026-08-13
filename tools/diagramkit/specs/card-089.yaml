@@ -1,0 +1,60 @@
+id: card-089
+template: ablauf
+title: "Szenario 89 · SQS, Idempotenz, Retry-Patterns"
+subtitle: >-
+  FIFO löst die Duplikate vor der Queue, der Idempotenz-Schlüssel die dahinter —
+  wer nur eines von beidem baut, bucht die Bestellung zweimal ab
+
+region: "Region eu-central-1 (Frankfurt)"
+
+outside_top:
+  icon: app
+  title: Bestelldienst
+  subs: ["Timeout, also sendet", "er dieselbe Nachricht"]
+
+top:
+  - icon: sqs
+    title: Amazon SQS FIFO
+    subs: ["Dedup-ID: die zweite", "wird nicht zugestellt"]
+    w: 175
+  - icon: lambda
+    title: AWS Lambda
+    subs: ["verarbeitet und bucht", "die Zahlung"]
+    w: 170
+  - icon: dynamodb
+    title: Amazon DynamoDB
+    subs: ["Schlüssel = Order-ID,", "Conditional Write"]
+    w: 180
+  - icon: documents
+    title: Buchung
+    subs: ["fachlich genau", "einmal wirksam"]
+    w: 165
+
+bottom:
+  - col: 1
+    icon: sqs-queue
+    title: Erneute Zustellung
+    subs: ["Visibility Timeout", "abgelaufen"]
+    from_top: true
+    from_label: "Absturz vor DeleteMessage"
+    accent: fail
+    to: 2
+    w: 170
+  - col: 2
+    icon: alert
+    title: Doppelbuchung
+    subs: ["ohne Schlüssel wird", "zweimal abgebucht"]
+    accent: fail
+    w: 180
+
+legend_cols: 3
+legend:
+  - "1  Nach einem Timeout sendet der Producer dieselbe Nachricht erneut"
+  - "2  Innerhalb von 5 Minuten stellt FIFO die zweite nicht zu — Duplikatquelle 1 erledigt"
+  - "3  Der Consumer bucht die Zahlung und schreibt den Schlüssel per Conditional Write"
+  - "4  Findet ein zweiter Lauf den Schlüssel vor, bricht er folgenlos ab"
+  - "5  Stirbt der Consumer vor DeleteMessage, wird die Nachricht wieder sichtbar"
+  - "6  Ohne Idempotenz-Schlüssel trifft diese Redelivery ungebremst die Datenbank"
+  - "Duplikatquelle 2 liegt hinter der Queue — dagegen hilft FIFO nicht"
+  - "Exactly-once ist eine Zusage über die Queue, keine über die Datenbank"
+  - "Erst verarbeiten, dann löschen — und den Doppellauf idempotent abfangen"

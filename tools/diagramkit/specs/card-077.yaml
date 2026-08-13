@@ -1,0 +1,80 @@
+id: card-077
+template: hybrid
+title: "Szenario 77 · Container im Werk — wo liegt der Control Plane?"
+subtitle: >-
+  Maschinendaten dürfen das Werk nicht verlassen, ein zweites Orchestrierungs-Team
+  soll es nicht geben: nicht der Name entscheidet, sondern die Lage der Steuerung
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Werk mit Produktionslinie
+  nodes:
+    - icon: server
+      title: Werksserver
+      subs: ["SSM Agent, ECS", "Agent und Docker"]
+    - icon: servers
+      title: VMs und Bare Metal
+      title_lines: ["VMs und", "Bare Metal"]
+      subs: ["hängen sich als", "Nodes ein"]
+    - icon: app
+      title: Fertigung
+      subs: ["Maschinendaten", "bleiben im Werk"]
+    - icon: amazon-e-k-s-anywhere
+      title: Amazon EKS Anywhere
+      title_lines: ["Amazon EKS", "Anywhere"]
+      subs: ["Steuerung hier,", "Lifecycle selbst"]
+
+bridge:
+  - icon: a-w-s-systems-manager
+    title: SSM Hybrid Activation
+    title_lines: ["SSM Hybrid", "Activation"]
+    subs: ["ausgehend genügt", "Port 443"]
+    to_band: 0
+  - icon: internet
+    title: Dauerverbindung
+    subs: ["Voraussetzung, kein", "air-gapped Betrieb"]
+    to_band: 1
+
+bands:
+  - label: "A · ECS Anywhere — Steuerung in AWS"
+    nodes:
+      - icon: a-w-s-systems-manager
+        title: AWS Systems Manager
+        title_lines: ["AWS Systems", "Manager"]
+        subs: ["registriert den Server", "als external instance"]
+      - icon: amazon-e-c-s-anywhere
+        title: Amazon ECS Anywhere
+        title_lines: ["Amazon ECS", "Anywhere"]
+        subs: ["Control Plane in AWS,", "Launch Type EXTERNAL"]
+
+  - label: "B · EKS Hybrid Nodes — dasselbe für Kubernetes"
+    nodes:
+      - icon: eks
+        title: Amazon EKS Hybrid Nodes
+        title_lines: ["Amazon EKS", "Hybrid Nodes"]
+        subs: ["AWS betreibt und patcht", "den Control Plane"]
+
+crossband:
+  heading: "Für external instances nicht verfügbar"
+  items:
+    - icon: alb
+      title: Load Balancer
+      subs: ["lokal davorstellen,", "ALB geht nicht"]
+    - icon: a-w-s-cloud-map
+      title: AWS Cloud Map
+      subs: ["keine Service", "Discovery"]
+    - icon: efs
+      title: Amazon EFS
+      subs: ["keine Volumes,", "auch kein App Mesh"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Der Werksserver meldet sich per Hybrid Activation an, ausgehend über 443"
+  - "2  Als external instance startet er Tasks mit Launch Type EXTERNAL"
+  - "3  Bei EKS hängen eigene Server als Nodes an einem Control Plane in AWS"
+  - "Task-Definitionen, IAM-Rollen und Konsole sind dieselben wie in der Cloud"
+  - "Verworfen: EKS Anywhere — Control Plane und Lifecycle blieben im Werk"
+  - "Nur EKS Anywhere läuft air-gapped; die beiden anderen brauchen die Leitung"

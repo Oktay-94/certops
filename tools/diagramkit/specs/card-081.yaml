@@ -1,0 +1,76 @@
+id: card-081
+template: vorher_nachher
+title: "Szenario 81 · Multi-AZ oder zweite Region"
+subtitle: >-
+  Multi-AZ überlebt den Ausfall einer Availability Zone mit RPO 0 —
+  gegen den Ausfall der ganzen Region hilft nur eine zweite Region
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: VPC
+  subnet_label: "Private Subnetze in AZ a und AZ b"
+  forward: "Die Schadenmeldung erreicht die Anwendung"
+  left:
+    icon: users
+    title: Versicherte
+    subs: ["melden einen Schaden", "über das Portal"]
+  inner:
+    icon: amazon-e-c2-auto-scaling
+    title: EC2 Auto Scaling
+    subs: ["hält Kapazität in", "zwei Availability Zones"]
+
+panels:
+  - state: broken
+    headline: "Vorher — Multi-AZ allein: der AZ-Ausfall ist gedeckt, der Regionsausfall nicht"
+    back: "die ganze Region ist weg — Multi-AZ greift hier nicht"
+    extras:
+      - icon: elastic-load-balancing
+        title: Elastic Load Balancing
+        subs: ["nimmt die ungesunde AZ", "aus der Verteilung"]
+        w: 180
+        badge: true
+      - icon: amazon-r-d-s-multi-a-z
+        title: Amazon RDS Multi-AZ
+        subs: ["synchroner Standby in AZ b", "Failover 60–120 s, RPO 0"]
+        w: 180
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt die"
+        - "zweite Region"
+        - "Multi-AZ endet an der Regionsgrenze"
+
+  - state: fixed
+    headline: "Nachher — zweite Region, asynchron repliziert, Promotion auf Zuruf"
+    back: "die Sekundärregion wird promotet und antwortet"
+    extras:
+      - icon: elastic-load-balancing
+        title: Elastic Load Balancing
+        subs: ["verteilt weiterhin auf", "die AZs dieser Region"]
+        w: 180
+        badge: true
+      - icon: amazon-simple-storage-service-s3-replication
+        title: Amazon S3 und Amazon DynamoDB
+        title_lines: ["Amazon S3 und", "Amazon DynamoDB"]
+        subs: ["CRR und Global Tables", "asynchron — RPO über null"]
+        w: 180
+        badge: true
+    insert:
+      kind: node
+      icon: aurora
+      title: Amazon Aurora Global Database
+      subs: ["repliziert auf Speicherebene", "in eine zweite Region"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Die Schadenmeldung läuft in die Anwendung in eu-central-1"
+  - "2  Fällt die ganze Region aus, bleibt jede Antwort aus"
+  - "3  Der Load Balancer deckt den Ausfall einer AZ ab, nicht den der Region"
+  - "4  RDS Multi-AZ repliziert synchron — RPO 0, aber in dieselbe Region"
+  - "5  Derselbe Weg, dieselbe Anwendung, unverändertes Skelett"
+  - "6  Die zweite Region übernimmt — Promotion, RPO rund 1 s, RTO rund 1 min"
+  - "7  Am Load Balancer ändert sich nichts — die Ergänzung liegt auf der Datenebene"
+  - "8  Objekt- und Schlüssel-Wert-Daten folgen asynchron in die zweite Region"

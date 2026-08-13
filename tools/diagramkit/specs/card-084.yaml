@@ -1,0 +1,53 @@
+id: card-084
+template: vorher_nachher
+title: "Szenario 84 · Route 53 Health Checks und Failover"
+subtitle: >-
+  Die Prüfstellen arbeiten aus dem öffentlichen Netz — melden mehr als 18 %
+  von ihnen gesund, gilt der Endpoint als gesund. Private IP-Adressen erreichen sie nie
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: VPC
+  subnet_label: "Privates Subnetz"
+  forward: "Die verteilten Prüfstellen fragen den Endpoint ab"
+  left:
+    icon: route53
+    title: Amazon Route 53
+    subs: ["verteilte Prüfstellen,", "Intervall 30 s oder 10 s"]
+  inner:
+    icon: ec2
+    title: Amazon EC2
+    subs: ["nur private IP-Adresse,", "kein öffentlicher Endpoint"]
+
+panels:
+  - state: broken
+    headline: "Vorher — Health Check direkt auf die Instanz im privaten Subnetz"
+    back: "private IP — die Prüfstelle erreicht sie nie"
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt der"
+        - "metrikbasierte Health Check"
+        - "der Endpoint bleibt dauerhaft unhealthy"
+
+  - state: fixed
+    headline: "Nachher — Failover-Zeit = Intervall × Failure Threshold + Aggregation + TTL"
+    back: "Metrik in den Alarm, Alarmzustand an Route 53"
+    insert:
+      kind: node
+      icon: amazon-cloud-watch-alarm
+      title: Amazon CloudWatch
+      subs: ["der Alarm ist der Health Check", "Failure Threshold 1 bis 10"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Die Prüfstellen fragen den Endpoint an, alle 30 oder alle 10 Sekunden"
+  - "2  Eine Instanz mit privater IP antwortet ihnen nie — sie gilt dauerhaft als krank"
+  - "3  Derselbe Weg, dieselbe Instanz, nur eine andere Art zu prüfen"
+  - "4  Der Zustand des CloudWatch-Alarms wird zum Health Check des Endpoints"
+  - "Ist der Primary unhealthy, antwortet Route 53 mit dem Secondary-Record"
+  - "Mit Standardwerten (30 s × 3) dauert allein das Erkennen rund 90 Sekunden"
+  - "Danach folgt die TTL: AWS empfiehlt 60 s, Resolver halten oft länger fest"
+  - "Sind beide Records unhealthy, gibt Route 53 den Primary zurück"

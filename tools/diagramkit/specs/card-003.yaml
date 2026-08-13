@@ -1,0 +1,65 @@
+id: card-003
+template: ablauf
+title: "Karte 3 · EC2 Auto Scaling, ALB und CloudWatch"
+subtitle: >-
+  Der Webshop DailyDeals hat einen klaren Tageszyklus: nachts reichen 2 Instanzen, mittags
+  braucht er bis zu 40 — die Kapazität soll der Last ohne Handgriff folgen
+
+region: "Region eu-central-1 (Frankfurt)"
+
+machine:
+  label: "Auto Scaling Group"
+  icon: grp-asg
+  color: "#ED7100"
+
+outside_top:
+  icon: users
+  title: Kundschaft
+  subs: ["nachts wenige,", "mittags sehr viele"]
+
+top:
+  - icon: alb
+    title: Application Load Balancer
+    title_lines: ["Application", "Load Balancer"]
+    subs: ["stabiler Eintrittspunkt", "vor der Auto Scaling Group"]
+    w: 240
+
+  - icon: ec2
+    title: Amazon EC2
+    subs: ["nachts 2, mittags bis 40", "Instanzen der Gruppe"]
+    w: 190
+    machine: true
+
+  - icon: cloudwatch
+    title: Amazon CloudWatch
+    subs: ["misst Ø CPU oder", "Requests je Target"]
+    w: 190
+
+bottom:
+  - col: 1
+    icon: ec2
+    title: Amazon EC2
+    subs: ["Instanz startet oder", "wird beendet"]
+    w: 190
+    machine: true
+
+  - col: 2
+    icon: amazon-e-c2-auto-scaling
+    title: EC2 Auto Scaling
+    subs: ["Scaling Policy setzt die", "desired capacity"]
+    w: 190
+    from_top: true
+    from_label: Alarm
+    from_color: accent
+    to: 1
+
+legend_cols: 2
+legend:
+  - "1  Die Kundschaft trifft auf den Application Load Balancer"
+  - "2  Der ALB verteilt auf alle gesunden Instanzen der Gruppe"
+  - "3  Die Instanzen liefern ihre Metriken an CloudWatch"
+  - "4  Weicht die Metrik vom Zielwert ab, schlägt der Alarm an"
+  - "5  Die Scaling Policy ändert die desired capacity der Gruppe"
+  - "CloudWatch misst und alarmiert — Instanzen startet EC2 Auto Scaling"
+  - "Neue Instanzen melden sich nach dem Health-Check selbst am ALB an"
+  - "Vorhersehbares Tagesmuster: Scheduled Scaling skaliert vor der Spitze"

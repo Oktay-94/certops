@@ -1,0 +1,84 @@
+id: card-032
+template: hybrid
+title: "Karte 32 · Site-to-Site VPN gegen Direct Connect"
+subtitle: >-
+  Mit VPN starten, auf Direct Connect landen — beide Wege enden am selben
+  Transit Gateway, der Umstieg passiert im Routing
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum Hamburg
+  nodes:
+    - icon: server
+      title: Sendungs-DB
+      subs: ["1,8 TB je Nacht", "Fenster: 6 Stunden"]
+    - icon: firewall
+      title: Kundenrouter
+      subs: ["BGP-Präferenz", "separat setzen"]
+
+bridge:
+  - icon: vpn-gateway
+    title: Site-to-Site VPN
+    subs: ["steht in Minuten,", "IPsec ab Werk"]
+    to_band: 0
+  - icon: a-w-s-direct-connect
+    title: AWS Direct Connect
+    subs: ["dedizierte Leitung,", "nicht verschlüsselt"]
+    to_band: 1
+
+bands:
+  - label: "A · Heute — VPN über das öffentliche Internet"
+    hero_note: "für alle VPCs"
+    nodes:
+      - icon: internet
+        title: Öffentliches Internet
+        title_lines: ["Öffentliches", "Internet"]
+        subs: ["real 0,3 bis 1,1 Gbps", "Egress 0,09 $/GB"]
+      - icon: vpn-gateway
+        title: VPN-Attachment
+        subs: ["zwei Tunnel in zwei AZ", "14 TB ≈ 1.290 $/Monat"]
+
+  - label: "B · Ziel — Direct Connect auf eigener Leitung"
+    hero_note: "derselbe Hub"
+    nodes:
+      - icon: a-w-s-direct-connect
+        title: DX Location
+        subs: ["Port 0,30 $/h ≈ 219 $", "Egress 0,02 $/GB"]
+      - icon: a-w-s-direct-connect-gateway
+        title: Direct Connect Gateway
+        title_lines: ["Direct Connect", "Gateway"]
+        subs: ["Transit VIF zum Hub", "14 TB ≈ 287 $/Monat"]
+
+hero:
+  icon: a-w-s-transit-gateway
+  title: AWS Transit Gateway
+  title_lines: ["AWS Transit", "Gateway"]
+  subs: ["Beide Wege enden hier", "", "DX-BGP-Routen schlagen", "die VPN-Routen", "kein VPC wird angefasst"]
+
+crossband:
+  heading: "Drei Fallen, die den Umstiegspfad nicht abkürzen"
+  items:
+    - icon: alert
+      title: "Large Bandwidth Tunnel"
+      title_lines: ["Large Bandwidth", "Tunnel"]
+      subs: ["hebt die Tunnel-Decke,", "nicht die des Internets"]
+    - icon: question
+      title: "DX ist unverschlüsselt"
+      title_lines: ["DX ist", "unverschlüsselt"]
+      subs: ["MACsec erst ab 10 Gbps,", "sonst IPsec über die DX"]
+    - icon: alert
+      title: "Eine Leitung ist keine HA"
+      title_lines: ["Eine Leitung", "ist keine HA"]
+      subs: ["SLA erst mit zweitem DX", "oder VPN als Backup"]
+
+legend_cols: 3
+legend_heading: "Datenfluss und Umstiegspfad Schritt für Schritt"
+legend:
+  - "1  Das VPN steht in Minuten — IPsec über das öffentliche Internet"
+  - "2  Real nur 0,3 bis 1,1 Gbps: der Pfad gehört dem Internet, nicht AWS"
+  - "3  Das VPN-Attachment endet am Transit Gateway, nicht an einem VPC"
+  - "4  Direct Connect wird parallel bestellt: Vorlauf Tage bis Wochen"
+  - "5  Transit VIF und DX Gateway führen die Leitung an denselben Hub"
+  - "6  AWS bevorzugt die DX-BGP-Routen — der Cutover passiert im Routing"
+  - "Fällt DX aus, verschwinden dessen Routen und das VPN übernimmt"

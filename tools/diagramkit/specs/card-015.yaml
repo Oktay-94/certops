@@ -1,0 +1,76 @@
+id: card-015
+template: vorher_nachher
+title: "Szenario 15 · Ransomware-sichere Backups — Versioning, Object Lock, MFA Delete"
+subtitle: >-
+  Derselbe Angreifer mit denselben Administrator-Rechten, zweimal: einmal löscht er die Backups,
+  einmal scheitert er an einer Bucket-Konfiguration, die auch Root nicht aufhebt
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: "AWS-Konto, das nur die Backups hält"
+  subnet_label: "Backup-Bucket der Stadtwerke Lippetal"
+  forward: "der Backup-Job schreibt nächtlich per PUT — unverändert"
+  left:
+    icon: server
+    title: Backup-Job
+    subs: ["sichert ERP und", "Abrechnung, 7 Jahre"]
+  inner:
+    icon: s3
+    title: Amazon S3
+    subs: ["nimmt die Sicherung", "entgegen"]
+
+panels:
+  - state: broken
+    headline: "Vorher — der Bucket kennt keine Sperre, erbeutete Admin-Rechte genügen"
+    back: "nach dem Angriff ist nichts mehr zurückzuholen"
+    extras:
+      - icon: user
+        title: Angreifer
+        subs: ["DeleteObjectVersion", "löscht endgültig"]
+        accent: fail
+        badge: true
+        w: 190
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlen"
+        - "Versioning und Object Lock"
+        - "eine IAM-Policy hält keinen Admin auf"
+
+  - state: fixed
+    headline: "Nachher — Versioning, Object Lock im Compliance Mode und MFA Delete"
+    back: "GET mit versionId holt die letzte saubere Version zurück"
+    extras:
+      - icon: user
+        title: Angreifer
+        subs: ["Löschen und Frist kürzen", "werden abgewiesen"]
+        ssize: 10
+        accent: fail
+        badge: true
+        w: 180
+      - icon: a-w-s-identity-access-management-m-f-a-token
+        title: MFA Delete
+        subs: ["schützt den Versionierungs-", "zustand vor dem Abschalten"]
+        ssize: 10
+        accent: ok
+        badge: true
+        w: 180
+    insert:
+      kind: node
+      icon: amazon-simple-storage-service-s3-object-lock
+      title: "S3 Object Lock · Compliance Mode"
+      title_lines: ["S3 Object Lock", "Compliance Mode"]
+      subs: ["setzt Versioning voraus", "Retain Until Date: 7 Jahre"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Der Backup-Job schreibt ganz normal per PUT — kein Agent, kein Sonderweg"
+  - "2  Nach dem Angriff gibt es nichts wiederherzustellen, die Version ist wirklich weg"
+  - "3  Erbeutete Admin-Rechte reichen: DeleteObjectVersion löscht eine bestimmte Version"
+  - "4  Am Schreibweg ändert sich nichts — der Schutz liegt in der Bucket-Konfiguration"
+  - "5  Die Wiederherstellung ist unspektakulär: die letzte saubere Version per versionId holen"
+  - "6  Jetzt scheitern DeleteObjectVersion und PutObjectRetention, egal was die IAM-Policy sagt"
+  - "7  MFA Delete hält den zweiten Angriff auf: die Versionierung lässt sich nicht abschalten"
+  - "Compliance Mode heißt: auch der Root-Benutzer kürzt die Frist nicht — Governance wäre aushebelbar"

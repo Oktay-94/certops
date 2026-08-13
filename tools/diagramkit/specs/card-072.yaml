@@ -1,0 +1,62 @@
+id: card-072
+template: hybrid
+title: "Szenario 72 · DMS homogen — gleiche Engine, kein Schema Conversion Tool"
+subtitle: >-
+  MySQL on-prem nach RDS for MySQL: Full Load und laufende Änderungen über dieselbe
+  Replikationsinstanz, die Quelle bleibt bis zum Cutover voll in Betrieb
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum vor Ort
+  nodes:
+    - icon: app
+      title: Anwendung
+      subs: ["schreibt weiter,", "kein Freeze"]
+    - icon: database
+      title: MySQL
+      subs: ["Quelle bleibt voll", "betriebsfähig"]
+
+bridge:
+  - icon: internet
+    title: Erstübertragung
+    subs: ["Bestand einmal", "über die Leitung"]
+    to_band: 0
+  - icon: internet
+    title: Änderungsstrom
+    subs: ["jede Änderung der", "Quelle, laufend"]
+    to_band: 1
+
+bands:
+  - label: "A · Full Load — der ganze Bestand"
+    hero_note: "Schema 1:1"
+    nodes:
+      - icon: a-w-s-database-migration-service
+        title: AWS Database Migration Service
+        title_lines: ["AWS Database", "Migration Service"]
+        subs: ["Full-Load-Task liest", "den Bestand"]
+
+  - label: "B · CDC — Änderungen folgen nach"
+    hero_note: "hält Schritt"
+    nodes:
+      - icon: a-w-s-database-migration-service
+        title: AWS Database Migration Service
+        title_lines: ["AWS Database", "Migration Service"]
+        subs: ["CDC-Task fängt jede", "Änderung ab"]
+
+hero:
+  icon: rds
+  title: Amazon RDS for MySQL
+  title_lines: ["Amazon RDS", "for MySQL"]
+  subs: ["dieselbe Engine", "wie die Quelle", "", "Schema, Datentypen", "und Code kommen", "unverändert an", "", "nichts zu konvertieren"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der Full-Load-Task liest den Bestand aus der laufenden Quelle"
+  - "2  Die Replikationsinstanz schreibt ihn nach RDS for MySQL"
+  - "3  Parallel fängt der CDC-Task jede Änderung der Quelle ab"
+  - "4  CDC hält das Ziel aktuell bis zum Cutover — Downtime nahe null"
+  - "Verworfen: AWS SCT — konvertiert nur zwischen verschiedenen Engines"
+  - "Quelle oder Ziel muss in AWS liegen; on-prem nach on-prem kann DMS nicht"

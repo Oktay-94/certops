@@ -1,0 +1,76 @@
+id: card-024
+template: vorher_nachher
+title: "Szenario 24 · Cache-Aside für einen Produktkatalog mit 95 % Reads"
+subtitle: >-
+  240.000 Artikel, 500 davon machen 60 % der Abrufe aus — und ein Preis-Batch
+  um 6 Uhr entscheidet, warum der Cache Anwendungscode braucht
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: VPC
+  subnet_label: "Privates Subnetz · Katalogschicht"
+  forward: "Anfrage auf eine Artikelseite des Großhandelskatalogs"
+  left:
+    icon: users
+    title: Einkäufer
+    subs: ["öffnen Artikelseiten,", "95 % Lesezugriffe"]
+  inner:
+    icon: app
+    title: Katalog-Anwendung
+    subs: ["entscheidet selbst,", "wen sie fragt"]
+    w: 190
+
+panels:
+  - state: broken
+    headline: "Vorher — jede Anfrage wird zu einem SELECT"
+    back: "mittags 800 ms statt 40 ms, DB-CPU bei 90 %"
+    extras:
+      - icon: rds
+        title: Amazon RDS for MySQL
+        title_lines: ["Amazon RDS", "for MySQL"]
+        subs: ["dieselben 500 Artikel,", "tausendfach pro Minute"]
+        accent: fail
+        badge: true
+        w: 195
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Kein Puffer davor:"
+        - "jeder Aufruf trifft die DB"
+        - "auch der, der nichts Neues erfährt"
+
+  - state: fixed
+    headline: "Nachher — Cache-Aside: erst fragen, bei Miss nachladen, zurückschreiben"
+    back: "Cache Hit antwortet in Millisekunden"
+    extras:
+      - icon: elasticache
+        title: Amazon ElastiCache
+        title_lines: ["Amazon", "ElastiCache"]
+        subs: ["eigener Client, GET/SET,", "TTL als Notbremse"]
+        accent: ok
+        badge: true
+        w: 195
+      - icon: rds
+        title: Amazon RDS for MySQL
+        title_lines: ["Amazon RDS", "for MySQL"]
+        subs: ["nur noch Cache Misses", "werden zum SELECT"]
+        badge: true
+        w: 180
+    insert:
+      kind: node
+      icon: a-w-s-batch
+      title: "Preis-Batch, täglich 6 Uhr"
+      subs: ["UPDATE in RDS und DEL", "im Cache — beides nötig"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Ein Einkäufer öffnet eine Artikelseite im Online-Katalog"
+  - "2  Mittags dauert die Antwort 800 ms statt 40 ms"
+  - "3  Denn jede Anfrage wird zu einem SELECT auf dieselben Datensätze"
+  - "4  Am Einstieg ändert sich nichts, die Anwendung nimmt die Anfrage an"
+  - "5  Ein Cache Hit beantwortet sie aus dem Arbeitsspeicher"
+  - "6  Die Anwendung fragt zuerst den Cache und schreibt selbst zurück"
+  - "7  Nur was dort fehlt, erreicht überhaupt noch die Datenbank"
+  - "Der Cache invalidiert nichts von allein — der 6-Uhr-Batch muss ihn aufräumen"

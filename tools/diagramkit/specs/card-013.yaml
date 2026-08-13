@@ -1,0 +1,92 @@
+id: card-013
+template: fanout
+title: "Szenario 13 · Gemeinsames Dateisystem für mehrere Webserver — EFS über drei AZs"
+subtitle: >-
+  Ein einziges Regional-Dateisystem, drei Availability Zones, kein Sync-Job: Was eine Instanz
+  schreibt, liefern die anderen im selben Moment aus — Zustand raus aus der Compute-Schicht
+region: "Region eu-central-1 (Frankfurt)"
+lane_note: "drei AZs — ein Dateisystem, nicht drei Kopien"
+
+outside:
+  icon: users
+  title: Redaktion
+  subs: ["lädt Bilder und PDFs", "ins CMS hoch"]
+
+producer:
+  icon: alb
+  title: Elastic Load Balancing
+  subs: ["Application Load Balancer,", "trifft irgendeine Instanz"]
+
+store:
+  icon: amazon-e-c2-auto-scaling
+  title: EC2 Auto Scaling
+  subs: ["3 bis 12 Instanzen,", "kommen und gehen"]
+
+hub:
+  icon: efs
+  title: Amazon EFS
+  subs: ["ein Regional-Dateisystem", "für alle drei AZs", "", "NFS v4.1, POSIX, Locking"]
+
+aside:
+  icon: amazon-elastic-file-system-e-f-s-intelligent-tiering
+  title: EFS Lifecycle Management
+  subs: ["30 Tage ohne Zugriff: EFS IA", "90 Tage: EFS Archive"]
+
+lanes:
+  - queue:
+      icon: amazon-v-p-c-elastic-network-interface
+      title: "Mount Target · AZ a"
+      subs: ["ENI im Subnetz dieser AZ,", "Security Group Port 2049"]
+    worker:
+      icon: ec2
+      title: Amazon EC2
+      subs: ["mountet /var/www/media", "per NFS"]
+    target:
+      icon: users
+      title: Website-Besucher
+      subs: ["bekommt dieselbe Datei", "aus AZ a"]
+
+  - queue:
+      icon: amazon-v-p-c-elastic-network-interface
+      title: "Mount Target · AZ b"
+      subs: ["ENI im Subnetz dieser AZ,", "Security Group Port 2049"]
+    worker:
+      icon: ec2
+      title: Amazon EC2
+      subs: ["schreibt den Upload", "als normalen fwrite"]
+    target:
+      icon: users
+      title: Website-Besucher
+      subs: ["bekommt dieselbe Datei", "aus AZ b"]
+
+  - queue:
+      icon: amazon-v-p-c-elastic-network-interface
+      title: "Mount Target · AZ c"
+      subs: ["ENI im Subnetz dieser AZ,", "Security Group Port 2049"]
+      accent: true
+    worker:
+      icon: ec2
+      title: Amazon EC2
+      subs: ["frisch hochskaliert,", "kein Warm-up nötig"]
+    target:
+      icon: users
+      title: Website-Besucher
+      subs: ["bekommt dieselbe Datei", "aus AZ c"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "Ein Mount Target je AZ — nicht je Instanz. Startet die Gruppe eine"
+    - "Instanz in einer AZ ohne Mount Target, hängt der Mount."
+    - "Zweiter Klassiker: Security Group ohne eingehenden TCP-Port 2049."
+
+legend:
+  - "1  Die Redaktion lädt eine Datei ins CMS hoch"
+  - "2  Der Load Balancer trifft irgendeine Instanz der Auto Scaling Group"
+  - "3  Diese Instanz schreibt die Datei per NFS ins Dateisystem"
+  - "4  Dasselbe Dateisystem steht in AZ a bereit"
+  - "5  ebenso in AZ b, wo geschrieben wurde"
+  - "6  und ebenso in AZ c, auch für gerade erst gestartete Instanzen"
+  - "7  Jede Instanz mountet über den Mount Target ihrer eigenen AZ"
+  - "8  und liefert dieselbe Datei aus — ohne Replikation, ohne Sync-Job"
+  - "Die Schritte 7 und 8 laufen in allen drei Bahnen gleich ab"

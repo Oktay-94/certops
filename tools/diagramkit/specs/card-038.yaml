@@ -1,0 +1,74 @@
+id: card-038
+template: vorher_nachher
+title: "Karte 38 · AWS Network Firewall — Egress-Kontrolle"
+subtitle: >-
+  Security Groups filtern Adressen, Network Firewall filtert Namen — ausgehender
+  Verkehr nur zu freigegebenen Domains, alles andere verworfen und protokolliert
+
+base:
+  region: "Region eu-central-1"
+  vpc_label: "VPC · eine von drei Availability Zones"
+  subnet_label: "Privates Subnetz"
+  forward: "Antwortpakete laufen über denselben Endpoint zurück"
+  left:
+    icon: internet
+    title: Internet
+    subs: ["Paketquellen und Repos —", "und paste.evil.example"]
+  inner:
+    icon: ec2
+    title: Amazon EC2
+    subs: ["Zulassungsdaten,", "keine öffentliche IP"]
+
+panels:
+  - state: broken
+    headline: "Vorher — Security Groups sollen ausgehend filtern und können es nicht"
+    back: "jede Domain wird erreicht, auch paste.evil.example"
+    extras:
+      - icon: router
+        title: Route Table
+        subs: ["0.0.0.0/0 direkt zum", "NAT Gateway, ungeprüft"]
+        accent: fail
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt die"
+        - "Egress-Kontrolle"
+        - "Security Groups kennen IP und Port,"
+        - "aber keine Domainnamen"
+
+  - state: fixed
+    headline: "Nachher — erst der Firewall-Endpoint, dann der NAT Gateway"
+    back: "nur freigegebene Domains passieren"
+    extras:
+      - icon: router
+        title: Route Table
+        subs: ["0.0.0.0/0 zum Firewall-", "Endpoint derselben AZ"]
+        accent: ok
+        badge: true
+        w: 190
+      - icon: amazon-v-p-c-flow-logs
+        title: Alert- und Flow-Logs
+        subs: ["nach S3, CloudWatch", "oder Data Firehose"]
+        accent: ok
+        badge: true
+        w: 175
+    insert:
+      kind: node
+      icon: a-w-s-network-firewall
+      title: AWS Network Firewall
+      subs: ["Stateful Domain List liest", "SNI und Host-Header"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Der Rückweg nimmt denselben Endpoint in derselben Availability Zone"
+  - "2  Heute erreicht jede beliebige Domain das Ziel; Security Groups greifen hier nicht"
+  - "3  Die Route-Tabelle schickt 0.0.0.0/0 direkt zum NAT Gateway, ohne Prüfung"
+  - "4  Am Rückweg ändert sich nichts — er läuft weiter über denselben Endpoint"
+  - "5  Die Domain List liest den SNI aus dem TLS-Handshake und verwirft, was nicht gelistet ist"
+  - "6  0.0.0.0/0 zeigt auf den Firewall-Endpoint derselben AZ — erst danach folgt der NAT"
+  - "7  Alert- und Flow-Logs gehen nach S3, CloudWatch Logs oder Data Firehose: der Nachweis"
+  - "Die Instanz baut ganz normal eine Verbindung auf — sie merkt vom Umweg nichts"
+  - "Hin- und Rückweg über denselben Endpoint, sonst sieht die Engine nur eine Richtung"

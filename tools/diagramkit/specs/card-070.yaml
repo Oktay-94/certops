@@ -1,0 +1,70 @@
+id: card-070
+template: kette
+title: "Szenario 70 · Fake-Registrierungen an der Kante abwehren"
+subtitle: >-
+  ACFP prüft die Sign-up-Seite als Managed Rule Group, bevor der Request die Anwendung
+  erreicht — Response Inspection gibt es nur bei CloudFront, für Cognito User Pools gar nicht
+
+outside:
+  icon: users
+  title: Bot-Traffic
+  subs: ["legt massenhaft Konten", "für das Startguthaben an"]
+  w: 165
+
+chain:
+  - icon: cloudfront
+    title: Amazon CloudFront
+    subs: ["nimmt den Traffic an,", "Web ACL hängt davor"]
+    w: 210
+
+  - icon: waf
+    title: AWS WAF
+    subs: ["AWSManagedRulesACFPRuleSet", "50 WCU, erst im Count-Modus"]
+    w: 210
+
+  - icon: app
+    title: Registrierungs-Endpoint
+    title_lines: ["Registrierungs-", "Endpoint"]
+    subs: ["GET auf die Seite,", "POST auf den Sign-up"]
+    w: 210
+    note: {text: "nur Echtes passiert", color: ok}
+
+  - icon: cloudfront
+    title: Response Inspection
+    subs: ["misst Erfolgs- und", "Fehlerraten, asynchron"]
+    w: 210
+
+branch:
+  from: 1
+  items:
+    - icon: disk
+      title: Stolen-Credential-DB
+      subs: ["laufend um Dark-Web-", "Leaks ergänzt"]
+      w: 210
+
+crossband:
+  heading: "Querschnitt: Voraussetzung, Grenzen und die beiden verworfenen Alternativen"
+  items:
+    - icon: waf
+      title: Application Integration SDK
+      title_lines: ["Application", "Integration SDK"]
+      subs: ["ohne SDK laufen die", "Token-Regeln ins Leere"]
+    - icon: cognito
+      title: Amazon Cognito
+      subs: ["ACFP steht für User Pools", "nicht zur Verfügung"]
+    - icon: amazon-fraud-detector
+      title: Amazon Fraud Detector
+      subs: ["ML auf eigenen Daten", "verworfen: Neukunden zu"]
+    - icon: amazon-sage-maker-a-i
+      title: Amazon SageMaker AI
+      subs: ["eigenes Betrugsmodell", "verworfen: säße dahinter"]
+
+legend_cols: 2
+legend:
+  - "1  Bots senden massenhaft Registrierungsanfragen"
+  - "2  CloudFront nimmt sie an, die Web ACL bindet die Rule Group ein"
+  - "3  ACFP prüft Formularfelder und lässt nur Echtes passieren"
+  - "4  Die Antworten der Anwendung werden zusätzlich ausgewertet"
+  - "5  Geprüft wird gegen die Stolen-Credential-Datenbank"
+  - "ACFP schützt die Anlage neuer Konten, ATP die Anmeldung an alten"
+  - "Der Blockierungspfad ist nicht gezeichnet: was blockt, verlässt den Fluss"

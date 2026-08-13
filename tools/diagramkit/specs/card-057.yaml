@@ -1,0 +1,75 @@
+id: card-057
+template: ablauf
+title: "Szenario 57 · Naechtliche CSV-nach-Parquet-Transformation mit Glue ETL"
+subtitle: >-
+  40 Speditionspartner liefern jede Nacht CSV — der Job soll nur die neuen Dateien
+  anfassen, ohne Server und ohne eigenen Spark-Cluster
+
+region: "Region eu-central-1 (Frankfurt)"
+
+machine:
+  label: "AWS Glue ETL-Job"
+  icon: glue
+  color: "#C2410C"
+  note: "gestartet vom EventBridge Scheduler, 02:00 Uhr"
+
+outside_top:
+  icon: office
+  title: Speditionspartner
+  subs: ["40 Partner,", "jede Nacht CSV"]
+
+top:
+  - icon: s3
+    title: "Amazon S3 (Raw-Zone)"
+    subs: ["CSV, unkomprimiert,", "uneinheitliche Typen"]
+    ssize: 10
+    w: 175
+  - icon: a-w-s-glue-crawler
+    title: AWS Glue Crawler
+    subs: ["liest Stichproben,", "erkennt Schema und Typen"]
+    ssize: 10
+    w: 175
+  - icon: a-w-s-glue-data-catalog
+    title: AWS Glue Data Catalog
+    title_lines: ["AWS Glue", "Data Catalog"]
+    subs: ["Register: Tabelle und", "Partitionen, kein Speicher"]
+    ssize: 10
+    w: 185
+  - icon: glue
+    title: AWS Glue ETL
+    subs: ["Spark, serverless", "liest from_catalog"]
+    ssize: 10
+    w: 185
+    machine: true
+  - icon: s3
+    title: "Amazon S3 (Curated)"
+    subs: ["Parquet, nach Datum", "partitioniert"]
+    ssize: 10
+    w: 195
+  - icon: athena
+    title: Amazon Athena
+    subs: ["liest nur die noetigen", "Spalten und Tage"]
+    ssize: 10
+    w: 175
+
+bottom:
+  - col: 3
+    icon: a-w-s-glue-data-quality
+    title: Job Bookmark
+    subs: ["haelt fest, was schon", "verarbeitet wurde"]
+    ssize: 10
+    machine: true
+    from_top: true
+    from_label: "fragt den Zustand ab"
+    accent: accent
+
+legend_cols: 2
+legend:
+  - "1  Die 40 Partner legen ihre CSV-Dateien in der Raw-Zone ab"
+  - "2  Der Crawler liest Stichproben aus den neuen Dateien"
+  - "3  Er traegt Tabelle und Partitionen in den Katalog ein"
+  - "4  Der Job liest die Quelle ueber den Katalog, nicht per Pfad"
+  - "5  Verarbeitet wird nur das Delta — als Parquet, nach Datum"
+  - "6  Dieselbe Athena-Abfrage kostet jetzt einen Bruchteil"
+  - "7  Der Job fragt vorher den Zustand des letzten Laufs ab"
+  - "Ohne transformation_ctx am Source-Node liest der Job jede Nacht alles"

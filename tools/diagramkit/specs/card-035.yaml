@@ -1,0 +1,54 @@
+id: card-035
+template: vorher_nachher
+title: "Karte 35 · Global Accelerator gegen CloudFront"
+subtitle: >-
+  Der Weg gegen den Inhalt — die Entscheidung fällt am Protokoll und an der
+  Cachebarkeit, nicht an der statischen IP
+
+base:
+  region: "Regionen eu-central-1 und ap-northeast-1"
+  vpc_label: "VPC"
+  subnet_label: "Subnetz der Game-Server"
+  forward: "Spielverkehr über UDP — Layer 4, nicht cachebar"
+  left:
+    icon: a-w-s-global-accelerator
+    title: AWS Global Accelerator
+    title_lines: ["AWS Global", "Accelerator"]
+    subs: ["zwei feste Anycast-IPs", "Layer 4: TCP und UDP"]
+  inner:
+    icon: ec2
+    title: Amazon EC2
+    subs: ["Game-Server in", "zwei Regionen"]
+
+panels:
+  - state: broken
+    headline: "Vorher — alles über den Accelerator: 40 TB Patches Byte für Byte durchs Backbone"
+    back: "auch die 40 TB Patches nehmen diesen Weg"
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt"
+        - "Amazon CloudFront"
+        - "40 TB Patches sind HTTP und"
+        - "hoch cachebar — hier zahlt man alles"
+
+  - state: fixed
+    headline: "Nachher — der Weg über Global Accelerator, der Inhalt über CloudFront"
+    back: "nur Spielverkehr — Failover unter 30 Sekunden"
+    insert:
+      kind: node
+      icon: cloudfront
+      title: Amazon CloudFront
+      subs: ["40 TB werden am Edge gecacht", "WAF, Signed URLs, Functions"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Der Spielverkehr läuft als UDP über zwei feste Anycast-IPs ins AWS-Backbone"
+  - "2  In dieser Variante nehmen auch die 40 TB Patches denselben Weg — Byte für Byte"
+  - "3  Am Spielverkehr ändert sich nichts: Layer 4 trägt TCP und UDP und cacht nichts"
+  - "4  Health Checks schalten bei Regionsausfall in unter 30 Sekunden um, ohne neue DNS-Auflösung"
+  - "Route 53 Latency-Routing ist kein Ersatz: es wählt nur die IP, der Pfad bleibt das Internet"
+  - "Die Entscheidungsachse: Ist es HTTP? Ist es cachebar? Zweimal nein → Global Accelerator"
+  - "Global Accelerator kostet rund 18 $ im Monat fix, dazu DT-Premium von 0,007 bis 0,105 $/GB"

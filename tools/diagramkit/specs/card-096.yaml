@@ -1,0 +1,87 @@
+id: card-096
+template: vorher_nachher
+title: "Szenario 96 · Express oder Standard"
+subtitle: >-
+  Derselbe Workflow, zweimal angelegt: der Typ wird beim Anlegen festgelegt und
+  lässt sich danach nicht mehr ändern — an der Zahlungsfreigabe wird das sichtbar
+
+base:
+  region: "Region eu-central-1"
+  vpc_label: "AWS Step Functions"
+  subnet_label: "State Machine · Typ ist nach dem Anlegen unveränderlich"
+  forward: "Der Bestell-Dienst startet die Zahlungsfreigabe"
+  left:
+    icon: app
+    title: Bestell-Dienst
+    subs: ["startet einen Lauf", "je Bestellung"]
+  inner:
+    icon: stepfunctions
+    title: Zahlungsfreigabe
+    subs: ["wartet auf eine", "Genehmigung durch Menschen"]
+    w: 200
+
+panels:
+  - state: broken
+    headline: "Express — hochfrequent und kurz, hier trotzdem falsch"
+    back: "nach fünf Minuten Abbruch, ohne Freigabe"
+    extras:
+      - icon: stepfunctions
+        title: Express Workflow
+        title_lines: ["Express", "Workflow"]
+        subs: ["fünf Minuten Deckel", "async at-least-once"]
+        ssize: 10
+        accent: fail
+        badge: true
+        w: 180
+      - icon: amazon-cloud-watch-logs
+        title: Ausführungshistorie
+        title_lines: ["Ausführungs-", "historie"]
+        subs: ["nur mit CloudWatch Logs", "im Dienst keine"]
+        ssize: 10
+        accent: fail
+        badge: true
+        w: 180
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt das"
+        - "Callback-Muster"
+        - "kein .waitForTaskToken, kein .sync"
+  - state: fixed
+    headline: "Standard — langlaufend, auditierbar, nicht idempotent"
+    back: "Freigabe trifft ein, der Lauf geht weiter"
+    extras:
+      - icon: stepfunctions
+        title: Standard Workflow
+        title_lines: ["Standard", "Workflow"]
+        subs: ["bis zu ein Jahr Laufzeit", "exactly-once"]
+        ssize: 10
+        accent: ok
+        badge: true
+        w: 180
+      - icon: stepfunctions
+        title: Abrechnung
+        subs: ["zählt State Transitions", "Express zählt Läufe"]
+        ssize: 10
+        accent: ok
+        badge: true
+        w: 180
+    insert:
+      kind: node
+      icon: stepfunctions
+      title: Callback mit Task Token
+      subs: ["der Lauf wartet, bis der Mensch entscheidet"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Der Bestell-Dienst startet einen Lauf je Bestellung"
+  - "2  Express bricht nach fünf Minuten ab — der Mensch war noch nicht so weit"
+  - "3  Asynchrones Express ist at-least-once: doppelt gebucht ohne Idempotenz"
+  - "4  Ohne eingeschaltetes Logging bleibt vom Lauf nichts nachvollziehbar"
+  - "5  Derselbe Start, diesmal gegen eine Standard-State-Machine"
+  - "6  Standard läuft bis zu ein Jahr und garantiert exactly-once"
+  - "7  Abgerechnet wird nach State Transitions statt nach Lauf und Dauer"
+  - "8  Der Typ lässt sich nicht umstellen — die Entscheidung fällt einmal"
+  - "Step Functions braucht keine VPC — die Rahmen zeigen Dienst und State Machine"

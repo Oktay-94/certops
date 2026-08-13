@@ -1,0 +1,78 @@
+id: card-011
+template: kette
+title: "Szenario 11 · Rechnungsarchiv über 10 Jahre — Lifecycle in den Deep Archive"
+subtitle: >-
+  Eine deklarative Lifecycle-Regel schiebt jede Rechnung durch drei Speicherklassen und löscht sie
+  am Ende — der Restore für die Betriebsprüfung holt das Objekt nie aus dem Archiv heraus
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: lifecycle
+    label: "S3 Lifecycle-Regel · Filter invoices/ · S3 wertet sie täglich selbst aus, kein Cronjob"
+    color: accent
+
+outside:
+  icon: app
+  title: ERP-System
+  subs: ["2 Mio. Rechnungen im Jahr", "gehen per PUT nach S3"]
+  w: 190
+
+chain:
+  - icon: amazon-simple-storage-service-s3-standard
+    title: S3 Standard
+    subs: ["Tag 0 bis 30: Versand", "und Mahnwesen greifen zu"]
+    w: 200
+    in: [cloud, region, lifecycle]
+
+  - icon: amazon-simple-storage-service-s3-standard-i-a
+    title: S3 Standard-IA
+    subs: ["ab Tag 30: halber Preis,", "weiter Millisekunden"]
+    w: 200
+    in: [cloud, region, lifecycle]
+
+  - icon: amazon-simple-storage-service-s3-glacier-deep-archive
+    title: S3 Glacier Deep Archive
+    title_lines: ["S3 Glacier", "Deep Archive"]
+    subs: ["ab Tag 365: rund 1 $ je", "TB-Monat, Abruf in Stunden"]
+    hero: true
+    w: 220
+    in: [cloud, region, lifecycle]
+
+  - icon: amazon-simple-storage-service-object
+    title: Expiration
+    subs: ["Tag 4015: Frist abgelaufen,", "S3 löscht das Objekt"]
+    w: 200
+    in: [cloud, region, lifecycle]
+
+branch:
+  from: 2
+  items:
+    - icon: amazon-simple-storage-service-s3-batch-operations
+      title: S3 Batch Operations
+      title_lines: ["S3 Batch", "Operations"]
+      subs: ["RestoreObject für einen", "ganzen Jahrgang"]
+      w: 200
+    - icon: amazon-simple-storage-service-s3-standard
+      title: Temporäre Kopie
+      subs: ["gültig laut RestoreDays,", "beide Kopien kosten"]
+      w: 200
+
+legend_cols: 2
+legend:
+  - "1  Das ERP legt jede Rechnung unter dem Prefix invoices/ ab"
+  - "2  Ab Tag 30 verschiebt die Regel das Objekt nach S3 Standard-IA"
+  - "3  Ab Tag 365 geht es weiter in den S3 Glacier Deep Archive"
+  - "4  Tag 4015 beendet die Aufbewahrung, das Objekt wird gelöscht"
+  - "5  Die Betriebsprüfung fordert einen Jahrgang an, S3 Batch Operations beauftragt den Restore"
+  - "6  Nach 12 Stunden (Standard) oder 48 Stunden (Bulk) liegt die Kopie bereit, der Prüfer lädt daraus"
+  - "Ein Restore verschiebt nichts: Das Original bleibt in Deep Archive, die Kopie verfällt von selbst"
+  - "Kein Expedited-Tier bei Deep Archive — wer Minuten braucht, nimmt Glacier Flexible Retrieval"

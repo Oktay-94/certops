@@ -1,0 +1,92 @@
+id: card-090
+template: fanout
+title: "Szenario 90 · Well-Architected Review"
+subtitle: >-
+  Ein wiederholter Bewertungsvorgang mit Milestones — die Fragen der sechs Säulen
+  erzeugen Risiken, aus den Risiken wird der Improvement Plan
+lane_note: "drei von sechs Säulen — jede läuft denselben Weg"
+region: "Region eu-central-1 · der Workload kann mehrere Accounts umfassen"
+
+outside:
+  icon: a-w-s-account
+  title: Workload
+  subs: ["Ressourcen und Code", "mit Geschäftswert"]
+
+producer:
+  icon: a-w-s-well-architected-tool
+  title: Well-Architected Tool
+  subs: ["Lens wählen, Fragen", "ehrlich beantworten"]
+
+store:
+  icon: documents
+  title: Milestone
+  subs: ["hält den Zustand zum", "Zeitpunkt fest"]
+
+hub:
+  icon: question
+  title: Sechs Säulen
+  subs: ["Operational Excellence,", "Security, Reliability,", "Performance Efficiency,", "Cost, Sustainability"]
+
+aside:
+  icon: a-w-s-well-architected-tool
+  title: Weitere Lenses
+  subs: ["Standard ist die", "Framework Lens"]
+
+lanes:
+  - queue:
+      icon: question
+      title: Säule Reliability
+      subs: ["Fragen zu Ausfall", "und Wiederanlauf"]
+    worker:
+      icon: alert
+      title: Risikobefunde
+      subs: ["High und Medium", "Risk Issues"]
+    target:
+      icon: folders
+      title: Improvement Plan
+      subs: ["Maßnahmen je Risiko,", "vom Tool erzeugt"]
+
+  - queue:
+      icon: question
+      title: Säule Security
+      subs: ["Fragen zu Identität", "und Datenschutz"]
+    worker:
+      icon: alert
+      title: Risikobefunde
+      subs: ["High und Medium", "Risk Issues"]
+    target:
+      icon: folders
+      title: Improvement Plan
+      subs: ["Maßnahmen je Risiko,", "vom Tool erzeugt"]
+
+  - queue:
+      icon: question
+      title: Säule Cost Optimization
+      subs: ["Fragen zu Kaufoption", "und Auslastung"]
+    worker:
+      icon: alert
+      title: Risikobefunde
+      subs: ["High und Medium", "Risk Issues"]
+    target:
+      icon: folders
+      title: Improvement Plan
+      subs: ["Maßnahmen je Risiko,", "vom Tool erzeugt"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "Ein einziges Review vor dem Go-Live: Ohne zweiten Milestone gibt es"
+    - "keinen Vergleichspunkt. Der Review wird zur Ablage statt zum"
+    - "Regelkreis — niemand sieht, ob die Risiken kleiner werden."
+
+legend:
+  - "1  Der Workload ist der Zuschnitt: Ressourcen und Code, die Geschäftswert liefern"
+  - "2  Ein Milestone hält den Zustand des Workloads zu einem Zeitpunkt fest"
+  - "3  Im Tool wird die Lens gewählt und der Fragenkatalog beantwortet"
+  - "4  Die Fragen der Säule Reliability"
+  - "5  die Fragen der Säule Security"
+  - "6  und die Fragen der Säule Cost Optimization"
+  - "7  Aus den Antworten leitet das Tool High und Medium Risk Issues ab"
+  - "8  Zu jedem Risiko entsteht ein Eintrag im Improvement Plan"
+  - "Nach jeder Verbesserung ein neuer Milestone — erst das misst Fortschritt"
+  - "Ein HRI ist eine Entwurfsentscheidung mit Schadenspotenzial, kein Incident"

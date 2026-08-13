@@ -1,0 +1,72 @@
+id: card-052
+template: kette
+title: "Szenario 52 · Amazon Data Firehose, S3 und Athena"
+subtitle: >-
+  Logs aus 40 Microservices ohne eine Zeile Anwendungscode in den Data Lake liefern —
+  und die Abfrage darauf so anlegen, dass sie nicht den ganzen Bucket liest
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: servers
+  title: Microservices
+  subs: ["40 Stueck, keine", "Data Engineers"]
+
+chain:
+  - icon: amazon-data-firehose
+    title: Amazon Data Firehose
+    title_lines: ["Amazon Data", "Firehose"]
+    subs: ["Direct PUT, kein Consumer", "Format Conversion nach Parquet", "Dynamic Partitioning", "Puffer: Groesse ODER Zeit"]
+    hero: true
+    border: accent
+    w: 235
+    in: [cloud, region]
+
+  - icon: s3
+    title: Amazon S3
+    subs: ["Parquet unter", "region=/dt="]
+    w: 200
+    in: [cloud, region]
+
+  - icon: athena
+    title: Amazon Athena
+    subs: ["Standard-SQL, kein Cluster", "je gescanntem Volumen"]
+    ssize: 10
+    w: 230
+    in: [cloud, region]
+    note: {text: "liest nur die passenden Praefixe", color: ok}
+
+  - icon: users
+    title: Betriebsabteilung
+    subs: ["fragt selbst,", "ohne Data Engineer"]
+    w: 200
+    in: []
+
+branch:
+  from: 2
+  items:
+    - icon: a-w-s-glue-data-catalog
+      title: AWS Glue Data Catalog
+      title_lines: ["AWS Glue", "Data Catalog"]
+      subs: ["Register: Tabelle,", "Spalten, Partitionen"]
+      w: 230
+
+legend_cols: 2
+legend:
+  - "1  Die 40 Microservices schreiben per Direct PUT in Firehose"
+  - "2  Firehose wandelt nach Parquet und legt region=/dt= an"
+  - "3  Athena oeffnet nur die Praefixe, die zur Abfrage passen"
+  - "4  Die Betriebsabteilung fragt selbst per Standard-SQL"
+  - "5  Vor dem Scan holt Athena die Tabellendefinition beim Katalog"
+  - "Verworfen: ein eigener Consumer auf EC2 — niemand betreibt ihn"
+  - "Firehose liefert ab, Data Streams puffern zum Abholen (Karte 51)"

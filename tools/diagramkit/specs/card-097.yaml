@@ -1,0 +1,94 @@
+id: card-097
+template: fanout
+title: "Szenario 97 · Millionen Einmal-Timer"
+subtitle: >-
+  Jeder Kunde bekommt seine Erinnerung zu seinem eigenen Zeitpunkt — ohne
+  Timer-Tabelle und ohne Poller, der jede Minute nachsieht
+region: "Region eu-central-1 (Frankfurt)"
+lane_note: "jeder Termin ein eigener Schedule"
+
+outside:
+  icon: users
+  title: Kundschaft
+  subs: ["bucht zu ganz", "eigenen Zeiten"]
+
+producer:
+  icon: app
+  title: Buchungsdienst
+  subs: ["legt beim Buchen", "einen Schedule an"]
+
+store:
+  icon: amazon-cloud-watch-event-time-based
+  title: Zielzeit und Zeitzone
+  title_lines: ["Zielzeit und", "Zeitzone"]
+  subs: ["Sommerzeit rechnet", "der Dienst selbst um"]
+
+hub:
+  icon: amazon-event-bridge-scheduler
+  title: Scheduler
+  subs: ["EventBridge Scheduler", "hält jeden Termin einzeln", "ein Ziel je Schedule", "", "10 Mio je Region, erhöhbar"]
+
+aside:
+  icon: amazon-event-bridge-scheduler
+  title: ActionAfterCompletion
+  subs: ["löscht erledigte Schedules", "sonst läuft die Quota voll"]
+
+lanes:
+  - queue:
+      icon: amazon-cloud-watch-event-time-based
+      title: "One-time-Schedule"
+      subs: ["3. Mai, 9:00 Uhr", "Europe/Berlin"]
+    worker:
+      icon: lambda
+      title: AWS Lambda
+      subs: ["holt die Kundendaten", "und formuliert"]
+    target:
+      icon: sns
+      title: Amazon SNS
+      subs: ["stellt zu, Kanäle", "bleiben austauschbar"]
+
+  - queue:
+      icon: amazon-cloud-watch-event-time-based
+      title: "One-time-Schedule"
+      subs: ["7. Juni, 14:30 Uhr", "eigener Termin"]
+      accent: true
+    worker:
+      icon: lambda
+      title: AWS Lambda
+      subs: ["derselbe Code,", "anderer Auslöser"]
+    target:
+      icon: sns
+      title: Amazon SNS
+      subs: ["dieselbe Zustellung", "wie in jeder Bahn"]
+
+  - queue:
+      icon: amazon-cloud-watch-event-time-based
+      title: "One-time-Schedule"
+      subs: ["1. August, 8:00 Uhr", "kein gemeinsamer Takt"]
+    worker:
+      icon: lambda
+      title: AWS Lambda
+      subs: ["Skalierung ist", "Sache des Dienstes"]
+    target:
+      icon: sns
+      title: Amazon SNS
+      subs: ["ein Ziel je Schedule,", "Auffächern erst hier"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "EventBridge Rules mit schedule sind der ältere Weg: an einen"
+    - "Event Bus gebunden, 300 je Bus voreingestellt, und ohne"
+    - "Einmal-Auslösung zu einem festen Zeitpunkt."
+    - "SQS Delay Queues reichen nur 15 Minuten weit."
+
+legend:
+  - "1  Die Kundschaft bucht zu einem beliebigen Zeitpunkt"
+  - "2  Zielzeit und Zeitzone stehen im Schedule selbst"
+  - "3  Je Buchung entsteht genau ein One-time-Schedule"
+  - "4  Der erste Termin wartet auf den 3. Mai"
+  - "5  Der zweite auf den 7. Juni — ohne gemeinsamen Takt"
+  - "6  Der dritte auf den 1. August, und so Millionen weitere"
+  - "7  Zur Zielzeit ruft Scheduler sein einziges Ziel auf"
+  - "8  Der Versand bleibt ein eigener Schritt"
+  - "Wer mehrere Ziele braucht, fächert bei SNS oder Step Functions auf"

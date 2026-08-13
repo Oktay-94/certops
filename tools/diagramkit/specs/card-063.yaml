@@ -1,0 +1,74 @@
+id: card-063
+template: kette
+title: "Szenario 63 · Support-Tickets nach Stimmung und Thema"
+subtitle: >-
+  Stimmung braucht kein Modell, firmeneigene Themen brauchen eins — und Topic Modeling
+  entdeckt Themen, statt in vorgegebene Klassen einzusortieren
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: documents
+  title: Support-Ticket
+  subs: ["Freitext, täglich", "tausende"]
+
+chain:
+  - icon: apigateway
+    title: Amazon API Gateway
+    subs: ["nimmt ein einzelnes", "Ticket entgegen"]
+    w: 190
+    in: [cloud, region]
+
+  - icon: lambda
+    title: AWS Lambda
+    subs: ["ruft beide Operationen", "nacheinander auf"]
+    w: 190
+    in: [cloud, region]
+
+  - icon: comprehend
+    title: DetectSentiment
+    subs: ["vortrainiert, kein Modell", "POSITIVE bis MIXED"]
+    w: 190
+    in: [cloud, region]
+
+  - icon: comprehend
+    title: ClassifyDocument
+    subs: ["firmeneigene Klassen", "am Custom-Endpoint"]
+    w: 190
+    in: [cloud, region]
+    note: {text: "Endpoint kostet im Stand", bold: true}
+
+  - icon: dynamodb
+    title: Amazon DynamoDB
+    subs: ["ein Ticket, zwei Werte:", "Stimmung und Thema"]
+    w: 190
+    in: [cloud, region]
+
+branch:
+  from: 1
+  items:
+    - icon: comprehend
+      title: Topic Modeling
+      subs: ["entdeckt Themen selbst", "verworfen: falsches Werkzeug"]
+      w: 200
+
+legend_cols: 2
+legend:
+  - "1  Das Ticket kommt als Freitext über API Gateway herein"
+  - "2  Lambda übernimmt den Text und ruft Comprehend zweimal auf"
+  - "3  DetectSentiment liefert die Stimmung ohne jedes Training"
+  - "4  ClassifyDocument sortiert in die firmeneigenen Klassen ein"
+  - "5  Beide Ergebnisse landen als Attribute am selben Ticket"
+  - "6  Verworfen: Topic Modeling entdeckt Themen, statt einzusortieren"
+  - "Wer die Kategorien schon kennt, braucht nie Topic Modeling"
+  - "Für neue Accounts ist es seit dem 30.04.2026 ohnehin geschlossen"

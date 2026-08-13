@@ -1,0 +1,82 @@
+id: card-083
+template: vorher_nachher
+title: "Szenario 83 · Pilot Light oder Warm Standby"
+subtitle: >-
+  Beide replizieren die Daten — der Unterschied ist, ob die DR-Region ohne
+  zusätzlichen Schritt schon Anfragen beantworten kann
+
+base:
+  region: "DR-Region us-west-2 (Oregon)"
+  vpc_label: VPC
+  subnet_label: "Privates Subnetz der DR-Region"
+  forward: "Nach dem Ausfall der Primärregion kommen die Anfragen hier an"
+  left:
+    icon: users
+    title: Kundschaft
+    subs: ["fragt nach dem Ausfall", "der Primärregion an"]
+  inner:
+    icon: rds
+    title: Amazon RDS
+    subs: ["repliziert dauerhaft —", "die Daten sind da"]
+
+panels:
+  - state: broken
+    headline: "Pilot Light — Kern-Infrastruktur steht, kein Compute: RPO in Minuten, RTO in Zehnerminuten"
+    back: "keine laufende Instanz — die Region kann nicht antworten"
+    extras:
+      - icon: elastic-load-balancing
+        title: Elastic Load Balancing
+        subs: ["ist da, hat aber", "kein gesundes Ziel"]
+        w: 180
+        accent: fail
+        badge: true
+      - icon: amazon-e-c2-auto-scaling
+        title: EC2 Auto Scaling
+        subs: ["Kapazität steht auf null,", "keine Instanz läuft"]
+        w: 180
+        accent: fail
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt"
+        - "laufendes Compute"
+        - "erst einschalten, dann hochskalieren"
+
+  - state: fixed
+    headline: "Warm Standby — verkleinert, aber voll funktionsfähig: RPO in Sekunden, RTO in Minuten"
+    back: "die verkleinerte Kopie antwortet sofort"
+    extras:
+      - icon: elastic-load-balancing
+        title: Elastic Load Balancing
+        subs: ["verteilt sofort, nur", "auf weniger Ziele"]
+        w: 180
+        accent: ok
+        badge: true
+      - icon: amazon-e-c2-auto-scaling
+        title: EC2 Auto Scaling
+        subs: ["läuft verkleinert mit,", "im Ernstfall nur größer"]
+        w: 180
+        accent: ok
+        badge: true
+    insert:
+      kind: node
+      icon: a-w-s-elastic-disaster-recovery
+      title: AWS Elastic Disaster Recovery
+      subs: ["Pilot-Light-Kosten,", "Warm-Standby-Werte"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Die Anfrage erreicht die DR-Region — repliziert wird in beiden Mustern"
+  - "2  Pilot Light beantwortet sie nicht: es läuft nichts, was antworten könnte"
+  - "3  Der Load Balancer steht bereit, findet aber kein gesundes Ziel"
+  - "4  Die Auto Scaling Group steht auf null — Einschalten ist ein eigener Schritt"
+  - "5  Derselbe Weg, dieselben Daten, dieselbe Replikation"
+  - "6  Warm Standby antwortet sofort, nur mit weniger Kapazität"
+  - "7  Der Load Balancer verteilt auf laufende, kleinere Ziele"
+  - "8  Im Ernstfall wird nur noch hochskaliert, nicht erst eingeschaltet"
+  - "Links dieser Skala liegt Backup & Restore (RTO bis 24 h), rechts Active/Active (RTO nahe null)"
+  - "Nie strenger wählen als die Vorgabe verlangt — Active/Active ist die komplexeste Strategie"
+  - "AWS Elastic Disaster Recovery: Warm-Standby-Werte zu Pilot-Light-Kosten, dauerhaft läuft nur die Replikation"

@@ -1,0 +1,82 @@
+id: card-053
+template: kette
+title: "Szenario 53 · Ad-hoc-SQL auf dem Data Lake ohne Cluster"
+subtitle: >-
+  40.000 Partitionen machen schon die Partitionsverwaltung zum Engpass — und dieselbe
+  Standardauswertung laeuft jeden Morgen fuenfmal identisch
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: user
+  title: Analyst
+  subs: ["stellt Standard-SQL,", "sporadisch"]
+
+chain:
+  - icon: athena
+    title: Amazon Athena
+    subs: ["serverless, schema-on-read", "nichts laeuft zwischen zwei Abfragen", "abgerechnet je gescanntem Volumen"]
+    hero: true
+    border: "#7A3FE0"
+    fill: "#F5F0FD"
+    w: 280
+    in: [cloud, region]
+
+  - icon: s3
+    title: Amazon S3
+    subs: ["Parquet, partitioniert", "nach jahr=/monat=/tag="]
+    ssize: 10
+    w: 230
+    in: [cloud, region]
+
+  - icon: documents
+    title: Ergebnis
+    subs: ["geht an den Analysten"]
+    w: 220
+    in: [cloud, region]
+    note: {text: "Partition spart Zeilen, Parquet spart Spalten", bold: true, color: ok}
+
+branch:
+  from: 0
+  items:
+    - icon: a-w-s-glue-data-catalog
+      title: AWS Glue Data Catalog
+      title_lines: ["AWS Glue", "Data Catalog"]
+      subs: ["GetPartitions bei 40.000", "Partitionen ist der Engpass"]
+      ssize: 10
+      w: 240
+
+crossband:
+  heading: "Querschnitt: vier Hebel auf das gescannte Volumen — und damit auf die Rechnung"
+  items:
+    - icon: amazon-simple-storage-service-bucket
+      title: Partitionierung
+      subs: ["spart Zeilen: nur der", "Tagesordner wird geoeffnet"]
+    - icon: documents
+      title: Parquet
+      subs: ["spart Spalten: nur die", "gefragten Felder"]
+    - icon: gear
+      title: Partition Projection
+      subs: ["spart den Katalog-Lookup", "Katalog-Partitionen: ignoriert"]
+    - icon: athena
+      title: Query Result Reuse
+      subs: ["spart den Scan ganz", "opt-in, exakt gleicher Text"]
+
+legend_cols: 2
+legend:
+  - "1  Der Analyst schickt Standard-SQL an Athena"
+  - "2  Athena oeffnet nur die Praefixe, die zur Abfrage passen"
+  - "3  Das Ergebnis geht zurueck — bezahlt wird das gescannte Volumen"
+  - "4  Ohne Projection ruft Athena erst GetPartitions bei Glue ab"
+  - "Mit Projection entfaellt Schritt 4 — Athena rechnet die Partitionen selbst"
+  - "Verworfen: ein Redshift-Cluster kostet auch, wenn niemand fragt"

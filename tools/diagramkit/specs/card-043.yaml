@@ -1,0 +1,75 @@
+id: card-043
+template: kette
+title: "Battle Card 43 · Envelope Encryption mit KMS und SSE-KMS"
+subtitle: >-
+  Patientenakten in S3 mit eigenem Schlüssel, nachweisbarer Rotation und einem
+  Audit-Eintrag je Zugriff — KMS sieht dabei die Akte selbst nie
+
+frames:
+  - key: cloud
+    label: "AWS Cloud"
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: app
+  w: 180
+  title: Anwendung
+  subs: ["lädt Akten hoch,", "8 MB je Datei"]
+
+chain:
+  - icon: s3
+    title: Amazon S3
+    subs: ["nimmt PutObject an und", "verschlüsselt serverseitig"]
+    w: 220
+    in: [cloud, region]
+  - icon: kms
+    title: AWS KMS
+    subs: ["Customer Managed Key,", "verlässt das HSM nie"]
+    w: 220
+    in: [cloud, region]
+    hero: true
+  - icon: a-w-s-identity-access-management-permissions
+    title: Key Policy
+    subs: ["ohne Eintrag hier hilft", "keine IAM Policy weiter"]
+    w: 220
+    in: [cloud, region]
+  - icon: a-w-s-identity-access-management-data-encryption-key
+    title: Data Key
+    subs: ["Klartextfassung und", "verschlüsselte Fassung"]
+    w: 220
+    in: [cloud, region]
+  - icon: cloudtrail
+    title: AWS CloudTrail
+    subs: ["Aufrufer, Zeitpunkt und", "Schlüssel-ARN je Aufruf"]
+    w: 220
+    in: [cloud, region]
+
+crossband:
+  heading: "Der Kostenhebel, die schwächere Variante und der Weg an der Größengrenze"
+  items:
+    - icon: s3-bucket
+      title: S3 Bucket Key
+      subs: ["ein Schlüssel je Bucket statt", "je Objekt, nicht ab Werk aktiv"]
+    - icon: s3
+      title: SSE-S3
+      subs: ["S3 verwaltet den Schlüssel selbst", "kein Audit-Eintrag je Zugriff"]
+    - icon: kms
+      title: "kms:Encrypt direkt"
+      subs: ["verworfen: nimmt höchstens", "4.096 Bytes entgegen"]
+
+legend_cols: 2
+legend:
+  - "1  Die Anwendung setzt PutObject ab und kennt keinen Schlüssel"
+  - "2  S3 fordert bei KMS einen frischen Data Key an"
+  - "3  Die Key Policy entscheidet, wer den Schlüssel benutzen darf"
+  - "4  KMS liefert den Data Key in beiden Fassungen zurück"
+  - "5  Jeder Schlüssel-Aufruf erscheint als Eintrag in CloudTrail"
+  - "Die Akte selbst wird nie an KMS geschickt — nur der Data Key wird eingepackt"
+  - "Der Lesepfad läuft spiegelbildlich und erzeugt den Decrypt-Eintrag"

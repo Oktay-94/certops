@@ -1,104 +1,67 @@
 id: card-005
-template: fanout
-title: "Szenario 5 · Fan-out an mehrere Verarbeitungspfade"
+template: kette
+title: "Karte 5 · AWS App Runner und ECR"
 subtitle: >-
-  Eine Bestellung, drei unabhängige Empfänger: entkoppelt über SNS und SQS,
-  mit Auffangbecken für Fehlschläge und garantierter Reihenfolge für die Buchhaltung
-lane_note: "drei unabhängige Bahnen — jede in eigenem Tempo"
+  Image rein, HTTPS-URL raus: die höchste Abstraktionsebene für Container auf AWS —
+  und der Hinweis, warum ein Neubau heute trotzdem woanders landet
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
 
 outside:
-  icon: users
-  title: Kundschaft
-  subs: ["schließt eine", "Bestellung ab"]
+  icon: user
+  title: Kleines Team
+  subs: ["schiebt das fertige", "Container-Image"]
+  w: 170
 
-producer:
-  icon: lambda
-  title: Bestell-Dienst
-  subs: ["nimmt die", "Bestellung an"]
+chain:
+  - icon: amazon-elastic-container-registry
+    title: Amazon ECR
+    subs: ["privates Image-Registry,", "Quelle des Service"]
+    w: 200
+    in: [cloud, region]
 
-store:
-  icon: dynamodb
-  title: Amazon DynamoDB
-  subs: ["Bestellung wird", "gespeichert"]
+  - icon: a-w-s-app-runner
+    title: AWS App Runner
+    subs:
+      - "Load Balancing, TLS, Scaling"
+      - "und Deploys — alles intern"
+      - ""
+      - "Maintenance Mode: ab 30.04.2026"
+      - "keine Neukunden mehr"
+    hero: true
+    w: 260
+    in: [cloud, region]
 
-hub:
-  icon: sns
-  title: SNS FIFO Topic
-  subs: ["eine Nachricht,", "drei Empfänger", "", "Reihenfolge bleibt erhalten"]
+  - icon: users
+    title: Nutzer
+    subs: ["erreichen den Dienst über", "die fertige HTTPS-URL"]
+    w: 200
+    in: []
 
-aside:
-  icon: cloudwatch
-  title: Amazon CloudWatch
-  subs: ["Alarm, wenn eine", "Warteschlange volläuft"]
+branch:
+  from: 1
+  items:
+    - icon: ecs
+      title: Amazon ECS Express Mode
+      title_lines: ["Amazon ECS", "Express Mode"]
+      subs: ["Migrationspfad ab 2026,", "gleiche Einfachheit"]
+      w: 200
 
-lanes:
-  - queue:
-      icon: sqs
-      title: "Lager · SQS Standard"
-      subs: ["puffert, verarbeitet", "im eigenen Tempo"]
-    dlq:
-      icon: sqs-queue
-      title: Dead-Letter-Queue
-      subs: ["fängt Fehlschläge auf"]
-    worker:
-      icon: lambda
-      title: Lager-Funktion
-      subs: ["bucht den", "Bestand ab"]
-    target:
-      icon: dynamodb
-      title: Lagerbestand
-      subs: ["in DynamoDB", "aktualisiert"]
-
-  - queue:
-      icon: sqs
-      title: "E-Mail · SQS Standard"
-      subs: ["Reihenfolge egal,", "Hauptsache zugestellt"]
-    dlq:
-      icon: sqs-queue
-      title: Dead-Letter-Queue
-      subs: ["fängt Fehlschläge auf"]
-    worker:
-      icon: lambda
-      title: E-Mail-Funktion
-      subs: ["versendet die", "Bestätigung"]
-    target:
-      icon: users
-      title: Kundschaft
-      subs: ["bekommt die", "Bestätigung"]
-
-  - queue:
-      icon: sqs
-      title: "Buchhaltung · SQS FIFO"
-      subs: ["exakte Reihenfolge,", "genau einmal"]
-      accent: true
-    dlq:
-      icon: sqs-queue
-      title: Dead-Letter-Queue
-      subs: ["fängt Fehlschläge auf"]
-    worker:
-      icon: lambda
-      title: Buchhaltung
-      subs: ["bucht in exakter", "Reihenfolge"]
-    target:
-      icon: app
-      title: Buchhaltungssystem
-      subs: ["erhält alles in", "der richtigen Folge"]
-
-callout:
-  headline: Fallstrick
-  lines:
-    - "Ein SNS-FIFO-Topic kann beide Warteschlangen-Typen bedienen."
-    - "Umgekehrt geht es nicht: Eine FIFO-Warteschlange lässt sich"
-    - "nicht an ein Standard-Topic hängen, AWS lehnt das ab."
-
+legend_cols: 2
 legend:
-  - "1  Die Kundschaft schließt die Bestellung ab"
-  - "2  Der Bestell-Dienst speichert sie in DynamoDB"
-  - "3  Danach veröffentlicht er genau eine Nachricht"
-  - "4  Das Topic verteilt sie an die Lager-Bahn"
-  - "5  gleichzeitig an die E-Mail-Bahn"
-  - "6  und gleichzeitig an die Buchhaltungs-Bahn"
-  - "7  Jede Bahn holt sich ihre Nachricht selbst ab"
-  - "8  und arbeitet sie im eigenen Tempo ab"
-  - "9  Was mehrfach scheitert, landet in der Dead-Letter-Queue"
-  - "Die Schritte 7 bis 9 laufen in allen drei Bahnen gleich ab"
+  - "1  Das Team schiebt das fertige Image nach ECR"
+  - "2  App Runner baut daraus einen Service — ohne Cluster, ohne Task-Definition"
+  - "3  Nutzer erreichen den Dienst über die fertige awsapprunner.com-URL"
+  - "4  Bei einem Neubau heute führt der Weg zu ECS Express Mode"
+  - "App Runner ist im Kern ein dünner Wrapper um ECS Fargate"
+  - "Bestandskunden nutzen App Runner weiter, es kommen aber keine Features mehr"

@@ -1,0 +1,99 @@
+id: card-036
+template: fanout
+title: "Karte 36 · Route 53 Routing Policies"
+subtitle: >-
+  Vier Ebenen in einer DNS-Antwort — Geolocation ist eine Regel, Latency ist
+  eine Messung, und die Regel liegt außen
+
+region: "Region eu-central-1 (Frankfurt) und eu-west-1 (Dublin)"
+lane_note: "Bahn 1 und 2 sind Weighted unter Frankfurt, Bahn 3 ist der Latency-Nachbar Dublin"
+
+outside:
+  icon: users
+  title: Client in München
+  subs: ["fragt app.vermeer.eu", "einmal auf"]
+
+producer:
+  icon: route53
+  title: Amazon Route 53
+  subs: ["Geolocation: EU bleibt", "EU, NA nach us-east-1"]
+
+store:
+  icon: s3
+  title: Amazon S3
+  subs: ["Wartungsseite in der EU", "nur wenn beide EU aus"]
+
+hub:
+  icon: route53
+  title: Latency-Records
+  fill: "#F3EEFC"
+  border: "#8C4FFF"
+  subs: ["Ebene 3 der Kaskade", "misst Netz-Latenz", "je Record ein eigener", "Health Check"]
+
+aside:
+  icon: amazon-route53-hosted-zone
+  title: Hosted Zone
+  subs: ["alle vier Ebenen liegen", "in derselben Hosted Zone"]
+
+lanes:
+  - queue:
+      icon: route53
+      title: "Weighted · Gewicht 90"
+      subs: ["Frankfurt, Version 4.2", "TTL 60 Sekunden"]
+    worker:
+      icon: alb
+      title: Application Load Balancer
+      title_lines: ["Application", "Load Balancer"]
+      subs: ["Produktionsstand"]
+    target:
+      icon: ec2
+      title: Amazon EC2
+      subs: ["bedient 90 % der", "EU-Nutzer"]
+
+  - queue:
+      icon: route53
+      title: "Weighted · Gewicht 10"
+      subs: ["Frankfurt, Canary 4.3", "Gewicht 0 wirkt erst nach TTL"]
+      accent: true
+    worker:
+      icon: alb
+      title: Application Load Balancer
+      title_lines: ["Application", "Load Balancer"]
+      subs: ["Canary-Deployment"]
+    target:
+      icon: ec2
+      title: Amazon EC2
+      subs: ["bedient 10 % der", "EU-Nutzer"]
+
+  - queue:
+      icon: route53
+      title: "Latency · eu-west-1"
+      subs: ["Dublin, eigener", "Health Check"]
+    worker:
+      icon: alb
+      title: Application Load Balancer
+      title_lines: ["Application", "Load Balancer"]
+      subs: ["nur Version 4.2"]
+    target:
+      icon: ec2
+      title: Amazon EC2
+      subs: ["springt ein, wenn", "Frankfurt ausfällt"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "Geolocation ohne Default-Record ist ein stiller Totalausfall:"
+    - "Route 53 antwortet mit rcode NOERROR und leerer ANSWER-Sektion."
+    - "Kein Fehler, keine Adresse — die Anwendung wirkt tot."
+
+legend:
+  - "1  Ein Rechner in München fragt app.vermeer.eu — eine reine Namensauflösung"
+  - "2  Fallen beide EU-Regionen aus, greift die Wartungsseite in der EU"
+  - "3  Geolocation gibt den EU-Baum frei, dann misst Latency innerhalb der Grenze"
+  - "4  Für München gewinnt in aller Regel Frankfurt, Version 4.2 mit Gewicht 90"
+  - "5  Zehn Prozent gehen an den Canary 4.3 — ebenfalls Frankfurt"
+  - "6  Fällt Frankfurt allein aus, antwortet diese Ebene mit Dublin"
+  - "7  Der gewählte Record zeigt als Alias auf ein Application Load Balancer"
+  - "8  Der Load Balancer verteilt auf die Instanzen der jeweiligen Version"
+  - "Die Schritte 7 und 8 laufen in allen drei Bahnen gleich ab"
+  - "Failover nach us-east-1 bräche die Datenresidenz — der Secondary bleibt in EU"

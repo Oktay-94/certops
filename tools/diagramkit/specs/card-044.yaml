@@ -1,0 +1,77 @@
+id: card-044
+template: vorher_nachher
+title: "Battle Card 44 · Secrets Manager gegen Parameter Store"
+subtitle: >-
+  Warum 3.000 Konfigurationswerte im Secrets Manager Geld kosten, das sie nicht
+  einbringen — und wo der Trennstrich tatsächlich verläuft
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: "AWS-Konto des Versicherers"
+  subnet_label: "Ablage der Werte"
+  forward: "Zugangsdaten und Konfiguration am selben Ort"
+  left:
+    icon: app
+    title: 40 Microservices
+    subs: ["lesen immer AWSCURRENT,", "nie eine Versionsnummer"]
+  inner:
+    icon: secretsmanager
+    title: AWS Secrets Manager
+    title_lines: ["AWS", "Secrets Manager"]
+    subs: ["rotiert von sich aus,", "je Secret berechnet"]
+
+panels:
+  - state: broken
+    headline: "Vorher — alles im Secrets Manager, auch was nie rotiert"
+    back: "teuer: 3.000 Werte ohne Lebenszyklus zahlen mit"
+    extras:
+      - icon: documents
+        title: 3.000 Konfigurationswerte
+        title_lines: ["3.000 Konfigurations-", "werte"]
+        subs: ["Feature-Flags, URLs,", "Timeouts — nie rotiert"]
+        w: 180
+        accent: fail
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt der"
+        - "Parameter Store"
+        - "Werte ohne Lebenszyklus zahlen mit"
+
+  - state: fixed
+    headline: "Nachher — getrennt nach Lebenszyklus, nicht nach Vertraulichkeit"
+    back: "rotiert, wo nötig — sonst ohne Aufpreis"
+    extras:
+      - icon: lambda
+        title: Rotation Lambda
+        subs: ["vier Schritte, setSecret", "schreibt in die RDS-Instanz"]
+        ssize: 10
+        w: 180
+        accent: ok
+        badge: true
+      - icon: a-w-s-systems-manager-parameter-store
+        title: Parameter Store
+        subs: ["3.000 Werte im Standard Tier", "SecureString über KMS"]
+        ssize: 10
+        w: 180
+        accent: ok
+        badge: true
+    insert:
+      kind: node
+      icon: kms
+      title: AWS KMS
+      subs: ["verschlüsselt beide Dienste", "Verschlüsselung ist kein Argument"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Die Services holen Zugangsdaten und Konfigurationswerte am selben Ort"
+  - "2  Beides wird je Secret und Monat berechnet, auch was nie rotiert"
+  - "3  Die 3.000 Werte ändern sich selten und brauchen keinen Lebenszyklus"
+  - "4  Nach der Trennung fragen dieselben Services dieselben Werte ab"
+  - "5  Rotation dort, wo sie gebraucht wird — der Rest kostet nichts extra"
+  - "6  Die Rotation läuft in vier Schritten, testSecret entscheidet über AWSCURRENT"
+  - "7  Konfiguration liegt als SecureString im Standard Tier"
+  - "Standard zu Advanced geht jederzeit, Advanced zurück zu Standard nie"

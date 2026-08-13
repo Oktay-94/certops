@@ -1,0 +1,67 @@
+id: card-074
+template: hybrid
+title: "Szenario 74 · Migration Hub und Application Discovery Service"
+subtitle: >-
+  Erst erfassen, dann in Wellen migrieren: der Agent sieht tief, der Agentless
+  Collector sieht breit — beide Ströme landen in der Home Region
+
+region: "Home Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum vor Ort
+  nodes:
+    - icon: servers
+      title: Server
+      subs: ["Prozesse, Netz,", "Performance"]
+    - icon: app
+      title: vCenter
+      subs: ["Hunderte VMs", "auf einen Schlag"]
+    - icon: database
+      title: Datenbanken
+      subs: ["Oracle, SQL Server,", "MySQL, Postgres"]
+
+bridge:
+  - icon: a-w-s-application-discovery-service-a-w-s-discovery-agent
+    title: Discovery Agent
+    subs: ["je Server installiert,", "sieht von innen"]
+    to_band: 0
+  - icon: a-w-s-application-discovery-service-a-w-s-agentless-collector
+    title: Agentless Collector
+    title_lines: ["Agentless", "Collector"]
+    subs: ["eine OVA in vCenter,", "kein Host-Agent"]
+    to_band: 0
+
+bands:
+  - label: "A · Erfassen und planen — der Hub migriert selbst nichts"
+    nodes:
+      - icon: a-w-s-application-discovery-service
+        title: AWS Application Discovery Service
+        title_lines: ["AWS Application", "Discovery Service"]
+        subs: ["nimmt beide Ströme an,", "nur in der Home Region"]
+      - icon: a-w-s-migration-hub
+        title: AWS Migration Hub
+        title_lines: ["AWS Migration", "Hub"]
+        subs: ["gruppiert Server zu", "Anwendungen und Wellen"]
+
+crossband:
+  heading: "Der Hub trackt nur den Status dieser Werkzeuge"
+  items:
+    - icon: a-w-s-application-migration-service
+      title: AWS Application Migration Service
+      title_lines: ["AWS Application", "Migration Service"]
+      subs: ["migriert ganze", "Server nach EC2"]
+    - icon: a-w-s-database-migration-service
+      title: AWS Database Migration Service
+      title_lines: ["AWS Database", "Migration Service"]
+      subs: ["migriert nur", "Datenbanken"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der Agent meldet Prozesse, Netzverbindungen und Performance je Server"
+  - "2  Der Agentless Collector meldet das breite VM- und DB-Inventar"
+  - "3  Aus den Daten entstehen Anwendungsgruppen und EC2-Empfehlungen"
+  - "Die Home Region ist zuerst zu setzen, sonst registriert sich kein Collector"
+  - "Dependency-Mapping braucht den Agent, schnelles Inventar den Collector"
+  - "Ohne Collector geht auch ein Datei-Import per CSV"

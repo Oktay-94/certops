@@ -1,0 +1,100 @@
+id: card-023
+template: kette
+title: "Szenario 23 · Dev/Test-Kapazität, die bis auf null atmet"
+subtitle: >-
+  14 Entwicklungsdatenbanken, alle 40 Minuten zwei Minuten Volllast und
+  sonst Leerlauf — Kapazität nach Bedarf statt rund um die Uhr
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: vpc
+    label: VPC
+    icon: grp-vpc
+    color: vpc
+  - key: subnet
+    label: Privates Subnetz
+    icon: grp-private-subnet
+    color: subnet-private
+
+outside:
+  icon: app
+  title: CI-Pipeline
+  subs: ["alle 40 Minuten,", "zwei Minuten Last"]
+  w: 160
+
+chain:
+  - icon: aurora
+    title: Amazon Aurora
+    subs: ["Cluster-Endpoint, gleicher", "Treiber wie bisher"]
+    w: 230
+    in: [cloud, region, vpc]
+
+  - icon: amazon-aurora-postgre-s-q-l-instance
+    title: Aurora Serverless v2
+    subs: ["Instanzklasse db.serverless", "atmet zwischen 0 und 256 ACU"]
+    hero: true
+    w: 270
+    in: [cloud, region, vpc, subnet]
+
+  - icon: databases
+    title: Aurora Cluster Volume
+    subs: ["6 Kopien über 3 AZs,", "wird immer berechnet"]
+    w: 240
+    in: [cloud, region, vpc]
+
+  - icon: cloudwatch
+    title: Amazon CloudWatch
+    subs: ["ACUUtilization zeigt,", "was die Kapazität tut"]
+    w: 210
+    in: [cloud, region]
+
+branch:
+  from: 1
+  items:
+    - icon: amazon-aurora-instance
+      title: Resume
+      subs: ["erste Verbindung weckt", "in etwa 15 Sekunden"]
+      w: 215
+    - icon: a-w-s-application-auto-scaling
+      title: Skalierung in-place
+      subs: ["0,5-ACU-Schritte, kein", "Verbindungsabbruch"]
+      w: 215
+    - icon: amazon-cloud-watch-event-time-based
+      title: Auto-Pause bei 0 ACU
+      subs: ["nach 300 s bis 86.400 s", "ohne Nutzerverbindung"]
+      w: 215
+      note: {text: "0 ACU gibt es erst seit November 2024", bold: true, color: ok}
+
+crossband:
+  heading: "Querschnitt: Diese drei halten die Instanz wach — dann pausiert sie nie"
+  items:
+    - icon: amazon-r-d-s-proxy-instance
+      title: Amazon RDS Proxy
+      subs: ["hält Verbindungen offen,", "die Pause bleibt aus"]
+    - icon: client
+      title: Offene Nutzerverbindung
+      title_lines: ["Offene", "Nutzerverbindung"]
+      subs: ["ein vergessener BI-Client", "zählt als Aktivität"]
+    - icon: database
+      title: Logische Replikation
+      subs: ["auch Binlog-Replikation", "hält die Instanz wach"]
+
+legend_cols: 3
+legend:
+  - "1  Der CI-Lauf verbindet sich wie gegen jede andere Aurora-DB"
+  - "2  Der Cluster-Endpoint führt auf die Instanzklasse db.serverless"
+  - "3  Die Rechenschicht arbeitet auf dem geteilten Cluster Volume"
+  - "4  An der ACU-Auslastung ist ablesbar, was die Kapazität tut"
+  - "5  Zwischen zwei Läufen durchläuft die Instanz drei Zustände"
+  - "6  Unter Last wächst die Kapazität in Sekunden, ohne Failover"
+  - "7  Bleibt es still, pausiert sie und die Compute-Abrechnung stoppt"
+  - "Der Storage atmet nicht mit — nur der Compute-Anteil fällt auf null"

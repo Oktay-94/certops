@@ -1,0 +1,69 @@
+id: card-064
+template: kette
+title: "Szenario 64 · Callcenter-Pipeline"
+subtitle: >-
+  Call Analytics bringt Sentiment und PII-Redaktion schon mit — Stream heißt Realtime,
+  Datei heißt Post-Call, und ein zweiter Dienst für die Stimmung wäre doppelte Arbeit
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: users
+  title: Anruf-Audio
+  subs: ["Stream oder Datei —", "das ist die Weiche"]
+  w: 165
+
+chain:
+  - icon: amazon-transcribe
+    title: Transcribe Call Analytics
+    title_lines: ["Transcribe", "Call Analytics"]
+    subs: ["Transkript, Sentiment,", "PII auch in der Audiodatei"]
+    w: 200
+    in: [cloud, region]
+
+  - icon: amazon-translate
+    title: Amazon Translate
+    subs: ["übersetzt für die QS,", "Custom Terminology"]
+    w: 200
+    in: [cloud, region]
+
+  - icon: amazon-polly
+    title: Amazon Polly
+    subs: ["spricht die Antwort,", "vier Engines zur Wahl"]
+    w: 200
+    in: [cloud, region]
+    note: {text: "lange Texte: asynchron"}
+
+  - icon: s3
+    title: Amazon S3
+    subs: ["Transkript und Audio", "liegen für die QS bereit"]
+    w: 200
+    in: [cloud, region]
+
+branch:
+  from: 0
+  items:
+    - icon: comprehend
+      title: Amazon Comprehend
+      subs: ["die Stimmung liegt schon vor", "verworfen: zweiter Dienst"]
+      w: 210
+
+legend_cols: 2
+legend:
+  - "1  Das Anruf-Audio geht an Transcribe Call Analytics"
+  - "2  Ein Dienst liefert Transkript, Sentiment und PII-Redaktion"
+  - "3  Translate übersetzt das Transkript für die Qualitätssicherung"
+  - "4  Polly spricht die Standardantwort, alles landet in S3"
+  - "5  Verworfen: Comprehend wäre ein überflüssiger zweiter Dienst"
+  - "Stream ergibt Realtime-Insights, eine Datei in S3 Post-Call-Insights"
+  - "Das Sentiment von Call Analytics ist nicht anpassbar"

@@ -1,0 +1,70 @@
+id: card-039
+template: hybrid
+title: "Karte 39 · Aurora Global Database"
+subtitle: >-
+  Switchover kostet Zeit, Failover kostet Daten — beide Wege enden mit einer
+  neuen Schreibregion, aber nur einer davon ohne Datenverlust
+
+region: "Aurora Global Database · Replikation auf der Storage-Ebene"
+
+bands:
+  - label: "A · Geplant — Quartalstest und Wartungsrotation"
+    hero_note: "Rollentausch ausführen"
+    nodes:
+      - icon: aurora
+        title: "Aurora eu-central-1"
+        subs: ["einzige Schreibregion", "Writer und Reader"]
+      - icon: a-w-s-backup-recovery-time-objective
+        title: Switchover
+        subs: ["wartet, bis alle Cluster", "aufgeholt haben"]
+      - icon: aurora
+        title: "Aurora us-east-1"
+        subs: ["wird Primary, RPO 0", "in etwa einer Minute"]
+
+  - label: "B · Ungeplant — die Primärregion ist nicht erreichbar"
+    hero_note: "Endpunkte nachziehen"
+    nodes:
+      - icon: aurora
+        title: "Aurora eu-central-1"
+        subs: ["ausgefallen, für den", "Rollentausch unerreichbar"]
+      - icon: a-w-s-backup-recovery-point-objective
+        title: Failover
+        subs: ["befördert ohne Aufholen", "was unterwegs war, ist weg"]
+      - icon: aurora
+        title: "Aurora us-east-1"
+        subs: ["wird Primary, RPO Sekunden", "RTO Minuten"]
+
+hero:
+  icon: amazon-application-recovery-controller
+  title: "Application Recovery Controller"
+  title_lines: ["Application", "Recovery Controller"]
+  subs: ["Beide Wege enden hier", "", "fertiger Ausführungsblock", "zieht Endpunkte und", "Connection-Strings nach"]
+
+crossband:
+  heading: "Vier Sätze, die Global Database von etwas anderem trennen"
+  items:
+    - icon: rds
+      title: "Nicht Multi-AZ"
+      subs: ["Multi-AZ schützt die AZ,", "Global Database die Region"]
+    - icon: router
+      title: "Write Forwarding"
+      subs: ["leitet an den Primary weiter", "und macht kein aktiv-aktiv"]
+    - icon: alert
+      title: "rds.global_db_rpo"
+      subs: ["zu eng gesetzt bremst es", "den Writer im Normalbetrieb"]
+    - icon: aurora
+      title: "Aurora DSQL"
+      subs: ["aktiv-aktiv relational —", "das ist Global Database nicht"]
+
+legend_cols: 3
+legend_heading: "Beide Wege Schritt für Schritt"
+legend:
+  - "1  Switchover wartet, bis alle Sekundärcluster aufgeholt haben"
+  - "2  Ergebnis: RPO 0, kein Datenverlust, in etwa einer Minute"
+  - "3  Der Ausführungsblock zieht Endpunkte und Connection-Strings nach"
+  - "4  Ist die Primärregion weg, bleibt nur Failover — Switchover bräuchte sie"
+  - "5  Der Sekundärcluster wird sofort befördert: was unterwegs war, ist verloren"
+  - "6  Auch hier müssen die Endpunkte folgen — sonst schreibt die App ins Leere"
+  - "Genau eine Schreibregion, eine Quelle der Wahrheit"
+  - "Sekundärregionen sind read-only und bedienen lokale Leser"
+  - "Wie viele Sekundärregionen? Service Quotas prüfen"

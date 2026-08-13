@@ -1,0 +1,92 @@
+id: card-095
+template: fanout
+title: "Szenario 95 · AppSync (GraphQL), DynamoDB"
+subtitle: >-
+  Ein Endpoint für ein Dutzend Ansichten: jede Query beschreibt ihre Felder selbst,
+  und eine Mutation erreicht alle angemeldeten Clients ohne Polling
+region: "Region eu-central-1 (Frankfurt)"
+lane_note: "drei Wege über denselben Endpoint"
+
+outside:
+  icon: users
+  title: Nutzer
+  subs: ["öffnet eine", "Ansicht"]
+
+producer:
+  icon: mobileclient
+  title: Mobile Client
+  subs: ["Query nennt genau", "die gebrauchten Felder"]
+
+store:
+  icon: cognito
+  title: Amazon Cognito
+  subs: ["User Pool prüft,", "wer fragen darf"]
+
+hub:
+  icon: a-w-s-app-sync
+  title: AWS AppSync
+  subs: ["ein GraphQL-Endpoint", "für alle Ansichten", "", "Resolver binden die Felder"]
+
+aside:
+  icon: a-w-s-app-sync
+  title: Konfliktauflösung
+  subs: ["Version je Item, serverseitig", "Offline-Store ist DataStore"]
+
+lanes:
+  - queue:
+      icon: app
+      title: Listenansicht
+      subs: ["fragt zwei Felder ab", "mehr braucht sie nicht"]
+    worker:
+      icon: a-w-s-app-sync
+      title: Resolver
+      subs: ["bildet die Felder", "auf die Quelle ab"]
+    target:
+      icon: dynamodb
+      title: Amazon DynamoDB
+      subs: ["eine Tabelle für", "alle Ansichten"]
+
+  - queue:
+      icon: app
+      title: Detailansicht
+      subs: ["fragt zwölf Felder ab", "ohne zweiten Endpoint"]
+      accent: true
+    worker:
+      icon: a-w-s-app-sync
+      title: Resolver
+      subs: ["mehrere Quellen in", "einer Query möglich"]
+    target:
+      icon: dynamodb
+      title: Amazon DynamoDB
+      subs: ["ein Roundtrip", "statt N"]
+
+  - queue:
+      icon: a-w-s-app-sync
+      title: Subscription
+      subs: ["eine Mutation über AppSync", "löst sie aus"]
+    worker:
+      icon: a-w-s-app-sync
+      title: WebSocket
+      subs: ["AppSync schiebt,", "niemand pollt"]
+    target:
+      icon: mobileclient
+      title: Weitere Clients
+      subs: ["sind sofort auf", "dem Stand"]
+
+callout:
+  headline: Fallstrick
+  lines:
+    - "Wer an AppSync vorbei direkt in die Tabelle schreibt, löst keine"
+    - "Subscription aus. Und „offline\" gehört nicht AppSync: der lokale"
+    - "Store ist Amplify DataStore, eine Client-Bibliothek."
+
+legend:
+  - "1  Der Nutzer öffnet eine Ansicht in der App"
+  - "2  Der Client weist sich aus — User Pool, IAM, API Key oder Lambda"
+  - "3  Eine einzige Anfrage geht an den einen Endpoint"
+  - "4  Die Listenansicht bekommt ihre zwei Felder"
+  - "5  Die Detailansicht ihre zwölf, über denselben Endpoint"
+  - "6  Eine Mutation löst die Subscription aus"
+  - "7  AppSync löst jede Bahn selbst auf und ruft die Quelle"
+  - "8  Am Ende steht genau das, was diese Bahn braucht"
+  - "Der Push kommt vom Dienst, nicht aus der Datenbank"

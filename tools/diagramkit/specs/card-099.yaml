@@ -1,0 +1,68 @@
+id: card-099
+template: kette
+title: "Szenario 99 · Echte Geräte statt Emulatoren"
+subtitle: >-
+  Tests laufen parallel auf echter Hardware aus der Pipeline heraus — und für einen
+  gemeldeten Fehler kommt ein einzelnes Gerät live in den Browser
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region us-west-2 (Oregon) — Device Farm gibt es nur hier"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: pool
+    label: "Gerätepool: öffentlich oder Private Devices"
+    color: band
+
+outside:
+  icon: app
+  title: CI-Pipeline
+  subs: ["lädt Anwendungs- und", "Testpaket hoch"]
+  w: 175
+
+chain:
+  - icon: a-w-s-device-farm
+    title: AWS Device Farm
+    subs: ["führt parallel aus,", "verwaltete Test-Hosts"]
+    w: 200
+    in: [cloud, region]
+  - icon: mobileclient
+    title: Echte Geräte
+    subs: ["quer über Hersteller,", "Größen und OS-Stände"]
+    w: 200
+    in: [cloud, region, pool]
+  - icon: documents
+    title: Testbericht
+    subs: ["Logs, Screenshots, Video", "je Gerät, laufend ergänzt"]
+    w: 205
+    in: [cloud, region]
+
+branch:
+  from: 0
+  items:
+    - icon: a-w-s-device-farm
+      title: Remote-Access-Sitzung
+      title_lines: ["Remote-Access-", "Sitzung"]
+      subs: ["ein echtes Gerät live", "im Browser, 150 Minuten"]
+      w: 210
+    - icon: users
+      title: Entwicklung
+      subs: ["stellt den Fehler nach —", "Haltepunkte über Appium"]
+      w: 210
+      note: {text: "Live-Video und Live-Logs", color: accent}
+
+legend_cols: 3
+legend:
+  - "1  Die Pipeline lädt Anwendungs- und Testpaket hoch"
+  - "2  Device Farm führt die Tests parallel auf dem Pool aus"
+  - "3  Je Gerät entstehen Logs, Screenshots, Video und Leistungsdaten"
+  - "4  Für einen gemeldeten Fehler wird ein Gerät live geschaltet"
+  - "5  Darauf lässt sich das Modell direkt bedienen und debuggen"
+  - "Emulatoren zeigen weder herstellerspezifisches Rendering noch echte Sensorik"
+  - "Private Devices bleiben einem Konto zugeordnet und behalten ihre Einstellungen"

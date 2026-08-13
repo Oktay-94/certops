@@ -1,0 +1,50 @@
+id: card-001
+template: kette
+title: "Karte 1 · API Gateway, Lambda und DynamoDB"
+subtitle: >-
+  TicketWave verkauft Konzert-Tickets: unvorhersehbarer Traffic, keine Server zu verwalten,
+  bezahlt wird nur, was tatsächlich genutzt wird — die Serverless-Standardantwort
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: users
+  title: Kundschaft
+  subs: ["kauft Tickets — 10 bis", "100.000 Requests/Minute"]
+  w: 170
+
+chain:
+  - icon: apigateway
+    title: Amazon API Gateway
+    subs: ["nimmt die REST-Aufrufe an,", "drosselt und leitet weiter"]
+    w: 200
+    in: [cloud, region]
+
+  - icon: lambda
+    title: AWS Lambda
+    subs: ["eine Umgebung je Request,", "skaliert mit dem Spike"]
+    w: 200
+    in: [cloud, region]
+
+  - icon: dynamodb
+    title: Amazon DynamoDB
+    subs: ["On-Demand Capacity Mode,", "keine RCU/WCU-Planung"]
+    w: 210
+    in: [cloud, region]
+
+legend_cols: 2
+legend:
+  - "1  Die App ruft die REST-API über HTTPS auf"
+  - "2  API Gateway übergibt den Request als Event an Lambda"
+  - "3  Die Funktion schreibt die Bestellung nach DynamoDB"
+  - "Die Antwort läuft denselben Weg zurück: Lambda, API Gateway, Client"

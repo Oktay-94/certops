@@ -1,0 +1,65 @@
+id: card-046
+template: ablauf
+title: "Battle Card 46 · Inspector und ECR Enhanced Scanning"
+subtitle: >-
+  Ein Scan beim Push findet nur, was heute schon bekannt ist — der eigentliche Fix
+  ist die erneute Bewertung bereits deployter Images
+region: "Region eu-central-1 (Frankfurt)"
+
+outside_top:
+  icon: a-w-s-code-pipeline
+  title: CI/CD-Pipeline
+  subs: ["Jenkins, TeamCity,", "GitHub Actions"]
+
+top:
+  - icon: amazon-inspector
+    title: Inspector-Plugin
+    subs: ["prüft vor dem Push,", "bricht den Build ab"]
+    w: 215
+  - icon: amazon-elastic-container-registry
+    title: Amazon ECR
+    subs: ["private Registry,", "Enhanced Scanning aktiv"]
+    w: 215
+  - icon: amazon-inspector
+    title: Amazon Inspector
+    subs: ["bewertet Images neu,", "sobald eine CVE erscheint"]
+    w: 215
+    note: {text: "auch lange nach dem Push", color: ok}
+  - icon: eventbridge
+    title: Amazon EventBridge
+    subs: ["Ereignis je Finding,", "Security Hub CSPM daneben"]
+    w: 215
+  - icon: fargate
+    title: Amazon ECS Fargate
+    subs: ["40 Microservices,", "Image-zu-Task-Zuordnung"]
+    w: 215
+
+bottom:
+  - col: 2
+    icon: ec2
+    title: EC2 Hybrid Scanning
+    subs: ["mit SSM Agent ereignisgetrieben,", "ohne ihn über EBS-Snapshots"]
+    ssize: 10
+    from_top: true
+    from_label: "dieselbe Aktivierung"
+    from_color: ok
+  - col: 1
+    icon: amazon-elastic-container-registry
+    title: ECR Basic Scanning
+    subs: ["scannt nur beim Push —", "spätere CVEs bleiben unsichtbar"]
+    ssize: 10
+    accent: fail
+    from_top: true
+    from_label: verworfen
+
+legend_cols: 3
+legend:
+  - "1  Die Pipeline lässt das Image vom Inspector-Plugin prüfen"
+  - "2  Ist es sauber, landet es in der privaten Registry"
+  - "3  Enhanced Scanning übergibt es an Inspector"
+  - "4  Jedes Finding erzeugt ein Ereignis"
+  - "5  Ticket und Alarm erreichen die laufende Umgebung"
+  - "6  Dieselbe Aktivierung deckt EC2 im Hybrid-Modus ab"
+  - "7  Basic Scanning scheitert am Kern der Anforderung"
+  - "Enhanced gilt registry-weit, nur die Scan-Frequenz ist je Repository steuerbar"
+  - "Standardmäßig überwacht Inspector ein Image 90 Tage"

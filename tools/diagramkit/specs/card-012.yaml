@@ -1,0 +1,100 @@
+id: card-012
+template: kette
+title: "Szenario 12 · Unbekanntes Zugriffsmuster — S3 Intelligent-Tiering statt Ratespiel"
+subtitle: >-
+  Drei automatische Tiers messen den Zugriff je Objekt statt sein Alter — Millisekunden in allen
+  dreien, keine Abrufgebühr, und ein einziger Zugriff hebt das Objekt sofort wieder nach vorn
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: auto
+    label: "automatische Tiers · Millisekunden, kein Restore, keine Abrufgebühr"
+    color: accent
+
+outside:
+  icon: app
+  title: Asset-Plattform
+  subs: ["40 Mio. Objekte, 900 TB", "PUT ohne Code-Änderung"]
+  w: 190
+
+chain:
+  - icon: amazon-simple-storage-service-s3-intelligent-tiering
+    title: S3 Intelligent-Tiering
+    title_lines: ["S3 Intelligent-", "Tiering"]
+    subs: ["misst den Zugriff je Objekt,", "nicht je Prefix"]
+    hero: true
+    w: 200
+    in: [cloud, region]
+
+  - icon: amazon-simple-storage-service-s3-standard
+    title: Frequent Access Tier
+    title_lines: ["Frequent", "Access Tier"]
+    subs: ["neue Objekte, Preis", "wie S3 Standard"]
+    w: 190
+    in: [cloud, region, auto]
+
+  - icon: amazon-simple-storage-service-s3-standard-i-a
+    title: Infrequent Access Tier
+    title_lines: ["Infrequent", "Access Tier"]
+    subs: ["30 Tage ohne Zugriff,", "Preis wie Standard-IA"]
+    w: 190
+    in: [cloud, region, auto]
+
+  - icon: amazon-simple-storage-service-glacier-archive
+    title: Archive Instant Access Tier
+    title_lines: ["Archive Instant", "Access Tier"]
+    subs: ["90 Tage ohne Zugriff,", "rund ein Sechstel Frequent"]
+    w: 200
+    in: [cloud, region, auto]
+
+  - icon: amazon-simple-storage-service-s3-glacier-deep-archive
+    title: Archive Access, Deep Archive Access
+    title_lines: ["Archive Access,", "Deep Archive Access"]
+    subs: ["nur nach Opt-in, Abruf", "braucht RestoreObject"]
+    w: 210
+    in: [cloud, region]
+
+branch:
+  from: 3
+  items:
+    - icon: amazon-simple-storage-service-s3-standard
+      title: Rücksprung nach Frequent Access
+      title_lines: ["Rücksprung nach", "Frequent Access"]
+      subs: ["ein GET genügt: kein Restore,", "keine Abrufgebühr"]
+      w: 220
+
+crossband:
+  heading: "Was die Automatik kostet — und wann sie sich nicht lohnt"
+  items:
+    - icon: cost-explorer
+      title: Monitoring & Automation
+      title_lines: ["Monitoring &", "Automation"]
+      subs: ["0,0025 $ je 1.000 Objekte", "je Objekt, nicht je GB"]
+    - icon: amazon-simple-storage-service-object
+      title: Objekte unter 128 KB
+      title_lines: ["Objekte unter", "128 KB"]
+      subs: ["werden nicht überwacht", "und nie herabgestuft"]
+    - icon: question
+      title: Ist das Muster bekannt?
+      title_lines: ["Ist das Muster", "bekannt?"]
+      subs: ["bekannt: feste Lifecycle-Regel", "unbekannt: dieser Weg"]
+
+legend_cols: 2
+legend:
+  - "1  Die Anwendung legt das Objekt mit StorageClass INTELLIGENT_TIERING ab"
+  - "2  Jedes neue Objekt startet im Frequent Access Tier"
+  - "3  30 aufeinanderfolgende Tage ohne Zugriff: Infrequent Access Tier"
+  - "4  90 Tage ohne Zugriff: Archive Instant Access — trotz des Namens kein Glacier"
+  - "5  Nur nach Opt-in geht es weiter in die beiden asynchronen Archivstufen"
+  - "6  Ein einziger Zugriff hebt das Objekt sofort zurück nach Frequent Access, ohne Wartezeit"
+  - "Rückstufung und Rücksprung sind kostenfrei — es gibt keine Mindestspeicherdauer"
+  - "Die Opt-in-Stufen brechen die Millisekunden-Zusage und scheiden im Szenario deshalb aus"

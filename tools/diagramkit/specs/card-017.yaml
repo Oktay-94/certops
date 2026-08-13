@@ -1,0 +1,73 @@
+id: card-017
+template: hybrid
+title: "Szenario 17 · Snowball Edge — 500 TB, wenn die Leitung zu langsam ist"
+subtitle: >-
+  Bandbreite mal Zeit gegen Datenmenge: 154 Tage Rechenweg gegen acht Wochen Deadline — der Bulk
+  reist physisch, und das Delta, das währenddessen entsteht, holt DataSync online nach
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Landesmedienarchiv
+  nodes:
+    - icon: disk
+      title: Altes SAN
+      subs: ["500 TB MXF/ProRes", "Serverraum läuft aus"]
+      ssize: 10
+    - icon: server
+      title: Digitalisierung
+      subs: ["läuft weiter, das", "Delta wächst"]
+      ssize: 10
+    - icon: app
+      title: AWS OpsHub
+      subs: ["entsperrt das Gerät", "mit Manifest + Code"]
+      ssize: 10
+
+bridge:
+  - icon: a-w-s-snowball-edge
+    title: AWS Snowball Edge
+    title_lines: ["AWS Snowball", "Edge"]
+    subs: ["3 Geräte à 210 TB,", "NFS oder S3-API, KMS"]
+    ssize: 10
+  - icon: a-w-s-data-sync
+    title: AWS DataSync
+    subs: ["zieht das Delta online", "nach, mit Prüfsummen"]
+    ssize: 10
+    to_band: 0
+
+bands:
+  - label: "A · Import — beide Wege münden in denselben Bucket"
+    nodes:
+      - icon: s3
+        title: Amazon S3
+        subs: ["Zielbucket laut Job,", "danach der Job-Report"]
+      - icon: amazon-simple-storage-service-s3-glacier-deep-archive
+        title: S3 Glacier Deep Archive
+        title_lines: ["S3 Glacier", "Deep Archive"]
+        subs: ["Lifecycle schiebt die", "Master ins Archiv"]
+
+crossband:
+  heading: "Drei Fragen entscheiden die Antwort"
+  items:
+    - icon: question
+      title: Bandbreite mal Zeit
+      title_lines: ["Bandbreite", "mal Zeit"]
+      subs: ["500 TB bei 300 Mbit/s", "= rund 154 Tage"]
+    - icon: kms
+      title: Manifest und Unlock-Code
+      title_lines: ["Manifest und", "Unlock-Code"]
+      subs: ["zwei getrennte Dinge,", "sonst bleibt es zu"]
+    - icon: a-w-s-snowball-edge
+      title: Storage oder Compute
+      title_lines: ["Storage oder", "Compute"]
+      subs: ["Migration: Storage", "Optimized, 210 TB"]
+
+legend_cols: 2
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Drei Snowball Edge fassen 630 TB, reisen per Kurier, AWS importiert sie"
+  - "2  Was während des Transports entsteht, zieht DataSync online nach"
+  - "3  Eine Lifecycle-Regel schiebt die Master anschließend in die Archivklasse"
+  - "Verworfen: der Direktupload — 154 Tage gegen acht Wochen Deadline"
+  - "Die Quelldaten erst nach dem Job-Report löschen, nie vorher"
+  - "Seit 07.11.2025 gibt AWS Snowball Edge nur noch an Bestandskunden aus — in der Prüfung"
+  - "bleibt es die erwartete Antwort, im Projekt prüft man DataSync, Data Transfer Terminal, Partner"

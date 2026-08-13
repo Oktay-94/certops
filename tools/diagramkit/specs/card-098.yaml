@@ -1,0 +1,64 @@
+id: card-098
+template: ablauf
+title: "Szenario 98 · Git-Push wird Preview"
+subtitle: >-
+  Jeder Pull Request bekommt eine eigene Adresse und verschwindet beim Merge
+  wieder — der main-Branch geht atomar in die Produktion
+region: "Region eu-central-1 (Frankfurt)"
+
+outside_top:
+  icon: git-repository
+  title: Git-Repository
+  subs: ["Push oder", "Pull Request"]
+
+top:
+  - icon: a-w-s-amplify
+    title: AWS Amplify (Build)
+    title_lines: ["AWS Amplify", "(Build)"]
+    subs: ["baut je Branch nach", "der Build-Spezifikation"]
+    w: 195
+  - icon: a-w-s-amplify
+    title: AWS Amplify Hosting
+    title_lines: ["AWS Amplify", "Hosting"]
+    subs: ["liefert aus und", "verzweigt in zwei Ziele"]
+    w: 195
+  - icon: cloudfront
+    title: Produktion
+    subs: ["main-Branch, atomar", "umgeschaltet"]
+    w: 190
+  - icon: users
+    title: Besucher
+    subs: ["sehen nie einen halb", "hochgeladenen Stand"]
+    w: 190
+
+bottom:
+  - col: 1
+    icon: a-w-s-amplify
+    title: Vorschau je Pull Request
+    title_lines: ["Vorschau je", "Pull Request"]
+    subs: ["eigene URL, Abbau", "beim Merge"]
+    accent: ok
+    from_top: true
+    from_label: je PR
+    from_color: ok
+    w: 195
+  - col: 0
+    icon: s3
+    title: S3 und CloudFront von Hand
+    title_lines: ["S3 und CloudFront", "von Hand"]
+    subs: ["Previews und Teardown", "baut man selbst"]
+    accent: fail
+    from_top: true
+    from_label: Bastelweg
+    w: 195
+
+legend_cols: 3
+legend:
+  - "1  Ein Push oder ein Pull Request löst den Build aus"
+  - "2  Amplify baut je Branch nach der Build-Spezifikation"
+  - "3  Der main-Branch geht atomar in die Produktion"
+  - "4  Umgeschaltet wird erst, wenn das Deployment vollständig ist"
+  - "5  Jeder Pull Request bekommt seine eigene Vorschau-URL"
+  - "6  Von Hand gebaut, fehlen genau Vorschau und Abbau"
+  - "Beim Merge verschwinden URL und temporäre Umgebung von selbst"
+  - "CodeBuild, CodeCommit und CodeDeploy sind im Exam-Guide out of scope"

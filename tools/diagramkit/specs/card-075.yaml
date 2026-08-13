@@ -1,0 +1,62 @@
+id: card-075
+template: hybrid
+title: "Szenario 75 · VMware Cloud on AWS — heben statt umbauen"
+subtitle: >-
+  Eine gewachsene vSphere-Landschaft zieht um, ohne dass Applikationen umgebaut
+  oder Admins neu ausgebildet werden: gleiche Tools, gleiche Runbooks
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum vor Ort
+  nodes:
+    - icon: app
+      title: vCenter
+      subs: ["Steuerung bleibt,", "gleiche Runbooks"]
+    - icon: servers
+      title: ESXi-Hosts
+      subs: ["gewachsene", "vSphere-Landschaft"]
+    - icon: server
+      title: VMs
+      subs: ["laufen weiter, bis", "sie umziehen"]
+
+bridge:
+  - icon: vpn-gateway
+    title: VMware HCX
+    subs: ["vMotion einzeln oder", "Bulk in Wellen"]
+    to_band: 0
+
+bands:
+  - label: "A · Das SDDC — dieselbe Plattform, nur woanders"
+    nodes:
+      - icon: servers
+        title: VMware Cloud on AWS
+        title_lines: ["VMware Cloud", "on AWS"]
+        subs: ["vSphere, vSAN und NSX", "auf Bare-Metal-Hosts"]
+      - icon: server
+        title: Migrierte VMs
+        subs: ["dieselbe VM, kein", "Image-Umbau"]
+      - icon: vpc
+        title: Amazon VPC
+        subs: ["ENI-Anbindung, kein", "Umweg über Internet"]
+
+crossband:
+  heading: "Über die ENI direkt erreichbar — erst 1:1 herüber, dann modernisieren"
+  items:
+    - icon: s3
+      title: Amazon S3
+      subs: ["Objektspeicher mit", "niedriger Latenz"]
+    - icon: rds
+      title: Amazon RDS
+      subs: ["Schritt für Schritt", "modernisieren"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  HCX koppelt das eigene vCenter mit dem SDDC in der Region"
+  - "2  Die VMs wandern per vMotion oder als Welle unverändert hinüber"
+  - "3  Das SDDC hängt über eine ENI direkt am Kunden-VPC"
+  - "Patching, Host-Tausch und Lifecycle des SDDC macht der Anbieter"
+  - "Dedizierte SDDC-Hosts sind nicht dasselbe wie EC2 Dedicated Hosts"
+  - "Verworfen: Refactoring auf EC2-nativ — Umbau plus Neuschulung des Teams"

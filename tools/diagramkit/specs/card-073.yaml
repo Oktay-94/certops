@@ -1,0 +1,75 @@
+id: card-073
+template: hybrid
+title: "Szenario 73 · AWS DataSync — geplanter, inkrementeller Massentransfer"
+subtitle: >-
+  Wiederkehrende NFS-Synchronisation über die bestehende Leitung: ein Agent im
+  Rechenzentrum, zwei Tasks, nach der Erstkopie nur noch Neues und Geändertes
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum vor Ort
+  nodes:
+    - icon: server
+      title: Fileserver
+      subs: ["nichts installiert", "auf dem Server"]
+    - icon: folders
+      title: NFS-Share
+      subs: ["Freigabe, die", "gespiegelt wird"]
+    - icon: a-w-s-datasync-agent
+      title: DataSync Agent
+      subs: ["VM im eigenen RZ,", "mountet den Share"]
+
+bridge:
+  - icon: internet
+    title: Bestehende Leitung
+    subs: ["Task 1 mit Ziel S3,", "TLS, inkrementell"]
+    to_band: 0
+  - icon: internet
+    title: Bestehende Leitung
+    subs: ["Task 2 mit Ziel EFS,", "dieselbe Strecke"]
+    to_band: 1
+
+bands:
+  - label: "A · Ziel Objektspeicher"
+    nodes:
+      - icon: a-w-s-data-sync
+        title: AWS DataSync
+        subs: ["komprimiert, drosselt,", "prüft die Integrität"]
+      - icon: s3
+        title: Amazon S3
+        subs: ["jede Datei wird ein", "Objekt samt Metadaten"]
+
+  - label: "B · Ziel Dateisystem"
+    nodes:
+      - icon: a-w-s-data-sync
+        title: AWS DataSync
+        subs: ["gleicher Dienst,", "anderes Ziel"]
+      - icon: efs
+        title: Amazon EFS
+        subs: ["POSIX bleibt POSIX,", "für Datei-Semantik"]
+
+crossband:
+  heading: "Quer dazu: Zeitplan und Abgrenzung"
+  items:
+    - icon: a-w-s-systems-manager-maintenance-windows
+      title: Zeitplan
+      subs: ["stündlich, täglich", "oder wöchentlich"]
+    - icon: a-w-s-storage-gateway
+      title: AWS Storage Gateway
+      title_lines: ["AWS Storage", "Gateway"]
+      subs: ["laufender Zugriff,", "nicht Transfer"]
+    - icon: snowball
+      title: AWS Snowball
+      subs: ["wenn die Leitung", "nicht reicht"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der Agent liest den Share und überträgt per TLS an den Dienst"
+  - "2  Jede Datei wird ein S3-Objekt, POSIX-Metadaten wandern mit"
+  - "3  Ein zweiter Task läuft über dieselbe Leitung"
+  - "4  Ziel EFS, wenn Anwendungen weiter Datei-Semantik brauchen"
+  - "Nach der Erstkopie bewegt sich nur noch Neues und Geändertes"
+  - "Integritätsprüfung in transit und at rest ist eingebaut"

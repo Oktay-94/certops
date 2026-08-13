@@ -1,0 +1,73 @@
+id: card-078
+template: hybrid
+title: "Szenario 78 · Elastic Disaster Recovery — RPO in Sekunden"
+subtitle: >-
+  120 Server ohne zweiten Standort absichern: kontinuierliche Block-Replikation in
+  einen günstigen Staging-Bereich, Proben ohne Störung, volle Instanzen erst im Ernstfall
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Klinikrechenzentrum
+  nodes:
+    - icon: servers
+      title: Physische Server
+      title_lines: ["Physische", "Server"]
+      subs: ["Teil der 120", "Systeme"]
+    - icon: server
+      title: Virtuelle Server
+      title_lines: ["Virtuelle", "Server"]
+      subs: ["oder eine", "andere Cloud"]
+    - icon: app
+      title: AWS Replication Agent
+      title_lines: ["AWS Replication", "Agent"]
+      subs: ["auf jedem", "Quellserver"]
+
+bridge:
+  - icon: internet
+    title: Blockstrom
+    subs: ["laufend, komprimiert", "und verschlüsselt"]
+    to_band: 0
+
+bands:
+  - label: "A · Staging als Pilot Light — die Kopie liegt bereit, sie läuft nicht"
+    nodes:
+      - icon: a-w-s-elastic-disaster-recovery
+        title: AWS Elastic Disaster Recovery
+        title_lines: ["AWS Elastic", "Disaster Recovery"]
+        subs: ["führt das Abbild mit,", "Block für Block"]
+      - icon: ebs
+        title: Staging-Subnetz
+        subs: ["kleine Server auf", "günstigen Volumes"]
+      - icon: ec2
+        title: Amazon EC2
+        subs: ["Drill-Instanz, ohne", "die Replikation zu stören"]
+      - icon: ec2
+        title: Amazon EC2
+        subs: ["Recovery-Instances,", "nativ bootfähig"]
+
+crossband:
+  heading: "Was DRS nicht ersetzt und was es nicht abdeckt"
+  items:
+    - icon: backup
+      title: AWS Backup
+      subs: ["Aufbewahrung, nicht", "Betriebsfortführung"]
+    - icon: ebs
+      title: EBS-Snapshots
+      subs: ["RPO 24 Stunden,", "RTO Stunden"]
+    - icon: rds
+      title: Amazon RDS
+      subs: ["eigene Mechanismen:", "Multi-AZ, Read Replica"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der Agent schickt Blockänderungen laufend und verschlüsselt nach AWS"
+  - "2  Im Staging halten kleine Server die Kopie auf günstigen Volumes bereit"
+  - "3  Drills starten aus dem Staging, ohne die Replikation zu unterbrechen"
+  - "4  Im Ernstfall startet DRS volle Recovery-Instances im Zielsubnetz"
+  - "RPO in Sekunden, RTO in Minuten — die Bootzeit bestimmt die Spanne"
+  - "Der Rückweg heißt Failback und führt zurück ins eigene Rechenzentrum"
+  - "Block-Level heißt: Betriebssystem, Systemzustand, Datenbanken und Dateien"
+  - "Ein DR-Plan, der nie geprobt wurde, ist eine Vermutung, keine Zusage"

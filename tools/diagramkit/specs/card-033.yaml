@@ -1,0 +1,96 @@
+id: card-033
+template: kette
+title: "Karte 33 · AWS PrivateLink"
+subtitle: >-
+  Einen eigenen Dienst privat und einseitig in Kunden-VPCs anbieten — ohne
+  Routen, ohne IP-Allowlist und trotz gleicher CIDR auf beiden Seiten
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: vpc-kunde
+    label: "VPC Kunde B · 10.0.0.0/16"
+    icon: grp-vpc
+    color: vpc
+  - key: subnet-kunde
+    label: Privates Subnetz des Kunden
+    icon: grp-private-subnet
+    color: subnet-private
+  - key: vpc-provider
+    label: "VPC Telemetrik24 · 10.0.0.0/16"
+    icon: grp-vpc
+    color: vpc
+
+outside:
+  icon: ec2
+  title: Kundenanwendung
+  subs: ["läuft in der Kunden-VPC,", "fragt Telemetrie ab"]
+
+chain:
+  - icon: amazon-v-p-c-elastic-network-interface
+    title: Interface Endpoint
+    subs: ["ENI im Subnetz des Kunden", "0,01 $ je AZ und Stunde"]
+    w: 200
+    in: [cloud, region, vpc-kunde, subnet-kunde]
+
+  - icon: privatelink
+    title: AWS PrivateLink
+    subs: ["keine Route, kein Peering", "bleibt im AWS-Netz"]
+    hero: true
+    w: 210
+    in: [cloud, region]
+
+  - icon: vpc-endpoint
+    title: VPC Endpoint Service
+    subs: ["Anbieterseite, akzeptiert", "die Verbindungsanfrage"]
+    w: 200
+    in: [cloud, region, vpc-provider]
+
+  - icon: nlb
+    title: Network Load Balancer
+    title_lines: ["Network Load", "Balancer"]
+    subs: ["Ziel des Endpoint Service", "verteilt auf die Instanzen"]
+    w: 200
+    in: [cloud, region, vpc-provider]
+
+  - icon: ec2
+    title: Amazon EC2
+    subs: ["Telemetrie-Verarbeitung", "je AZ bereitgestellt"]
+    w: 180
+    in: [cloud, region, vpc-provider]
+
+crossband:
+  heading: "Querschnitt: Zugang, Namen, Verfügbarkeit — und der Weg, der hier nicht geht"
+  items:
+    - icon: iam
+      title: Allowed Principals
+      subs: ["40 stabile Account-IDs", "statt 40 NAT-IPs"]
+    - icon: route53
+      title: Private DNS Name
+      subs: ["eigener Name erst nach", "TXT-Verifikation"]
+    - icon: nlb
+      title: Cross-Zone Load Balancing
+      title_lines: ["Cross-Zone", "Load Balancing"]
+      subs: ["schließt fehlende AZs,", "kostet Datentransfer"]
+    - icon: amazon-v-p-c-peering-connection
+      title: VPC Peering
+      subs: ["hier verworfen: gleiche", "CIDR auf beiden Seiten"]
+
+legend_cols: 2
+legend_colw: 780
+legend_heading: "Ablauf Schritt für Schritt"
+legend:
+  - "1  Die Anwendung des Kunden ruft eine IP aus ihrem eigenen Subnetz auf"
+  - "2  Der Interface Endpoint reicht die Verbindung über PrivateLink weiter"
+  - "3  PrivateLink stellt sie beim Endpoint Service des Anbieters zu"
+  - "4  Der Endpoint Service zeigt auf den Network Load Balancer"
+  - "5  Der NLB verteilt auf die Service-Instanzen — ab hier normale Anbieter-Architektur"
+  - "Der Anbieter erreicht die Kunden-VPC über diesen Weg nicht: PrivateLink ist einseitig"

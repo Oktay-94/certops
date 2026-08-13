@@ -1,0 +1,61 @@
+id: card-086
+template: ablauf
+title: "Szenario 86 · Cost Explorer, Budgets, Anomaly Detection"
+subtitle: >-
+  Anomaly Detection erkennt ohne Schwelle, Cost Explorer erklärt das Warum,
+  Budgets zieht die Konsequenz — drei Werkzeuge auf demselben Datenstrom
+
+region: "Region us-east-1 · Kosten- und Nutzungsdaten sind global"
+
+outside_top:
+  icon: nat-gateway
+  title: Dev-Account
+  subs: ["falsche Route zwingt", "allen Egress ins NAT"]
+
+top:
+  - icon: a-w-s-costand-usage-report
+    title: Kosten- und Nutzungsdaten
+    title_lines: ["Kosten- und", "Nutzungsdaten"]
+    subs: ["mindestens alle 24 h", "aktualisiert"]
+  - icon: cloud-financial-management
+    title: AWS Cost Anomaly Detection
+    title_lines: ["AWS Cost", "Anomaly Detection"]
+    subs: ["erkennt ohne Schwelle,", "Spike wie Schleichgang"]
+    w: 175
+  - icon: sns
+    title: Amazon SNS
+    subs: ["IMMEDIATE nur hier —", "täglich geht per Mail"]
+    w: 170
+  - icon: cost-explorer
+    title: AWS Cost Explorer
+    subs: ["gruppiert nach Service,", "Usage Type, Tag"]
+    w: 175
+  - icon: budgets
+    title: AWS Budgets
+    subs: ["actual oder forecasted,", "mit Aktion"]
+    w: 170
+  - icon: ec2
+    title: Amazon EC2
+    subs: ["gestoppt über", "Systems Manager"]
+
+bottom:
+  - col: 4
+    icon: alert
+    title: Alarm bei 100 %
+    subs: ["kommt erst, wenn das", "Geld schon weg ist"]
+    from_top: true
+    from_label: verworfen
+    accent: fail
+    w: 170
+
+legend_cols: 3
+legend:
+  - "1  Eine falsch gesetzte Route verdreifacht die Kosten des Dev-Accounts"
+  - "2  Anomaly Detection liest den Datenstrom und erkennt die Abweichung"
+  - "3  Der Alert geht raus — IMMEDIATE ausschließlich über ein SNS-Topic"
+  - "4  Cost Explorer zeigt rückblickend, welcher Treiber dahintersteckt"
+  - "5  Das Budget feuert auf Ist- oder Prognosewert und löst eine Aktion aus"
+  - "6  Die Aktion stoppt die Ressource oder blockiert neue per SCP"
+  - "7  Verworfen: ein Alarm bei 100 % kommt zu spät, um noch zu helfen"
+  - "Keines der drei Werkzeuge misst selbst — alle lesen denselben Datenstrom"
+  - "Eine SCP wirkt nur aus dem Management Account, nicht auf fremde Instanzen"

@@ -1,0 +1,81 @@
+id: card-076
+template: hybrid
+title: "Szenario 76 · Mainframe Modernization — Replatform oder Refactor"
+subtitle: >-
+  COBOL-Batch auf z/OS in Wellen ablösen statt als Big Bang: erst analysieren,
+  dann Daten und Artefakte hinüberbringen, dann Welle für Welle umstellen
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum vor Ort
+  nodes:
+    - icon: servers
+      title: z/OS Mainframe
+      subs: ["Policen-Batch,", "jede Nacht"]
+    - icon: documents
+      title: COBOL-Code
+      subs: ["Programme und", "Copybooks"]
+    - icon: documents
+      title: JCL-Jobs
+      subs: ["steuern den", "Nachtlauf"]
+    - icon: database
+      title: DB2 und VSAM
+      subs: ["der ganze", "Datenbestand"]
+
+bridge:
+  - icon: documents
+    title: Bestandsaufnahme
+    subs: ["Programme, JCL,", "Copybooks"]
+    to_band: 0
+  - icon: a-w-s-database-migration-service
+    title: AWS Database Migration Service
+    title_lines: ["AWS Database", "Migration Service"]
+    subs: ["DB2 und VSAM", "wandern hinüber"]
+    to_band: 1
+  - icon: internet
+    title: Artefakt-Transfer
+    subs: ["JCL-Dateien und", "Batch-Binaries"]
+    to_band: 2
+
+bands:
+  - label: "A · Erst messen"
+    hero_note: "Wellenplan"
+    nodes:
+      - icon: a-w-s-mainframe-modernization-analyzer
+        title: AWS Mainframe Modernization Analyzer
+        title_lines: ["AWS Mainframe", "Modernization Analyzer"]
+        subs: ["findet die Abhängig-", "keiten vor dem Umbau"]
+
+  - label: "B · Dann die Daten"
+    hero_note: "Datenstand"
+    nodes:
+      - icon: aurora
+        title: Amazon Aurora
+        subs: ["Ziel für DB2 und", "VSAM, alternativ RDS"]
+
+  - label: "C · Dann die Artefakte"
+    hero_note: "erwartete Pfade"
+    nodes:
+      - icon: s3
+        title: Amazon S3
+        subs: ["JCL und Binaries,", "genau wo erwartet"]
+
+hero:
+  icon: a-w-s-mainframe-modernization
+  title: AWS Mainframe Modernization
+  title_lines: ["AWS Mainframe", "Modernization"]
+  subs: ["Replatform: COBOL", "bleibt COBOL auf der", "Rocket-Runtime", "", "Refactor: Blu Age", "wandelt COBOL in", "Java-Services", "", "beide Wege auf", "demselben Datenstand"]
+
+legend_cols: 2
+legend_colw: 560
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Der Analyzer liest Programme, JCL-Jobs und Copybooks ein"
+  - "2  Aus den Abhängigkeiten entsteht der Wellenplan"
+  - "3  DMS bringt DB2 und VSAM nach Aurora oder RDS"
+  - "4  Die Runtime setzt auf dem migrierten Datenstand auf"
+  - "5  JCL-Dateien und Batch-Binaries wandern nach S3"
+  - "6  Die Laufzeitumgebung liest die Pfade aus der Application-Definition"
+  - "Ohne migrierte Daten lässt sich keine der beiden Runtimes testen"
+  - "Verworfen: manueller Rewrite als Big Bang, ohne Rückweg zum Altsystem"

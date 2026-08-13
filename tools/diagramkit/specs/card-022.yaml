@@ -1,0 +1,79 @@
+id: card-022
+template: vorher_nachher
+title: "Szenario 22 · Verfügbarkeit und Lesekapazität auseinanderhalten"
+subtitle: >-
+  Eine Instanz trägt Schadenbearbeitung und Quartalsauswertung zugleich —
+  und der Ausfall einer Availability Zone darf keinen Datensatz kosten
+
+base:
+  region: "Region eu-central-1 (Frankfurt)"
+  vpc_label: VPC
+  subnet_label: "Privates Subnetz · Datenbankschicht"
+  forward: "Anfragen der Schadenbearbeitung an den Writer-Endpoint"
+  left:
+    icon: users
+    title: Schadenbearbeitung
+    subs: ["1.400 Sachbearbeiter,", "lesen und schreiben"]
+  inner:
+    icon: rds
+    title: "Amazon RDS (PostgreSQL)"
+    title_lines: ["Amazon RDS", "(PostgreSQL)"]
+    subs: ["Primary, einziger", "Schreibpunkt"]
+    w: 190
+
+panels:
+  - state: broken
+    headline: "Vorher — eine Instanz für zwei Aufgaben und keinen Ausfall"
+    back: "8 bis 10 Uhr: Timeouts statt Antworten"
+    extras:
+      - icon: app
+        title: Reporting-Last
+        subs: ["Full-Table-Scans auf", "derselben Instanz"]
+        accent: fail
+        badge: true
+      - icon: alert
+        title: Single-AZ
+        subs: ["kein Standby, kein", "automatisches Failover"]
+        accent: fail
+        badge: true
+        w: 185
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Ein Weg, eine Instanz:"
+        - "kein Standby, kein Puffer"
+        - "zwei Probleme brauchen zwei Werkzeuge"
+
+  - state: fixed
+    headline: "Nachher — Multi-AZ für die Verfügbarkeit, Replica für die Last"
+    back: "gewohnte Antwortzeiten, auch vormittags"
+    extras:
+      - icon: amazon-aurora-amazon-r-d-s-instance-aternate
+        title: Standby in AZ-b
+        subs: ["synchrone Kopie, RPO 0,", "beantwortet keine Abfrage"]
+        badge: true
+      - icon: amazon-aurora-amazon-r-d-s-instance
+        title: Read Replica in AZ-c
+        subs: ["asynchron, eigener", "Endpoint fürs Reporting"]
+        accent: ok
+        badge: true
+        w: 185
+    insert:
+      kind: node
+      icon: amazon-r-d-s-multi-a-z
+      title: Multi-AZ deployment
+      subs: ["Failover in 60 bis 120 s,", "der Endpoint bleibt gleich"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Die Schadenbearbeitung erreicht die Primary über den Writer-Endpoint"
+  - "2  Werktags zwischen 8 und 10 Uhr laufen die Anfragen in Timeouts"
+  - "3  Ursache eins: Das Controlling scannt dieselbe Instanz voll durch"
+  - "4  Ursache zwei: Eine einzelne Instanz überlebt keinen AZ-Ausfall"
+  - "5  Am Schreibweg ändert sich nichts, es bleibt bei einem Schreibpunkt"
+  - "6  Die Sachbearbeitung bekommt ihre gewohnten Antwortzeiten zurück"
+  - "7  Der Standby hält synchron mit — RPO 0, Failover in 60 bis 120 s"
+  - "8  Das Reporting fragt ab jetzt den eigenen Endpoint der Read Replica"
+  - "Der Standby ist passiv: Er beantwortet nichts, er wartet nur"

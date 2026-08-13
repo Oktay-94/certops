@@ -1,0 +1,94 @@
+id: card-059
+template: kette
+title: "Szenario 59 · Betrugsregeln ueber mehrere Ereignisse hinweg mit Apache Flink"
+subtitle: >-
+  Alarm bei mehr als fuenf Transaktionen in einem beliebigen Fuenf-Minuten-Zeitraum,
+  geprueft jede Minute — bei Ereignissen, die unsortiert eintreffen
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: flink
+    label: "Amazon Managed Service for Apache Flink — eine Anwendung, vier Schritte"
+    icon: amazon-managed-servicefor-apache-flink
+    color: "#0F766E"
+
+outside:
+  icon: client
+  title: Zahlungsterminals
+  subs: ["jede Karten-", "transaktion"]
+
+chain:
+  - icon: amazon-kinesis-data-streams
+    title: Amazon Kinesis Data Streams
+    title_lines: ["Amazon Kinesis", "Data Streams"]
+    subs: ["transportiert und puffert,", "rechnet nichts"]
+    ssize: 10
+    w: 180
+    in: [cloud, region]
+
+  - icon: amazon-cloud-watch-event-time-based
+    title: Watermarks
+    subs: ["Ereigniszeit statt", "Verarbeitungszeit"]
+    ssize: 10
+    w: 165
+    in: [cloud, region, flink]
+
+  - icon: data-table
+    title: keyBy(Kartennummer)
+    title_lines: ["keyBy", "(Kartennummer)"]
+    subs: ["eigener Zustand je Karte,", "dauerhaft, exactly-once"]
+    ssize: 10
+    w: 175
+    in: [cloud, region, flink]
+
+  - icon: metrics
+    title: Sliding Window
+    subs: ["fuenf Minuten Fenster,", "eine Minute Versatz", "die Fenster ueberlappen"]
+    hero: true
+    border: "#0F766E"
+    fill: "#EFF7F6"
+    w: 200
+    in: [cloud, region, flink]
+
+  - icon: magnifying-glass
+    title: Mustererkennung
+    subs: ["zuletzt gesehenes Land", "je Karte, zehn Minuten"]
+    ssize: 10
+    w: 175
+    in: [cloud, region, flink]
+
+  - icon: sns
+    title: Amazon SNS
+    subs: ["Treffer sofort an die", "Betrugsabwehr"]
+    ssize: 10
+    w: 165
+    in: [cloud, region]
+
+branch:
+  from: 4
+  items:
+    - icon: s3
+      title: Amazon S3
+      subs: ["alle Ereignisse, damit die", "Revision spaeter nachvollzieht"]
+      ssize: 10
+      w: 230
+
+legend_cols: 2
+legend:
+  - "1  Die Terminals schreiben jede Transaktion in den Stream"
+  - "2  Die Flink-Anwendung liest den Stream als Quelle"
+  - "3  Watermarks ordnen nach der Zeit, zu der etwas passiert ist"
+  - "4  keyBy gruppiert den Zustand je Kartennummer"
+  - "5  Jede Minute entsteht ein neues Fuenf-Minuten-Fenster"
+  - "6  Ein Treffer geht sofort per SNS an die Betrugsabwehr"
+  - "7  Unabhaengig davon landen alle Ereignisse in S3"
+  - "Tumbling waere lueckenhaft an der Grenze — allowedLateness steht per Default auf null"

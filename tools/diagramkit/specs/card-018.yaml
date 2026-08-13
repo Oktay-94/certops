@@ -1,0 +1,86 @@
+id: card-018
+template: kette
+title: "Szenario 18 · S3 Transfer Acceleration und Multipart Upload — große Dateien von überall"
+subtitle: >-
+  Multipart löst das Zuverlässigkeitsproblem, Transfer Acceleration das Distanzproblem — und eine
+  Lifecycle-Regel räumt die Parts weg, für die sonst niemand eine Rechnung erklären kann
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+
+outside:
+  icon: users
+  title: Cutter in Sydney
+  subs: ["Rohmaterial, 40 bis 80 GB", "je Datei"]
+  w: 190
+
+chain:
+  - icon: apigateway
+    title: Amazon API Gateway
+    title_lines: ["Amazon", "API Gateway"]
+    subs: ["nimmt die Anfrage nach", "presigned URLs entgegen"]
+    w: 200
+    in: [cloud]
+
+  - icon: lambda
+    title: AWS Lambda
+    subs: ["CreateMultipartUpload,", "eine URL je Part"]
+    w: 190
+    in: [cloud]
+    note: {text: "Credentials bleiben serverseitig", bold: true, color: ok}
+
+  - icon: amazon-cloud-front-edge-location
+    title: CloudFront Edge Location
+    title_lines: ["CloudFront", "Edge Location"]
+    subs: ["Eintritt nahe Sydney,", "dann AWS-Backbone"]
+    w: 200
+    in: [cloud]
+
+  - icon: s3
+    title: Amazon S3
+    subs: ["ein Bucket in eu-central-1,", "Transfer Acceleration an", "CompleteMultipartUpload", "fügt die Parts zusammen"]
+    hero: true
+    w: 230
+    in: [cloud]
+
+branch:
+  from: 3
+  items:
+    - icon: amazon-simple-storage-service-object
+      title: "S3 Lifecycle: AbortIncompleteMultipartUpload"
+      title_lines: ["S3 Lifecycle-Regel", "Abort Incomplete Multipart Upload"]
+      subs: ["löscht Parts nie beendeter", "Uploads nach 7 Tagen"]
+      w: 280
+
+crossband:
+  heading: "Nicht verwechseln — und die Grenzen, die in der Prüfung gerechnet werden"
+  items:
+    - icon: cloudfront
+      title: Amazon CloudFront
+      title_lines: ["Amazon", "CloudFront"]
+      subs: ["liefert heraus und", "cached — TA tut das nicht"]
+    - icon: a-w-s-global-accelerator
+      title: AWS Global Accelerator
+      title_lines: ["AWS Global", "Accelerator"]
+      subs: ["statische Anycast-IPs", "für beliebiges TCP/UDP"]
+    - icon: question
+      title: Partgrößen
+      subs: ["5 MiB bis 5 GiB je Part,", "höchstens 10.000 Parts"]
+    - icon: question
+      title: Speed Comparison Tool
+      title_lines: ["Speed", "Comparison Tool"]
+      subs: ["misst vorher, ob TA", "auf dieser Strecke hilft"]
+
+legend_cols: 2
+legend:
+  - "1  Der Browser holt sich beim API Gateway presigned URLs, eine je Part"
+  - "2  Lambda startet den Upload mit CreateMultipartUpload und erzeugt die URLs"
+  - "3  Damit gehen die Parts direkt an die nächste Edge, nicht über den Webserver"
+  - "4  Über das AWS-Backbone erreichen sie den Bucket, Part für Part"
+  - "5  Eine Lifecycle-Regel räumt Parts weg, die nie zu einem Objekt zusammengesetzt wurden"
+  - "Erst CompleteMultipartUpload erzeugt das Objekt — vorher liegt im Bucket nichts Sichtbares"
+  - "Bringt TA nichts, berechnet AWS auch keine TA-Gebühr, sondern die normalen Transferpreise"

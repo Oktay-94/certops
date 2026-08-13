@@ -1,0 +1,82 @@
+id: card-008
+template: kette
+title: "Karte 8 · Elastic Beanstalk und RDS"
+subtitle: >-
+  Code hochladen, die Plattform macht den Rest: Beanstalk baut ALB, Auto Scaling Group und
+  EC2 — die Datenbank gehört aber bewusst außerhalb der Environment
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: env
+    label: "Elastic Beanstalk Environment"
+    color: accent
+  - key: asg
+    label: Auto Scaling Group
+    icon: grp-asg
+    color: "#ED7100"
+
+outside:
+  icon: user
+  title: Developer
+  subs: ["lädt nur den Code hoch", "eb deploy oder .zip"]
+  w: 170
+
+chain:
+  - icon: a-w-s-elastic-beanstalk
+    title: AWS Elastic Beanstalk
+    subs:
+      - "nimmt nur den Code entgegen"
+      - ""
+      - "baut und betreibt die"
+      - "komplette Environment"
+    hero: true
+    w: 250
+    in: [cloud, region]
+
+  - icon: alb
+    title: Application Load Balancer
+    title_lines: ["Application", "Load Balancer"]
+    subs: ["verteilt auf die", "Web-Instances"]
+    w: 190
+    in: [cloud, region, env]
+
+  - icon: ec2
+    title: Amazon EC2
+    subs: ["Web-Instances, Rolling", "Deployments und Health-Checks"]
+    w: 200
+    in: [cloud, region, env, asg]
+
+  - icon: rds
+    title: Amazon RDS
+    subs: ["Multi-AZ, separat", "provisioniert"]
+    w: 190
+    in: [cloud, region]
+    note: {text: "außerhalb der Environment", bold: true, color: ok}
+
+branch:
+  from: 0
+  items:
+    - icon: a-w-s-cloud-formation
+      title: AWS CloudFormation
+      subs: ["baut den Stack im", "Hintergrund"]
+      w: 190
+
+legend_cols: 2
+legend:
+  - "1  Der Developer schiebt nur den Code — keine Infrastruktur-Definition"
+  - "2  Beanstalk provisioniert ALB, Auto Scaling Group und EC2-Instances"
+  - "3  Der ALB verteilt den Traffic auf die Web-Instances"
+  - "4  Die App erreicht die RDS über einen Endpoint aus einer Umgebungsvariable"
+  - "5  Unter der Haube baut CloudFormation den kompletten Stack"
+  - "Die RDS lebt außerhalb der Environment und übersteht jeden Neuaufbau"
+  - "RDS innerhalb der Environment wird mitgelöscht — nur für Dev/Test vertretbar"
+  - "AL2-Plattformen laufen zum 30.06.2026 aus, neue Environments auf AL2023"

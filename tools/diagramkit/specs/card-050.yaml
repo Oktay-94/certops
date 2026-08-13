@@ -1,0 +1,77 @@
+id: card-050
+template: vorher_nachher
+title: "Battle Card 50 · WAF Bot Control, Challenge gegen CAPTCHA"
+subtitle: >-
+  Warum IP-Sperren gegen Scalper mit Residential Proxies nicht greifen — und wie
+  man Bots stoppt, ohne 400.000 Kunden Puzzles lösen zu lassen
+
+base:
+  region: "Amazon CloudFront · AWS WAF Web ACL"
+  vpc_label: "Auswertung der Regeln"
+  subnet_label: "Regelgruppe im Web ACL"
+  forward: "Anfragen an /drop und /checkout"
+  left:
+    icon: users
+    title: Kunden und Bots
+    subs: ["400.000 echte Kunden,", "Scalper mit Proxies"]
+  inner:
+    icon: waf
+    title: AWS WAF Web ACL
+    title_lines: ["AWS WAF", "Web ACL"]
+    subs: ["wertet die Regeln in", "ihrer Reihenfolge aus"]
+
+panels:
+  - state: broken
+    headline: "Vorher — eine Schwelle, die man nur raten kann"
+    back: "Bestand nach elf Sekunden weg"
+    extras:
+      - icon: a-w-s-w-a-f-rule
+        title: Rate-based Rule
+        subs: ["zählt je Client-IP über", "ein rollierendes Fenster"]
+        ssize: 10
+        w: 180
+        accent: fail
+        badge: true
+    insert:
+      kind: gap
+      bold_lines: 2
+      lines:
+        - "Hier fehlt Bot Control"
+        - "auf Targeted Level"
+        - "IP-Zählung sieht keinen echten Browser"
+
+  - state: fixed
+    headline: "Nachher — Erkennung am Verhalten statt an der Adresse"
+    back: "Bots gestoppt, Kunden merken nichts"
+    extras:
+      - icon: a-w-s-w-a-f-bot-control
+        title: Bot Control Common
+        subs: ["Scope-Down davor: nur", "/drop und /checkout"]
+        ssize: 10
+        w: 180
+        accent: ok
+        badge: true
+      - icon: a-w-s-w-a-f-bad-bot
+        title: Bot Control Targeted
+        subs: ["Fingerprinting, dynamisches", "Rate-Limit ohne Schwelle"]
+        ssize: 10
+        w: 180
+        accent: ok
+        badge: true
+    insert:
+      kind: node
+      icon: a-w-s-w-a-f-labels
+      title: "Challenge und CAPTCHA"
+      subs: ["still für alle, sichtbar nur im Checkout", "beide erzeugen dasselbe aws-waf-token"]
+
+legend_cols: 2
+legend_heading: "Was in welchem Schritt passiert"
+legend:
+  - "1  Anfragen an /drop und /checkout treffen das Web ACL"
+  - "2  Die Bots kommen durch — der Bestand ist nach elf Sekunden weg"
+  - "3  Die Rate-based Rule zählt je Client-IP, die Schwelle ist immer geraten"
+  - "4  Dieselben Anfragen treffen dasselbe Web ACL"
+  - "5  Die Bots werden gestoppt, die echten Kunden merken nichts davon"
+  - "6  Common erkennt Bots, die sich zu erkennen geben — Googlebot bleibt drin"
+  - "7  Targeted erkennt die, die sich absichtlich als Nutzer ausgeben"
+  - "Targeted ohne Scope-Down ist der teuerste Konfigurationsfehler dieser Karte"

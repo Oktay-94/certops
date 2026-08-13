@@ -1,0 +1,90 @@
+id: card-100
+template: kette
+title: "Szenario 100 · Ein Netz für viele Accounts"
+subtitle: >-
+  Einmal zentral bauen, per Resource Share mitnutzen lassen: der Owner behält das
+  Netz, die Participants behalten ihre Ressourcen
+
+frames:
+  - key: org
+    label: AWS Organizations
+    icon: a-w-s-organizations
+    color: cloud
+    full_height: true
+  - key: netacc
+    label: "Netzwerk-Account (Owner)"
+    icon: grp-account
+    color: band
+  - key: teamacc
+    label: "Team-Account (Participant)"
+    icon: grp-account
+    color: band
+
+outside:
+  icon: users
+  title: Plattform-Team
+  subs: ["baut das Netz", "genau einmal"]
+  w: 165
+
+chain:
+  - icon: vpc
+    title: Amazon VPC
+    subs: ["Subnetze, NAT Gateway,", "Routing, Direct Connect"]
+    w: 225
+    in: [org, netacc]
+  - icon: a-w-s-resource-access-manager
+    title: AWS RAM Resource Share
+    title_lines: ["AWS RAM", "Resource Share"]
+    subs: ["Principal ist die OU,", "keine Konto-IDs nötig"]
+    w: 235
+    in: [org, netacc]
+    note: {text: "Subnetze nur innerhalb der eigenen Organization", bold: true}
+  - icon: a-w-s-organizations-organizational-unit
+    title: Geteilte Subnetze
+    subs: ["erscheinen im Konto,", "als lägen sie dort"]
+    w: 225
+    in: [org, teamacc]
+  - icon: ec2
+    title: Eigene Ressourcen
+    subs: ["EC2, RDS und Lambda,", "vom Team selbst verwaltet"]
+    w: 235
+    in: [org, teamacc]
+
+branch:
+  from: 0
+  items:
+    - icon: a-w-s-transit-gateway
+      title: Transit Gateway
+      subs: ["verbindet getrennte Netze,", "wird selbst per RAM geteilt"]
+      w: 235
+
+crossband:
+  heading: "Querschnitt: was beim Owner bleibt und was je Konto getrennt bleibt"
+  items:
+    - icon: router
+      title: Routing
+      subs: ["bleibt beim", "Owner"]
+    - icon: route53
+      title: DNS
+      subs: ["bleibt beim", "Owner"]
+    - icon: vpc
+      title: VPC-Einstellungen
+      title_lines: ["VPC-", "Einstellungen"]
+      subs: ["bleiben beim", "Owner"]
+    - icon: iam
+      title: IAM-Grenze
+      subs: ["bleibt je Konto", "getrennt"]
+    - icon: cost-explorer
+      title: Abrechnung
+      subs: ["bleibt je Konto", "getrennt"]
+
+legend_cols: 3
+legend:
+  - "1  Netz, NAT Gateway und Anbindung entstehen genau einmal"
+  - "2  Der Resource Share gibt die Subnetze frei"
+  - "3  Im Team-Account tauchen sie in Konsole und API auf"
+  - "4  Das Team startet dort seine eigenen Ressourcen"
+  - "5  Ein Transit Gateway steht daneben — auch das wird per RAM geteilt"
+  - "Fremde Ressourcen sieht und ändert ein Participant nicht"
+  - "Doppelte Infrastruktur wäre nicht doppelte Isolation"
+  - "RAM selbst kostet nichts — gespart wird an NAT Gateways und Endpoints"

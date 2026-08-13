@@ -1,0 +1,97 @@
+id: card-020
+template: kette
+title: "Szenario 20 · S3 Access Points und VPC Endpoints — ein Bucket, viele Teams, privater Traffic"
+subtitle: >-
+  Aus einer Bucket Policy mit 240 Statements werden viele kleine Access-Point-Policies — und der
+  Weg aus dem Rechenzentrum führt über den Interface Endpoint, nicht über den Gateway Endpoint
+
+frames:
+  - key: cloud
+    label: AWS Cloud
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+  - key: vpc
+    label: "VPC · privates Subnetz"
+    icon: grp-vpc
+    color: vpc
+  - key: s3zone
+    label: "Amazon S3 · dieselbe Regionalinfrastruktur, zwei Zugangswege"
+    color: accent
+
+outside:
+  icon: server
+  title: "Finance · BI-Tool"
+  subs: ["im eigenen Rechenzentrum,", "liest nur unter /finance"]
+  w: 200
+
+chain:
+  - icon: directconnect
+    title: AWS Direct Connect
+    title_lines: ["AWS Direct", "Connect"]
+    subs: ["private Anbindung,", "noch keine S3-Lösung"]
+    w: 190
+    in: [cloud, region]
+
+  - icon: privatelink
+    title: S3 Interface Endpoint
+    title_lines: ["S3 Interface", "Endpoint (PrivateLink)"]
+    subs: ["ENI mit privater IP,", "Stundensatz je AZ plus GB"]
+    w: 220
+    in: [cloud, region, vpc]
+
+  - icon: amazon-simple-storage-service-general-access-points
+    title: "Access Point finance-ro"
+    title_lines: ["Access Point", "finance-ro"]
+    subs: ["nur GetObject, nur /finance,", "Network Origin: VPC"]
+    w: 220
+    in: [cloud, region, s3zone]
+
+  - icon: s3
+    title: Amazon S3
+    subs: ["ein Bucket, 8 PB", "die Bucket Policy delegiert", "nur noch an Access Points"]
+    hero: true
+    w: 220
+    in: [cloud, region, s3zone]
+
+branch:
+  from: 0
+  items:
+    - icon: amazon-v-p-c-endpoints
+      title: S3 Gateway Endpoint
+      title_lines: ["S3 Gateway Endpoint", "— hier verworfen"]
+      subs: ["arbeitet über die Route Table", "der VPC, endet an ihrer Grenze"]
+      w: 260
+
+crossband:
+  heading: "Was die Prüfung an dieser Karte abfragt"
+  items:
+    - icon: amazon-v-p-c-endpoints
+      title: Gateway Endpoint
+      title_lines: ["Gateway", "Endpoint"]
+      subs: ["kostenlos, aber nur aus", "der VPC — Data Science"]
+    - icon: iam
+      title: Zwei Policies
+      subs: ["Bucket und Access Point", "müssen beide erlauben"]
+    - icon: question
+      title: "aws:SourceVpce"
+      subs: ["aws:SourceIp greift nicht,", "die Quelle wird privat"]
+    - icon: amazon-simple-storage-service-s3-object-lambda-access-points
+      title: MRAP und Object Lambda
+      title_lines: ["MRAP und", "Object Lambda"]
+      subs: ["Geo-Latenz bzw. Inhalt", "ändern — anderer Zweck"]
+
+legend_cols: 2
+legend:
+  - "1  Das BI-Tool erreicht AWS über Direct Connect — Voraussetzung, nicht Lösung"
+  - "2  Der Interface Endpoint gibt S3 eine private IP im Subnetz — auch von on-prem"
+  - "3  Der Access Point finance-ro lässt nur Lesezugriffe unter /finance durch"
+  - "4  Die Bucket Policy delegiert nur noch an Access Points dieses Accounts"
+  - "5  Verworfen: der Gateway Endpoint — er wirkt über die Route Table und nie von on-premises"
+  - "Data Science liest denselben Bucket über einen eigenen Access Point und einen Gateway Endpoint"
+  - "Ein Access Point ist kein Proxy im Datenpfad, sondern ein zweiter benannter Zugangsweg"

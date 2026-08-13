@@ -1,0 +1,68 @@
+id: card-093
+template: ablauf
+title: "Szenario 93 · MediaConvert, S3, CloudFront"
+subtitle: >-
+  Dateibasierte Transkodierung für eine On-Demand-Bibliothek: eine Rendition-Ladder
+  je Video, ausgeliefert über ein CDN — unten die zwei bequemen Irrwege
+region: "Region eu-central-1 (Frankfurt)"
+
+outside_top:
+  icon: users
+  title: Nutzer
+  subs: ["lädt ein Video", "hoch"]
+
+top:
+  - icon: s3
+    title: Amazon S3 (Eingang)
+    title_lines: ["Amazon S3", "(Eingang)"]
+    subs: ["Datei liegt vollständig", "vor, bevor es losgeht"]
+    w: 180
+  - icon: a-w-s-elemental-media-convert
+    title: AWS Elemental MediaConvert
+    title_lines: ["AWS Elemental", "MediaConvert"]
+    subs: ["ein Job je Datei,", "HLS und DASH parallel"]
+    w: 190
+  - icon: s3
+    title: Amazon S3 (Ausgabe)
+    title_lines: ["Amazon S3", "(Ausgabe)"]
+    subs: ["Renditions und Manifeste,", "Bucket bleibt privat"]
+    w: 195
+  - icon: cloudfront
+    title: Amazon CloudFront
+    title_lines: ["Amazon", "CloudFront"]
+    subs: ["Origin Access Control,", "Bucket nur über OAC"]
+    w: 190
+  - icon: client
+    title: Player
+    subs: ["fragt das Manifest ab", "und wählt die Bitrate"]
+    w: 175
+
+bottom:
+  - col: 1
+    icon: lambda
+    title: Lambda mit FFmpeg
+    title_lines: ["Lambda mit", "FFmpeg"]
+    subs: ["Laufzeitgrenze,", "Codec-Pflege selbst"]
+    accent: fail
+    from_top: true
+    from_label: Bastelweg
+    w: 190
+  - col: 2
+    icon: s3-bucket
+    title: Bucket public read
+    title_lines: ["Bucket", "public read"]
+    subs: ["Renditions direkt aus S3,", "Cache umgangen"]
+    accent: fail
+    from_top: true
+    from_label: bequem
+    w: 195
+
+legend_cols: 3
+legend:
+  - "1  Der Upload landet vollständig im Eingangs-Bucket"
+  - "2  MediaConvert baut daraus mehrere Auflösungen und Bitraten"
+  - "3  Renditions und Manifeste gehen in den Ausgabe-Bucket"
+  - "4  CloudFront holt sich den Inhalt beim Origin"
+  - "5  Der Player wählt anhand des Manifests seine Bitrate"
+  - "6  Selbst transkodieren scheitert an Laufzeit und Codec-Pflege"
+  - "7  Ein öffentlicher Bucket umgeht den Cache — in der Prüfung falsch"

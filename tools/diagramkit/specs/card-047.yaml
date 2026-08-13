@@ -1,0 +1,88 @@
+id: card-047
+template: kette
+title: "Battle Card 47 · Macie über 1.400 S3-Buckets"
+subtitle: >-
+  Erst breit und billig herausfinden, wo etwas liegen könnte — und erst dann
+  gezielt und teuer nachsehen, was dort tatsächlich liegt
+
+frames:
+  - key: cloud
+    label: "AWS Cloud"
+    icon: grp-cloud
+    color: cloud
+    full_height: true
+  - key: region
+    label: "Region eu-central-1 (Frankfurt)"
+    icon: grp-region
+    color: region
+    full_height: true
+
+outside:
+  icon: users
+  w: 170
+  title: Revision
+  subs: ["fragt vor dem", "DSGVO-Audit"]
+
+chain:
+  - icon: s3
+    title: Amazon S3
+    subs: ["1.400 Buckets in 30", "Accounts, Inhalt unklar"]
+    w: 220
+    in: [cloud, region]
+  - icon: macie
+    title: Amazon Macie
+    subs: ["Bucket-Posture bewertet,", "ohne ein Objekt zu lesen"]
+    w: 220
+    in: [cloud, region]
+    hero: true
+  - icon: macie
+    title: Automated Discovery
+    subs: ["Sampling je Bucket,", "Sensitivity Score"]
+    w: 220
+    in: [cloud, region]
+  - icon: eventbridge
+    title: Amazon EventBridge
+    subs: ["Ort und Typ des Funds,", "nie der Inhalt selbst"]
+    w: 220
+    in: [cloud, region]
+
+branch:
+  from: 1
+  items:
+    - icon: macie
+      title: Custom Data Identifier
+      subs: ["Regex plus Keywords", "für VS-DE-Nummern"]
+      w: 220
+      align_with: 1
+    - icon: macie
+      title: Allow List
+      subs: ["sticht Managed und", "Custom Identifier"]
+      w: 220
+    - icon: macie
+      title: Targeted Job
+      subs: ["gezielt und vollständig", "auf den Treffern"]
+      w: 220
+
+crossband:
+  heading: "Was mitgeliefert wird, was archiviert wird — und der Weg, der daran scheitert"
+  items:
+    - icon: macie
+      title: Managed Data Identifiers
+      subs: ["Kreditkarten, Pass- und Steuernummern", "eingebaut, aber ohne eigene Formate"]
+    - icon: documents
+      title: Discovery Results
+      subs: ["90 Tage, verschlüsselt, nur in einen", "selbst konfigurierten Bucket"]
+    - icon: s3
+      title: Vollscan über alles
+      subs: ["verworfen: abgerechnet wird nach", "inspizierter Datenmenge"]
+
+legend_cols: 2
+legend:
+  - "1  Die Revision fragt, wo personenbezogene Daten liegen"
+  - "2  Macie inventarisiert die Buckets und bewertet ihre Erreichbarkeit"
+  - "3  Automated Discovery zieht Stichproben und vergibt einen Score"
+  - "4  Jedes Finding meldet Ort und Typ, nie den gefundenen Inhalt"
+  - "5  Für das eigene Nummernformat kommt ein Custom Data Identifier dazu"
+  - "6  Die Allow List blendet die synthetischen Testdaten aus"
+  - "7  Erst auf den Buckets mit hohem Score läuft der Targeted Job"
+  - "Ein Treffer in der Allow List wird nie gemeldet — sie sticht beide Identifier"
