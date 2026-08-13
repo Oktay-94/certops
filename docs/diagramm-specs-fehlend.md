@@ -43,6 +43,35 @@ Das ist beim späteren Rollout relevant, weil `build_one()` in
 YAML zieht — ungepolstert entstünde `card-41.web.svg` neben `card-041.web.svg`.
 Beim Entpacken ist auf `card-NNN` zu normalisieren, Dateiname **und** `id`.
 
+## Bekannter Mangel in `cli.py` — Fehler werden als Erfolg gezählt
+
+**Nicht behoben, bewusst nicht heute repariert.** Die Fassung aus
+`certops-diagramkit.zip` ist byte-identisch mit der im Repo, bringt also keinen
+Fix mit.
+
+`main()` in `tools/diagramkit/certops_diagram/cli.py` fängt nur `Finding` ab.
+Zwei Fehlerpfade laufen daran vorbei:
+
+1. `spec = load(p)` steht **vor** dem `try` — ein defektes Spec wirft ungefangen.
+2. `_template()` läuft zwar innerhalb von `build_one()` und damit im `try`, wirft
+   aber `ModuleNotFoundError`, wenn das Template fehlt. Gefangen wird nur
+   `Finding`.
+
+In beiden Fällen erscheint ein Traceback statt der Meldung `ABGELEHNT`.
+
+**Praktische Folge, einmal real passiert:** Wer den Sammellauf auf das Wort
+„ABGELEHNT" filtert, zählt gescheiterte Karten als gebaut. Im ersten
+Rollout-Anlauf am 13.08. meldete der Lauf „90 gebaut, 0 abgelehnt", tatsächlich
+waren es 62 — die 28 Karten mit den damals fehlenden Templates `ablauf` und
+`hybrid` waren mit Traceback gescheitert. Aufgefallen ist es erst beim Kopieren,
+als nur 62 Zielordner Dateien bekamen.
+
+**Bis das behoben ist:** Erfolg am *Vorhandensein der Ausgabedatei* messen, nicht
+am Fehlen eines Schlüsselworts. Ein Fix würde `load()` in den `try` ziehen und
+neben `Finding` auch `ModuleNotFoundError` sowie `Exception` behandeln, mit
+unterscheidbaren Meldungen für „Spec kaputt", „Template fehlt" und „QC
+abgelehnt".
+
 ## Nebenbefund: Kit-Vorlagen sind keine Karten
 
 `tools/diagramkit/specs/` enthält neben den Kartenspecs die Vorlagen

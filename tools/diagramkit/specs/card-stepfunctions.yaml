@@ -1,0 +1,128 @@
+id: card-stepfunctions
+template: ablauf
+title: "Szenario 3 · Event-getriebene Medienverarbeitung"
+subtitle: >-
+  Serverlose Orchestrierung mit AWS Step Functions: ein Ereignis startet den Ablauf,
+  jeder Schritt wird gesteuert, wiederholt und im Fehlerfall sauber abgefangen
+
+region: "Region eu-central-1 (Frankfurt)"
+
+machine:
+  label: "AWS Step Functions · Zustandsautomat"
+  icon: stepfunctions
+  color: "#E7157B"
+  note: "Standard-Workflow · steuert die Reihenfolge, wiederholt bei Fehlern, merkt sich den Zustand"
+
+outside_top:
+  icon: users
+  title: Redaktion
+  subs: ["lädt eine Videodatei", "in den Bucket"]
+
+outside_bottom:
+  icon: users
+  title: Betriebsteam
+  subs: ["bekommt eine E-Mail", "mit Fehlerdetails"]
+
+top:
+  - icon: s3
+    title: Amazon S3 (Eingang)
+    subs: ["Rohvideos, KMS-", "verschlüsselt"]
+    w: 166
+  - icon: lambda
+    title: AWS Lambda (Start)
+    subs: ["startet die", "Ausführung"]
+  - icon: lambda
+    title: Prüfen
+    subs: ["Format, Größe, Codec", "Retry 3×, wachsend"]
+    ssize: 10
+    isize: 42
+    w: 150
+    machine: true
+  - icon: question
+    title: Choice-Zustand
+    subs: ["Ist die Datei gültig?", "reine Weiche, kein Code"]
+    ssize: 10
+    isize: 42
+    w: 150
+    machine: true
+  - icon: lambda
+    title: Umwandeln
+    subs: ["Transcodieren und", "Vorschaubild, Retry 3×"]
+    ssize: 10
+    isize: 42
+    w: 150
+    machine: true
+    note: {text: "gültig", color: ok}
+  - icon: dynamodb
+    title: Amazon DynamoDB
+    subs: ["Job-Status jedes", "Schritts, Metadaten"]
+    w: 170
+
+bottom:
+  - col: 1
+    icon: sns
+    title: Amazon SNS
+    subs: ["Fehlermeldung an", "das Betriebsteam"]
+    to: outside
+  - col: 3
+    icon: alert
+    title: Fehler-Zustand
+    subs: ["Catch fängt jeden", "endgültigen Fehler"]
+    ssize: 10
+    isize: 42
+    machine: true
+    from_top: true
+    from_label: ungültig
+    to: 1
+  - col: 4
+    icon: lambda
+    title: Speichern
+    subs: ["legt Ergebnis ab und", "schreibt Metadaten"]
+    ssize: 10
+    isize: 42
+    machine: true
+    from_top: true
+    to: 5
+  - col: 5
+    icon: s3
+    title: Amazon S3 (Ausgabe)
+    subs: ["fertige Datei und", "Vorschaubild"]
+
+catches:
+  - {from_col: 2, to_col: 3, label: Catch}
+  - {from_col: 4, to_col: 3, label: Catch}
+
+crossband:
+  heading: "Querschnitt: Sicherheit, Betrieb und Beobachtbarkeit — wirkt auf alle Bausteine oben"
+  items:
+    - icon: iam
+      title: AWS IAM
+      subs: ["Rollen für Lambda", "und Step Functions"]
+    - icon: kms
+      title: AWS KMS
+      subs: ["verschlüsselt beide", "Buckets"]
+    - icon: cloudwatch
+      title: Amazon CloudWatch
+      title_lines: ["Amazon", "CloudWatch"]
+      subs: ["Logs, Metriken,", "Alarm bei Fehlern"]
+    - icon: xray
+      title: AWS X-Ray
+      subs: ["zeigt, welcher Schritt", "wie lange braucht"]
+    - icon: cloudtrail
+      title: AWS CloudTrail
+      subs: ["protokolliert", "jeden Aufruf"]
+
+legend_cols: 3
+legend:
+  - "1  Die Redaktion legt eine Videodatei im Eingangs-Bucket ab"
+  - "2  S3 meldet das neue Objekt (Event Notification) an Lambda"
+  - "3  Lambda startet die Ausführung des Zustandsautomaten"
+  - "4  Schritt 1 prüft die Datei und übergibt an die Weiche"
+  - "5  Ist die Datei gültig, geht es zum Umwandeln weiter"
+  - "6  Jeder Schritt schreibt seinen Status nach DynamoDB"
+  - "7  Ist die Datei ungültig, geht es in den Fehler-Zustand"
+  - "8  Nach dem Umwandeln folgt der Speicher-Schritt"
+  - "9  Von dort meldet SNS den Fehler weiter"
+  - "10  Die fertige Datei landet im Ausgabe-Bucket"
+  - "11  Das Betriebsteam bekommt die Nachricht per E-Mail"
+  - "Graue Pfeile: Catch — schlägt ein Schritt endgültig fehl, greift derselbe Fehlerpfad"

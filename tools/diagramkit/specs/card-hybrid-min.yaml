@@ -1,0 +1,37 @@
+id: card-hybrid-min
+template: hybrid
+title: "Prüfkarte · Hybrid mit fünf Knoten und einem Band"
+subtitle: >-
+  Fünf statt vier Knoten im Rechenzentrum, ein Band statt zwei, kein Hero —
+  das Raster bricht selbst auf drei Zeilen um, nichts davon steht in der Spec
+
+region: "Region eu-west-1 (Irland)"
+
+datacenter:
+  label: Werk Rüsselsheim
+  nodes:
+    - {icon: server, title: Steuerrechner, subs: ["SPS-Anbindung"]}
+    - {icon: app, title: MES, subs: ["Fertigungsdaten"]}
+    - {icon: documents, title: Prüfprotokolle, subs: ["täglich neu"]}
+    - {icon: folders, title: CAD-Ablage, subs: ["Konstruktionsdaten"]}
+    - {icon: firewall, title: Werksfirewall, subs: ["Übergabepunkt"]}
+
+bridge:
+  - icon: vpn-gateway
+    title: Site-to-Site VPN
+    subs: ["verschlüsselt über", "das Internet"]
+    to_band: 0
+
+bands:
+  - label: "A · So kommen die Werksdaten in die Cloud"
+    nodes:
+      - {icon: s3, title: Amazon S3, subs: ["Rohdaten, KMS-", "verschlüsselt"]}
+      - {icon: lambda, title: AWS Lambda, subs: ["normalisiert die", "Messreihen"]}
+      - {icon: dynamodb, title: Amazon DynamoDB, subs: ["Kennzahlen je", "Charge"]}
+
+legend_cols: 2
+legend:
+  - "1  Das VPN verbindet das Werk mit der Region"
+  - "2  Die Rohdaten landen im Bucket"
+  - "3  Lambda normalisiert jede Messreihe"
+  - "4  Die Kennzahlen stehen in DynamoDB bereit"

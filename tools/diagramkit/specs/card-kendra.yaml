@@ -1,0 +1,115 @@
+id: card-kendra
+template: hybrid
+title: "Szenario 2 · Intelligente Wissenssuche über viele Dokumente"
+subtitle: >-
+  Hybride Lösungsarchitektur: Anbindung des Rechenzentrums, Weg der Dokumente in den
+  Index, Weg der Suchanfrage und die Sicherheitskontrollen
+
+region: "Region eu-central-1 (Frankfurt)"
+
+datacenter:
+  label: Rechenzentrum vor Ort
+  nodes:
+    - icon: folders
+      title: Dateiserver
+      subs: ["SMB-Freigaben,", "PDFs und Word"]
+    - icon: documents
+      title: "SharePoint, Wiki"
+      subs: ["interne", "Dokumente"]
+    - icon: server
+      title: E-Mail-Server
+      subs: ["Postfächer", "und Anhänge"]
+    - icon: app
+      title: Active Directory
+      subs: ["Benutzer", "und Gruppen"]
+  actor:
+    icon: users
+    title: Mitarbeitende
+    subs: ["stellen Fragen", "in normaler Sprache"]
+    to_band: 1
+    both: true
+
+bridge:
+  - icon: directconnect
+    title: AWS Direct Connect
+    subs: ["Standleitung ins RZ,", "nicht übers Internet"]
+    to_band: 0
+  - icon: snowball
+    title: AWS Snowball
+    subs: ["Erstbefüllung,", "80 TB per Kurier"]
+    to_band: 0
+
+bands:
+  - label: "A · So kommen die Dokumente in den Index"
+    hero_note: "Dokument + Metadaten"
+    nodes:
+      - icon: s3
+        title: Amazon S3
+        subs: ["Rohablage aller Dateien,", "verschlüsselt mit KMS"]
+      - icon: lambda
+        title: AWS Lambda
+        subs: ["startet automatisch bei", "jedem neuen Objekt"]
+      - icon: comprehend
+        title: Amazon Comprehend
+        subs: ["erkennt Sprache, Thema", "und Personendaten"]
+
+  - label: "B · So wird eine Suchanfrage beantwortet"
+    hero_note: "Suchanfrage + AD-Gruppen"
+    nodes:
+      - icon: cloudfront
+        title: Amazon CloudFront
+        subs: ["öffentlicher Eingang", "der Such-Oberfläche"]
+      - icon: apigateway
+        title: Amazon API Gateway
+        subs: ["nimmt die Suchanfrage", "entgegen, prüft Token"]
+      - icon: lambda
+        title: AWS Lambda
+        subs: ["fragt Kendra ab und", "reicht Gruppen mit"]
+
+hero:
+  icon: kendra
+  title: Amazon Kendra
+  subs: ["Der Kern der Lösung", "", "durchsuchbarer Index", "versteht ganze Fragen", "filtert nach Rechten"]
+  return_to_band: 1
+  return_note: "Antwort, nach Berechtigung gefiltert"
+
+crossband:
+  heading: "Querschnitt: Sicherheit, Identität und Betrieb — wirkt auf alle Bausteine oben"
+  items:
+    - icon: iam-identity-center
+      title: IAM Identity Center
+      title_lines: ["IAM Identity", "Center"]
+      subs: ["Anmeldung mit", "Firmenkonto"]
+    - icon: waf
+      title: AWS WAF
+      subs: ["blockt Bots", "und Angriffe"]
+    - icon: iam
+      title: AWS IAM
+      subs: ["Rollen mit", "minimalen Rechten"]
+    - icon: kms
+      title: AWS KMS
+      subs: ["verschlüsselt S3", "und den Index"]
+    - icon: vpc-endpoint
+      title: VPC-Endpunkte
+      subs: ["Verkehr bleibt", "im AWS-Netz"]
+    - icon: cloudtrail
+      title: AWS CloudTrail
+      subs: ["protokolliert", "jeden Aufruf"]
+    - icon: cloudwatch
+      title: Amazon CloudWatch
+      title_lines: ["Amazon", "CloudWatch"]
+      subs: ["Metriken, Logs", "und Alarme"]
+
+legend_cols: 3
+legend_heading: "Datenfluss Schritt für Schritt"
+legend:
+  - "1  Dokumente werden über die Standleitung nach S3 kopiert"
+  - "2  Altbestand einmalig per Snowball-Koffer nach S3"
+  - "3  Jedes neue Objekt in S3 startet automatisch Lambda"
+  - "4  Lambda schickt den Text zur Analyse an Comprehend"
+  - "5  Dokument und Metadaten wandern in den Kendra-Index"
+  - "6  Mitarbeitende stellen ihre Frage im Browser"
+  - "7  CloudFront reicht die Anfrage an das API Gateway weiter"
+  - "8  API Gateway ruft Lambda im privaten Subnetz auf"
+  - "9  Lambda fragt Kendra ab und reicht die AD-Gruppen mit"
+  - "10  Kendra liefert die Antwort, gefiltert nach Zugriffsrechten"

@@ -1,0 +1,34 @@
+id: card-ablauf-min
+template: ablauf
+title: "Prüfkarte · Ablauf in Minimalform"
+subtitle: >-
+  Drei Spalten statt sechs, ein einziger Knoten unten, kein Automatenrahmen,
+  kein Querschnittsband — Nachweis, dass die Spalten aus dem Inhalt entstehen
+
+region: "Region us-east-1 (Nord-Virginia)"
+
+outside_top:
+  icon: users
+  title: Nutzer
+  subs: ["lädt ein Bild hoch"]
+
+top:
+  - {icon: s3, title: Amazon S3, subs: ["nimmt das Bild an"]}
+  - {icon: lambda, title: AWS Lambda, subs: ["erzeugt eine", "Vorschau"]}
+  - {icon: dynamodb, title: Amazon DynamoDB, subs: ["merkt sich den", "Verweis"], w: 175}
+
+bottom:
+  - col: 1
+    icon: sqs-queue
+    title: Dead-Letter-Queue
+    subs: ["fängt Fehlschläge auf"]
+    from_top: true
+    from_label: Fehler
+    accent: fail
+
+legend_cols: 2
+legend:
+  - "1  Der Nutzer lädt ein Bild in den Bucket"
+  - "2  S3 startet die Funktion"
+  - "3  Die Funktion schreibt den Verweis nach DynamoDB"
+  - "4  Was mehrfach scheitert, landet in der Warteschlange"
