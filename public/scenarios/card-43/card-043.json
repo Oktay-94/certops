@@ -1,0 +1,14 @@
+{
+  "id": "card-043",
+  "title": "Battle Card 43 · Envelope Encryption mit KMS und SSE-KMS",
+  "subtitle": "Patientenakten in S3 mit eigenem Schlüssel, nachweisbarer Rotation und einem Audit-Eintrag je Zugriff — KMS sieht dabei die Akte selbst nie",
+  "steps": [
+    "1  Die Anwendung setzt PutObject ab und kennt keinen Schlüssel",
+    "2  S3 fordert bei KMS einen frischen Data Key an",
+    "3  Die Key Policy entscheidet, wer den Schlüssel benutzen darf",
+    "4  KMS liefert den Data Key in beiden Fassungen zurück",
+    "5  Jeder Schlüssel-Aufruf erscheint als Eintrag in CloudTrail",
+    "Die Akte selbst wird nie an KMS geschickt — nur der Data Key wird eingepackt",
+    "Der Lesepfad läuft spiegelbildlich und erzeugt den Decrypt-Eintrag"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "card-072",
+  "title": "Szenario 72 · DMS homogen — gleiche Engine, kein Schema Conversion Tool",
+  "subtitle": "MySQL on-prem nach RDS for MySQL: Full Load und laufende Änderungen über dieselbe Replikationsinstanz, die Quelle bleibt bis zum Cutover voll in Betrieb",
+  "steps": [
+    "1  Der Full-Load-Task liest den Bestand aus der laufenden Quelle",
+    "2  Die Replikationsinstanz schreibt ihn nach RDS for MySQL",
+    "3  Parallel fängt der CDC-Task jede Änderung der Quelle ab",
+    "4  CDC hält das Ziel aktuell bis zum Cutover — Downtime nahe null",
+    "Verworfen: AWS SCT — konvertiert nur zwischen verschiedenen Engines",
+    "Quelle oder Ziel muss in AWS liegen; on-prem nach on-prem kann DMS nicht"
+  ]
+}

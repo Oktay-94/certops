@@ -1,0 +1,13 @@
+{
+  "id": "card-026",
+  "title": "Szenario 26 · Betrugsringe über Beziehungsnetzwerke finden",
+  "subtitle": "240 Mio. Beziehungen zwischen Kunden, Geräten und Adressen — ein Traversal je Antrag in Echtzeit, eine Ringsuche über den Gesamtgraph in der Nacht",
+  "steps": [
+    "1  Jeder Antrag liefert Gerät, IP und Adresse an den Fraud-Service",
+    "2  Die Funktion fragt den Graphen über bis zu drei Hops ab",
+    "3  Für die Ermittlung wird ein Snapshot des Graphen abgelegt",
+    "4  Neptune Analytics lädt ihn als eigene In-Memory-Kopie",
+    "5  Erst darauf fallen ganze Ringe auf, nicht nur einzelne Konten",
+    "Die Kopie altert ab dem Laden — sie gleicht sich nie wieder ab"
+  ]
+}

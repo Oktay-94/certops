@@ -1,0 +1,14 @@
+{
+  "id": "card-094",
+  "title": "Szenario 94 · Amazon IVS, Live-Streaming",
+  "subtitle": "Live ohne eigene Streaming-Infrastruktur: der Dienst nimmt an, transkodiert und liefert aus — die Betriebsart entscheidet über Produkt und Abrechnung",
+  "steps": [
+    "1  Der Broadcaster sendet per RTMP, RTMPS oder SRT",
+    "2  IVS nimmt an und baut die Rendition-Ladder selbst",
+    "3  Ein Channel sendet an ein Publikum",
+    "4  Zuschauer sehen weltweit zu — abgerechnet nach Dauer",
+    "5  Alternativ verbindet ein Stage die Teilnehmer miteinander",
+    "6  Dort wird nach Teilnehmerstunden abgerechnet",
+    "Die Betriebsart wird am Anfang gewählt, nicht nach dem Transcoding"
+  ]
+}

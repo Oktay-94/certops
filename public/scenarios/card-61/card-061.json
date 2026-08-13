@@ -1,0 +1,14 @@
+{
+  "id": "card-061",
+  "title": "Szenario 61 · Bildmoderation im Marktplatz",
+  "subtitle": "Kein Bild wird sichtbar, bevor es geprüft ist: Rekognition entscheidet automatisch, A2I holt im Graubereich einen Menschen dazu — ohne eigenes Modell",
+  "steps": [
+    "1  Der Händler lädt das Bild in den privaten Upload-Bucket",
+    "2  Die Event Notification startet die Funktion asynchron",
+    "3  Lambda übergibt Bucket und Key an DetectModerationLabels",
+    "4  Bei hoher Confidence wandert das Bild in den Public-Bucket",
+    "5  Im Graubereich öffnet Rekognition einen Human Loop in A2I",
+    "6  Ein Mensch entscheidet, sein Urteil steuert die Freigabe",
+    "Rot umrandet: der Batch-Weg ist für neue Accounts gesperrt"
+  ]
+}

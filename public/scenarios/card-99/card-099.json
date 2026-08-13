@@ -1,0 +1,14 @@
+{
+  "id": "card-099",
+  "title": "Szenario 99 · Echte Geräte statt Emulatoren",
+  "subtitle": "Tests laufen parallel auf echter Hardware aus der Pipeline heraus — und für einen gemeldeten Fehler kommt ein einzelnes Gerät live in den Browser",
+  "steps": [
+    "1  Die Pipeline lädt Anwendungs- und Testpaket hoch",
+    "2  Device Farm führt die Tests parallel auf dem Pool aus",
+    "3  Je Gerät entstehen Logs, Screenshots, Video und Leistungsdaten",
+    "4  Für einen gemeldeten Fehler wird ein Gerät live geschaltet",
+    "5  Darauf lässt sich das Modell direkt bedienen und debuggen",
+    "Emulatoren zeigen weder herstellerspezifisches Rendering noch echte Sensorik",
+    "Private Devices bleiben einem Konto zugeordnet und behalten ihre Einstellungen"
+  ]
+}

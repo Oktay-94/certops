@@ -1,0 +1,14 @@
+{
+  "id": "card-017",
+  "title": "Szenario 17 · Snowball Edge — 500 TB, wenn die Leitung zu langsam ist",
+  "subtitle": "Bandbreite mal Zeit gegen Datenmenge: 154 Tage Rechenweg gegen acht Wochen Deadline — der Bulk reist physisch, und das Delta, das währenddessen entsteht, holt DataSync online nach",
+  "steps": [
+    "1  Drei Snowball Edge fassen 630 TB, reisen per Kurier, AWS importiert sie",
+    "2  Was während des Transports entsteht, zieht DataSync online nach",
+    "3  Eine Lifecycle-Regel schiebt die Master anschließend in die Archivklasse",
+    "Verworfen: der Direktupload — 154 Tage gegen acht Wochen Deadline",
+    "Die Quelldaten erst nach dem Job-Report löschen, nie vorher",
+    "Seit 07.11.2025 gibt AWS Snowball Edge nur noch an Bestandskunden aus — in der Prüfung",
+    "bleibt es die erwartete Antwort, im Projekt prüft man DataSync, Data Transfer Terminal, Partner"
+  ]
+}

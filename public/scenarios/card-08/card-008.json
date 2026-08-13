@@ -1,0 +1,15 @@
+{
+  "id": "card-008",
+  "title": "Karte 8 · Elastic Beanstalk und RDS",
+  "subtitle": "Code hochladen, die Plattform macht den Rest: Beanstalk baut ALB, Auto Scaling Group und EC2 — die Datenbank gehört aber bewusst außerhalb der Environment",
+  "steps": [
+    "1  Der Developer schiebt nur den Code — keine Infrastruktur-Definition",
+    "2  Beanstalk provisioniert ALB, Auto Scaling Group und EC2-Instances",
+    "3  Der ALB verteilt den Traffic auf die Web-Instances",
+    "4  Die App erreicht die RDS über einen Endpoint aus einer Umgebungsvariable",
+    "5  Unter der Haube baut CloudFormation den kompletten Stack",
+    "Die RDS lebt außerhalb der Environment und übersteht jeden Neuaufbau",
+    "RDS innerhalb der Environment wird mitgelöscht — nur für Dev/Test vertretbar",
+    "AL2-Plattformen laufen zum 30.06.2026 aus, neue Environments auf AL2023"
+  ]
+}

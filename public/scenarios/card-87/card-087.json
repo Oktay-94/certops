@@ -1,0 +1,15 @@
+{
+  "id": "card-087",
+  "title": "Szenario 87 · Compute Optimizer und Rightsizing",
+  "subtitle": "40 Instanzen bei 8 % CPU-Last: Rightsizing kommt vor dem Commitment — und ohne Memory-Metrik ist die Empfehlung nur die halbe Wahrheit",
+  "steps": [
+    "1  Compute Optimizer liest die Metriken der laufenden Flotte",
+    "2  Er stuft ein: over-provisioned, under-provisioned oder optimized",
+    "3  Ohne CloudWatch-Agent fehlt ihm der Speicherverbrauch — er rechnet auf CPU",
+    "4  Derselbe Dienst, dieselbe Flotte, nur eine vollständige Messgrundlage",
+    "5  Befund over-provisioned: die Instanz wird kleiner, die Baseline sinkt dauerhaft",
+    "6  Mit Agent sieht der Dienst auch den Speicher und empfiehlt belastbar",
+    "Cost Explorer muss aktiviert sein, sonst weist der Dienst keine Sparbeträge aus",
+    "Enhanced Infrastructure Metrics dehnt den Zeitraum von 14 auf bis zu 93 Tage — kostenpflichtig"
+  ]
+}

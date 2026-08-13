@@ -1,0 +1,15 @@
+{
+  "id": "card-023",
+  "title": "Szenario 23 · Dev/Test-Kapazität, die bis auf null atmet",
+  "subtitle": "14 Entwicklungsdatenbanken, alle 40 Minuten zwei Minuten Volllast und sonst Leerlauf — Kapazität nach Bedarf statt rund um die Uhr",
+  "steps": [
+    "1  Der CI-Lauf verbindet sich wie gegen jede andere Aurora-DB",
+    "2  Der Cluster-Endpoint führt auf die Instanzklasse db.serverless",
+    "3  Die Rechenschicht arbeitet auf dem geteilten Cluster Volume",
+    "4  An der ACU-Auslastung ist ablesbar, was die Kapazität tut",
+    "5  Zwischen zwei Läufen durchläuft die Instanz drei Zustände",
+    "6  Unter Last wächst die Kapazität in Sekunden, ohne Failover",
+    "7  Bleibt es still, pausiert sie und die Compute-Abrechnung stoppt",
+    "Der Storage atmet nicht mit — nur der Compute-Anteil fällt auf null"
+  ]
+}

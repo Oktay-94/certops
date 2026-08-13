@@ -1,0 +1,16 @@
+{
+  "id": "card-045",
+  "title": "Battle Card 45 · GuardDuty, Security Hub CSPM und EventBridge",
+  "subtitle": "Bedrohungen aus dreißig Accounts an einer Stelle sichtbar — und drei Regeln, die darauf reagieren, ohne dass jemand die Konsole öffnet",
+  "steps": [
+    "1  In dreißig Mitgliedskonten läuft dieselbe GuardDuty-Konfiguration",
+    "2  Security Hub CSPM sammelt die Findings und normalisiert sie",
+    "3  Parallel dazu wird jedes Finding an EventBridge veröffentlicht",
+    "4  Eine Regel greift nur bei kritischer Severity",
+    "5  eine zweite bei jeder neuen Finding-ID",
+    "6  und eine dritte für alles, was länger bleiben muss",
+    "7  Jede Bahn übergibt an den Dienst, der handelt",
+    "8  und der erzeugt das Ergebnis der Bahn",
+    "GuardDuty hält Findings 90 Tage — danach zählt nur der Export"
+  ]
+}

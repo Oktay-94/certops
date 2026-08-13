@@ -1,0 +1,16 @@
+{
+  "id": "card-095",
+  "title": "Szenario 95 · AppSync (GraphQL), DynamoDB",
+  "subtitle": "Ein Endpoint für ein Dutzend Ansichten: jede Query beschreibt ihre Felder selbst, und eine Mutation erreicht alle angemeldeten Clients ohne Polling",
+  "steps": [
+    "1  Der Nutzer öffnet eine Ansicht in der App",
+    "2  Der Client weist sich aus — User Pool, IAM, API Key oder Lambda",
+    "3  Eine einzige Anfrage geht an den einen Endpoint",
+    "4  Die Listenansicht bekommt ihre zwei Felder",
+    "5  Die Detailansicht ihre zwölf, über denselben Endpoint",
+    "6  Eine Mutation löst die Subscription aus",
+    "7  AppSync löst jede Bahn selbst auf und ruft die Quelle",
+    "8  Am Ende steht genau das, was diese Bahn braucht",
+    "Der Push kommt vom Dienst, nicht aus der Datenbank"
+  ]
+}

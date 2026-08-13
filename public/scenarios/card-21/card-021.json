@@ -1,0 +1,15 @@
+{
+  "id": "card-021",
+  "title": "Szenario 21 · Gaming-Leaderboard mit Mikrosekunden-Reads",
+  "subtitle": "900.000 Leseanfragen pro Sekunde auf immer dieselben Top-100-Einträge — warum hier ein Cache gehört, der die DynamoDB-API selbst spricht",
+  "steps": [
+    "1  Die Tabelle hält die Top-100 und liefert sie an das Backend",
+    "2  Ohne Cache stellt jedes geöffnete HUD seine Anfrage an die Tabelle",
+    "3  Das Backend spricht den DynamoDB-Client an — jeder Read kostet RCU",
+    "4  Am Inhalt der Tabelle ändert sich nichts, sie bleibt die Wahrheit",
+    "5  Nur was nicht im Item Cache liegt, erreicht überhaupt die Tabelle",
+    "6  Nur der Client wechselt: gleiche Aufrufe, DAX-Endpoint statt Tabelle",
+    "7  Strongly consistent Reads reicht DAX durch und cacht sie nicht",
+    "Ein Cache Hit endet in DAX — die Tabelle erfährt von der Anfrage nichts"
+  ]
+}

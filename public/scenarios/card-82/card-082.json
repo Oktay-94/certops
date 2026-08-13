@@ -1,0 +1,17 @@
+{
+  "id": "card-082",
+  "title": "Szenario 82 · AWS Backup zentral über Accounts",
+  "subtitle": "Eine Backup Policy für 40 Konten, der Recovery Point entsteht immer zuerst im Quell-Account — erst die Copy Action bringt ihn in den zentralen Vault",
+  "steps": [
+    "1  Die Aufsicht verlangt sieben Jahre unveränderliche Aufbewahrung",
+    "2  Verwaltet wird aus dem delegierten Account, nicht aus dem Management-Account",
+    "3  Aus der vererbten Policy wird in jedem Konto ein Backup Plan",
+    "4  Der Plan sichert die EBS-Volumes des ersten Kontos",
+    "5  ebenso die Datenbanken des zweiten Kontos",
+    "6  und die Buckets des dritten Kontos",
+    "7  Der Recovery Point entsteht in jeder Bahn zuerst im eigenen Konto",
+    "8  Erst die Copy Action legt die Kopie in den zentralen Vault",
+    "Alle drei Bahnen kopieren in denselben Vault des Backup-Accounts",
+    "Ein Backup direkt in ein fremdes Konto schreiben geht nicht"
+  ]
+}

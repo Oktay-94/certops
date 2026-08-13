@@ -1,0 +1,13 @@
+{
+  "id": "card-075",
+  "title": "Szenario 75 · VMware Cloud on AWS — heben statt umbauen",
+  "subtitle": "Eine gewachsene vSphere-Landschaft zieht um, ohne dass Applikationen umgebaut oder Admins neu ausgebildet werden: gleiche Tools, gleiche Runbooks",
+  "steps": [
+    "1  HCX koppelt das eigene vCenter mit dem SDDC in der Region",
+    "2  Die VMs wandern per vMotion oder als Welle unverändert hinüber",
+    "3  Das SDDC hängt über eine ENI direkt am Kunden-VPC",
+    "Patching, Host-Tausch und Lifecycle des SDDC macht der Anbieter",
+    "Dedizierte SDDC-Hosts sind nicht dasselbe wie EC2 Dedicated Hosts",
+    "Verworfen: Refactoring auf EC2-nativ — Umbau plus Neuschulung des Teams"
+  ]
+}

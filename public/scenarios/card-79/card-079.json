@@ -1,0 +1,13 @@
+{
+  "id": "card-079",
+  "title": "Szenario 79 · Storage Gateway — Bandworkflow behalten, Roboter ersetzen",
+  "subtitle": "Sieben Jahre Aufbewahrung ohne Umbau der Backup-Prozesse: eine virtuelle Tape Library über iSCSI, und der Archiv-Pool entscheidet über die Speicherklasse",
+  "steps": [
+    "1  Der Job schreibt auf ein virtuelles Tape, der Upload läuft asynchron",
+    "2  Beim Eject wandert das Tape in den Pool, der beim Anlegen gewählt wurde",
+    "3  Wer Block-Volumes statt Bänder braucht, nimmt Volume Gateway",
+    "Cached: Primärdaten in S3, lokal nur der heiße Anteil. Stored: alles lokal",
+    "Archivierte Tapes müssen erst zurückgeholt werden und sind nur lesbar",
+    "Verworfen: S3 File Gateway — ein Datei-Share, kein Bandroboter"
+  ]
+}

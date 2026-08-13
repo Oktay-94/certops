@@ -1,0 +1,13 @@
+{
+  "id": "card-016",
+  "title": "Szenario 16 · S3 File Gateway — das Netzlaufwerk bleibt, die Daten landen in S3",
+  "subtitle": "Der Protokollbruch zwischen Datei- und Objektwelt wird im Gateway aufgelöst, nicht in der Anwendung: SMB bleibt SMB, und trotzdem entsteht aus jeder Datei ein echtes S3-Objekt",
+  "steps": [
+    "1  Der PDM-Server schreibt über SMB, das Gateway lädt asynchron nach S3",
+    "2  Der Write landet zuerst im lokalen Cache, der ACK kommt vor der WAN-Leitung",
+    "3  Eine Lifecycle-Regel im Bucket archiviert Altprojekte — kein Gateway-Feature",
+    "4  Die QS fragt die Prüfprotokolle per SQL ab, ohne sie vorher zu exportieren",
+    "Aus Z:\\projekte\\anlage-7.pdf wird das Objekt projekte/anlage-7.pdf — kein Container, kein Blob",
+    "Deshalb lesen auch Lambda (s3:ObjectCreated) und SageMaker dieselben Objekte direkt"
+  ]
+}

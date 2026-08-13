@@ -1,0 +1,14 @@
+{
+  "id": "card-018",
+  "title": "Szenario 18 · S3 Transfer Acceleration und Multipart Upload — große Dateien von überall",
+  "subtitle": "Multipart löst das Zuverlässigkeitsproblem, Transfer Acceleration das Distanzproblem — und eine Lifecycle-Regel räumt die Parts weg, für die sonst niemand eine Rechnung erklären kann",
+  "steps": [
+    "1  Der Browser holt sich beim API Gateway presigned URLs, eine je Part",
+    "2  Lambda startet den Upload mit CreateMultipartUpload und erzeugt die URLs",
+    "3  Damit gehen die Parts direkt an die nächste Edge, nicht über den Webserver",
+    "4  Über das AWS-Backbone erreichen sie den Bucket, Part für Part",
+    "5  Eine Lifecycle-Regel räumt Parts weg, die nie zu einem Objekt zusammengesetzt wurden",
+    "Erst CompleteMultipartUpload erzeugt das Objekt — vorher liegt im Bucket nichts Sichtbares",
+    "Bringt TA nichts, berechnet AWS auch keine TA-Gebühr, sondern die normalen Transferpreise"
+  ]
+}

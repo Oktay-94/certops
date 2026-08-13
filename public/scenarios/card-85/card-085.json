@@ -1,0 +1,17 @@
+{
+  "id": "card-085",
+  "title": "Szenario 85 · Savings Plans, Reserved Instances, Spot",
+  "subtitle": "Jedes Lastprofil bekommt die Kaufoption, die zu seiner Beweglichkeit passt — Rabatt kauft man gegen Bindung, Kapazität reserviert nur die zonale RI",
+  "steps": [
+    "1  FinOps soll 30 % senken, ohne den Umbau zu blockieren",
+    "2  Die Graviton-Migration ist terminiert und entscheidet über die Bindung",
+    "3  Für jedes Lastprofil wird einzeln entschieden",
+    "4  Konstante Grundlast bei beweglicher Architektur",
+    "5  Unterbrechbarer, zustandsloser Nacht-Batch",
+    "6  Datenbanken mit stabiler Instanzklasse",
+    "7  Jedes Profil bekommt die Kaufoption, die seine Beweglichkeit zulässt",
+    "8  Der Rabatt kostet Bindung — 1 oder 3 Jahre, Spot gar keine",
+    "Realitätsstand seit 12/2025: Database Savings Plans (Prüfungsstand bleibt RI)",
+    "Convertible RI liegt bei bis zu 66 %, verlangt aber einen manuellen Tausch"
+  ]
+}

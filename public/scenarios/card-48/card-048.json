@@ -1,0 +1,16 @@
+{
+  "id": "card-048",
+  "title": "Battle Card 48 · IAM Identity Center und Permission Sets",
+  "subtitle": "Eine Identität je Person, ein Entzug für alle dreißig Accounts — und ein SCP, der auch dann noch begrenzt, wenn jemand das Permission Set umschreibt",
+  "steps": [
+    "1  Der externe IdP bleibt führend, SCIM synchronisiert Nutzer und Gruppen",
+    "2  Im Identity Center entsteht ein Permission Set aus IAM-Policies",
+    "3  Die Zuweisung läuft in einer Operation über die Organisation",
+    "4  Sie erreicht den Produktions-Account",
+    "5  ebenso jeden weiteren Account",
+    "6  bis zum dreißigsten",
+    "7  In jedem Zielaccount entsteht dieselbe Rolle",
+    "8  und STS stellt dafür temporäre Credentials aus",
+    "Der SCP begrenzt jede dieser Rollen — gewähren kann nur das Permission Set"
+  ]
+}

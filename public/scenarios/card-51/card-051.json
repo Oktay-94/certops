@@ -1,0 +1,15 @@
+{
+  "id": "card-051",
+  "title": "Szenario 51 · Kinesis Data Streams statt SQS",
+  "subtitle": "Clickstream eines Web-Shops: drei Teams brauchen dieselben Events gleichzeitig, und nach einem fehlerhaften Deployment muss eines davon drei Stunden erneut lesen",
+  "steps": [
+    "1  Die Kundschaft klickt im Web-Shop",
+    "3  Das Frontend schreibt jedes Klick-Event in den Stream",
+    "4  Die Personalisierung liest den Stream ...",
+    "5  ... die Betrugserkennung liest dieselben Records ...",
+    "6  ... und die BI-Ladung ebenfalls, ohne die anderen zu stoeren",
+    "7  Lesen entfernt nichts: jeder haelt seine eigene Position",
+    "8  Jede Bahn schreibt ihr Ergebnis an ihr eigenes Ziel",
+    "Replay: der Konsument setzt seinen Iterator zurueck"
+  ]
+}

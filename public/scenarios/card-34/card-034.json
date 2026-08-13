@@ -1,0 +1,15 @@
+{
+  "id": "card-034",
+  "title": "Karte 34 · NAT Gateway gegen VPC Endpoints",
+  "subtitle": "Ab wann sich ein Endpoint rechnet: Gateway Endpoint immer, Interface Endpoint erst ab rund 626 GB pro Monat und Dienst",
+  "steps": [
+    "1  Der NAT übersetzt in beide Richtungen — die Antwort kommt denselben Weg zurück",
+    "2  11,4 TB durch den NAT: 8 TB S3, 2,5 TB ECR, 400 GB Logs, 300 GB Internet — 614 $",
+    "3  Die Route Table schickt 0.0.0.0/0 zum NAT, auch den Verkehr zu AWS-Diensten",
+    "4  Am Antwortweg ändert sich nichts: der NAT bleibt für echten Internetverkehr",
+    "5  Nur 300 GB echtes Internet bleiben am NAT — aus 614 $ werden 199 $ im Monat",
+    "6  Die S3-Prefix-List in der Route Table zeigt auf den Endpoint, kostenlos und ohne Gerät",
+    "7  ecr.api und ecr.dkr über drei AZ kosten 69,40 $ statt 115,20 $ über den NAT",
+    "CloudWatch Logs bleibt bewusst am NAT: 18 $ gegen 25,90 $ über einen eigenen Endpoint"
+  ]
+}

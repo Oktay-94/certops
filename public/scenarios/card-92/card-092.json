@@ -1,0 +1,13 @@
+{
+  "id": "card-092",
+  "title": "Szenario 92 · IoT Greengrass V2, Inferenz am Edge",
+  "subtitle": "Die Klassifikation läuft auf dem Gerät weiter, wenn die Leitung ausfällt — Komponenten werden vorher ausgerollt, Ergebnisse später nachgereicht",
+  "steps": [
+    "1  Das trainierte Modell liegt als Artefakt in S3",
+    "2  Das Deployment rollt Model, Runtime und Inference auf das Gerät aus",
+    "3  Steht die Leitung wieder, exportiert Stream Manager das Gepufferte",
+    "Kameras sprechen über den lokalen MQTT-Broker mit dem Core-Gerät",
+    "Fällt die Verbindung aus, klassifiziert das Gerät unverändert weiter",
+    "Ohne vorheriges Deployment kann ein Gerät im Funkloch gar nichts"
+  ]
+}

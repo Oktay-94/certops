@@ -1,0 +1,15 @@
+{
+  "id": "card-044",
+  "title": "Battle Card 44 · Secrets Manager gegen Parameter Store",
+  "subtitle": "Warum 3.000 Konfigurationswerte im Secrets Manager Geld kosten, das sie nicht einbringen — und wo der Trennstrich tatsächlich verläuft",
+  "steps": [
+    "1  Die Services holen Zugangsdaten und Konfigurationswerte am selben Ort",
+    "2  Beides wird je Secret und Monat berechnet, auch was nie rotiert",
+    "3  Die 3.000 Werte ändern sich selten und brauchen keinen Lebenszyklus",
+    "4  Nach der Trennung fragen dieselben Services dieselben Werte ab",
+    "5  Rotation dort, wo sie gebraucht wird — der Rest kostet nichts extra",
+    "6  Die Rotation läuft in vier Schritten, testSecret entscheidet über AWSCURRENT",
+    "7  Konfiguration liegt als SecureString im Standard Tier",
+    "Standard zu Advanced geht jederzeit, Advanced zurück zu Standard nie"
+  ]
+}

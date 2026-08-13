@@ -1,0 +1,13 @@
+{
+  "id": "card-073",
+  "title": "Szenario 73 · AWS DataSync — geplanter, inkrementeller Massentransfer",
+  "subtitle": "Wiederkehrende NFS-Synchronisation über die bestehende Leitung: ein Agent im Rechenzentrum, zwei Tasks, nach der Erstkopie nur noch Neues und Geändertes",
+  "steps": [
+    "1  Der Agent liest den Share und überträgt per TLS an den Dienst",
+    "2  Jede Datei wird ein S3-Objekt, POSIX-Metadaten wandern mit",
+    "3  Ein zweiter Task läuft über dieselbe Leitung",
+    "4  Ziel EFS, wenn Anwendungen weiter Datei-Semantik brauchen",
+    "Nach der Erstkopie bewegt sich nur noch Neues und Geändertes",
+    "Integritätsprüfung in transit und at rest ist eingebaut"
+  ]
+}

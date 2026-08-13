@@ -1,0 +1,15 @@
+{
+  "id": "card-012",
+  "title": "Szenario 12 · Unbekanntes Zugriffsmuster — S3 Intelligent-Tiering statt Ratespiel",
+  "subtitle": "Drei automatische Tiers messen den Zugriff je Objekt statt sein Alter — Millisekunden in allen dreien, keine Abrufgebühr, und ein einziger Zugriff hebt das Objekt sofort wieder nach vorn",
+  "steps": [
+    "1  Die Anwendung legt das Objekt mit StorageClass INTELLIGENT_TIERING ab",
+    "2  Jedes neue Objekt startet im Frequent Access Tier",
+    "3  30 aufeinanderfolgende Tage ohne Zugriff: Infrequent Access Tier",
+    "4  90 Tage ohne Zugriff: Archive Instant Access — trotz des Namens kein Glacier",
+    "5  Nur nach Opt-in geht es weiter in die beiden asynchronen Archivstufen",
+    "6  Ein einziger Zugriff hebt das Objekt sofort zurück nach Frequent Access, ohne Wartezeit",
+    "Rückstufung und Rücksprung sind kostenfrei — es gibt keine Mindestspeicherdauer",
+    "Die Opt-in-Stufen brechen die Millisekunden-Zusage und scheiden im Szenario deshalb aus"
+  ]
+}

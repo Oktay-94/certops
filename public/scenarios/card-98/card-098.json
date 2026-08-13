@@ -1,0 +1,15 @@
+{
+  "id": "card-098",
+  "title": "Szenario 98 · Git-Push wird Preview",
+  "subtitle": "Jeder Pull Request bekommt eine eigene Adresse und verschwindet beim Merge wieder — der main-Branch geht atomar in die Produktion",
+  "steps": [
+    "1  Ein Push oder ein Pull Request löst den Build aus",
+    "2  Amplify baut je Branch nach der Build-Spezifikation",
+    "3  Der main-Branch geht atomar in die Produktion",
+    "4  Umgeschaltet wird erst, wenn das Deployment vollständig ist",
+    "5  Jeder Pull Request bekommt seine eigene Vorschau-URL",
+    "6  Von Hand gebaut, fehlen genau Vorschau und Abbau",
+    "Beim Merge verschwinden URL und temporäre Umgebung von selbst",
+    "CodeBuild, CodeCommit und CodeDeploy sind im Exam-Guide out of scope"
+  ]
+}

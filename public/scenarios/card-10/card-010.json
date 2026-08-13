@@ -1,0 +1,16 @@
+{
+  "id": "card-010",
+  "title": "Karte 10 · AWS Batch, EC2 GPU und S3",
+  "subtitle": "Ein Animationsstudio rendert nachts hunderte unabhängige Szenen: GPU-Jobs in einer Queue, Kapazität auf Spot, tagsüber keine Kosten — und ein Retry, wenn Spot zurückgeholt wird",
+  "steps": [
+    "1  Das Render-Team schickt hunderte Jobs per submit-job an AWS Batch",
+    "2  Batch dispatcht den Job, der seine Szenen aus dem Input-Bucket zieht",
+    "3  Gerendert wird auf GPU-Instanzen der p-Familie, die Kapazität läuft auf Spot",
+    "4  Fertige Frames landen im Output-Bucket, per Lifecycle später im Archiv",
+    "5  Wird eine Spot-Instanz zurückgeholt, meldet EC2 das zwei Minuten vorher",
+    "6  Batch plant den betroffenen Job automatisch neu — kein Frame geht verloren",
+    "Nach dem letzten Job fährt Batch auf 0 Instanzen herunter (minvCpus 0)",
+    "Fargate kann kein GPU — GPU-Jobs brauchen das EC2-Compute-Environment",
+    "Lambda scheidet aus: 15 Minuten Timeout und ebenfalls keine GPU"
+  ]
+}

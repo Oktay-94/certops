@@ -1,0 +1,15 @@
+{
+  "id": "card-062",
+  "title": "Szenario 62 · Rechnungsprüfung mit Human-in-the-Loop",
+  "subtitle": "Der Task Token hält die Execution an, während ein Mensch korrigiert — kein Compute im Leerlauf, und waitForTaskToken gibt es nur im Standard Workflow",
+  "steps": [
+    "1  Die Rechnung landet im Eingangs-Bucket",
+    "2  Das S3-Event startet eine Standard-Execution",
+    "3  Der Workflow ruft AnalyzeDocument mit FeatureTypes FORMS auf",
+    "4  Sind alle wichtigen Felder sicher, geht der Satz in die Ablage",
+    "5  Sonst legt der Task den Token in die Queue und pausiert",
+    "6  Der Sachbearbeiter korrigiert in der selbst gebauten Anwendung",
+    "SendTaskSuccess weckt die Execution — der Rückweg ist nicht gezeichnet",
+    "Rot umrandet: A2I wäre der fertige Weg, ist für Neukunden aber zu"
+  ]
+}

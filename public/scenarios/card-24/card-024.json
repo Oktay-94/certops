@@ -1,0 +1,15 @@
+{
+  "id": "card-024",
+  "title": "Szenario 24 · Cache-Aside für einen Produktkatalog mit 95 % Reads",
+  "subtitle": "240.000 Artikel, 500 davon machen 60 % der Abrufe aus — und ein Preis-Batch um 6 Uhr entscheidet, warum der Cache Anwendungscode braucht",
+  "steps": [
+    "1  Ein Einkäufer öffnet eine Artikelseite im Online-Katalog",
+    "2  Mittags dauert die Antwort 800 ms statt 40 ms",
+    "3  Denn jede Anfrage wird zu einem SELECT auf dieselben Datensätze",
+    "4  Am Einstieg ändert sich nichts, die Anwendung nimmt die Anfrage an",
+    "5  Ein Cache Hit beantwortet sie aus dem Arbeitsspeicher",
+    "6  Die Anwendung fragt zuerst den Cache und schreibt selbst zurück",
+    "7  Nur was dort fehlt, erreicht überhaupt noch die Datenbank",
+    "Der Cache invalidiert nichts von allein — der 6-Uhr-Batch muss ihn aufräumen"
+  ]
+}

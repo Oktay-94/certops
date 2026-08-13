@@ -1,0 +1,13 @@
+{
+  "id": "card-053",
+  "title": "Szenario 53 · Ad-hoc-SQL auf dem Data Lake ohne Cluster",
+  "subtitle": "40.000 Partitionen machen schon die Partitionsverwaltung zum Engpass — und dieselbe Standardauswertung laeuft jeden Morgen fuenfmal identisch",
+  "steps": [
+    "1  Der Analyst schickt Standard-SQL an Athena",
+    "2  Athena oeffnet nur die Praefixe, die zur Abfrage passen",
+    "3  Das Ergebnis geht zurueck — bezahlt wird das gescannte Volumen",
+    "4  Ohne Projection ruft Athena erst GetPartitions bei Glue ab",
+    "Mit Projection entfaellt Schritt 4 — Athena rechnet die Partitionen selbst",
+    "Verworfen: ein Redshift-Cluster kostet auch, wenn niemand fragt"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "card-006",
+  "title": "Karte 6 · EKS, Karpenter und Spot",
+  "subtitle": "Eine Streaming-Plattform fährt ihre Microservices kostenoptimal: unkritische Pods auf Spot, kritische auf On-Demand — und ein sauberer Umgang mit der Spot-Kündigung",
+  "steps": [
+    "1  Der Developer deployt, der kube-scheduler findet keine Kapazität",
+    "2  Karpenter liest die echten Anforderungen der Pending Pods",
+    "3  Für unterbrechbare Pods startet er Nodes aus dem Spot NodePool",
+    "4  EC2 kündigt die Spot-Node ~2 Minuten vorher an, EventBridge fängt es",
+    "5  Die Rule legt die Kündigung in die SQS Interruption Queue",
+    "6  Kritische und stateful Pods laufen im On-Demand NodePool",
+    "7  Karpenter drainiert die Node und startet rechtzeitig Ersatz",
+    "Fehlt Spot-Kapazität, fällt Karpenter automatisch auf On-Demand zurück",
+    "Sinkt die Auslastung, packt Karpenter die Pods auf weniger Nodes",
+    "Cluster Autoscaler skaliert nur vordefinierte Node Groups — entweder/oder"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "card-076",
+  "title": "Szenario 76 · Mainframe Modernization — Replatform oder Refactor",
+  "subtitle": "COBOL-Batch auf z/OS in Wellen ablösen statt als Big Bang: erst analysieren, dann Daten und Artefakte hinüberbringen, dann Welle für Welle umstellen",
+  "steps": [
+    "1  Der Analyzer liest Programme, JCL-Jobs und Copybooks ein",
+    "2  Aus den Abhängigkeiten entsteht der Wellenplan",
+    "3  DMS bringt DB2 und VSAM nach Aurora oder RDS",
+    "4  Die Runtime setzt auf dem migrierten Datenstand auf",
+    "5  JCL-Dateien und Batch-Binaries wandern nach S3",
+    "6  Die Laufzeitumgebung liest die Pfade aus der Application-Definition",
+    "Ohne migrierte Daten lässt sich keine der beiden Runtimes testen",
+    "Verworfen: manueller Rewrite als Big Bang, ohne Rückweg zum Altsystem"
+  ]
+}

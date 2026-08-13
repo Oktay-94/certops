@@ -1,0 +1,16 @@
+{
+  "id": "card-022",
+  "title": "Szenario 22 · Verfügbarkeit und Lesekapazität auseinanderhalten",
+  "subtitle": "Eine Instanz trägt Schadenbearbeitung und Quartalsauswertung zugleich — und der Ausfall einer Availability Zone darf keinen Datensatz kosten",
+  "steps": [
+    "1  Die Schadenbearbeitung erreicht die Primary über den Writer-Endpoint",
+    "2  Werktags zwischen 8 und 10 Uhr laufen die Anfragen in Timeouts",
+    "3  Ursache eins: Das Controlling scannt dieselbe Instanz voll durch",
+    "4  Ursache zwei: Eine einzelne Instanz überlebt keinen AZ-Ausfall",
+    "5  Am Schreibweg ändert sich nichts, es bleibt bei einem Schreibpunkt",
+    "6  Die Sachbearbeitung bekommt ihre gewohnten Antwortzeiten zurück",
+    "7  Der Standby hält synchron mit — RPO 0, Failover in 60 bis 120 s",
+    "8  Das Reporting fragt ab jetzt den eigenen Endpoint der Read Replica",
+    "Der Standby ist passiv: Er beantwortet nichts, er wartet nur"
+  ]
+}

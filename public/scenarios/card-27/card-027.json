@@ -1,0 +1,15 @@
+{
+  "id": "card-027",
+  "title": "Szenario 27 · IoT-Zeitreihen zwischen Prüfungsstand und Produktstand",
+  "subtitle": "3 Mio. Messwerte pro Minute, zwei Zugriffsmuster, die einander widersprechen — und ein Dienst, der für Neukunden nicht mehr offen ist",
+  "steps": [
+    "1  Die Maschinen melden ihre Messwerte per MQTT an IoT Core",
+    "2  Eine Rule Action schreibt sie direkt in den Memory Store",
+    "3  Nach Ablauf der Retention wandern sie automatisch weiter",
+    "4  Eine einzige SQL-Abfrage greift über beide Stufen zu",
+    "5  Leitwarte und Konstruktion fragen dieselbe Tabelle an",
+    "6  Dieselbe Regel, anderes Ziel: der Weg für Neukunden",
+    "7  Auch dieser Weg endet bei SQL, dazu kommt InfluxQL",
+    "Es gibt kein FROM memory_store — die Engine wählt die Stufe selbst"
+  ]
+}

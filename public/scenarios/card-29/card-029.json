@@ -1,0 +1,13 @@
+{
+  "id": "card-029",
+  "title": "Szenario 29 · MongoDB-Workload managed betreiben, ohne umzuschreiben",
+  "subtitle": "1,4 TB Katalogdaten aus einem selbst betriebenen Replica Set — das Datenmodell bleibt, der Betrieb wandert, die Anwendung wird nicht angefasst",
+  "steps": [
+    "1  DMS liest aus dem bestehenden Replica Set im Rechenzentrum",
+    "2  Erst wandert der Bestand, dann hält CDC die Zielseite aktuell",
+    "3  Die Primary-Instanz schreibt in das gemeinsame Cluster-Volume",
+    "4  Die Replicas lesen aus demselben Volume, ohne eigene Kopie",
+    "5  Die Anwendung wechselt den Connection-String, sonst nichts",
+    "Dokument zu Dokument — für diese Migration braucht es kein SCT"
+  ]
+}

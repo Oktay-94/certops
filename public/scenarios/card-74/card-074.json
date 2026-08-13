@@ -1,0 +1,13 @@
+{
+  "id": "card-074",
+  "title": "Szenario 74 · Migration Hub und Application Discovery Service",
+  "subtitle": "Erst erfassen, dann in Wellen migrieren: der Agent sieht tief, der Agentless Collector sieht breit — beide Ströme landen in der Home Region",
+  "steps": [
+    "1  Der Agent meldet Prozesse, Netzverbindungen und Performance je Server",
+    "2  Der Agentless Collector meldet das breite VM- und DB-Inventar",
+    "3  Aus den Daten entstehen Anwendungsgruppen und EC2-Empfehlungen",
+    "Die Home Region ist zuerst zu setzen, sonst registriert sich kein Collector",
+    "Dependency-Mapping braucht den Agent, schnelles Inventar den Collector",
+    "Ohne Collector geht auch ein Datei-Import per CSV"
+  ]
+}

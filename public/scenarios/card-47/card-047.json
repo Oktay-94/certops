@@ -1,0 +1,15 @@
+{
+  "id": "card-047",
+  "title": "Battle Card 47 · Macie über 1.400 S3-Buckets",
+  "subtitle": "Erst breit und billig herausfinden, wo etwas liegen könnte — und erst dann gezielt und teuer nachsehen, was dort tatsächlich liegt",
+  "steps": [
+    "1  Die Revision fragt, wo personenbezogene Daten liegen",
+    "2  Macie inventarisiert die Buckets und bewertet ihre Erreichbarkeit",
+    "3  Automated Discovery zieht Stichproben und vergibt einen Score",
+    "4  Jedes Finding meldet Ort und Typ, nie den gefundenen Inhalt",
+    "5  Für das eigene Nummernformat kommt ein Custom Data Identifier dazu",
+    "6  Die Allow List blendet die synthetischen Testdaten aus",
+    "7  Erst auf den Buckets mit hohem Score läuft der Targeted Job",
+    "Ein Treffer in der Allow List wird nie gemeldet — sie sticht beide Identifier"
+  ]
+}

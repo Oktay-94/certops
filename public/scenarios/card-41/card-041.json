@@ -1,0 +1,15 @@
+{
+  "id": "card-041",
+  "title": "Battle Card 41 · Temporäre Credentials über IAM Roles und STS",
+  "subtitle": "Ein Altsystem im eigenen Rechenzentrum, eine EC2-Flotte und eine Lambda-Funktion holen sich Rechte beim selben Aussteller — ohne einen einzigen Access Key",
+  "steps": [
+    "1  Das Altsystem weist sein Zertifikat aus der eigenen PKI vor",
+    "2  Roles Anywhere lässt darauf eine Rollensitzung erzeugen",
+    "3  STS stellt die kurzlebigen Credentials für die Rolle aus",
+    "4  Damit landen die Bestandslisten im Bucket",
+    "5  Lambda erhält seine Credentials über dieselbe Stelle",
+    "6  und schreibt die verarbeiteten Aufträge nach DynamoDB",
+    "Trust Policy entscheidet, wer die Rolle annehmen darf",
+    "Permissions Policy entscheidet, was der Anrufer danach tun darf"
+  ]
+}

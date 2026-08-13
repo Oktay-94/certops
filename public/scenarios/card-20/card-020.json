@@ -1,0 +1,14 @@
+{
+  "id": "card-020",
+  "title": "Szenario 20 · S3 Access Points und VPC Endpoints — ein Bucket, viele Teams, privater Traffic",
+  "subtitle": "Aus einer Bucket Policy mit 240 Statements werden viele kleine Access-Point-Policies — und der Weg aus dem Rechenzentrum führt über den Interface Endpoint, nicht über den Gateway Endpoint",
+  "steps": [
+    "1  Das BI-Tool erreicht AWS über Direct Connect — Voraussetzung, nicht Lösung",
+    "2  Der Interface Endpoint gibt S3 eine private IP im Subnetz — auch von on-prem",
+    "3  Der Access Point finance-ro lässt nur Lesezugriffe unter /finance durch",
+    "4  Die Bucket Policy delegiert nur noch an Access Points dieses Accounts",
+    "5  Verworfen: der Gateway Endpoint — er wirkt über die Route Table und nie von on-premises",
+    "Data Science liest denselben Bucket über einen eigenen Access Point und einen Gateway Endpoint",
+    "Ein Access Point ist kein Proxy im Datenpfad, sondern ein zweiter benannter Zugangsweg"
+  ]
+}

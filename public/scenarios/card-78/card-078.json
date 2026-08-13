@@ -1,0 +1,15 @@
+{
+  "id": "card-078",
+  "title": "Szenario 78 · Elastic Disaster Recovery — RPO in Sekunden",
+  "subtitle": "120 Server ohne zweiten Standort absichern: kontinuierliche Block-Replikation in einen günstigen Staging-Bereich, Proben ohne Störung, volle Instanzen erst im Ernstfall",
+  "steps": [
+    "1  Der Agent schickt Blockänderungen laufend und verschlüsselt nach AWS",
+    "2  Im Staging halten kleine Server die Kopie auf günstigen Volumes bereit",
+    "3  Drills starten aus dem Staging, ohne die Replikation zu unterbrechen",
+    "4  Im Ernstfall startet DRS volle Recovery-Instances im Zielsubnetz",
+    "RPO in Sekunden, RTO in Minuten — die Bootzeit bestimmt die Spanne",
+    "Der Rückweg heißt Failback und führt zurück ins eigene Rechenzentrum",
+    "Block-Level heißt: Betriebssystem, Systemzustand, Datenbanken und Dateien",
+    "Ein DR-Plan, der nie geprobt wurde, ist eine Vermutung, keine Zusage"
+  ]
+}

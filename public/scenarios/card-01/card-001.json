@@ -1,0 +1,11 @@
+{
+  "id": "card-001",
+  "title": "Karte 1 · API Gateway, Lambda und DynamoDB",
+  "subtitle": "TicketWave verkauft Konzert-Tickets: unvorhersehbarer Traffic, keine Server zu verwalten, bezahlt wird nur, was tatsächlich genutzt wird — die Serverless-Standardantwort",
+  "steps": [
+    "1  Die App ruft die REST-API über HTTPS auf",
+    "2  API Gateway übergibt den Request als Event an Lambda",
+    "3  Die Funktion schreibt die Bestellung nach DynamoDB",
+    "Die Antwort läuft denselben Weg zurück: Lambda, API Gateway, Client"
+  ]
+}

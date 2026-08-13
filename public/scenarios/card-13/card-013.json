@@ -1,0 +1,16 @@
+{
+  "id": "card-013",
+  "title": "Szenario 13 · Gemeinsames Dateisystem für mehrere Webserver — EFS über drei AZs",
+  "subtitle": "Ein einziges Regional-Dateisystem, drei Availability Zones, kein Sync-Job: Was eine Instanz schreibt, liefern die anderen im selben Moment aus — Zustand raus aus der Compute-Schicht",
+  "steps": [
+    "1  Die Redaktion lädt eine Datei ins CMS hoch",
+    "2  Der Load Balancer trifft irgendeine Instanz der Auto Scaling Group",
+    "3  Diese Instanz schreibt die Datei per NFS ins Dateisystem",
+    "4  Dasselbe Dateisystem steht in AZ a bereit",
+    "5  ebenso in AZ b, wo geschrieben wurde",
+    "6  und ebenso in AZ c, auch für gerade erst gestartete Instanzen",
+    "7  Jede Instanz mountet über den Mount Target ihrer eigenen AZ",
+    "8  und liefert dieselbe Datei aus — ohne Replikation, ohne Sync-Job",
+    "Die Schritte 7 und 8 laufen in allen drei Bahnen gleich ab"
+  ]
+}

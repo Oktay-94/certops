@@ -1,0 +1,17 @@
+{
+  "id": "card-090",
+  "title": "Szenario 90 · Well-Architected Review",
+  "subtitle": "Ein wiederholter Bewertungsvorgang mit Milestones — die Fragen der sechs Säulen erzeugen Risiken, aus den Risiken wird der Improvement Plan",
+  "steps": [
+    "1  Der Workload ist der Zuschnitt: Ressourcen und Code, die Geschäftswert liefern",
+    "2  Ein Milestone hält den Zustand des Workloads zu einem Zeitpunkt fest",
+    "3  Im Tool wird die Lens gewählt und der Fragenkatalog beantwortet",
+    "4  Die Fragen der Säule Reliability",
+    "5  die Fragen der Säule Security",
+    "6  und die Fragen der Säule Cost Optimization",
+    "7  Aus den Antworten leitet das Tool High und Medium Risk Issues ab",
+    "8  Zu jedem Risiko entsteht ein Eintrag im Improvement Plan",
+    "Nach jeder Verbesserung ein neuer Milestone — erst das misst Fortschritt",
+    "Ein HRI ist eine Entwurfsentscheidung mit Schadenspotenzial, kein Incident"
+  ]
+}

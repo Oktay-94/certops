@@ -1,0 +1,16 @@
+{
+  "id": "card-066",
+  "title": "Szenario 66 · Absatzprognose für Filial-Nachschub",
+  "subtitle": "Forecast wäre der passende Dienst und ist für Neukunden zu — SageMaker Canvas verlangt dafür ein Dataset statt drei und wird direkt als Endpoint aufgerufen",
+  "steps": [
+    "1  Die Filialen liefern seit drei Jahren Kassendaten nach S3",
+    "2  Der Data Flow führt die drei Dateien zu einem Dataset zusammen",
+    "3  AutoML trainiert ein Ensemble und deployt das beste Modell",
+    "4  Modelle und Datasets liegen im konfigurierten Canvas-Bucket",
+    "5  Von dort wird das Modell auf den Real-time Endpoint gebracht",
+    "6  Die Warenwirtschaft ruft den Endpoint per HTTPS auf",
+    "7  Verworfen: Forecast ist seit dem 29.07.2024 für Neukunden zu",
+    "Der Migrationsaufwand liegt im Umbau der Daten, nicht im Modell",
+    "Wartungsmodus heißt nicht Abschaltung — ein Enddatum gibt es nicht"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "card-011",
+  "title": "Szenario 11 · Rechnungsarchiv über 10 Jahre — Lifecycle in den Deep Archive",
+  "subtitle": "Eine deklarative Lifecycle-Regel schiebt jede Rechnung durch drei Speicherklassen und löscht sie am Ende — der Restore für die Betriebsprüfung holt das Objekt nie aus dem Archiv heraus",
+  "steps": [
+    "1  Das ERP legt jede Rechnung unter dem Prefix invoices/ ab",
+    "2  Ab Tag 30 verschiebt die Regel das Objekt nach S3 Standard-IA",
+    "3  Ab Tag 365 geht es weiter in den S3 Glacier Deep Archive",
+    "4  Tag 4015 beendet die Aufbewahrung, das Objekt wird gelöscht",
+    "5  Die Betriebsprüfung fordert einen Jahrgang an, S3 Batch Operations beauftragt den Restore",
+    "6  Nach 12 Stunden (Standard) oder 48 Stunden (Bulk) liegt die Kopie bereit, der Prüfer lädt daraus",
+    "Ein Restore verschiebt nichts: Das Original bleibt in Deep Archive, die Kopie verfällt von selbst",
+    "Kein Expedited-Tier bei Deep Archive — wer Minuten braucht, nimmt Glacier Flexible Retrieval"
+  ]
+}

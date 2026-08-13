@@ -1,0 +1,14 @@
+{
+  "id": "card-049",
+  "title": "Battle Card 49 · CloudTrail-Forensik mit Athena",
+  "subtitle": "Ein Vorfall vier Monate in der Vergangenheit — beantwortbar nur, wenn vorher ein Trail nach S3 lief und die Abfrage auf Partitionsspalten filtert",
+  "steps": [
+    "1  Das Forensik-Team fragt nach einer Löschung von vor vier Monaten",
+    "2  Der Organization Trail schreibt die Events aller Accounts weg",
+    "3  Athena liest sie dort und berechnet die Partitionen selbst",
+    "4  Die Antwort nennt Principal, IP-Adresse, Zeitpunkt und Session",
+    "5  Parallel dazu hätte Insights die Anomalie schon vorher gemeldet",
+    "Ohne Trail nach S3 gibt es nichts zu untersuchen — Event History ist kein Trail",
+    "Wer nach einem gelöschten Objekt sucht, braucht Data Events"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "card-059",
+  "title": "Szenario 59 · Betrugsregeln ueber mehrere Ereignisse hinweg mit Apache Flink",
+  "subtitle": "Alarm bei mehr als fuenf Transaktionen in einem beliebigen Fuenf-Minuten-Zeitraum, geprueft jede Minute — bei Ereignissen, die unsortiert eintreffen",
+  "steps": [
+    "1  Die Terminals schreiben jede Transaktion in den Stream",
+    "2  Die Flink-Anwendung liest den Stream als Quelle",
+    "3  Watermarks ordnen nach der Zeit, zu der etwas passiert ist",
+    "4  keyBy gruppiert den Zustand je Kartennummer",
+    "5  Jede Minute entsteht ein neues Fuenf-Minuten-Fenster",
+    "6  Ein Treffer geht sofort per SNS an die Betrugsabwehr",
+    "7  Unabhaengig davon landen alle Ereignisse in S3",
+    "Tumbling waere lueckenhaft an der Grenze — allowedLateness steht per Default auf null"
+  ]
+}

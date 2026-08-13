@@ -1,0 +1,15 @@
+{
+  "id": "card-100",
+  "title": "Szenario 100 · Ein Netz für viele Accounts",
+  "subtitle": "Einmal zentral bauen, per Resource Share mitnutzen lassen: der Owner behält das Netz, die Participants behalten ihre Ressourcen",
+  "steps": [
+    "1  Netz, NAT Gateway und Anbindung entstehen genau einmal",
+    "2  Der Resource Share gibt die Subnetze frei",
+    "3  Im Team-Account tauchen sie in Konsole und API auf",
+    "4  Das Team startet dort seine eigenen Ressourcen",
+    "5  Ein Transit Gateway steht daneben — auch das wird per RAM geteilt",
+    "Fremde Ressourcen sieht und ändert ein Participant nicht",
+    "Doppelte Infrastruktur wäre nicht doppelte Isolation",
+    "RAM selbst kostet nichts — gespart wird an NAT Gateways und Endpoints"
+  ]
+}

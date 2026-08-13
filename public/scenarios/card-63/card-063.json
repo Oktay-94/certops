@@ -1,0 +1,15 @@
+{
+  "id": "card-063",
+  "title": "Szenario 63 · Support-Tickets nach Stimmung und Thema",
+  "subtitle": "Stimmung braucht kein Modell, firmeneigene Themen brauchen eins — und Topic Modeling entdeckt Themen, statt in vorgegebene Klassen einzusortieren",
+  "steps": [
+    "1  Das Ticket kommt als Freitext über API Gateway herein",
+    "2  Lambda übernimmt den Text und ruft Comprehend zweimal auf",
+    "3  DetectSentiment liefert die Stimmung ohne jedes Training",
+    "4  ClassifyDocument sortiert in die firmeneigenen Klassen ein",
+    "5  Beide Ergebnisse landen als Attribute am selben Ticket",
+    "6  Verworfen: Topic Modeling entdeckt Themen, statt einzusortieren",
+    "Wer die Kategorien schon kennt, braucht nie Topic Modeling",
+    "Für neue Accounts ist es seit dem 30.04.2026 ohnehin geschlossen"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "card-033",
+  "title": "Karte 33 · AWS PrivateLink",
+  "subtitle": "Einen eigenen Dienst privat und einseitig in Kunden-VPCs anbieten — ohne Routen, ohne IP-Allowlist und trotz gleicher CIDR auf beiden Seiten",
+  "steps": [
+    "1  Die Anwendung des Kunden ruft eine IP aus ihrem eigenen Subnetz auf",
+    "2  Der Interface Endpoint reicht die Verbindung über PrivateLink weiter",
+    "3  PrivateLink stellt sie beim Endpoint Service des Anbieters zu",
+    "4  Der Endpoint Service zeigt auf den Network Load Balancer",
+    "5  Der NLB verteilt auf die Service-Instanzen — ab hier normale Anbieter-Architektur",
+    "Der Anbieter erreicht die Kunden-VPC über diesen Weg nicht: PrivateLink ist einseitig"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "card-005",
+  "title": "Karte 5 · AWS App Runner und ECR",
+  "subtitle": "Image rein, HTTPS-URL raus: die höchste Abstraktionsebene für Container auf AWS — und der Hinweis, warum ein Neubau heute trotzdem woanders landet",
+  "steps": [
+    "1  Das Team schiebt das fertige Image nach ECR",
+    "2  App Runner baut daraus einen Service — ohne Cluster, ohne Task-Definition",
+    "3  Nutzer erreichen den Dienst über die fertige awsapprunner.com-URL",
+    "4  Bei einem Neubau heute führt der Weg zu ECS Express Mode",
+    "App Runner ist im Kern ein dünner Wrapper um ECS Fargate",
+    "Bestandskunden nutzen App Runner weiter, es kommen aber keine Features mehr"
+  ]
+}

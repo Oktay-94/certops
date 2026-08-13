@@ -1,0 +1,15 @@
+{
+  "id": "card-056",
+  "title": "Szenario 56 · Self-Service-BI und eingebettete Haendler-Dashboards",
+  "subtitle": "Die Geschaeftsfuehrung klickt den ganzen Tag, 300 Haendler sehen ihre eigenen Zahlen ohne AWS-Login — und die Kosten fuer gescanntes Volumen sollen dabei nicht mitwachsen",
+  "steps": [
+    "1  Auftraege und Verkaufshistorie liegen im Data Lake",
+    "2  Crawler oder DDL tragen die Parquet-Dateien in den Katalog ein",
+    "3  Athena liest das Schema und wendet SQL auf die S3-Objekte an",
+    "4  Das Abfrageergebnis wird als Dataset in SPICE importiert",
+    "5  Analyse und Dashboard lesen aus SPICE, nicht aus der Quelle",
+    "6  Das Dashboard wird anonym ins Haendlerportal eingebettet",
+    "7  Auf dasselbe Dataset werden RLS-Regeln gelegt",
+    "Session-Tags mit der Haendler-ID filtern das Dataset zur Laufzeit"
+  ]
+}

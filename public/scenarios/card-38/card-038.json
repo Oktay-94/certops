@@ -1,0 +1,16 @@
+{
+  "id": "card-038",
+  "title": "Karte 38 · AWS Network Firewall — Egress-Kontrolle",
+  "subtitle": "Security Groups filtern Adressen, Network Firewall filtert Namen — ausgehender Verkehr nur zu freigegebenen Domains, alles andere verworfen und protokolliert",
+  "steps": [
+    "1  Der Rückweg nimmt denselben Endpoint in derselben Availability Zone",
+    "2  Heute erreicht jede beliebige Domain das Ziel; Security Groups greifen hier nicht",
+    "3  Die Route-Tabelle schickt 0.0.0.0/0 direkt zum NAT Gateway, ohne Prüfung",
+    "4  Am Rückweg ändert sich nichts — er läuft weiter über denselben Endpoint",
+    "5  Die Domain List liest den SNI aus dem TLS-Handshake und verwirft, was nicht gelistet ist",
+    "6  0.0.0.0/0 zeigt auf den Firewall-Endpoint derselben AZ — erst danach folgt der NAT",
+    "7  Alert- und Flow-Logs gehen nach S3, CloudWatch Logs oder Data Firehose: der Nachweis",
+    "Die Instanz baut ganz normal eine Verbindung auf — sie merkt vom Umweg nichts",
+    "Hin- und Rückweg über denselben Endpoint, sonst sieht die Engine nur eine Richtung"
+  ]
+}

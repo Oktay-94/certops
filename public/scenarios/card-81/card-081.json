@@ -1,0 +1,15 @@
+{
+  "id": "card-081",
+  "title": "Szenario 81 · Multi-AZ oder zweite Region",
+  "subtitle": "Multi-AZ überlebt den Ausfall einer Availability Zone mit RPO 0 — gegen den Ausfall der ganzen Region hilft nur eine zweite Region",
+  "steps": [
+    "1  Die Schadenmeldung läuft in die Anwendung in eu-central-1",
+    "2  Fällt die ganze Region aus, bleibt jede Antwort aus",
+    "3  Der Load Balancer deckt den Ausfall einer AZ ab, nicht den der Region",
+    "4  RDS Multi-AZ repliziert synchron — RPO 0, aber in dieselbe Region",
+    "5  Derselbe Weg, dieselbe Anwendung, unverändertes Skelett",
+    "6  Die zweite Region übernimmt — Promotion, RPO rund 1 s, RTO rund 1 min",
+    "7  Am Load Balancer ändert sich nichts — die Ergänzung liegt auf der Datenebene",
+    "8  Objekt- und Schlüssel-Wert-Daten folgen asynchron in die zweite Region"
+  ]
+}

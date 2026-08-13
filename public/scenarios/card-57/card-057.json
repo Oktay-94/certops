@@ -1,0 +1,15 @@
+{
+  "id": "card-057",
+  "title": "Szenario 57 · Naechtliche CSV-nach-Parquet-Transformation mit Glue ETL",
+  "subtitle": "40 Speditionspartner liefern jede Nacht CSV — der Job soll nur die neuen Dateien anfassen, ohne Server und ohne eigenen Spark-Cluster",
+  "steps": [
+    "1  Die 40 Partner legen ihre CSV-Dateien in der Raw-Zone ab",
+    "2  Der Crawler liest Stichproben aus den neuen Dateien",
+    "3  Er traegt Tabelle und Partitionen in den Katalog ein",
+    "4  Der Job liest die Quelle ueber den Katalog, nicht per Pfad",
+    "5  Verarbeitet wird nur das Delta — als Parquet, nach Datum",
+    "6  Dieselbe Athena-Abfrage kostet jetzt einen Bruchteil",
+    "7  Der Job fragt vorher den Zustand des letzten Laufs ab",
+    "Ohne transformation_ctx am Source-Node liest der Job jede Nacht alles"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "card-014",
+  "title": "Szenario 14 · Windows-Fileserver in die Cloud — FSx for Windows mit Active Directory",
+  "subtitle": "SMB bleibt SMB, NTFS-ACLs bleiben NTFS-ACLs, und das Active Directory bleibt im Werk stehen — FSx tritt der bestehenden Domäne bei, statt sie zu ersetzen",
+  "steps": [
+    "1  Der SMB-Verkehr verlässt das Werk über Direct Connect und erreicht das VPC",
+    "2  Im Login-Skript steht jetzt fsx.bergmann.local statt fileserver",
+    "3  Das AD bleibt im Werk; ein Managed Microsoft AD wäre Ersatz oder Trust",
+    "4  FSx tritt der Domäne beim Anlegen bei und wertet die vorhandenen NTFS-ACLs aus",
+    "Für die Anwender bleibt alles gleich: Laufwerk Z:, dieselben Rechte, dieselben Sperren",
+    "Ein DNS-Name über den Failover hinweg — Linux- und macOS-Clients folgen ihm nicht selbst"
+  ]
+}

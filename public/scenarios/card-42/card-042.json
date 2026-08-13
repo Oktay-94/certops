@@ -1,0 +1,15 @@
+{
+  "id": "card-042",
+  "title": "Battle Card 42 · Cognito User Pool und Identity Pool",
+  "subtitle": "Anmeldung per E-Mail oder Google, danach direkter Upload nach S3 — jeder Nutzer ausschließlich in seinen eigenen Ordner, durchgesetzt von IAM statt von der App",
+  "steps": [
+    "1  Der Nutzer meldet sich am User Pool an und bekommt Tokens",
+    "2  Die App reicht das ID-Token an den Identity Pool weiter",
+    "3  Der Identity Pool lässt sich bei STS Credentials ausstellen",
+    "4  Die Policy der authenticated Role schneidet den Zugriff zu",
+    "5  Der Upload trifft nur den Ordner des angemeldeten Nutzers",
+    "6  Der User Pool reicht die Anmeldung an Google weiter",
+    "Beide Anmeldewege enden im selben Pool und liefern dieselben Tokens",
+    "Die Identity ID stammt aus dem Identity Pool, nicht aus dem User Pool"
+  ]
+}

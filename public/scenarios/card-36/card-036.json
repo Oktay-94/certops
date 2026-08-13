@@ -1,0 +1,17 @@
+{
+  "id": "card-036",
+  "title": "Karte 36 · Route 53 Routing Policies",
+  "subtitle": "Vier Ebenen in einer DNS-Antwort — Geolocation ist eine Regel, Latency ist eine Messung, und die Regel liegt außen",
+  "steps": [
+    "1  Ein Rechner in München fragt app.vermeer.eu — eine reine Namensauflösung",
+    "2  Fallen beide EU-Regionen aus, greift die Wartungsseite in der EU",
+    "3  Geolocation gibt den EU-Baum frei, dann misst Latency innerhalb der Grenze",
+    "4  Für München gewinnt in aller Regel Frankfurt, Version 4.2 mit Gewicht 90",
+    "5  Zehn Prozent gehen an den Canary 4.3 — ebenfalls Frankfurt",
+    "6  Fällt Frankfurt allein aus, antwortet diese Ebene mit Dublin",
+    "7  Der gewählte Record zeigt als Alias auf ein Application Load Balancer",
+    "8  Der Load Balancer verteilt auf die Instanzen der jeweiligen Version",
+    "Die Schritte 7 und 8 laufen in allen drei Bahnen gleich ab",
+    "Failover nach us-east-1 bräche die Datenresidenz — der Secondary bleibt in EU"
+  ]
+}

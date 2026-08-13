@@ -1,0 +1,14 @@
+{
+  "id": "card-093",
+  "title": "Szenario 93 · MediaConvert, S3, CloudFront",
+  "subtitle": "Dateibasierte Transkodierung für eine On-Demand-Bibliothek: eine Rendition-Ladder je Video, ausgeliefert über ein CDN — unten die zwei bequemen Irrwege",
+  "steps": [
+    "1  Der Upload landet vollständig im Eingangs-Bucket",
+    "2  MediaConvert baut daraus mehrere Auflösungen und Bitraten",
+    "3  Renditions und Manifeste gehen in den Ausgabe-Bucket",
+    "4  CloudFront holt sich den Inhalt beim Origin",
+    "5  Der Player wählt anhand des Manifests seine Bitrate",
+    "6  Selbst transkodieren scheitert an Laufzeit und Codec-Pflege",
+    "7  Ein öffentlicher Bucket umgeht den Cache — in der Prüfung falsch"
+  ]
+}

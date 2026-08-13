@@ -1,0 +1,16 @@
+{
+  "id": "card-096",
+  "title": "Szenario 96 · Express oder Standard",
+  "subtitle": "Derselbe Workflow, zweimal angelegt: der Typ wird beim Anlegen festgelegt und lässt sich danach nicht mehr ändern — an der Zahlungsfreigabe wird das sichtbar",
+  "steps": [
+    "1  Der Bestell-Dienst startet einen Lauf je Bestellung",
+    "2  Express bricht nach fünf Minuten ab — der Mensch war noch nicht so weit",
+    "3  Asynchrones Express ist at-least-once: doppelt gebucht ohne Idempotenz",
+    "4  Ohne eingeschaltetes Logging bleibt vom Lauf nichts nachvollziehbar",
+    "5  Derselbe Start, diesmal gegen eine Standard-State-Machine",
+    "6  Standard läuft bis zu ein Jahr und garantiert exactly-once",
+    "7  Abgerechnet wird nach State Transitions statt nach Lauf und Dauer",
+    "8  Der Typ lässt sich nicht umstellen — die Entscheidung fällt einmal",
+    "Step Functions braucht keine VPC — die Rahmen zeigen Dienst und State Machine"
+  ]
+}

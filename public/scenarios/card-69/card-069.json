@@ -1,0 +1,16 @@
+{
+  "id": "card-069",
+  "title": "Szenario 69 · Kendra im Wartungsmodus — Migration auf Bedrock",
+  "subtitle": "Das ist keine Aufwärts-Migration: bei RAG gewinnt die Managed Knowledge Base, bei klassischer Suche verliert sie — 7 Konnektoren statt 32+, der Rest geht über S3",
+  "steps": [
+    "1  ServiceNow und Salesforce haben keinen Konnektor — Umweg über S3",
+    "2  Bedrock parst und zerlegt; die Chunking-Strategie wird gewählt",
+    "3  Den Vektorindex betreibt Bedrock vollständig selbst",
+    "4  Er gehört zur Managed Knowledge Base, nicht zu einem eigenen Store",
+    "5  Die Suchmaske stellt die Frage und setzt die Filter",
+    "6  Metadatenfilter ersetzen die Facetten, so weit das geht",
+    "7  RetrieveAndGenerate antwortet mit Zitaten aus derselben Wissensbasis",
+    "Wer eine Suchmaske betreibt, verliert; wer einen Chatbot baut, gewinnt",
+    "Wartungsmodus ist keine Abschaltung — für Kendra gibt es kein Enddatum"
+  ]
+}

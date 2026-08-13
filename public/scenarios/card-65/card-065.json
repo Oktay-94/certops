@@ -1,0 +1,15 @@
+{
+  "id": "card-065",
+  "title": "Szenario 65 · Webshop-Empfehlungen ohne ML-Team",
+  "subtitle": "Domain-Gruppe gibt einen Recommender, der selbst nachtrainiert — und PutEvents macht den gerade angesehenen Artikel sofort wirksam, ganz ohne Retraining",
+  "steps": [
+    "1  Der Shop liefert seit Jahren Bestell- und Klickdaten nach S3",
+    "2  Der Dataset Import Job zieht sie in die Dataset Group",
+    "3  Die Domain-Gruppe stellt den Recommender fertig bereit",
+    "4  Das Frontend holt die Empfehlungen je Produktseite",
+    "5  Jeder Klick geht über PutEvents an den Event Tracker",
+    "6  Verworfen: ein eigenes Modell kostet Monate statt Tage",
+    "Der Event Tracker schreibt zurück in den Datenbestand",
+    "Die Empfehlung ändert sich in Sekunden, ohne neues Training"
+  ]
+}

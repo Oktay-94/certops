@@ -1,0 +1,14 @@
+{
+  "id": "card-052",
+  "title": "Szenario 52 · Amazon Data Firehose, S3 und Athena",
+  "subtitle": "Logs aus 40 Microservices ohne eine Zeile Anwendungscode in den Data Lake liefern — und die Abfrage darauf so anlegen, dass sie nicht den ganzen Bucket liest",
+  "steps": [
+    "1  Die 40 Microservices schreiben per Direct PUT in Firehose",
+    "2  Firehose wandelt nach Parquet und legt region=/dt= an",
+    "3  Athena oeffnet nur die Praefixe, die zur Abfrage passen",
+    "4  Die Betriebsabteilung fragt selbst per Standard-SQL",
+    "5  Vor dem Scan holt Athena die Tabellendefinition beim Katalog",
+    "Verworfen: ein eigener Consumer auf EC2 — niemand betreibt ihn",
+    "Firehose liefert ab, Data Streams puffern zum Abholen (Karte 51)"
+  ]
+}

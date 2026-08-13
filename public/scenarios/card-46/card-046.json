@@ -1,0 +1,16 @@
+{
+  "id": "card-046",
+  "title": "Battle Card 46 · Inspector und ECR Enhanced Scanning",
+  "subtitle": "Ein Scan beim Push findet nur, was heute schon bekannt ist — der eigentliche Fix ist die erneute Bewertung bereits deployter Images",
+  "steps": [
+    "1  Die Pipeline lässt das Image vom Inspector-Plugin prüfen",
+    "2  Ist es sauber, landet es in der privaten Registry",
+    "3  Enhanced Scanning übergibt es an Inspector",
+    "4  Jedes Finding erzeugt ein Ereignis",
+    "5  Ticket und Alarm erreichen die laufende Umgebung",
+    "6  Dieselbe Aktivierung deckt EC2 im Hybrid-Modus ab",
+    "7  Basic Scanning scheitert am Kern der Anforderung",
+    "Enhanced gilt registry-weit, nur die Scan-Frequenz ist je Repository steuerbar",
+    "Standardmäßig überwacht Inspector ein Image 90 Tage"
+  ]
+}

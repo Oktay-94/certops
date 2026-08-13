@@ -1,0 +1,18 @@
+{
+  "id": "card-083",
+  "title": "Szenario 83 · Pilot Light oder Warm Standby",
+  "subtitle": "Beide replizieren die Daten — der Unterschied ist, ob die DR-Region ohne zusätzlichen Schritt schon Anfragen beantworten kann",
+  "steps": [
+    "1  Die Anfrage erreicht die DR-Region — repliziert wird in beiden Mustern",
+    "2  Pilot Light beantwortet sie nicht: es läuft nichts, was antworten könnte",
+    "3  Der Load Balancer steht bereit, findet aber kein gesundes Ziel",
+    "4  Die Auto Scaling Group steht auf null — Einschalten ist ein eigener Schritt",
+    "5  Derselbe Weg, dieselben Daten, dieselbe Replikation",
+    "6  Warm Standby antwortet sofort, nur mit weniger Kapazität",
+    "7  Der Load Balancer verteilt auf laufende, kleinere Ziele",
+    "8  Im Ernstfall wird nur noch hochskaliert, nicht erst eingeschaltet",
+    "Links dieser Skala liegt Backup & Restore (RTO bis 24 h), rechts Active/Active (RTO nahe null)",
+    "Nie strenger wählen als die Vorgabe verlangt — Active/Active ist die komplexeste Strategie",
+    "AWS Elastic Disaster Recovery: Warm-Standby-Werte zu Pilot-Light-Kosten, dauerhaft läuft nur die Replikation"
+  ]
+}

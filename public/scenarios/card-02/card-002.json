@@ -1,0 +1,12 @@
+{
+  "id": "card-002",
+  "title": "Karte 2 · ECS auf Fargate, ALB und ECR",
+  "subtitle": "ShopFlow bringt fertige Docker-Container in Produktion: kein Cluster-Management, kein OS-Patching, keine EC2-Instanzen — ECS orchestriert, Fargate stellt die Compute-Ebene",
+  "steps": [
+    "1  Der Nutzer erreicht die App über den Application Load Balancer",
+    "2  Der ALB verteilt auf die gesunden Tasks seiner Target Group",
+    "3  Jeder Task zieht sein Image beim Start aus ECR — ohne Image kein Task",
+    "Fargate ist kein eigener Dienst, sondern ein Launch-Type von ECS",
+    "Jeder Task bekommt eine eigene ENI: die Subnetz-Größe begrenzt die Task-Zahl"
+  ]
+}

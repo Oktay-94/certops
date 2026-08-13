@@ -1,0 +1,15 @@
+{
+  "id": "card-058",
+  "title": "Szenario 58 · Eine Tabelle, drei Sichten — Lake Formation statt drei Kopien",
+  "subtitle": "Zeilen- und Spaltenrechte, die fuer Athena und Redshift Spectrum gleichermassen gelten — ohne den Datensatz zu duplizieren und ohne tabellenweise Rechtevergabe",
+  "steps": [
+    "1  Die S3-Location wird in Lake Formation registriert",
+    "2  Der Katalog beschreibt Tabellen und Spalten — er setzt nichts durch",
+    "3  LF-Tags haengen an Datenbank, Tabelle und einzelnen Spalten",
+    "4  Wo Tags nicht reichen, praezisieren Zeilen- und Spaltenfilter",
+    "5  Athena prueft die Berechtigung und wendet die Filter an",
+    "6  Jedes Team sieht seine Sicht — dieselbe Datei in S3",
+    "7  Fuer Redshift Spectrum gelten dieselben Regeln",
+    "Solange IAMAllowedPrincipals steht, entscheidet IAM und nichts davon greift"
+  ]
+}

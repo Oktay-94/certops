@@ -1,0 +1,13 @@
+{
+  "id": "card-071",
+  "title": "Szenario 71 · Application Migration Service — Cutover in Minuten",
+  "subtitle": "50 Server aus vSphere, Hyper-V und Bare Metal ziehen unverändert nach EC2: Block-Replikation im laufenden Betrieb, Test ohne Störung, Umschaltung in Minuten",
+  "steps": [
+    "1  Der Agent repliziert Blöcke laufend und verschlüsselt nach AWS",
+    "2  MGN legt die mitwachsende Kopie in der Staging Area ab",
+    "3  Aus dem Staging-Stand startet jederzeit eine Test-Instanz",
+    "4  Final Sync, dann startet die Produktion — Cutover in Minuten",
+    "Die Quellserver bleiben ein Rollback-Fenster lang stehen, dann Stilllegung",
+    "Verworfen: AWS SMS — Snapshot-basiert, Cutover in Stunden, eingestellt"
+  ]
+}

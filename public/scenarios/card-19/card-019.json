@@ -1,0 +1,16 @@
+{
+  "id": "card-019",
+  "title": "Szenario 19 · EBS gp3 und io2 Block Express — garantierte IOPS und schneller Restore",
+  "subtitle": "Derselbe Snapshot, zweimal wiederhergestellt: einmal ist die Datenbank verfügbar und trotzdem stundenlang zäh, einmal liefert sie ab der ersten Sekunde ihre provisionierte Leistung",
+  "steps": [
+    "1  Aus dem täglichen Snapshot entsteht im Störfall ein neues Volume in der Ziel-AZ",
+    "2  Die Datenbank ist nach zwei Minuten oben und danach eine Stunde zäh — das reißt das SLA",
+    "3  gp2 koppelt IOPS an die Größe; ist das Burst-Guthaben leer, bricht die Latenz ein",
+    "4  Derselbe Snapshot, derselbe Weg — nur vorher vorbereitet",
+    "5  Das Volume bringt sofort seine 22.000 IOPS, die Datenbank ist in 30 Minuten wieder da",
+    "6  Die Primary läuft auf io2 Block Express: konstante Latenz statt guter Durchschnittswerte",
+    "7  Die Reporting-Replica bleibt auf gp3 — größere Volumes bringen dort keine IOPS mehr",
+    "Snapshots liegen regional: ein Volume lebt in einer AZ, ein Snapshot passt in jede AZ der Region",
+    "Snapshot Archive ist die Aufbewahrungsstufe, kein Störfallwerkzeug: Restore dauert 24 bis 72 Stunden"
+  ]
+}

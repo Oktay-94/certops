@@ -1,0 +1,16 @@
+{
+  "id": "card-097",
+  "title": "Szenario 97 · Millionen Einmal-Timer",
+  "subtitle": "Jeder Kunde bekommt seine Erinnerung zu seinem eigenen Zeitpunkt — ohne Timer-Tabelle und ohne Poller, der jede Minute nachsieht",
+  "steps": [
+    "1  Die Kundschaft bucht zu einem beliebigen Zeitpunkt",
+    "2  Zielzeit und Zeitzone stehen im Schedule selbst",
+    "3  Je Buchung entsteht genau ein One-time-Schedule",
+    "4  Der erste Termin wartet auf den 3. Mai",
+    "5  Der zweite auf den 7. Juni — ohne gemeinsamen Takt",
+    "6  Der dritte auf den 1. August, und so Millionen weitere",
+    "7  Zur Zielzeit ruft Scheduler sein einziges Ziel auf",
+    "8  Der Versand bleibt ein eigener Schritt",
+    "Wer mehrere Ziele braucht, fächert bei SNS oder Step Functions auf"
+  ]
+}

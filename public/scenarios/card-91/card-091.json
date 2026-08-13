@@ -1,0 +1,15 @@
+{
+  "id": "card-091",
+  "title": "Szenario 91 · IoT Core, Rules Engine, DynamoDB",
+  "subtitle": "100.000 Sensoren melden per MQTT, die Regel schreibt ohne eigenen Code in die Tabelle — und was endgültig scheitert, landet in den Logs",
+  "steps": [
+    "1  Jeder Sensor publiziert per MQTT auf sein eigenes Topic",
+    "2  IoT Core prüft am Zertifikat, ob dieses Gerät schreiben darf",
+    "3  Die angenommene Nachricht läuft in die Rules Engine",
+    "4  Die Regel übergibt den Messwert an die dynamoDBv2-Action",
+    "5  Scheitert eine Action endgültig, greift die errorAction",
+    "7  Jede Action schreibt selbst an ihr Ziel",
+    "8  Von dort holt sich ab, wer die Daten braucht",
+    "Zwischen MQTT-Nachricht und Tabellenzeile steht keine eigene Funktion"
+  ]
+}

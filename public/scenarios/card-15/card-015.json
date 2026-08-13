@@ -1,0 +1,15 @@
+{
+  "id": "card-015",
+  "title": "Szenario 15 · Ransomware-sichere Backups — Versioning, Object Lock, MFA Delete",
+  "subtitle": "Derselbe Angreifer mit denselben Administrator-Rechten, zweimal: einmal löscht er die Backups, einmal scheitert er an einer Bucket-Konfiguration, die auch Root nicht aufhebt",
+  "steps": [
+    "1  Der Backup-Job schreibt ganz normal per PUT — kein Agent, kein Sonderweg",
+    "2  Nach dem Angriff gibt es nichts wiederherzustellen, die Version ist wirklich weg",
+    "3  Erbeutete Admin-Rechte reichen: DeleteObjectVersion löscht eine bestimmte Version",
+    "4  Am Schreibweg ändert sich nichts — der Schutz liegt in der Bucket-Konfiguration",
+    "5  Die Wiederherstellung ist unspektakulär: die letzte saubere Version per versionId holen",
+    "6  Jetzt scheitern DeleteObjectVersion und PutObjectRetention, egal was die IAM-Policy sagt",
+    "7  MFA Delete hält den zweiten Angriff auf: die Versionierung lässt sich nicht abschalten",
+    "Compliance Mode heißt: auch der Root-Benutzer kürzt die Frist nicht — Governance wäre aushebelbar"
+  ]
+}

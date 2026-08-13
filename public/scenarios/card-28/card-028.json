@@ -1,0 +1,16 @@
+{
+  "id": "card-028",
+  "title": "Szenario 28 · Wenn der Lambda-Schwarm die Verbindungen auffrisst",
+  "subtitle": "9.000 Requests pro Sekunde, 900 gleichzeitige Ausführungen und eine Datenbank mit 200 Verbindungsplätzen — ein Verbindungsproblem, kein Kapazitätsproblem",
+  "steps": [
+    "1  Der Ansturm trifft die Bestell-API, Lambda skaliert auf 900 Instanzen",
+    "2  Die Aufrufe scheitern, obwohl die Datenbank noch Luft hätte",
+    "3  Denn jede Instanz baut ihre eigene Datenbankverbindung auf",
+    "4  Bei 200 Plätzen ist Schluss — daran ändert auch mehr CPU nichts",
+    "5  An der Last ändert sich nichts, es ist derselbe Black Friday",
+    "6  Die Bestellungen laufen durch, ohne größere Instanz",
+    "7  Lambda verbindet sich zum Proxy-Endpoint, der 900 auf 40 bündelt",
+    "8  Die Datenbank sieht 40 statt 900 — dieselbe Instanz, dieselbe Größe",
+    "Ein einziges SET beim Verbindungsaufbau pinnt — dann poolt nichts mehr"
+  ]
+}

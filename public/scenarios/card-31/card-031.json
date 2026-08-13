@@ -1,0 +1,13 @@
+{
+  "id": "card-031",
+  "title": "Karte 31 · VPC Peering gegen Transit Gateway",
+  "subtitle": "Warum ein Full Mesh am Betriebsaufwand scheitert — und warum nur ein Hub das Rechenzentrum an alle VPCs weiterträgt",
+  "steps": [
+    "1  Team 3 erreicht Shared Services direkt — Peering verbindet immer nur ein Paar",
+    "2  Weiter nach Hamburg geht es nicht: Peering routet weder transitiv noch Edge-to-Edge",
+    "3  Jede Route Table trägt elf Peering-Routen; ein Full Mesh aus 12 VPCs bräuchte 132",
+    "4  Am Peering zwischen beiden VPCs ändert sich nichts — es war nie das Problem",
+    "5  Über das Transit Gateway erreichen alle VPCs dieselbe VPN-Leitung nach Hamburg",
+    "6  Eine Route zum TGW ersetzt elf; zwei TGW-Route-Tables trennen Prod von Test"
+  ]
+}

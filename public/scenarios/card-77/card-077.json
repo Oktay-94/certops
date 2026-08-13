@@ -1,0 +1,13 @@
+{
+  "id": "card-077",
+  "title": "Szenario 77 · Container im Werk — wo liegt der Control Plane?",
+  "subtitle": "Maschinendaten dürfen das Werk nicht verlassen, ein zweites Orchestrierungs-Team soll es nicht geben: nicht der Name entscheidet, sondern die Lage der Steuerung",
+  "steps": [
+    "1  Der Werksserver meldet sich per Hybrid Activation an, ausgehend über 443",
+    "2  Als external instance startet er Tasks mit Launch Type EXTERNAL",
+    "3  Bei EKS hängen eigene Server als Nodes an einem Control Plane in AWS",
+    "Task-Definitionen, IAM-Rollen und Konsole sind dieselben wie in der Cloud",
+    "Verworfen: EKS Anywhere — Control Plane und Lifecycle blieben im Werk",
+    "Nur EKS Anywhere läuft air-gapped; die beiden anderen brauchen die Leitung"
+  ]
+}

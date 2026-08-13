@@ -1,0 +1,15 @@
+{
+  "id": "card-088",
+  "title": "Szenario 88 · Chaos Engineering mit FIS",
+  "subtitle": "Das Szenario „AZ Availability: Power Interruption\" erzeugt die Symptome eines zonalen Stromausfalls — die Stop Condition unterscheidet den Test von der Sabotage",
+  "steps": [
+    "1  Das Szenario nimmt der Availability Zone die Compute-Kapazität",
+    "2  Ohne Stop Condition lässt sich der Lauf nicht anhalten",
+    "3  Die EBS-Volumes der Zone reagieren nicht mehr",
+    "4  RDS schwenkt auf den Standby in der zweiten AZ",
+    "5  Dasselbe Szenario, dieselben Symptome — nur mit Abbruchbedingung",
+    "6  Reißt die Fehlerrate die Schwelle, stoppt FIS das Experiment selbst",
+    "Ohne definierten Steady State ist das Ergebnis hinterher nicht interpretierbar",
+    "FIS beweist Resilienz, es baut sie nicht — die Antwort auf „validieren“, nicht auf „absichern“"
+  ]
+}

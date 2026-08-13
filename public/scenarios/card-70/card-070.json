@@ -1,0 +1,14 @@
+{
+  "id": "card-070",
+  "title": "Szenario 70 · Fake-Registrierungen an der Kante abwehren",
+  "subtitle": "ACFP prüft die Sign-up-Seite als Managed Rule Group, bevor der Request die Anwendung erreicht — Response Inspection gibt es nur bei CloudFront, für Cognito User Pools gar nicht",
+  "steps": [
+    "1  Bots senden massenhaft Registrierungsanfragen",
+    "2  CloudFront nimmt sie an, die Web ACL bindet die Rule Group ein",
+    "3  ACFP prüft Formularfelder und lässt nur Echtes passieren",
+    "4  Die Antworten der Anwendung werden zusätzlich ausgewertet",
+    "5  Geprüft wird gegen die Stolen-Credential-Datenbank",
+    "ACFP schützt die Anlage neuer Konten, ATP die Anmeldung an alten",
+    "Der Blockierungspfad ist nicht gezeichnet: was blockt, verlässt den Fluss"
+  ]
+}

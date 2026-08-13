@@ -1,0 +1,16 @@
+{
+  "id": "card-039",
+  "title": "Karte 39 · Aurora Global Database",
+  "subtitle": "Switchover kostet Zeit, Failover kostet Daten — beide Wege enden mit einer neuen Schreibregion, aber nur einer davon ohne Datenverlust",
+  "steps": [
+    "1  Switchover wartet, bis alle Sekundärcluster aufgeholt haben",
+    "2  Ergebnis: RPO 0, kein Datenverlust, in etwa einer Minute",
+    "3  Der Ausführungsblock zieht Endpunkte und Connection-Strings nach",
+    "4  Ist die Primärregion weg, bleibt nur Failover — Switchover bräuchte sie",
+    "5  Der Sekundärcluster wird sofort befördert: was unterwegs war, ist verloren",
+    "6  Auch hier müssen die Endpunkte folgen — sonst schreibt die App ins Leere",
+    "Genau eine Schreibregion, eine Quelle der Wahrheit",
+    "Sekundärregionen sind read-only und bedienen lokale Leser",
+    "Wie viele Sekundärregionen? Service Quotas prüfen"
+  ]
+}

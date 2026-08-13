@@ -1,0 +1,16 @@
+{
+  "id": "card-086",
+  "title": "Szenario 86 · Cost Explorer, Budgets, Anomaly Detection",
+  "subtitle": "Anomaly Detection erkennt ohne Schwelle, Cost Explorer erklärt das Warum, Budgets zieht die Konsequenz — drei Werkzeuge auf demselben Datenstrom",
+  "steps": [
+    "1  Eine falsch gesetzte Route verdreifacht die Kosten des Dev-Accounts",
+    "2  Anomaly Detection liest den Datenstrom und erkennt die Abweichung",
+    "3  Der Alert geht raus — IMMEDIATE ausschließlich über ein SNS-Topic",
+    "4  Cost Explorer zeigt rückblickend, welcher Treiber dahintersteckt",
+    "5  Das Budget feuert auf Ist- oder Prognosewert und löst eine Aktion aus",
+    "6  Die Aktion stoppt die Ressource oder blockiert neue per SCP",
+    "7  Verworfen: ein Alarm bei 100 % kommt zu spät, um noch zu helfen",
+    "Keines der drei Werkzeuge misst selbst — alle lesen denselben Datenstrom",
+    "Eine SCP wirkt nur aus dem Management Account, nicht auf fremde Instanzen"
+  ]
+}

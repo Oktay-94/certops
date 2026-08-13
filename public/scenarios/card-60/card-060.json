@@ -1,0 +1,15 @@
+{
+  "id": "card-060",
+  "title": "Szenario 60 · Warehouse fuer schubweise Quartalslast mit Redshift Serverless",
+  "subtitle": "Drei Tage im Quartal arbeiten zwanzig Analysten gleichzeitig, dazwischen steht das System tagelang still — und die Finanzabteilung verlangt eine harte Obergrenze",
+  "steps": [
+    "1  Das Bestellsystem schreibt weiter in Aurora",
+    "2  Zero-ETL repliziert die Daten in Sekunden nach Redshift",
+    "3  Kapazitaet in RPU statt Knotentyp und Knotenzahl",
+    "4  Das Controlling bekommt seine Quartalsauswertung",
+    "5  Zwanzig Analysten arbeiten drei Tage lang per SQL",
+    "6  Spectrum verbindet Warehouse und Data Lake in einer Abfrage",
+    "7  Die sieben Jahre Historie werden nicht geladen",
+    "Max ist eine Budgetgrenze in RPU-Stunden, kein Kapazitaetslimit"
+  ]
+}
