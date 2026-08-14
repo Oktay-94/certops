@@ -2,6 +2,10 @@
 
 > Setzt `HANDOFF-UI-01.md` fort (Teile B–D). Auftrag war
 > `~/Downloads/HANDOFF-UI-SZENARIEN.md`, Teil A.
+>
+> **⏭ Nicht mehr der aktuelle Stand.** Fortgesetzt in `HANDOFF-UI-03.md`
+> (Mobil-Lesbarkeit, 14.08.) — dort stehen auch die offenen Punkte
+> gesammelt, inklusive der zehn fehlenden Specs aus „Nächste Schritte" unten.
 
 ## 🔴 Zuerst: der Stand ist nicht auf main
 
