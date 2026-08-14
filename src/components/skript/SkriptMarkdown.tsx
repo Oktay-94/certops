@@ -168,6 +168,23 @@ const COMPONENTS = {
       {...props}
     />
   ),
+  // Fenced blocks scroll inside their own box — same treatment as tables below,
+  // and for the same reason. Without this a <pre> keeps `white-space: pre` and
+  // pushes the whole DOCUMENT sideways on narrow viewports: measured on
+  // Szenario 17, whose alignment block is 418px wide against 342px of text
+  // column, i.e. 88px of horizontal page scroll. It was the only page in all
+  // 100 with a rendered <pre>, which is why it stayed unnoticed.
+  //
+  // Wrapping instead of scrolling was rejected: these blocks are column-aligned
+  // with spaces, and pre-wrap would break the alignment that is the whole point
+  // of them. The inner <code> also has to shed the inline-chip styling from the
+  // rule above — a background pill around a whole block reads as a mistake.
+  pre: (props: ComponentProps<"pre">) => (
+    <pre
+      className="mt-4 max-w-full overflow-x-auto rounded-xl border border-line bg-surface-2 p-4 text-[13px] leading-relaxed text-ink-soft [&>code]:bg-transparent [&>code]:p-0"
+      {...props}
+    />
+  ),
   hr: () => <hr className="my-8 border-line" />,
   a: (props: ComponentProps<"a">) => (
     <a
