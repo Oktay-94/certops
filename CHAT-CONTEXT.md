@@ -1,8 +1,9 @@
-# CHAT-CONTEXT — CertOps SAA-C03 (Stand 17.07.2026 — strukturierte Karten-Rückseiten + Quiz-Erklärungen)
+# CHAT-CONTEXT — CertOps SAA-C03 (Stand 14.08.2026 — Diagramm-Rollout + Mobil-Lesbarkeit)
 
 > **Zweck:** Diese Datei macht jeden neuen Chat sofort arbeitsfähig, ohne den alten Verlauf. Sie ist die **Single Source of Truth** für den Projektstand.
 > **Zielort:** Project Knowledge **und** Repo-Root auf Oktays Mac (`~/Projekte/certops/`).
-> **Letzte große Änderung:** **Strukturierte Quiz-Erklärungen komplett** — Migration 0014, zustandsgefärbte Ergebnis-UI, generalisiertes Backfill-Tooling, Batches 1–8 (265/265) lokal + remote (§3c). Commits bis `ce78eb2` auf main, origin synchron. Davor: strukturierte Karten-Rückseiten 207/207 komplett (§3b), SAA-Skript-Track komplett (§3) — alle drei SAA-Content-Stränge lokal UND live komplett.
+> **Letzte große Änderung:** **Diagramm-Rollout + Mobil-Lesbarkeit** (§14, Nachtrag 14.08.) — 90 von 100 Karten mit generiertem Diagramm, Legende, Vollbild und Breitenregler; auf Mobilgeräten lesbar und am Gerät bestätigt; Seitenüberlauf auf Karte 17 gefunden und behoben. Code-Stand `8a87b9c` auf `main`. Davor: Narrative-Integration + Notizfilter (§13, 10.08.).
+> **Älterer Kopfstand (bis 17.07.):** Strukturierte Quiz-Erklärungen komplett — Migration 0014, zustandsgefärbte Ergebnis-UI, generalisiertes Backfill-Tooling, Batches 1–8 (265/265) lokal + remote (§3c). Commits bis `ce78eb2` auf main, origin synchron. Davor: strukturierte Karten-Rückseiten 207/207 komplett (§3b), SAA-Skript-Track komplett (§3) — alle drei SAA-Content-Stränge lokal UND live komplett.
 
 ---
 
@@ -906,3 +907,143 @@ Umschalter, `?v=lang` wirkungslos.
 und in der App, 39 davon mit Langfassung hinter einem Umschalter, Notizfilter
 aktiv, Code-Stand auf `54dc2e3` (dieser Nachtrag folgt als reiner Doku-Commit
 darüber). Nächster Narrativ-Batch: 14 = Karten 40, 41, 42.*
+
+---
+
+# NACHTRAG 14.08.2026 — Diagramm-Rollout + Mobil-Lesbarkeit
+
+> **Lesehinweis:** Oberhalb dieser Linie wurde kein Zeichen geändert. Wo dieser
+> Nachtrag früheren Abschnitten widerspricht, gilt der Nachtrag.
+
+## 14.1 Was sich seit dem 10.08. geändert hat
+
+**Korrektur zur Auftragsformulierung:** Battle Cards 91–100 sind **nicht** neu —
+die kamen am 27.07. (§12, „Stand 100/100"). Seit dem 10.08. dazugekommen sind
+die Narrative und der komplette Diagramm-Strang.
+
+**Narrative fast komplett.** §13.5 nennt „Narrative 40–100 fehlen — rund 20
+weitere Batch-Chats". Erledigt: **99 von 100 Karten** haben eine
+`narrative.md`. Es fehlt genau eine — **Karte 53**.
+
+**Generierte Diagramme, 90 von 100.** `public/scenarios/card-NN/card-NNN.web.svg`
+plus `.png`, `.pdf` und `.json` (Schrittliste). Die übrigen zehn (4, 7, 9, 25,
+30, 37, 40, 54, 55, 80) zeigen weiter ihr `battle_card_N.svg`; die Auflösung in
+`assetUrl` (`src/lib/scenario-content.ts`) fällt darauf zurück. Erzeugt mit dem
+`tools/diagramkit` (Canvas 1600 px breit, Höhe variabel 534–1365).
+
+**Vier Oberflächen-Züge am Diagramm:**
+
+1. **Legende** unter dem Panel aus `card-NNN.json` (`readDiagramLegend`),
+   Überschrift „Legende zum Diagramm" — bewusst, weil Prosa-Nummern und
+   Badge-Nummern sich nicht decken.
+2. **Vollbild** über Panel-Klick oder schwebenden Knopf.
+3. **Breitenregler** am Panel (`--diagram-w`, 700–1400, Default 860,
+   `localStorage`-Key `certops:diagram-width`), erst ab 900 px Viewport.
+4. **Mobil-Lesbarkeit** (14.08.) — siehe §14.3.
+
+## 14.2 Commits und wo die Branches stehen
+
+| Commit | Datum | Inhalt |
+|---|---|---|
+| `8fe7fd5` | 13.08. | Szenario-Vorschaukacheln, Quiz-Kachel je Exam, Vollbild |
+| `d381d33` | 13.08. | diagramkit: fehlende Templates `ablauf`/`hybrid` |
+| `c188e30` | 13.08. | 90 Specs + gerenderte Assets |
+| `a780835` | 13.08. | Auflösung mit Battle-Card-Fallback, Panel schmaler |
+| `653c319` | 13.08. | Schrittlisten als Assets |
+| `03a636c` | 13.08. | Legende gerendert, Panel geschrumpft, Breite ziehbar |
+| `b27eb7f` | 14.08. | Diagramm auf Mobilgeräten lesbar |
+| `57dc272` | 14.08. | `pre`-Scroll-Box im Markdown-Renderer (Karte-17-Fix) |
+| `8a87b9c` | 14.08. | Backdrop schließt auf Touch, Wischschutz |
+| `20dadba` | 14.08. | Handoff `docs/ui-handoffs/HANDOFF-UI-03.md` |
+
+**Branch-Stand:**
+
+- `main` = `origin/main` = **`8a87b9c`** — enthält den gesamten Code, **nicht**
+  den Handoff-Commit.
+- `feat/diagram-mobile-readable` = `origin/…` = **`20dadba`** — der Handoff
+  liegt nur hier.
+- `ui-dashboard-szenarien` = `origin/…` = **`03a636c`**, in `main` gemergt.
+
+⚠️ **Beobachtung ohne Erklärung:** Am 14.08. wurde `main` zweimal per
+`checkout` + `merge --ff` bewegt (09:52 und 12:06, `git reflog show main`),
+ohne dass ein Hook, ein Cron, ein LaunchAgent, ein zweiter Worktree oder eine
+zweite Claude-Session auffindbar wäre — `.git/hooks/` ist leer,
+`core.hooksPath` nicht gesetzt. Dasselbe Muster am 13.08. um 00:11 mit
+`ui-dashboard-szenarien`. Git protokolliert *dass*, nicht *wer*. **Vor jedem
+Commit `git branch --show-current` prüfen** — an diesem Tag ist genau deshalb
+ein Commit auf `main` statt auf dem Feature-Branch gelandet.
+
+## 14.3 Mobil-Lesbarkeit — der Befund und was er kostete
+
+Das Panel ist auf einem 390-px-Gerät **358 px** breit bei einem auf 1600 px
+gezeichneten Bild — Maßstab 0,22, Beschriftungen bei 3–4 px. Das Vollbild war
+**kein Ausweg**: es rendert dasselbe Bild `object-contain` und kam auf dieselben
+358 px.
+
+Lesbar wird es ab ~1100 px. Deshalb ist das Vollbild unter 900 px ein **nativer
+Scroll-Container** bei `max(1100px, 100vw)` — Panning macht der Browser, es gibt
+bewusst keine Gestenlogik. Das Schließverhalten teilt sich am selben
+Schwellenwert: Desktop behält „jeder Klick, jede Taste außer Modifiern", schmal
+bekommt ✕, Backdrop und Escape. `DRAG_MIN_VIEWPORT` (900) regiert damit drei
+Dinge — Ziehgriff, Zoom-Modus, Schließverhalten — statt dass eine zweite Grenze
+danebensteht.
+
+**Die Panelbreite bleibt unverändert.** Bei 700–900 px würde das Panel eine
+Übersicht, keine Lesefläche: die kleinsten Schriftgrade (`FS_NODE_SUB = 11` in
+`theme.py`) lägen bei 5–6 px. Panel und Vollbild sind zwei Rollen, nicht zwei
+Meinungen.
+
+**Karte 17 — der Überlauf war nicht das Diagramm.** Die Seite ließ sich seitlich
+schieben. `card-017.web.svg` ist 1600×746, Ratio 2,14, unauffällig im Feld aller
+90 (1,17–3,00). Ursache war ein `<pre>` ohne Auffangbecken: `SkriptMarkdown.tsx`
+überschrieb `code` und `table`, aber nie `pre`. Die Rechnung in
+`card-17/narrative.md:145–151` ist 418 px breit gegen 342 px Textspalte — 88 px
+Dokumentüberlauf. **Sweep über alle 100 Karten in beiden Erzähl-Zweigen
+(`?v=lang` mitgeprüft): Karte 17 ist die einzige Seite der App mit einem
+gerenderten `<pre>`.** In den CLF-Kapiteln und SAA-Skripten gibt es überhaupt
+keine Code-Fences.
+
+## 14.4 Was am Gerät bestätigt ist, was nur am Rechner
+
+**Am echten Gerät bestätigt (14.08.):**
+
+- Wischschutz — ein Wisch im Overlay schließt nicht und schaltet nicht um
+- Streifen-Tap — der Bereich über und unter dem Bild schließt das Vollbild
+- Karte-17-Überlauf — die Seite lässt sich nicht mehr seitlich schieben
+
+**Nur am Rechner geprüft:** Tap aufs Bild schaltet um (1425 → 1393) und schließt
+nicht · ✕ schließt · Leseposition nach dem Schließen unverändert (an gescrollter
+Stelle gemessen, 900 → 900) · Fokus zurück aufs Panel · Desktop ab 900 px
+unverändert. 397 Tests grün, `tsc` und ESLint sauber, Sweep nach dem Fix über
+alle 100 Karten: Dokumentüberlauf 0.
+
+**Methodenfehler, der sich nicht wiederholen darf:** Der Backdrop-Bug wurde in
+der ersten Runde fälschlich als geprüft gemeldet, weil der Test `ov.click()` auf
+dem Dialog aufrief — das setzt `target` künstlich auf den Dialog, was ein echter
+Tap nie tut. **Schließwege nur mit echten Koordinaten-Klicks prüfen.**
+
+## 14.5 Offene Punkte
+
+Alle drei sind dokumentiert; hier steht der Verweis, der bisher fehlte.
+
+1. **Zehn Karten ohne Spec** (4, 7, 9, 25, 30, 37, 40, 54, 55, 80) — kein
+   generiertes Diagramm und **keine Legende**, auf Mobil fällt damit der
+   Lesepfad weg, den die anderen 90 haben. → `docs/diagramm-specs-fehlend.md`
+2. **Nummern-Kollision** zwischen Prosa-Schritten und Badges im Bild — die
+   Legendenüberschrift „zum Diagramm" ist die billige Hälfte der Lösung.
+   → `docs/diagramm-nummern-kollision.md`
+3. **`#232F3E` an zwei Stellen** (`theme.py` als `T.INK`, hartkodiert im
+   Legenden-Badge) — es fehlt eine gemeinsame Farbquelle für Diagramm-Farben in
+   TS. → `docs/diagramm-farbquelle-fehlt.md`
+
+Dazu unverändert offen: **Narrativ für Karte 53** (§14.1) und die Punkte aus
+§13.5, soweit nicht oben erledigt. Als Langfrist-Option bewusst nicht gezogen:
+eine eigene Mobil-Variante der Diagramme (~800 px Canvas, umgebrochenes Layout,
+Aufwand Tage inklusive QC-Kette über 90 Karten)
+→ `docs/diagramm-mobil-variante.md`
+
+*Ende NACHTRAG 14.08.2026. Ein neuer Chat startet mit: 100 Battle Cards, 99
+Narrative, 90 generierte Diagramme mit Legende und Vollbild, auf Mobilgeräten
+lesbar. Code-Stand `8a87b9c` auf `main`, Handoff `20dadba` auf
+`feat/diagram-mobile-readable`. Detail-Handoff der letzten beiden Tage:
+`docs/ui-handoffs/HANDOFF-UI-03.md`.*
