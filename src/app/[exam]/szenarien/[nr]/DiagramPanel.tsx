@@ -33,6 +33,14 @@ const DRAG_MIN_VIEWPORT = 900;
  * showing a 1100px column.
  */
 const READ_WIDTH = "max(1100px, 100vw)";
+/**
+ * How far a pointer may travel between press and release and still count as a
+ * tap. Above it the gesture was a pan, and panning must never trigger anything
+ * — not closing, not zooming. Touch platforms usually suppress the click after
+ * a scroll, but "usually" is not a guarantee across engines, and the overlay is
+ * now a surface people drag on by design.
+ */
+const TAP_SLOP_PX = 10;
 
 const clampWidth = (px: number) =>
   Math.round(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, px)));
@@ -139,6 +147,20 @@ export function DiagramPanel({ src, title }: { src: string; title: string }) {
     handle.addEventListener("pointermove", onMove);
     handle.addEventListener("pointerup", onUp);
     handle.addEventListener("pointercancel", onUp);
+  }, []);
+
+  // Tap-versus-pan. One source for both places that must tell them apart: the
+  // backdrop (a pan must not close) and the image (a pan must not toggle).
+  const pressRef = useRef<{ x: number; y: number } | null>(null);
+  const onPress = useCallback((e: React.PointerEvent) => {
+    pressRef.current = { x: e.clientX, y: e.clientY };
+  }, []);
+  const wasTap = useCallback((e: React.MouseEvent) => {
+    const p = pressRef.current;
+    pressRef.current = null;
+    // No press recorded (keyboard-activated click) counts as a tap.
+    if (!p) return true;
+    return Math.hypot(e.clientX - p.x, e.clientY - p.y) <= TAP_SLOP_PX;
   }, []);
 
   // In "lesbar" the diagram is wider than the screen, and the interesting part
@@ -271,8 +293,15 @@ export function DiagramPanel({ src, title }: { src: string; title: string }) {
           aria-modal="true"
           aria-label={`${title} — Diagramm, Vollbild`}
           tabIndex={-1}
+          onPointerDown={onPress}
           onClick={(e) => {
-            if (isWide || e.target === e.currentTarget) setOpen(false);
+            if (isWide) {
+              setOpen(false);
+              return;
+            }
+            // Narrow: only the backdrop closes, and only on a tap. The wrapper
+            // counts as backdrop — see its comment.
+            if (e.target === e.currentTarget && wasTap(e)) setOpen(false);
           }}
           className={`fixed inset-0 z-50 overflow-auto bg-black/85 outline-none ${
             isWide ? "cursor-zoom-out" : ""
@@ -282,8 +311,25 @@ export function DiagramPanel({ src, title }: { src: string; title: string }) {
               a plain centred flex child gets clipped at the top and left once
               it outgrows the container, and the clipped part cannot be
               scrolled to. Sized to the content instead, centring only kicks in
-              while the image still fits. */}
-          <div className="flex h-fit min-h-full w-fit min-w-full items-center justify-center p-4">
+              while the image still fits.
+
+              That sizing is also why this element has to close the view itself.
+              It covers the dialog completely, so `target === dialog` is never
+              true for a real tap — the backdrop handler above alone would leave
+              the ✕ as the only way out, which is exactly the bug this fixes.
+
+              py-14 on narrow so there is a strip worth aiming at above and
+              below the picture, rather than the 16px p-4 left. */}
+          <div
+            onClick={(e) => {
+              if (!isWide && e.target === e.currentTarget && wasTap(e)) {
+                setOpen(false);
+              }
+            }}
+            className={`flex h-fit min-h-full w-fit min-w-full items-center justify-center ${
+              isWide ? "p-4" : "px-4 py-14"
+            }`}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={src}
@@ -293,8 +339,10 @@ export function DiagramPanel({ src, title }: { src: string; title: string }) {
                 isWide
                   ? undefined
                   : (e) => {
+                      // Always stop propagation, tap or pan: the picture is
+                      // never the backdrop. Only a tap toggles.
                       e.stopPropagation();
-                      toggleZoom();
+                      if (wasTap(e)) toggleZoom();
                     }
               }
               style={zoom === "read" ? { width: READ_WIDTH } : undefined}
