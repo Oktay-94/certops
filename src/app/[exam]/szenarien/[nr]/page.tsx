@@ -152,7 +152,12 @@ export default async function SzenarioDetailPage({
             Diagramm" on purpose: many cards number their prose steps too, and
             those numbers do NOT line up with the badges (see
             docs/diagramm-nummern-kollision.md). Saying which set these digits
-            belong to is the cheap half of that problem. */}
+            belong to is the cheap half of that problem.
+
+            On a phone this list is not a footnote to the picture — it is the
+            readable path through the architecture, because the picture there
+            is 358px wide for a 1600px canvas. Hence the second line, which
+            only appears on narrow viewports where that is actually true. */}
         {legend && legend.steps.length > 0 && (
           <section
             aria-labelledby="diagramm-legende"
@@ -164,10 +169,26 @@ export default async function SzenarioDetailPage({
             >
               Legende zum Diagramm
             </h2>
+            {/* min-[900px] and not `lg`: 900 is DRAG_MIN_VIEWPORT in
+                DiagramPanel. Tailwind's lg is 1024, which would leave a
+                124px band claiming the picture is unreadable while the
+                fullscreen there is still the fit view. One threshold. */}
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft min-[900px]:hidden">
+              Der Weg durch die Architektur, Schritt für Schritt. Die Ziffern
+              sind dieselben wie im Bild — tippe das Diagramm an, um sie
+              vergrößert zu sehen.
+            </p>
+            {/* The badge mirrors the one drawn into the SVG
+                (tools/diagramkit/certops_diagram/canvas.py:203) — white fill,
+                dark ring, dark bold digit. It used to be an accent-filled
+                circle with a white digit, i.e. the exact inverse, which held up
+                only while this list sat under a picture you could actually
+                read. Once the list carries the diagram on its own, the two
+                numbers have to look like the same number. */}
             <ol className="mt-3 space-y-1.5">
               {legend.steps.map((s) => (
                 <li key={s.n} className="flex gap-2.5 text-[14px] leading-relaxed text-ink">
-                  <span className="mt-[3px] inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] text-[10.5px] font-semibold text-white">
+                  <span className="mt-[3px] inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#232F3E] bg-white text-[10.5px] font-bold text-[#232F3E]">
                     {s.n}
                   </span>
                   <span>{s.text}</span>

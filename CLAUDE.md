@@ -80,6 +80,9 @@ Ein weiteres Band schlägt auf diesen beiden fälschlich an.
 
 ## Bekannte Schuld (dokumentiert, niedrig-Prio)
 - SAA-Skripte ohne TTS (bewusst verschoben). Nachrüst-Skizze: `resolveSegmentMarkdown` um einen DB-Zweig für SAA-Slugs erweitern (Abuse-Guard bleibt „nur geseedeter Content erreichbar"), Cache-Pfad `tts/saa/{slug}/{section}-{hash}.mp3`, content-addressed Hash unverändert.
+- **Diagramm-Ink `#232F3E` an zwei Stellen** (`theme.py` als `T.INK`, hartkodiert
+  im Legenden-Badge in `szenarien/[nr]/page.tsx`). Es fehlt eine gemeinsame
+  Farbquelle für Diagramm-Farben in TS — siehe `docs/diagramm-farbquelle-fehlt.md`.
 - `source_ref`-Upsert statt TRUNCATE+INSERT (Stats-Reset bei Reseed).
 - Dashboard-Karteikarten-Untertitel „Compute & Storage" veraltet.
 - **Zurück-zum-Dashboard-Knopf existiert in drei Varianten**, keine gemeinsame
