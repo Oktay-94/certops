@@ -54,16 +54,16 @@ offiziellen AWS-Architektur-Icons statt handgezeichneter Kästen.
 ```mermaid
 flowchart TB
   subgraph APP["Next.js App Router"]
-    R["/exam/[...] Pruefungs- und Lernstrecke"]
+    R["/exam/[...] Prüfungs- und Lernstrecke"]
     API["API-Routen"]
     SA["Server Actions"]
   end
 
   subgraph LIB["src/lib — Fachlogik"]
     EX["exam-status, exam-path<br/>Fortschritt je Profil"]
-    SC["scenario-content<br/>Karten laden und pruefen"]
+    SC["scenario-content<br/>Karten laden und prüfen"]
     MD["inline-markup, markdown-marks<br/>eigener Renderer"]
-    DOM["domains, aws-services<br/>172 Dienste, Domaenenfarben"]
+    DOM["domains, aws-services<br/>172 Dienste, Domänenfarben"]
   end
 
   subgraph DB["src/db — Drizzle ORM"]
@@ -79,7 +79,7 @@ flowchart TB
   APP --> LIB --> DB
   DB --> LOCAL
   DB --> TURSO
-  PG -.schuetzt.-> TURSO
+  PG -.schützt.-> TURSO
 ```
 
 Ein Schema, zwei Ziele: In der Entwicklung läuft eine lokale SQLite-Datei, im
