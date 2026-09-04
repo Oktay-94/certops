@@ -10,6 +10,14 @@ ab. Die AWS-Prüfungen fragen aber Entscheidungen unter Randbedingungen — welc
 Dienst bei welcher Anforderung, und warum nicht der naheliegende. Dafür braucht
 es Szenarien statt Vokabeln.
 
+**Live:** [certops-omega.vercel.app](https://certops-omega.vercel.app)
+
+![Dashboard](docs/screenshots/01-dashboard-clf.png)
+
+| Bereiche | Szenario-Karten | Karte im Detail |
+|---|---|---|
+| ![Bereiche](docs/screenshots/02-bereiche-saa.png) | ![Karten](docs/screenshots/03-battle-cards.png) | ![Detail](docs/screenshots/04-battle-card-detail.png) |
+
 ## Funktionen
 
 - **Karteikarten** mit strukturierter Rückseite: nicht nur die Antwort, sondern
